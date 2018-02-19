@@ -1,0 +1,22 @@
+CREATE PROCEDURE QueryDettaglioSpese 
+(
+	@persona varchar(20),
+	@startstring varchar(10),
+        @endstring varchar(10)
+) AS
+
+DECLARE @startdate DATETIME
+DECLARE @enddate DATETIME
+
+IF @persona = ''
+SELECT @persona = 'Expenses.Persons_id'
+
+SELECT @startdate =CONVERT(datetime, @startstring,110 )
+SELECT @enddate =CONVERT(datetime, @endstring,110  )
+
+
+SELECT Expenses.CreditCardPayed, Expenses.Date, ExpenseType.ExpenseCode, ExpenseType.Name, Expenses.Amount, ExpenseType.UnitOfMeasure, Round(Expenses.Amount*ExpenseType.ConversionRate,2) AS Espr1, Expenses.Comment
+FROM (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) INNER JOIN Projects ON Expenses.Projects_Id = Projects.Projects_Id
+WHERE (((Expenses.Date)>=@startdate And (Expenses.Date)<=@enddate) AND ((Expenses.Persons_id)=@persona))
+ORDER BY Expenses.CreditCardPayed, Expenses.Date;
+

@@ -1,0 +1,218 @@
+<%@ Page Language="VB" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- Jquery   -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.css" />
+<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
+<script src="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+
+<script runat="server">
+
+    Dim strKeyName      ' name of the key field od the table
+    Dim bolRecordFound
+    Dim aRecord
+    Dim objRs
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        '	    Authorization level 3 needed for this function
+        Auth.CheckPermission("CONFIG", "TABLE");
+
+
+        '--- delete record
+        If Request.QueryString("action") = "delete" Then
+
+            Database.OpenConnection()
+
+            ' get the name of the key field
+            objRs = Database.GetReader(Session("TableName"), Me)
+
+            strKeyName = objRs(0).name
+
+            objRs = Database.GetReader("SELECT * FROM " & Session("TableName") & " where " & strKeyName & "=" & FormatStringDb(Request("Id")), Me)
+            objRs.delete
+
+            '--- Clear open connections	
+            Database.CloseConnection()
+            Response.Redirect("lookup_list.asp?TableName=" & Session("TableName"))
+
+        End If
+
+        '--- Initialize values
+        If Request("init") = "true" Then
+
+            Session("TableName") = ""   ' name of the checktable
+            Session("FieldNumber") = "" ' number of fields to be dispalyed on the list
+            Session("SortField") = ""       ' Field by which the list is sorted
+            Session("CheckTable") = ""  ' if used name of the cross reference table (e.g. for author<->book)
+
+            If Request("TableName") <> "" Then Session("TableName") = Request("TableName")
+            If Request("CheckTable") <> "" Then Session("CheckTable") = Request("CheckTable")
+
+            If Request("SortField") <> "" Then Session("SortField") = Request("SortField")
+            If Request("FieldNumber") <> "" Then Session("FieldNumber") = Request("FieldNumber")
+
+        End If
+
+        '--- Get the records
+        Dim aRecord         ' contains the records
+
+        Database.OpenConnection()
+
+        If Session("SortField") = "" Then
+            objRs = Database.GetReader("SELECT * FROM " & Session("TableName"), Me)
+        Else
+            objRs = Database.GetReader("SELECT * FROM " & Session("TableName") & " ORDER BY " & Session("SortField"), Me)
+        End If
+
+        bolRecordFound = False
+
+        If objRS.EOF <> True Then
+            aRecord = objRS.getrows ' fetch the record into the array
+            bolRecordFound = True
+        End If
+
+        strKeyName = objRs(0).name
+
+        Database.CloseConnection()
+
+    End Sub
+
+    Protected Sub DeleteIcon(intIndex)
+
+        Dim objRs1
+        Dim aCheckTable, i
+        Dim bolFound
+
+        If Session("CheckTable") = "" Then
+            Response.Write("<a href=lookup_list.asp?action=delete&id=" & intIndex & "><img src=images/icons/16x16/trash.gif width=16 height=16 border=0></a>")
+            Return        ' no check table has been defined
+        End If
+
+        aCheckTable = Split(Session("CheckTable"), "_")
+
+        bolFound = False
+        Database.OpenConnection()
+
+        For i = 0 To UBound(aCheckTable, 1)
+            ' search the key field in the checktable	
+            objRs1 = Database.GetReader("SELECT " & strKeyName & " FROM " & aCheckTable(i) & " WHERE " & strKeyName & "='" & intIndex & "'", Me)
+
+            If objRs1.EOF = False Then ' if a record has be found the lookup entry cannot be deleted
+                bolFound = True
+                Exit For
+            End If
+        Next
+
+        If Not bolFound Then ' if no record has be found the lookup entry can be deleted
+            Response.Write("<a href=lookup_list.asp?action=delete&id=" & intIndex & "><img src=images/icons/16x16/trash.gif width=16 height=16 border=0></a>")
+        Else
+            Response.Write("<img src=images/transparent.gif width=16 height=16 border=0>")
+        End If
+
+    End Sub
+
+</script>
+
+<html>
+
+<head>
+
+    <title>Gestione Parametri</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+
+    <div id="TopStripe"></div>
+    
+    <div id="MainWindow">
+
+    <div id="FormWrap"> 
+	
+<form name="form1" method="get" action="lookup_detail.asp" class="StandardForm">
+
+        <!-- *** TITOLO FORM ***  --> 
+        <div class="formtitle">Edit Tabella</div> 
+
+        <table class="TabellaLista">
+<%
+    if bolRecordFound Then ' at least one record exists	
+
+        Dim intCounter
+        intCounter = 0
+
+        While ( intCounter <= Ubound(aRecord, 2) )
+
+            if ( ( intCounter mod 2 ) = 0 ) Then
+                response.Write("<tr class=GV_row>")
+            else
+                response.Write("<tr class=GV_row_alt>")
+            End if
+
+            For i = 1 to session("FieldNumber")
+%>	
+      <td>      	
+<%
+    ' if the record is a counter get the description from the associated lookup table
+    If instr( Ucase(objRS(i).name) , "_ID") <> 0 Then
+        'response.write(  GetDescription( objRS(i).name, aRecord(i, intCounter) ) )
+        Response.Write(aRecord(i, intCounter))
+    Else
+        response.write( aRecord(i, intCounter) )
+    End If
+%>      	     	
+      	</td>
+<%
+			Next
+%>      
+      <td nowrap width="10%"> <div align="center"><a href="lookup_detail.asp?action=update&Id=<%=aRecord(0, intCounter)%>"> 
+          <img src="images/icons/16x16/modifica.gif" width="16" height="16" border="0"></a>&nbsp;&nbsp; 
+<% 
+			call DeleteIcon( aRecord(0, intCounter) ) 
+%>
+        </div></td>
+    </tr>
+<% 
+	 		IntCounter = IntCounter + 1  		
+		Wend
+
+	End If 'if NOT objRS.EOF Then ' at least one record exists
+	
+%>
+  </table>
+                <div class="buttons"> 
+                    <input type="submit" name="insert" value=<%= CREATE_TXT %> class="orangebutton">
+                    <input name="cancel_from_list" type="submit" class="greybutton" value=<%= CANCEL_TXT %>>
+                </div>
+</form>
+
+<%
+		Destroy(objRS)	
+		Destroy(objConn)
+%>	
+
+    </div>  <!-- END FormWrap-->
+
+    </div> <!-- END MainWindow -->
+
+    <!-- **** FOOTER **** -->  
+    <div id="WindowFooter">       
+        <div ></div>        
+        <div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div> 
+        <div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
+        <div id="WindowFooter-R">Utente: <%= Session("UserName")  %></div>        
+     </div>
+
+
+</body>
+
+</html>
+

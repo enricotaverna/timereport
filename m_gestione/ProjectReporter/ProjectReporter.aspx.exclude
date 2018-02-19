@@ -1,0 +1,155 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ProjectReporter.aspx.cs" Inherits="m_gestione_ProjectReporter_ProjectReporter" %>
+
+<!DOCTYPE html>
+<!-- Stili -->
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+
+<%--SUMO select--%>
+<link href="../../include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
+
+<!-- Menù  -->
+<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
+<!-- Jquery   -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
+<%--<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>--%>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- SUMO select - Dropdown list multiple   -->
+<script src="../../include/jquery/sumoselect/jquery.sumoselect.js"></script> 
+
+<!-- Attiva finestra per messaggio di conferma slvataggio   -->
+<script>
+
+    // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
+    function ShowPopup(message) {
+        $(function () {
+            $("#dialog").html(message);
+            $("#dialog").dialog({
+                title: "Messaggio",
+                buttons: {
+                    Close: function () {
+                        $(this).dialog('close');
+                    }
+                },
+                modal: true 
+            });
+        });
+    };
+
+
+    // JQUERY
+         $(function () {
+
+             // crea le label per il raggruppamento degli elementi della ListBox
+             setupOptGroups($("#DDLprogetto"));
+
+             // attiva chosen
+             $('.SUMO-select').SumoSelect();
+
+         });
+
+         // abilita il raggruppamento nel ListBox generato
+         function setupOptGroups(select) {
+             var optGroups = new Array();
+             var i = 0;
+
+             $(select).find("[optgroup]").each(function (index, domEle) {
+                 var optGroup = $(this).attr("optgroup");
+                 if ($.inArray(optGroup, optGroups) == -1) optGroups[i++] = optGroup;
+             });
+
+             for (i = 0; i < optGroups.length; i++) {
+                 $("option[optgroup='" + optGroups[i] + "']").wrapAll("<optgroup label='" + optGroups[i] + "'>");
+             }
+         }
+
+         </script>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+    <title>Utenti Reporter </title>
+</head>
+
+<body>
+
+    <div id="TopStripe"></div>
+
+    <div id="MainWindow">
+
+        <div id="FormWrap" >
+
+            <form id="FVProjectReporter" runat="server" class="StandardForm">
+
+                <div class="formtitle">Utenti reporter</div>
+                <br />
+                <!-- *** DDL Progetto ***  -->
+                <div class="SUMOselect"> 
+    
+                        <asp:Label  class="inputtext" runat="server" Text="Progetto"></asp:Label>
+                        
+                        <asp:dropdownlist ID="DDLprogetto" runat="server" AppendDataBoundItems="True"   
+                            AutoPostBack="True" DataTextField="PrjDesc" DataValueField="PrjId" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged"  Height="26px" Width="240px">
+                            <asp:ListItem Value="" Text="Selezionare un progetto" />
+                        </asp:dropdownlist>
+
+                       <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server"
+                       ControlToValidate="DDLprogetto" Display="None"
+                       ErrorMessage="Specificare un codice progetto" InitialValue="0"></asp:RequiredFieldValidator>
+                
+                </div> 
+
+                <!-- *** DDL Persone ***  -->
+                <div class="SUMOselect" >
+                    
+                    <asp:Label  class="inputtext" runat="server" Text="Elenco reporter"></asp:Label>
+                    
+                    <span style="width:240px; position:absolute;"  >
+                        <asp:ListBox ID="LBProjectReporter"  runat="server" SelectionMode="Multiple" DataTextField="name" DataSourceID="DSProjectReporter"  
+                            DataValueField="persons_id" data-placeholder="Inserisci gli utenti reporter" class="SUMO-select" OnDataBound="LBProjectReporter_DataBound"></asp:ListBox>
+                    </span>
+                
+                </div>
+
+                <!-- *** spazio bianco nel form ***  -->
+                <p style="margin-bottom: 180px;"></p>
+                . 
+
+                 <!-- *** BOTTONI ***  -->
+                <div class="buttons">
+                    <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClick="InsertButton_Click" />
+                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" />
+                </div>
+
+            </form>
+
+        </div>
+        <%-- END FormWrap  --%>
+    </div>
+    <%-- END MainWindow --%>
+
+    <!-- Per output messaggio conferma salvataggio -->
+    <div id="dialog" style="display: none"></div>
+
+    <!-- **** FOOTER **** -->
+    <div id="WindowFooter">
+        <div></div>
+        <div id="WindowFooter-L">Aeonvis Spa     <%= DateTime.Now.Year %></div>
+        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
+        <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>
+    </div>
+
+</body>
+
+<%--    Dataset Project Reporter   --%>
+<asp:sqldatasource id="DSProjectReporter" runat="server"
+    connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+    selectcommand="">
+</asp:sqldatasource>
+
+</html>

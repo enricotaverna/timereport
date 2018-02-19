@@ -1,0 +1,48 @@
+﻿#CookieMessage
+{
+    display: none;
+}
+        
+.ui-page {
+    background: url("/timereport/images/mobile-background.jpg");
+    background-repeat: repeat;
+        }
+
+#imagePreview {
+    width: 60px;
+    height: 60px;
+    background-position: center center;
+    background-color: white;
+    background-size: cover;
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
+    display: inline-block;
+}
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  float: left;
+  margin-right: 4px;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  transform: translate(-300px, 0) scale(4);
+  font-size: 23px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+label.error { 
+    border: 1px solid;
+    margin: 10px 0px;
+    padding:5px 5px 5px 5px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    color: #D8000C;
+    background-color: #FFBABA;
+    text-shadow: none;
+}

@@ -1,0 +1,78 @@
+CREATE PROCEDURE QueryEsportaSpese
+(
+   @startstring varchar(10),
+   @endstring varchar(10),
+   @nonAeonvis int = NULL,   
+   @persona int = NULL,
+   @progetto int = NULL,
+   @società int = NULL
+) AS
+
+DECLARE @startdate DATETIME
+DECLARE @enddate DATETIME
+
+SELECT @startdate =CONVERT(datetime, @startstring,110 )
+SELECT @enddate =CONVERT(datetime, @endstring,110 )
+
+-- seleziona la società specificata in select option
+IF @nonAeonvis IS NULL
+BEGIN
+	SELECT 
+		Persons.Name, 
+		Company.Name, 
+		Projects.ProjectCode, 
+		Projects.Name, 
+		ProjectType.Name, 
+		ExpenseType.ExpenseCode, 
+		ExpenseType.Name, 
+		Expenses.Date, 
+		Expenses.Amount, 
+		ExpenseType.ConversionRate, 
+		Expenses.Comment, 
+		Expenses.CreditCardPayed
+	
+	FROM Company 
+		INNER JOIN ((((Projects INNER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id) 
+		INNER JOIN Expenses ON Projects.Projects_Id = Expenses.Projects_Id) 
+		INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id) 
+		INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) ON Company.Company_id = Persons.Company_id
+	
+	WHERE (((Expenses.Date)>=@startdate And (Expenses.Date)<=@enddate) AND 
+	       ((Persons.Persons_id)= COALESCE(@persona,Persons.Persons_id)) AND 
+	       ((Expenses.Projects_Id)= COALESCE(@progetto,Expenses.Projects_Id)) AND 
+	       ((Company.Company_id)= COALESCE(@società,Company.Company_id))
+	      )
+ORDER BY Persons.Name, 
+				 Expenses.Date
+END
+-- seleziona tutte le società terze
+ELSE
+BEGIN
+	SELECT 
+		Persons.Name, 
+		Company.Name, 
+		Projects.ProjectCode, 
+		Projects.Name, 
+		ProjectType.Name, 
+		ExpenseType.ExpenseCode, 
+		ExpenseType.Name, 
+		Expenses.Date, 
+		Expenses.Amount, 
+		ExpenseType.ConversionRate, 
+		Expenses.Comment, 
+		Expenses.CreditCardPayed
+	
+	FROM Company 
+		INNER JOIN ((((Projects INNER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id) 
+		INNER JOIN Expenses ON Projects.Projects_Id = Expenses.Projects_Id) 
+		INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id) 
+		INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) ON Company.Company_id = Persons.Company_id
+	
+	WHERE (((Expenses.Date)>=@startdate And (Expenses.Date)<=@enddate) AND 
+	       ((Persons.Persons_id)= COALESCE(@persona,Persons.Persons_id)) AND 
+	       ((Expenses.Projects_Id)= COALESCE(@progetto,Expenses.Projects_Id)) AND 
+	       ((Company.Company_id)<>1)
+	      )
+ORDER BY Persons.Name, 
+				 Expenses.Date
+END			

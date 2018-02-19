@@ -1,0 +1,43 @@
+﻿USE [MSSql12155]
+GO
+
+/****** Object:  StoredProcedure [SPattivitaTotale]    Script Date: 01/03/2014 22:57:56 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [SPattivitaTotale] 
+   @startdate DateTime,
+   @enddate DateTime,
+   @sprojects_id int,
+   @sphase_id int,
+   @sactivity_id int
+AS
+      
+SELECT		Projects.ProjectCode As 'Codice', Projects.Name AS "Nome Progetto", Phase.PhaseCode as 'Cod.', 
+                      Phase.Name AS 'Nome Fase', Activity.ActivityCode As 'Codice Attività', Activity.Name AS 'Nome Attività', Persons.Name AS Responsabile, Activity.Budget, 
+                      Cast(SUM(Hours.Hours) AS DECIMAL(10,2)) AS Actual, ROUND(COALESCE (SUM(Hours.Hours) * 100 / NULLIF (Activity.Budget, 0), 0), 2)  AS Progress
+FROM         Hours INNER JOIN
+                      Activity ON Hours.Activity_Id = Activity.Activity_Id INNER JOIN
+                      Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN
+                      Persons ON Activity.Responsable_id = Persons.Persons_id INNER JOIN
+                      Phase ON Activity.Phase_id = Phase.Phase_Id
+WHERE     Hours.Activity_Id <> 0 AND
+		  ( Hours.Projects_Id = @sprojects_id OR @sprojects_id = 0 ) AND
+		  ( Hours.Activity_Id = @sactivity_id OR @sactivity_id = 0 )  AND
+		  ( Phase.Phase_Id = @sphase_id OR @sphase_id = 0 ) AND
+		  Hours.Date >= @startdate AND
+		  Hours.Date <= @enddate  		  		
+GROUP BY Activity.ActivityCode, Activity.Budget, Activity.Name, Projects.ProjectCode, Projects.Name, Persons.Name, 
+                      Phase.PhaseCode, Phase.Name, Hours.Projects_Id, Phase.Phase_Id, Hours.Activity_Id
+
+GO
+
+

@@ -1,0 +1,21 @@
+CREATE PROCEDURE QuerySpese01
+(
+   @startstring varchar(10),
+   @endstring varchar(10),
+   @persona int = NULL
+) AS
+
+SELECT Persons.Name, 
+			 Expenses.CreditCardPayed, 
+			 ExpenseType.ExpenseCode, 
+			 ExpenseType.Name, 
+			 Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount
+FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) 
+			 INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id
+
+WHERE (((Expenses.Date)>=@startstring And (Expenses.Date)<=@endstring) AND 
+       ((Persons.Persons_id)= COALESCE(@persona,Persons.Persons_id))
+      )
+      
+GROUP BY Persons.Name, Expenses.CreditCardPayed, ExpenseType.ExpenseCode, ExpenseType.Name
+ORDER BY Persons.Name, Expenses.CreditCardPayed, ExpenseType.ExpenseCode

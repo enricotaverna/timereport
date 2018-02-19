@@ -1,0 +1,109 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="DettaglioOreNonCaricate.aspx.cs" Inherits="report_checkInput_DettaglioOreNonCaricate" %>
+
+<!DOCTYPE html>
+
+<!-- Stili -->
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+
+<!-- Menù  -->
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%=Session["userLevel"]%> type =text/javascript></SCRIPT>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
+<!-- Jquery   -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
+<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<script>
+
+    // JQUERY
+
+    // gestione validation summary su validator custom (richiede timereport.js)//
+    displayAlert();
+
+</script>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+    <title>Dettaglio Ore non caricate </title>
+</head>
+
+<body>
+
+    <div id="TopStripe"></div>
+
+    <div id="MainWindow">
+
+        <div id="FormWrap">
+
+            <form id="NOME_FORM" runat="server" class="StandardForm">
+
+                    <table class="TabellaLista">
+                        <tr>
+                            <th>Mese</th>
+                        </tr>
+                        <tr class="GV_row">
+                            <td><%= Request.QueryString["mese"] %>/<%= Request.QueryString["anno"] %></td>
+                        </tr>
+                    </table>
+
+                    <br />
+
+                    <table class="TabellaLista"  >
+                        <tr>
+                            <th colspan="2">Dettagli persona
+                            </th>
+                        </tr>
+                        <tr class="GV_row">
+                            <td>Nome:</td>                            
+                            <td><asp:Label ID="lblNome" runat="server" Text=""></asp:Label></td>
+                        </tr>
+                        <tr class="GV_row_alt">
+                            <td>Società:</td>                           
+                            <td><asp:Label ID="lblSocieta" runat="server" Text=""></asp:Label></td>
+                        </tr>
+                        <tr class="GV_row">
+                            <td>Indirizzo e-mail:</td>
+                            <td><asp:HyperLink ID="lblMail" runat="server"></asp:HyperLink></td>
+                        </tr>
+                        <tr class="GV_row_alt">
+                            <td>Ore lavorative:</td>
+                            <td><asp:Label ID="lblOre" runat="server" Text=""></asp:Label></td>
+                        </tr>
+                    </table>
+
+                <br />
+
+                <!-- *** GRID ***  -->
+                <asp:GridView ID="GVDettaglioOre" runat="server" CssClass="GridView" GridLines="None">
+                    <HeaderStyle CssClass="GV_header" />
+                    <FooterStyle CssClass="GV_footer" />
+                    <RowStyle CssClass="GV_row" />
+                    <AlternatingRowStyle CssClass="GV_row_alt" />
+                </asp:GridView>
+
+                <!-- *** BOTTONI ***  -->
+                <div class="buttons">
+                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" OnClientClick="JavaScript:window.history.back(1);return false;" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
+                </div>
+
+            </form>
+
+        </div>
+        <%-- END FormWrap  --%>
+    </div>
+    <%-- END MainWindow --%>
+
+    <!-- **** FOOTER **** -->
+    <div id="WindowFooter">
+        <div></div>
+        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
+        <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>
+    </div>
+
+</body>
+</html>
