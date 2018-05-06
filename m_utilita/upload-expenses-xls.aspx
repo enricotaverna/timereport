@@ -33,14 +33,15 @@
         ' Risorsa (0); Data (1);Progetto (2); Tipo Spesa (3);Valore (4);Pagato (5);Storno (6); Note (7)
 
         '       Const RISORSA = 0 ' codice esistente
-        Const DATA = 0 ' formato campo, data oltre cutt-off
-        Const PROGETTO = 1 ' codice ammesso
-        Const TIPOSPESA = 2 ' codice ammesso
-        Const VALORE = 3 ' valore numerico > 0
-        Const PAGATO = 4 ' o X o blank
-        Const STORNO = 5 ' o X o blank
-        Const FATTURA = 6 ' o X o blank
-        Const NOTA = 7
+        Dim DATA = 0 ' formato campo, data oltre cutt-off
+        Dim PROGETTO = 1 ' codice ammesso
+        Dim TIPOSPESA = 2 ' codice ammesso
+        Dim VALORE = 3 ' valore numerico > 0
+        Dim CCREDITO = 4 ' o X o blank
+        Dim PAGATO = 5 ' o X o blank
+        Dim STORNO = 6 ' o X o blank
+        Dim FATTURA = 7 ' o X o blank
+        Dim NOTA = 8
 
         Dim c = New ValidationClass
 
@@ -52,11 +53,11 @@
                 conStr = ConfigurationManager.ConnectionStrings("Excel03ConString") _
                            .ConnectionString
                 Exit Select
-                'Case ".xlsx"
-                '    'Excel 07
-                '    conStr = ConfigurationManager.ConnectionStrings("Excel07ConString") _
-                '              .ConnectionString
-                '    Exit Select
+            Case ".xlsx"
+                'Excel 07
+                conStr = ConfigurationManager.ConnectionStrings("Excel07ConString") _
+                              .ConnectionString
+                Exit Select
             Case Else
                 messaggio.Text = GetLocalResourceObject("msgErrore").ToString
                 Return
@@ -125,24 +126,32 @@
             End If
 
             ' valori flag                               
-            If dr(PAGATO).ToString <> "" And _
-               dr(PAGATO).ToString <> "X" And dr(PAGATO).ToString <> "x" Then
+            If dr(CCREDITO).ToString.Trim <> "" And
+               dr(CCREDITO).ToString <> "X" And dr(CCREDITO).ToString <> "x" Then
+                messaggio.Text = messaggio.Text & Chr(13) &
+                                "Row " & i & GetLocalResourceObject("msg16").ToString ' ": valore flag 'Carta di Credito' non riconosciuto"
+                Continue For
+            End If
+
+            ' valori flag                               
+            If dr(PAGATO).ToString.Trim <> "" And
+        dr(PAGATO).ToString <> "X" And dr(PAGATO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg4").ToString ' ": valore flag 'PAGATO con cc' non riconosciuto"
                 Continue For
             End If
 
             ' valori flag                               
-            If dr(STORNO).ToString <> "" And _
-               dr(STORNO).ToString <> "X" And dr(STORNO).ToString <> "x" Then
+            If dr(STORNO).ToString <> "" And
+        dr(STORNO).ToString <> "X" And dr(STORNO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg5").ToString ' ": valore flag 'STORNO' non riconosciuto"
                 Continue For
             End If
 
             ' valori flag                               
-            If dr(FATTURA).ToString <> "" And _
-               dr(FATTURA).ToString <> "X" And dr(FATTURA).ToString <> "x" Then
+            If dr(FATTURA).ToString.Trim <> "" And
+           dr(FATTURA).ToString <> "X" And dr(FATTURA).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg6").ToString ' ": valore flag 'FATTURA' non riconosciuto"
                 Continue For

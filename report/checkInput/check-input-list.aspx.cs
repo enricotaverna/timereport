@@ -76,6 +76,9 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
                   " FROM ( Persons INNER JOIN Company ON Persons.Company_id = Company.Company_id ) " +  
                   sWhere;
 
+        Response.Write(sSelect);
+        Response.End();
+
         // Esegue Select sulle persone attive
         Database.OpenConnection();
 

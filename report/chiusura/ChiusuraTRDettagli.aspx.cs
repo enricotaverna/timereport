@@ -29,6 +29,13 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
                                                        Session["persons_id"].ToString(),
                                                        ref ListaAnomalie);
 
+        if (Request.QueryString["type"] == "02") // check spese
+            CheckChiusura.CheckSpese(Session["Month"].ToString(),
+                                                       Session["Year"].ToString(),
+                                                       Session["persons_id"].ToString(),
+                                                       ref ListaAnomalie);
+
+
         foreach (CheckChiusura.CheckAnomalia curr in ListaAnomalie)
         {
             DataRow dr = dt.NewRow();

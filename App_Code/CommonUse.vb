@@ -623,6 +623,51 @@ Public Class CheckChiusura
 
     End Function
 
+    Public Shared Function CheckSpese(sMese As String, ByVal sAnno As String, ByVal persons_id As String, ByRef ListaAnomalie As List(Of CheckAnomalia)) As Int16
+        ' Funzione ritorna
+        ' 0 = nessun problema
+        ' 1 = warning
+        ' 2 = errore
+        ' La lista di oggetti contiene le anomalie secondo la struttura della class CheckAnomalia        
+
+        ListaAnomalie.Clear()
+
+        Dim dFirst As String = ASPcompatility.FormatDateDb("01/" + sMese + "/" + sAnno)
+        Dim dLast As String = ASPcompatility.FormatDateDb(Date.DaysInMonth(sAnno, sMese).ToString + "/" + sMese + "/" + sAnno)
+
+        ' seleziona tutte le spese del mese
+        Dim dt As DataTable = Database.GetData("SELECT Projects_id, date FROM Expenses WHERE Persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, Nothing)
+        Dim rs As DataRow
+
+        If (dt IsNot Nothing) And dt.Rows.Count > 0 Then
+
+            ' cicla sulla spese del mese
+            For Each rs In dt.Rows
+
+                Dim sdata As String = ASPcompatility.FormatDateDb(String.Format("{0:dd/MM/yyyy}", rs("date")))
+
+                ' verifica se esistono ore caricate per lo stesso progetto
+                If Not Database.RecordEsiste("SELECT * FROM hours WHERE date=" + sdata + " AND Projects_id=" + rs("Projects_id").ToString) Then
+                    Dim a As CheckAnomalia = New CheckAnomalia()
+                    a.Data = rs("date")
+                    a.Tipo = "M"
+                    a.Descrizione = "Spesa caricata su commessa non presente nel giorno"
+                    ListaAnomalie.Add(a)
+                End If
+
+
+            Next
+
+        End If
+
+        If ListaAnomalie.Count > 0 Then
+            CheckSpese = 1
+        Else
+            CheckSpese = 0
+        End If
+
+    End Function
+
 End Class
 
 Public Class Database
@@ -900,18 +945,14 @@ Public Class ASPcompatility
         aMonth = Month(DateToConvert)
         aYear = Year(DateToConvert)
 
-        '        If ConfigurationSettings.AppSettings("DATASOURCE") <> "CASA-PC\SQLEXPRESS" Then
-        Dim server As String = ConfigurationSettings.AppSettings("DATASOURCE")
+        Dim server As String = ConfigurationSettings.AppSettings("FORMATODATA")
 
         Select Case server
 
-            Case "STAN\SQLEXPRESS"
+            Case "US"
                 FormatDateDb = "'" & aMonth & "-" & aDay & "-" & aYear
 
-            Case "62.149.153.12"
-                FormatDateDb = "'" & aMonth & "-" & aDay & "-" & aYear
-
-            Case "DESKTOP-4MLA928\SQLEXPRESS"
+            Case "IT"
                 FormatDateDb = "'" & aDay & "-" & aMonth & "-" & aYear
 
         End Select

@@ -54,10 +54,36 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
 
 	        } // ** Fine Check **
 
+        // ********* Check Spese ************* 
+        int bCheckResult = CheckChiusura.CheckSpese(Session["Month"].ToString(),
+                                                     Session["Year"].ToString(),
+                                                     Session["persons_id"].ToString(),
+                                                     ref ListaAnomalie);
+
+        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : "Spesa caricata su commessa non presente nella giornata";
+        CheckSpeseImg.ImageUrl = bCheckResult == 0 ? "/timereport/images/icons/50x50/icon-ok.png" : "/timereport/images/icons/50x50/icon-alert.png";
+
+        if (bCheckResult != 0) {
+            CheckSpeseDettagli.NavigateUrl = "/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=02";
+            CheckSpeseDettagli.Text = "[dettagli]";
+            }
+
         // imposta indirizzo stampa ricevute
         btStampaRicevute.OnClientClick = "window.open('/timereport/report/ricevute/ricevute_list.aspx?mese=" + Session["Month"] + "&anno=" + Session["Year"] + "')";
 
     } // Page_Load()      
+
+
+    protected bool ControllaSpese(int persons_id, int month, int year)
+    {
+
+        // loop su tutte le spese del mese, se trovo spese senza che nel giorno sia caricato il progetto 
+        // emetto un warning
+
+
+
+        return true;
+    }
 
         protected void InsertButton_Click(object sender, EventArgs e)
     {

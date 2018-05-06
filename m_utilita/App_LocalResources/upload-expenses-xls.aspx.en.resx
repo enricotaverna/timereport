@@ -228,4 +228,7 @@
   <data name="Titolo" xml:space="preserve">
     <value>Import Expenses</value>
   </data>
+  <data name="msg16" xml:space="preserve">
+    <value>: flag 'Payed by company" not correct</value>
+  </data>
 </root>

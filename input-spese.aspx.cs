@@ -13,7 +13,7 @@ using System.Threading;
 
 public partial class input_spese : System.Web.UI.Page
 {
-	// attivata MARS 
+	// attivata MARS .
 	private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
 	public string lProject_id, lExpenseType_id;
@@ -433,7 +433,8 @@ public partial class input_spese : System.Web.UI.Page
 
 			if (LBAccountingDateDisplay != null)
 				LBAccountingDateDisplay.Visible = false;
-		}   
+		}
+
 	}
 
 	protected void DDLTipoSpesa_SelectedIndexChanged(object sender, EventArgs e)
@@ -560,4 +561,20 @@ public partial class input_spese : System.Web.UI.Page
 		// Imposta la lingua della pagina
 		Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
 	}
+
+	protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
+	{
+
+        Label LBdate = (Label)FVSpese.FindControl("LBdate");
+
+        DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
+
+        if ( !Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page) )
+            // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
+            if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno non esistono progetti caricati');", true);
+            else
+                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno sono caricati altri progetti');", true);
+          
+    }
 }

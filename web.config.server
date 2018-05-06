@@ -3,12 +3,14 @@
   <connectionStrings>   
     <!--<add name="MSSql12155ConnectionString" connectionString="Data Source=62.149.153.12;Initial Catalog=MSSql12155;Persist Security Info=True;User ID=MSSql12155;Password=50a715f9;MultipleActiveResultSets=True" providerName="System.Data.SqlClient"/>-->
     <add name="MSSql12155ConnectionString" connectionString="Data Source=STAN\SQLEXPRESS;Initial Catalog=MSSql12155;Persist Security Info=True;MultipleActiveResultSets=True;User ID=MSSql12155;Password=50a715f9" providerName="System.Data.SqlClient"/> 
-    <!--<add name="MSSql12155ConnectionString" connectionString="Data Source=DESKTOP-4MLA928\SQLEXPRESS;Initial Catalog=MSSql12155;Persist Security Info=True;MultipleActiveResultSets=True;User ID=MSSql12155;Password=50a715f9" providerName="System.Data.SqlClient"/>-->
+    <!--<add name="MSSql12155ConnectionString" connectionString="Data Source=DESKTOP-4MLA928\SQLEXPRESS;Initial Catalog=MSSql12155;Persist Security Info=True;MultipleActiveResultSets=True;User ID=MSSql12155;Password=50a715f9" providerName="System.Data.SqlClient"/> -->
+    <add name="MSSql12155ConnectionString" connectionString="Data Source=95.110.230.190;Initial Catalog=MSSql12155;Persist Security Info=True;User ID=MSSql12155;Password=50a715f9;MultipleActiveResultSets=True" providerName="System.Data.SqlClient" />
+
     <add name="Excel03ConString" connectionString="Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Extended Properties='Excel 8.0;HDR={1}'"/>
     <add name="Excel07ConString" connectionString="Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 8.0;HDR={1}'"/>
   </connectionStrings>
   <system.web>
-    <globalization uiCulture="it" culture="it-IT"/>
+    <!--<globalization uiCulture="it" culture="it-IT"/>  IMPOSTATO DA APPLICAZIONE IN BASE ALL'UTENTE  -->
     <xhtmlConformance mode="Transitional"/>
     <customErrors mode="Off"/>
     <compilation debug="true" targetFramework="4.0">
@@ -25,16 +27,17 @@
         <add directoryName="CodiceCSharp"/>
       </codeSubDirectories>-->
     </compilation>
-    <httpHandlers>
+    <!--<httpHandlers>
       <add path="Reserved.ReportViewerWebControl.axd" verb="*" type="Microsoft.Reporting.WebForms.HttpHandler, Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" validate="false"/>
-    </httpHandlers>
+    </httpHandlers> -->
     <pages controlRenderingCompatibilityVersion="3.5" clientIDMode="AutoID"/>
+    <httpRuntime requestValidationMode="2.0" />
   </system.web>
   <appSettings>
     <!-- Costanti applicative -->
     <!--  Error Messages -->
     <add key="MSGNO_AUTHORIZATION_FAILED" value="300"/>
-    <add key="DATASOURCE" value="STAN\SQLEXPRESS"/>
+    <add key="FORMATODATA" value="US"/>
     <!--<add key="DATASOURCE" value="CASA-PC\SQLEXPRESS"/> -->
     <!--<add key="DATASOURCE" value="62.149.153.12"/>-->
     <add key="AUTH_ADMIN" value="4"/>
@@ -66,6 +69,8 @@
     <add key="CONTRATTO_FIXED" value="2"/>
     <!-- PAGE SIZE -->
     <add key="GRID_PAGE_SIZE" value="25"/>
+    <!-- TIPO PROGETTO PER ESTRAZIONE REPORT ORE E SPESE  -->
+    <add key="PROGETTO_CHARGEABLE" value="1"/>
   </appSettings>
   <system.serviceModel>
     <behaviors>
@@ -84,8 +89,8 @@
   </system.serviceModel>
   <system.webServer>
     <validation validateIntegratedModeConfiguration="false"/>
-    <handlers>
+  <!--  <handlers>
       <add name="ReportViewerWebControlHandler" preCondition="integratedMode" verb="*" path="Reserved.ReportViewerWebControl.axd" type="Microsoft.Reporting.WebForms.HttpHandler, Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"/>
-    </handlers>
+    </handlers> -->
   </system.webServer>
 </configuration>

@@ -66,6 +66,7 @@
         </div>
 
         <br />
+
         <!-- *** SPESE ***  -->
         <div class="input nobottomborder">
             <asp:Image ID="CheckSpeseImg" runat="server" ImageAlign="Middle" meta:resourcekey="CheckSpeseImgResource1"  />
