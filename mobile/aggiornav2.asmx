@@ -31,7 +31,7 @@ public class Spese
 
 public class TipoOre
 {
-    public int TipoOreId { get; set; }
+    public int TipoOreId { get; set; }  
     public string TipoOreName { get; set; }
 }
 
@@ -193,7 +193,7 @@ public class aggiorna : System.Web.Services.WebService
     public List<Projects> GetProjectsList(int Person_id)
     {
         var ReturnList = new List<Projects>();
-        DataTable dt = Database.GetData("SELECT ForcedAccounts.Projects_Id, ProjectCode, ([ProjectCode] + ' ' + [Name]) as PrgNames FROM Projects " +
+        DataTable dt = Database.GetData("SELECT DISTINCT ForcedAccounts.Projects_Id, ProjectCode, ([ProjectCode] + ' ' + [Name]) as PrgNames FROM Projects " +
                                            " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
                                            " WHERE ( ForcedAccounts.Persons_id=" + Person_id.ToString() + " OR Projects.Always_available = 'true')" +
                                            " AND active = 'true' ORDER BY Projects.ProjectCode", null);
