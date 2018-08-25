@@ -455,8 +455,6 @@
 
         </asp:FormView>
     
-        <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
-
     </form>
     
     </div> <%-- END FormWrap  --%> 

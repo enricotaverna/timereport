@@ -17,11 +17,11 @@ const AUTH_ADMIN = 5;
 // Legge livello autorizzazioni da file chiamante
 var sUserLevel = AUTH_EXTERNAL;
 if (document.getElementById("IncludeMenu") != null) {
-    sUserLevel = document.getElementById("IncludeMenu").getAttribute("UserLevel");
-    sLingua = document.getElementById("IncludeMenu").getAttribute("lingua");
+	sUserLevel = document.getElementById("IncludeMenu").getAttribute("UserLevel");
+	sLingua = document.getElementById("IncludeMenu").getAttribute("lingua");
 
-    if (sLingua == null)
-        sLingua = "it";
+	if (sLingua == null)
+		sLingua = "it";
 }
 
 if(navigator.appVersion.indexOf("MSIE 6.0")>0)
@@ -138,52 +138,52 @@ effect,				// Filter - Text variable for setting transitional effects on menu ac
 , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=Utilita", , "", 1
 , (sLingua == 'it') ?  "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=Progetti", , "", 1
 , (sLingua == 'it') ? "Amministrazione&nbsp;&nbsp;" : "Administration&nbsp;&nbsp;", "show-menu=Amministrazione", , "", 1
-,"Logout&nbsp;&nbsp;","/timereport/logout.asp",,"",1
+,"Logout&nbsp;&nbsp;","/timereport/logout.aspx",,"",1
 ])
 
-    // cancella menu progetti (Manager)
+	// cancella menu progetti (Manager)
 if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AUTH_TEAMLEADER)
-        menu.splice(42, 10);
+		menu.splice(42, 10);
 
-    // cancella menu Amministrazione
-    if (sUserLevel == AUTH_MANAGER )
-        menu.splice(47, 5);
+	// cancella menu Amministrazione
+	if (sUserLevel == AUTH_MANAGER )
+		menu.splice(47, 5);
 
-	addmenu(menu=["Spese",
-	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-	,"<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Spese personali", "/timereport/report/report-spese-dettaglio.asp",,,1
-	,"<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Riepilogo tipo spesa", "/timereport/report/report-spese-01.asp",,,1
-	])	
-    
+	//addmenu(menu=["Spese",
+	//,,180,1,"",style1,,"",effect,,,,,,,,,,,,
+	//,"<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Spese personali", "/timereport/report/report-spese-dettaglio.asp",,,1
+	//,"<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Riepilogo tipo spesa", "/timereport/report/report-spese-01.asp",,,1
+	//])	
+	
 	if (sUserLevel == AUTH_EXTERNAL)
-	    addmenu(menu = ["Report",
-	    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-	    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese" : "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Hours and Expenses", "/timereport/esporta.aspx", , , 1
-        , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi" :"<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Tickets" , "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
- 	    ])
+		addmenu(menu = ["Report",
+		, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+		, (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese" : "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Hours and Expenses", "/timereport/esporta.aspx", , , 1
+		, (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi" :"<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Tickets" , "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
+		])
 	else
-	    addmenu(menu=["Report",
-	    ,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-	    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese", "/timereport/esporta.aspx", , , 1
-        , "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
-        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
-	    ])	
+		addmenu(menu=["Report",
+		,,180,1,"",style1,,"",effect,,,,,,,,,,,,
+		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese", "/timereport/esporta.aspx", , , 1
+		, "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
+		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
+		])	
 
 	if (sUserLevel == AUTH_EXTERNAL)
-	    addmenu(menu=["Inserisci",
-	    ,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-	    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore" : "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Hours", "/timereport/input.aspx?type=hours", , , 1
-	    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese" : "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Expenses", "/timereport/input.aspx?type=expenses", , , 1
-        , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbspUpload spese" : "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbspUpload expenses", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
-	    ])
+		addmenu(menu=["Inserisci",
+		,,180,1,"",style1,,"",effect,,,,,,,,,,,,
+		, (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore" : "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Hours", "/timereport/input.aspx?type=hours", , , 1
+		, (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese" : "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Expenses", "/timereport/input.aspx?type=expenses", , , 1
+		, (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbspUpload spese" : "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbspUpload expenses", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
+		])
 	else
-	    addmenu(menu = ["Inserisci",
-        , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-        , "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore", "/timereport/input.aspx?type=hours", , , 1
-        , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese", "/timereport/input.aspx?type=expenses", , , 1
-        , "<img src=/timereport/images/icons/16x16/restaurant.png border=0>&nbsp;Ticket", "/timereport/input.aspx?type=bonus", , , 1
-        , "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Upload spese", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
-	    ])
+		addmenu(menu = ["Inserisci",
+		, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+		, "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore", "/timereport/input.aspx?type=hours", , , 1
+		, "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese", "/timereport/input.aspx?type=expenses", , , 1
+		, "<img src=/timereport/images/icons/16x16/restaurant.png border=0>&nbsp;Ticket", "/timereport/input.aspx?type=bonus", , , 1
+		, "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Upload spese", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
+		])
 
 	addmenu(menu=["Utilita",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
@@ -191,27 +191,27 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	
 	addmenu(menu=["Amministrazione",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-    , "Gestione Chiusura", "show-menu=Amm_CutOff", , , 1
-    , "<img src=/timereport/images/icons/16x16/persone.gif border=0>&nbsp;Anagrafica Clienti", "/timereport/m_gestione/customer/customer_lookup_list.aspx", , , 1
-    , "Modifiche massive", "show-menu=Amm_MassChange", , , 1
-    , "Persone", "show-menu=Persone", , , 1
-    , "Gestione Economics", "show-menu=Amm_Economics", , , 1
-    , "Tabelle valori", "show-menu=Tabelle", , , 1
-    , "Report", "show-menu=Amm_Export", , , 1
+	, "Gestione Chiusura", "show-menu=Amm_CutOff", , , 1
+	, "<img src=/timereport/images/icons/16x16/persone.gif border=0>&nbsp;Anagrafica Clienti", "/timereport/m_gestione/customer/customer_lookup_list.aspx", , , 1
+	, "Modifiche massive", "show-menu=Amm_MassChange", , , 1
+	, "Persone", "show-menu=Persone", , , 1
+	, "Gestione Economics", "show-menu=Amm_Economics", , , 1
+	, "Tabelle valori", "show-menu=Tabelle", , , 1
+	, "Report", "show-menu=Amm_Export", , , 1
 	])
 	
 	addmenu(menu = ["Amm_CutOff",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-    , "<img src=/timereport/images/icons/16x16/cutoff.gif border=0>&nbsp;CutOff", "/timereport/cutoff.asp", , , 1
+	, "<img src=/timereport/images/icons/16x16/cutoff.gif border=0>&nbsp;CutOff", "/timereport/m_gestione/Cutoff/cutoff.aspx", , , 1
 	, "<img src=/timereport/images/icons/16x16/S_B_ACTY.gif border=0>&nbsp;Check inserimenti", "/timereport/report/checkInput/check-input-select.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/unlock.gif order=0>&nbsp;Riapri Timereport", "/timereport/report/chiusura/Amm_chiusureTR.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select.aspx?mode=admin", , , 1
+	, "<img src=/timereport/images/icons/16x16/unlock.gif order=0>&nbsp;Riapri Timereport", "/timereport/report/chiusura/Amm_chiusureTR.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select.aspx?mode=admin", , , 1
 	])
 
 	addmenu(menu = ["Amm_Economics",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-    , "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Cost rate per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/progetto.gif border=0>&nbsp;Cost rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Cost rate per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/progetto.gif border=0>&nbsp;Cost rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
 	])
 
 	addmenu(menu = ["Amm_MassChange",
@@ -222,41 +222,41 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 
 	addmenu(menu = ["Amm_Export",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/EstraiRevenue-select.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Straordinari", "/timereport/report/straordinari/Straordinari-select.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Progetti e risorse attive", "/timereport/report/general-download.aspx?query=SELECT+Persons.Name+AS+NomePersona,+AuthUserLevel.name,+Persons.Attivo_da,+Persons.Attivo_fino,+Projects.ProjectCode,+Projects.Name+AS+NomeProgetto,+Projects.active+FROM+ForcedAccounts+INNER+JOIN+Persons+ON+Persons.Persons_id+=+ForcedAccounts.Persons_id+INNER+JOIN+AuthUserLevel+ON+AuthUserLevel.UserLevel_id+=+persons.UserLevel_id+INNER+JOIN+Projects+ON+Projects.Projects_id=ForcedAccounts.Projects_id+WHERE+Projects.active=1+and+Persons.active=1", , , 1
+	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/EstraiRevenue-select.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Straordinari", "/timereport/report/straordinari/Straordinari-select.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Progetti e risorse attive", "/timereport/report/general-download.aspx?query=SELECT+Persons.Name+AS+NomePersona,+AuthUserLevel.name,+Persons.Attivo_da,+Persons.Attivo_fino,+Projects.ProjectCode,+Projects.Name+AS+NomeProgetto,+Projects.active+FROM+ForcedAccounts+INNER+JOIN+Persons+ON+Persons.Persons_id+=+ForcedAccounts.Persons_id+INNER+JOIN+AuthUserLevel+ON+AuthUserLevel.UserLevel_id+=+persons.UserLevel_id+INNER+JOIN+Projects+ON+Projects.Projects_id=ForcedAccounts.Projects_id+WHERE+Projects.active=1+and+Persons.active=1", , , 1
 	])
 
 	addmenu(menu = ["Progetti",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-     , "Anagrafiche", "show-menu=Anagrafica_Progetti", , , 1
-    , "Economics", "show-menu=Amm_Economics", , , 1
-    , "Reporting", "show-menu=Report_manager", , , 1
+	 , "Anagrafiche", "show-menu=Anagrafica_Progetti", , , 1
+	, "Economics", "show-menu=Amm_Economics", , , 1
+	, "Reporting", "show-menu=Report_manager", , , 1
 	])
 
 	addmenu(menu = ["Anagrafica_Progetti",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
 	, "<img src=/timereport/images/icons/16x16/progetto.jpeg border=0>&nbsp;Progetti", "/timereport/m_gestione/Project/projects_lookup_list.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/fasi.png border=0>&nbsp;Fasi", "/timereport/m_gestione/Phase/Phase_lookup_list.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/attivita.png border=0>&nbsp;Attivita", "/timereport/m_gestione/activity/activity_lookup_list.aspx", , , 1])
+	, "<img src=/timereport/images/icons/16x16/fasi.png border=0>&nbsp;Fasi", "/timereport/m_gestione/Phase/Phase_lookup_list.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/attivita.png border=0>&nbsp;Attivita", "/timereport/m_gestione/activity/activity_lookup_list.aspx", , , 1])
 
 	addmenu(menu = ["Report_manager",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
 	])
 
 	addmenu(menu=["Persone",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Crea Profili Spese", "/timereport/lookup_list.asp?TableName=ExpensesProfile&SortField=Name&FieldNumber=1&CheckTable=ForcedExpensesProf&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Associa spese a profili", "/timereport/m_gestione/selection-profilo.asp",,,1	
-    ,"<img src=/timereport/images/icons/16x16/persone.gif border=0>&nbsp;Persone", "/timereport/m_gestione/Persone/persons_lookup_list.aspx",,,1
+//	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Crea Profili Spese", "/timereport/lookup_list.asp?TableName=ExpensesProfile&SortField=Name&FieldNumber=1&CheckTable=ForcedExpensesProf&init=true",,,1	
+//	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Associa spese a profili", "/timereport/m_gestione/selection-profilo.asp",,,1	
+	,"<img src=/timereport/images/icons/16x16/persone.gif border=0>&nbsp;Persone", "/timereport/m_gestione/Persone/persons_lookup_list.aspx",,,1
 	,"<img src=/timereport/images/icons/16x16/lock.gif border=0>&nbsp;Forza progetti e spese", "/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx",,,1
 	])
 
 	addmenu(menu=["Tabelle",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Autorizzazioni", "/timereport/m_gestione/AuthPermission/AuthPermission.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Contratto", "/timereport/lookup_list.asp?TableName=TipoContratto&SortField=Descrizione&FieldNumber=1&init=true", , , 1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Autorizzazioni", "/timereport/m_gestione/AuthPermission/AuthPermission.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Contratto", "/timereport/lookup_list.asp?TableName=TipoContratto&SortField=Descrizione&FieldNumber=1&init=true", , , 1
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Metodo di Pagamento", "/timereport/lookup_list.asp?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=1&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.asp?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=1&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Spese", "/timereport/lookup_list.asp?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true",,,1
@@ -266,8 +266,8 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo progetti", "/timereport/lookup_list.asp?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo ore", "/timereport/lookup_list.asp?TableName=HourType&SortField=HourTypeCode&FieldNumber=2&CheckTable=Hours&init=true",,,1
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Canali", "/timereport/lookup_list.asp?TableName=Channels&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true", , , 1
-    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Messaggi", "/timereport/m_gestione/messaggi/messaggi_lookup_list.aspx", , , 1
-   	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Bonus", "/timereport/lookup_list.asp?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true", , , 1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Messaggi", "/timereport/m_gestione/messaggi/messaggi_lookup_list.aspx", , , 1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Bonus", "/timereport/lookup_list.asp?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true", , , 1
 ])
 
 

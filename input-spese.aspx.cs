@@ -442,9 +442,12 @@ public partial class input_spese : System.Web.UI.Page
 		TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
 		DropDownList DDlspesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
 
-		// se la spesa è di tipo bonus mette 1 di default alla quantità e spegne il campo
-		// Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-		Database.OpenConnection();
+        if (DDlspesa.SelectedValue == "")
+            return;
+
+        // se la spesa è di tipo bonus mette 1 di default alla quantità e spegne il campo
+        // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
+            Database.OpenConnection();
 
 		using (SqlDataReader rdr = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + DDlspesa.SelectedValue, this.Page)) 
 		{

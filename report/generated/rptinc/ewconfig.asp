@@ -12,8 +12,8 @@ Const EW_DBMSNAME = "Microsoft SQL Server"
 Const EW_DB_START_QUOTE = "["
 Const EW_DB_END_QUOTE = "]"
 Const EW_CURSOR_LOCATION = 3
-Dim EW_CONNECTION_STRING
-EW_CONNECTION_STRING = "Provider=SQLOLEDB;Persist Security Info=False;Data Source=62.149.153.12;Initial Catalog=MSSql12155;User Id=MSSql12155;Password=50a715f9"
+'Dim EW_CONNECTION_STRING = "Provider=SQLOLEDB;Persist Security Info=False;Data Source=62.149.153.12;Initial Catalog=MSSql12155;User Id=MSSql12155;Password=50a715f9"
+Dim EW_CONNECTION_STRING = "Provider=SQLOLEDB;Persist Security Info=False;Data Source=95.110.230.190;Initial Catalog=MSSql12155;User Id=MSSql12155;Password=50a715f9"
 
 ' Project Level Configuration
 Const EW_PROJECT_NAME = "timereport" ' Project Name

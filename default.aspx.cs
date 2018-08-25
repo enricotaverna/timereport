@@ -64,12 +64,14 @@ public partial class defaultAspx : System.Web.UI.Page
             // carica variabile di sessione con spese forzate
             // Carica spese e progetti possibili
             DataRowCollection ProgettiForzati;
+            DataTable dtProgettiForzati = null;
             DataRowCollection SpeseForzate;
 				
             if (Session["ForcedAccount"] != "")  {
                 //** A.1 Carica progetti possibili
                 // Right join: includes all the forced projects plus the ones with the flag always_available on							
                 ProgettiForzati = ASPcompatility.GetRows("SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name,  Projects.Always_available FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode");
+                dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode", this.Page);
 
                 //** A.2 Carica spese possibili				
                 if ( Convert.ToInt32(Session["ExpensesProfile_id"]) > 0)  
@@ -88,11 +90,13 @@ public partial class defaultAspx : System.Web.UI.Page
             else  {
                 //** B.1 tutti i progetti attivi		
                 ProgettiForzati = ASPcompatility.GetRows("SELECT Projects_Id, ProjectCode, Name  FROM Projects WHERE active = 1 ORDER BY ProjectCode");
+                dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto  FROM Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
                 //** B.2 tutte le spese attive 							
                 SpeseForzate = ASPcompatility.GetRows("SELECT ExpenseType_Id, ExpenseCode, Name  FROM ExpenseType WHERE active=1");
             }
         
         Session["ProgettiForzati"] = ProgettiForzati;
+        Session["dtProgettiForzati"] = dtProgettiForzati;
         Session["SpeseForzate"] = SpeseForzate;
 
         // *** carica autorizzazioni ***

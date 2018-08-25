@@ -4,7 +4,7 @@
 ' ****  NON CANCELLARE ****
 
 If Session("userLevel") < AUTH_EXTERNAL Then
-    response.redirect("/timereport/default.asp")
+    response.redirect("/timereport/default.aspx")
 End If
 %>
 

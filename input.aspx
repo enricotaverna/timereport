@@ -79,8 +79,6 @@
 
     } // cancella_ricevuta
 
-
-
     $(document).ready(function () {
 
         // drag & drop
@@ -415,7 +413,7 @@
         <div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session["UserName"]  %></div>
     </div>
 
-
+    <!-- **** Finestre richiesta spese / trasferte **** -->
     <div id="boxes">
 
         <form name="loginform" action="input.aspx" method="post" class="StandardForm" runat="server">

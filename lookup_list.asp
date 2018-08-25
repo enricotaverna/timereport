@@ -1,10 +1,14 @@
 <%@LANGUAGE="VBSCRIPT" CODEPAGE="1252"%>
 
+<!DOCTYPE html>
+
+<script runat="server">
+
 <%
 
-    'Auth.CheckPermission("CONFIG", "TABLE"); *** non funziona con ASP classico ***
+	'Auth.CheckPermission("CONFIG", "TABLE"); *** non funziona con ASP classico ***
 
-    '   se annulla torna indietro
+	'   se annulla torna indietro
 	if request("cancel_from_list") <> "" then
 		response.redirect("default.asp")
 	End if
@@ -21,7 +25,7 @@
 		Dim bolFound
 
 		if session("CheckTable") = "" Then
- 		    %><a href="lookup_list.asp?action=delete&id=<%=intIndex%>"><img src="images/icons/16x16/trash.gif" width="16" height="16" border="0"></a><%					
+			%><a href="lookup_list.asp?action=delete&id=<%=intIndex%>"><img src="images/icons/16x16/trash.gif" width="16" height="16" border="0"></a><%					
 			Exit Sub		' no check table has been defined
 		End If
 
@@ -65,7 +69,8 @@
 		destroy(objConn)				
 		response.redirect("lookup_list.asp?TableName=" & session("TableName") )
 	End if
-		
+
+
 	'--- Initialize values
 	if request("init") = "true" then		
 	
@@ -106,6 +111,9 @@
 		
 %>
 
+</script>
+
+
 <html><!-- InstanceBegin template="/Templates/common.dwt" codeOutsideHTMLIsLocked="false" -->
 <!--#include virtual="/timereport/include/auth.asp" -->
 <!--#include virtual="/timereport/include/common.asp" -->
@@ -124,84 +132,86 @@
 
 <body>
 
-    <div id="TopStripe"></div>
-    
-    <div id="MainWindow">
+	<div id="TopStripe"></div>
+	
+	<div id="MainWindow">
 
-    <div id="FormWrap"> 
+	<div id="FormWrap"> 
 	
 <form name="form1" method="get" action="lookup_detail.asp" class="StandardForm">
 
-        <!-- *** TITOLO FORM ***  --> 
-        <div class="formtitle">Edit Tabella</div> 
+		<!-- *** TITOLO FORM ***  --> 
+		<div class="formtitle">Edit Tabella</div> 
 
-        <table class="TabellaLista">
+		<table class="TabellaLista">
 <%
 	if bolRecordFound Then ' at least one record exists	
 	
 		Dim intCounter          	
 		intCounter = 0
-           
+		   
 		While ( intCounter <= Ubound(aRecord, 2) ) 
 
-        if ( ( intCounter mod 2 ) = 0 ) Then
-            response.Write("<tr class=GV_row>")
-        else
-            response.Write("<tr class=GV_row_alt>")
-        End if
+		if ( ( intCounter mod 2 ) = 0 ) Then
+			response.Write("<tr class=GV_row>")
+		else
+			response.Write("<tr class=GV_row_alt>")
+		End if
 
 		For i = 1 to session("FieldNumber")  
 %>	
-      <td>      	
+	  <td>      	
 <%
 				' if the record is a counter get the description from the associated lookup table
-   				If instr( Ucase(objRS(i).name) , "_ID") <> 0 Then	
-      					response.write(  GetDescription( objRS(i).name, aRecord(i, intCounter) ) )
-      				else
-      					response.write( aRecord(i, intCounter) )
-      				End If	      		
+				If instr( Ucase(objRS(i).name) , "_ID") <> 0 Then	
+						response.write(  GetDescription( objRS(i).name, aRecord(i, intCounter) ) )
+					else
+						response.write( aRecord(i, intCounter) )
+					End If	      		
 %>      	     	
-      	</td>
+		</td>
 <%
 			Next
 %>      
-      <td nowrap width="10%"> <div align="center"><a href="lookup_detail.asp?action=update&Id=<%=aRecord(0, intCounter)%>"> 
-          <img src="images/icons/16x16/modifica.gif" width="16" height="16" border="0"></a>&nbsp;&nbsp; 
+	  <td nowrap width="10%"> <div align="center"><a href="lookup_detail.asp?action=update&Id=<%=aRecord(0, intCounter)%>"> 
+		  <img src="images/icons/16x16/modifica.gif" width="16" height="16" border="0"></a>&nbsp;&nbsp; 
 <% 
 			call DeleteIcon( aRecord(0, intCounter) ) 
 %>
-        </div></td>
-    </tr>
+		</div></td>
+	</tr>
 <% 
-	 		IntCounter = IntCounter + 1  		
+			IntCounter = IntCounter + 1  		
 		Wend
 
 	End If 'if NOT objRS.EOF Then ' at least one record exists
 	
 %>
   </table>
-                <div class="buttons"> 
-                    <input type="submit" name="insert" value=<%= CREATE_TXT %> class="orangebutton">
-                    <input name="cancel_from_list" type="submit" class="greybutton" value=<%= CANCEL_TXT %>>
-                </div>
+				<div class="buttons"> 
+					<input type="submit" name="insert" value=<%= CREATE_TXT %> class="orangebutton">
+					<input name="cancel_from_list" type="submit" class="greybutton" value=<%= CANCEL_TXT %>>
+				</div>
 </form>
 
 <%
 		Destroy(objRS)	
 		Destroy(objConn)
+
+    	
 %>	
 
-    </div>  <!-- END FormWrap-->
+	</div>  <!-- END FormWrap-->
 
-    </div> <!-- END MainWindow -->
+	</div> <!-- END MainWindow -->
 
-    <!-- **** FOOTER **** -->  
-    <div id="WindowFooter">       
-        <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div> 
-        <div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
-        <div id="WindowFooter-R">Utente: <%= Session("UserName")  %></div>        
-     </div>
+	<!-- **** FOOTER **** -->  
+	<div id="WindowFooter">       
+		<div ></div>        
+		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div> 
+		<div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
+		<div id="WindowFooter-R">Utente: <%= Session("UserName")  %></div>        
+	 </div>
 
 </body>
 </html>

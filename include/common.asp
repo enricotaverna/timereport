@@ -17,9 +17,10 @@ Dim objConn, objRS, objCmd
 		
 		Const PROVIDER = "SQLOLEDB"
 '		Const DATASOURCE =  "CASA-PC\SQLEXPRESS"  
-        Const DATASOURCE =  "STAN\SQLEXPRESS" 
+'        Const DATASOURCE =  "STAN\SQLEXPRESS" 
 '		Const DATASOURCE =  "62.149.153.12"
-		Const DATABASE = "MSSql12155" 
+		Const DATASOURCE =  "95.110.230.190"
+		Const DATABASE = "MSSql12155_test" 
 		Const USER = "MSSql12155"
 		Const PWD = "50a715f9"
 
