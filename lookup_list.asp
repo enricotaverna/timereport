@@ -10,7 +10,7 @@
 
 	'   se annulla torna indietro
 	if request("cancel_from_list") <> "" then
-		response.redirect("default.asp")
+		response.redirect("default.aspx")
 	End if
 
 	Dim	strKeyName		' name of the key field od the table

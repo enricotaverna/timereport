@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-spese.aspx.cs" Inherits="input_spese"  %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-spese.aspx.cs" Inherits="input_spese" EnableEventValidation="False" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- Stili -->
@@ -577,13 +577,13 @@
 	<!-- Per output messaggio warning -->
 	<div id="dialog" style="display: none"></div>
 
-		<!-- **** FOOTER **** -->  
-	<div id="WindowFooter">       
-		<div ></div>        
-		<div  id="WindowFooter-L"> Aeonvis Spa <%-- per ritornare l'id del record inserito--%></div> 
-		<div  id="WindowFooter-C">cutoff: <%--        EDIT--%>  </div>              
-		<div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%--        DISPLAY--%></div>       
-	 </div>  
+    <!-- **** FOOTER **** -->  
+    <div id="WindowFooter">       
+        <div ></div>        
+        <div  id="WindowFooter-L"> Aeonvis Spa <%= DateTime.Today.Year  %></div> 
+        <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
+        <div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session["UserName"]  %></div>      
+     </div>  
 
 </body>
 </html>

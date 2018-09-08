@@ -76,17 +76,11 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
                   " FROM ( Persons INNER JOIN Company ON Persons.Company_id = Company.Company_id ) " +  
                   sWhere;
 
-        Response.Write(sSelect);
-        Response.End();
-
         // Esegue Select sulle persone attive
-        Database.OpenConnection();
-
-        using (SqlDataReader rdr = Database.GetReader(sSelect, this.Page))
-        {
+        DataTable dtPersons = Database.GetData(sSelect, this.Page);
 
             // Loop sulle persone selezionate
-            while (rdr != null && rdr.Read())
+            foreach (  DataRow rdr in dtPersons.Rows)
             {
 
                 DataRow dr = dt.NewRow();
@@ -123,9 +117,8 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
                         break;
                 }
             }
-        }
 
-        // sort
+            // sort
         dt.DefaultView.Sort = "GGMancanti";
         dt.DefaultView.ToTable();
 
@@ -146,16 +139,12 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
         // Calcola mese precedente
         string sDataInizio = ASPcompatility.FormatDateDb("1/" + sMese + "/" + sAnno, false);
         string sDataFine = ASPcompatility.FormatDateDb(System.DateTime.DaysInMonth(Convert.ToInt16(sAnno), Convert.ToInt16(sMese)) + "/" + sMese + "/" + sAnno, false);
-
-        Database.OpenConnection();
         
         string query = "SELECT SUM (hours) FROM hours WHERE Date >=" + sDataInizio + " AND  Date <=" + sDataFine + " AND HourType_Id = 1 AND persons_id=" + Persons_id;
 
         object result = Database.ExecuteScalar(query, this.Page);
         if (result != DBNull.Value)
             sGiorni = Convert.ToInt16(result) > 0 ? Convert.ToInt16(result) / 8 : 0;
-
-        //Database.CloseConnection();
 
         return(sGiorni.ToString());
 
@@ -167,16 +156,16 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
 
         // per preparare la select
         string sDataInizio = ASPcompatility.FormatDateDb("1/" + sMese + "/" + sAnno, false);
-        string sDataFine = ASPcompatility.FormatDateDb(System.DateTime.DaysInMonth(Convert.ToInt16(sAnno), Convert.ToInt16(sMese)) + "/" + sMese + "/" + sAnno, false);     
+        string sDataFine = ASPcompatility.FormatDateDb(System.DateTime.DaysInMonth(Convert.ToInt16(sAnno), Convert.ToInt16(sMese)) + "/" + sMese + "/" + sAnno, false);
 
-        Database.OpenConnection();
+        DataTable dtHours = Database.GetData("SELECT persons_id, date, hours FROM HOURS WHERE Date>=" + sDataInizio + "AND  Date<=" + sDataFine + " AND HourType_Id = 1", this.Page);
 
         // carica tutte le ore del mese per tutte le persone nella lista lCheckGiorni
-        using (SqlDataReader rdr = Database.GetReader("SELECT persons_id, date, hours FROM HOURS WHERE Date>=" + sDataInizio + "AND  Date<=" + sDataFine + " AND HourType_Id = 1", this.Page))
-        {
-
-            while (rdr != null && rdr.Read())
+ 
+            if (dtHours.Rows.Count > 0 )
             {
+
+                DataRow rdr = dtHours.Rows[0];
 
                 CheckGiorni curr = new CheckGiorni();
                 curr.persons_id = rdr["persons_id"].ToString();
@@ -186,7 +175,7 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
                 // carica lista
                 lCheckGiorni.Add(curr);                        
             }
-        }
+ 
     } // CaricaOreMese
 
     // Calcola i giorni mancanti nel mese

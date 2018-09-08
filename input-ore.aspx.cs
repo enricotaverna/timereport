@@ -94,27 +94,30 @@ public partial class input_ore : System.Web.UI.Page
     protected void Bind_DDLprogetto()
     {
 
-        conn.Open();
+        //conn.Open();
 
-        SqlCommand cmd;
-        
-        // imposta selezione progetti in base all'utente
+        //SqlCommand cmd;
 
-        if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-            cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
-        else
-            cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
-                                       " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-                                       " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
-                                       " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
+        //// imposta selezione progetti in base all'utente
 
-        SqlDataReader dr = cmd.ExecuteReader();
+        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
+        //    cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
+        //else
+        //    cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
+        //                               " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
+        //                               " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
+        //                               " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
+
+        //SqlDataReader dr = cmd.ExecuteReader();
+
+
+        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
         ddlProject = (DropDownList)FVore.FindControl("DDLprogetto");
 
-        ddlProject.DataSource = dr;
+        ddlProject.DataSource = dtProgettiForzati;
         ddlProject.Items.Clear();
         ddlProject.Items.Add(new ListItem(GetLocalResourceObject("DDLprogetto.testo").ToString(), "0"));             
-        ddlProject.DataTextField = "iProgetto";
+        ddlProject.DataTextField = "DescProgetto";
         ddlProject.DataValueField = "Projects_Id";
         ddlProject.DataBind();
         if (lProject_id != "")
@@ -124,7 +127,7 @@ public partial class input_ore : System.Web.UI.Page
         if (FVore.CurrentMode == FormViewMode.Insert)
             ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
 
-        conn.Close();
+        //conn.Close();
     }
 
     public void Bind_DDLAttivita()
@@ -291,15 +294,13 @@ public partial class input_ore : System.Web.UI.Page
         string sMessaggioDiErrore = "";
 
         // Legge il flag di commento obbligatorio su tipo spesa
-        using (SqlDataReader rdr = Database.GetReader("Select TestoObbligatorio, MessaggioDiErrore from Projects where Projects_Id = " + DDLprogetto.SelectedValue, this.Page))
-        {
-            if (rdr != null)
-                while (rdr.Read())
+        DataTable dtRecord = Database.GetData("Select TestoObbligatorio, MessaggioDiErrore from Projects where Projects_Id = " + DDLprogetto.SelectedValue, this.Page);
+
+        if (dtRecord.Rows.Count > 0)
                 {
-                    bTestoObbligatorio = (rdr["TestoObbligatorio"] == DBNull.Value) ? false : Convert.ToBoolean(rdr["TestoObbligatorio"]);
-                    sMessaggioDiErrore = rdr["MessaggioDiErrore"].ToString();
+                    bTestoObbligatorio = (dtRecord.Rows[0]["TestoObbligatorio"] == DBNull.Value) ? false : Convert.ToBoolean(dtRecord.Rows[0]["TestoObbligatorio"]);
+                    sMessaggioDiErrore = dtRecord.Rows[0]["MessaggioDiErrore"].ToString();
                 } // endwhile
-        }  // using
 
         if (TBtoValidate.Text.Trim().Length == 0 && bTestoObbligatorio)
         {

@@ -123,7 +123,7 @@ Partial Class menu
         Dim oRes As Object = objCommand.ExecuteScalar()
 
         ' ** Calcola spese caricate per il mese
-        oRes = objCommand.ExecuteScalar()
+        ' oRes = objCommand.ExecuteScalar() duplicato
         Dim iContaSpeseSenzaCC As Integer = IIf(IsDBNull(oRes), 0, oRes)
 
         lContaSpeseSenzaCC.Text = iContaSpeseSenzaCC.ToString("N2")

@@ -23,23 +23,10 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
             // salva l'id della persona
             sPersonaSelezionata = Request["IdPersonaSelezionata"];
 
-            // recupera nome            
-            Database.OpenConnection();
+            // recupera nome                        
+            DataRow drPersons = Database.GetRow("Select Name from Persons where Persons_id=" + sPersonaSelezionata, this.Page);
+            lbNome.Text = lbNome.Text + drPersons["name"];
 
-            using (SqlDataReader rdr = Database.GetReader("Select Name from Persons where Persons_id=" + sPersonaSelezionata, this.Page))
-            {
-                if (rdr != null && rdr.HasRows)
-                {
-                    rdr.Read();
-                    lbNome.Text = lbNome.Text + rdr["name"];
-                }
-            }
-
-            Database.CloseConnection();
-
-            // qualcosa è andato male
-            if (sPersonaSelezionata == "" || sPersonaSelezionata == null)
-                Response.Redirect("/timereport/menu.aspx");
         }
 
         Auth.CheckPermission("MASTERDATA", "PERSONE");
@@ -51,8 +38,6 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
     {
 
         // cancella precedenti assegnazioni
-        Database.OpenConnection();
-
         Database.ExecuteScalar("DELETE FROM ForcedAccounts WHERE Persons_Id=" + sPersonaSelezionata, this);
 
         // loop sugli elementi selezionati - SALVA PROGETTI
@@ -79,8 +64,6 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
             }
         }
 
-        Database.CloseConnection();
-
         // emette messaggio di conferma salvataggio
         string message = "Salvataggio effettuato";
         ClientScript.RegisterStartupScript(this.GetType(), "Popup", "ShowPopup('" + message + "');", true);
@@ -95,26 +78,32 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
 
     protected void LBSpese_DataBound(object sender, EventArgs e)
     {
+
         // imposta default
+        DataTable dtForcedExpenses = Database.GetData("Select * from ForcedExpensesPers where persons_id=" + sPersonaSelezionata, this.Page);
+
         foreach (ListItem li in LBSpese.Items)
         {
-            if (Database.RecordEsiste("Select * from ForcedExpensesPers where persons_id=" + sPersonaSelezionata + " AND ExpenseType_id=" + li.Value.ToString()))
-            {
+            DataRow[] drRow = dtForcedExpenses.Select("ExpenseType_id = " + li.Value.ToString());
+            
+            if (drRow.Count() > 0)
                 li.Selected = true;
-            }
         }
     }
 
     protected void LBProgetti_DataBound(object sender, EventArgs e)
     {
         // imposta default
-        foreach (ListItem li in LBProgetti.Items)
+        DataTable dtForcedAccounts = Database.GetData("Select * from ForcedAccounts where persons_id=" + sPersonaSelezionata, this.Page);
+
+        foreach (ListItem li in LBSpese.Items)
         {
-            if (Database.RecordEsiste("Select * from ForcedAccounts where persons_id=" + sPersonaSelezionata + " AND projects_id=" + li.Value.ToString()))
-            {
+            DataRow[] drRow = dtForcedAccounts.Select("projects_id = " + li.Value.ToString());
+
+            if (drRow.Count() > 0)
                 li.Selected = true;
-            }
         }
+
     }
 
     protected void aprogetti_Click(object sender, EventArgs e)

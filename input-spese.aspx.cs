@@ -228,27 +228,29 @@ public partial class input_spese : System.Web.UI.Page
 	{
 
 		DropDownList ddlProject;
+		DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
 
-		conn.Open();
+        //conn.Open();
 
-		SqlCommand cmd;
+        //SqlCommand cmd;
 
-		// imposta selezione progetti in base all'utente
+        //// imposta selezione progetti in base all'utente
 
-		if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-			cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
-		else
-			cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
-									   " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-									   " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
-									   " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
+        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
+        //	cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
+        //else
+        //	cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
+        //							   " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
+        //							   " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
+        //							   " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
 
-		using (SqlDataReader dr = cmd.ExecuteReader()) {
-		ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
+        //using (SqlDataReader dr = cmd.ExecuteReader()) {
 
-		ddlProject.DataSource = dr;
+        ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
+
+		ddlProject.DataSource = dtProgettiForzati;
 		ddlProject.Items.Clear();
-		ddlProject.DataTextField = "iProgetto";
+		ddlProject.DataTextField = "DescProgetto";
 		ddlProject.DataValueField = "Projects_Id";
 		ddlProject.DataBind();
 		
@@ -258,57 +260,57 @@ public partial class input_spese : System.Web.UI.Page
 		// se in creazione imposta il default di progetto 
 		if (FVSpese.CurrentMode == FormViewMode.Insert)
 			ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
-		}
 
-		conn.Close();
+		//}
+		//conn.Close();
 	}
 
 	protected void Bind_DDLTipoSpesa()
 	{
 
-		string sTipoBonus_sel;
+        DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
+        DropDownList ddlTipoSpesa;
+        String sTipoBonus_sel = "";
 
-		DropDownList ddlTipoSpesa;
+        //conn.Open();
+        //SqlCommand cmd;
 
-		conn.Open();
-
-		SqlCommand cmd;
-
-		// 08/2014 se viene richiamato da pagina bonus cambia il flag per il biding
-		if (lTipoBonus_id > 0) 
+        // 08/2014 se viene richiamato da pagina bonus cambia il flag per il biding
+        if (lTipoBonus_id > 0) 
 			sTipoBonus_sel = "";
 		else
 			sTipoBonus_sel = " AND TipoBonus_Id = 0 ";
 
-		// imposta selezione progetti in base all'utente
+        // imposta selezione progetti in base all'utente
 
-		if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-			cmd = new SqlCommand("SELECT ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ExpenseType WHERE active = 'true' AND TipoBonus_Id = 0 ORDER BY ExpenseCode", conn);
-		else
-			cmd = new SqlCommand("SELECT ExpenseType.ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione  FROM ExpenseType " +
-									   " INNER JOIN ForcedExpensesPers ON ExpenseType.ExpenseType_id = ForcedExpensesPers.ExpenseType_id " +
-									   " WHERE ForcedExpensesPers.Persons_id=" + Session["persons_id"] +
-									   " AND active = 'true' " + sTipoBonus_sel + " ORDER BY ExpenseType.ExpenseCode", conn);
+        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
+        //	cmd = new SqlCommand("SELECT ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ExpenseType WHERE active = 'true' AND TipoBonus_Id = 0 ORDER BY ExpenseCode", conn);
+        //else
+        //	cmd = new SqlCommand("SELECT ExpenseType.ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione  FROM ExpenseType " +
+        //							   " INNER JOIN ForcedExpensesPers ON ExpenseType.ExpenseType_id = ForcedExpensesPers.ExpenseType_id " +
+        //							   " WHERE ForcedExpensesPers.Persons_id=" + Session["persons_id"] +
+        //							   " AND active = 'true' " + sTipoBonus_sel + " ORDER BY ExpenseType.ExpenseCode", conn);
 
-		using (SqlDataReader dr = cmd.ExecuteReader()) 
-		{ 
-			ddlTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
+        //using (SqlDataReader dr = cmd.ExecuteReader())
+            //{ 
+            	ddlTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
 
-			ddlTipoSpesa.DataSource = dr;
-			ddlTipoSpesa.Items.Clear();
-			ddlTipoSpesa.DataTextField = "descrizione";
-			ddlTipoSpesa.DataValueField = "ExpenseType_Id";
-			ddlTipoSpesa.DataBind();
+            //	ddlTipoSpesa.DataSource = dr;
+            ddlTipoSpesa.DataSource = dtSpeseForzate;
+        	ddlTipoSpesa.Items.Clear();
+        	ddlTipoSpesa.DataTextField = "descrizione";
+        	ddlTipoSpesa.DataValueField = "ExpenseType_Id";
+        	ddlTipoSpesa.DataBind();
 
-			if (lExpenseType_id != "")
+        if (lExpenseType_id != "")
 				ddlTipoSpesa.SelectedValue = lExpenseType_id;
 
 			// se in creazione imposta il default di progetto 
 			if (FVSpese.CurrentMode == FormViewMode.Insert)
 				ddlTipoSpesa.SelectedValue = (string)Session["ExpenseTypeDefault"];
-		}
+		//}
 
-		conn.Close();
+		//conn.Close();
 	}
 
 	protected void DSSpese_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
@@ -339,27 +341,23 @@ public partial class input_spese : System.Web.UI.Page
 		if (ddlList1.SelectedValue != null)
 			e.Command.Parameters["@ExpenseType_id"].Value = ddlList1.SelectedValue;
 
-		// Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-		Database.OpenConnection();
+        // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
+        DataTable dtTipoSpesa = (DataTable)Session["dtTipoSpesa"];
+        DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + ddlList1.SelectedValue);
 
-		using (SqlDataReader rdr = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + ddlList1.SelectedValue, this.Page)) 
-		{ 
-		
-			if (rdr != null)  {
-			rdr.Read();
-			e.Command.Parameters["@TipoBonus_id"].Value = rdr["TipoBonus_id"];
-			}
+        if (dr.Count() == 1)  // dovrebbe essere sempre così
+            e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32( dr[0]["TipoBonus_id"].ToString() );
+        else
+            e.Command.Parameters["@TipoBonus_id"].Value = 0;
 
-			// salva default per select list
-			Session["ProjectCodeDefault"] = ddlList.SelectedValue;
-			Session["ExpenseTypeDefault"] = ddlList1.SelectedValue;
-			Session["TipoBonus_IdDefault"] = rdr["TipoBonus_id"]; // usato per spegnere/accendere il campo in insert
-		}
+        // salva default per select list
+        Session["ProjectCodeDefault"] = ddlList.SelectedValue;
+        Session["ExpenseTypeDefault"] = ddlList1.SelectedValue;
+        Session["TipoBonus_IdDefault"] = e.Command.Parameters["@TipoBonus_id"].Value; // usato per spegnere/accendere il campo in insert
+        //}
 
-		Database.CloseConnection();
-
-		// solo insert
-		if (FVSpese.CurrentMode == FormViewMode.Insert)
+        // solo insert
+        if (FVSpese.CurrentMode == FormViewMode.Insert)
 		{
 			e.Command.Parameters["@persons_id"].Value = Session["persons_id"];
 			Label LBdate = (Label)FVSpese.FindControl("LBdate");
@@ -439,39 +437,39 @@ public partial class input_spese : System.Web.UI.Page
 
 	protected void DDLTipoSpesa_SelectedIndexChanged(object sender, EventArgs e)
 	{
-		TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
-		DropDownList DDlspesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
+	    // 0208 FUNZIONE MIGRATA: disattivata in quanto non più usata
+        
+        //TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
+		//DropDownList DDlspesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
 
-        if (DDlspesa.SelectedValue == "")
-            return;
+		//if (DDlspesa.SelectedValue == "")
+		//	return;
 
-        // se la spesa è di tipo bonus mette 1 di default alla quantità e spegne il campo
-        // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-            Database.OpenConnection();
+  ////      // se la spesa è di tipo bonus mette 1 di default alla quantità e spegne il campo
+  ////      // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
 
-		using (SqlDataReader rdr = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + DDlspesa.SelectedValue, this.Page)) 
-		{
-			if (rdr == null)
-				return;                
+  //        // NB: dtSpeseForzate  contiene solo le spese NON bonus/ticket
+  //        DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
 
-			rdr.Read();
-		
-			if (Convert.ToInt16(rdr["TipoBonus_id"]) != 0)
-			{
-				TBAmount.Text = "1";
-				TBAmount.Enabled = false;
-			}
-			else if (!TBAmount.Enabled)  {
-				TBAmount.Text = "";
-				TBAmount.Enabled = true;
-			}
-		}
+  //        DataRow[] drItems = dtSpeseForzate.Select("ExpenseType_id = " + DDlspesa.SelectedValue);
 
-		Database.CloseConnection();
-	}
+  //        if (drItems.Count() == 0)
+  //          {
+  //              // entry non trovata è un Bonus/Ticket
+  //              TBAmount.Text = "1";
+  //              TBAmount.Enabled = false;
+  //          }
+  //          else if (!TBAmount.Enabled)
+  //          {
+  //          // entry trovata spesa normale
+  //              TBAmount.Text = "";
+  //              TBAmount.Enabled = true;
+  //          }
 
-	// recupera la chiave primaria inserita e richiama la pagina in modifica
-	protected void DSSpese_Inserted(object sender, SqlDataSourceStatusEventArgs e)
+    }
+
+    // recupera la chiave primaria inserita e richiama la pagina in modifica
+    protected void DSSpese_Inserted(object sender, SqlDataSourceStatusEventArgs e)
 	{
 		int newIdentity;
 
@@ -504,17 +502,12 @@ public partial class input_spese : System.Web.UI.Page
 		DropDownList DDLtoValidate = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
 		Boolean bBloccoCaricoSpese = false;
-		string sMessaggioDiErrore = "";
 
-		// Legge il flag di spesa bloccata su anagrafica progetto
-		using (SqlDataReader rdr = Database.GetReader("Select BloccoCaricoSpese from Projects where Projects_Id = " + DDLtoValidate.SelectedValue, this.Page))
-		{
-			if (rdr != null)
-				while (rdr.Read())
-				{
-					bBloccoCaricoSpese = (rdr["BloccoCaricoSpese"] == DBNull.Value) ? false : Convert.ToBoolean(rdr["BloccoCaricoSpese"]);
-				} // endwhile
-		}  // using
+        // Legge il flag di spesa bloccata su anagrafica progetto
+        DataTable dtRecord = Database.GetData("Select BloccoCaricoSpese from Projects where Projects_Id = " + DDLtoValidate.SelectedValue, this.Page);
+
+        if (dtRecord.Rows.Count > 0)
+                bBloccoCaricoSpese = (dtRecord.Rows[0]["BloccoCaricoSpese"] == DBNull.Value) ? false : Convert.ToBoolean(dtRecord.Rows[0]["BloccoCaricoSpese"]);
 
 		if (bBloccoCaricoSpese) 
 			{ 
@@ -536,16 +529,14 @@ public partial class input_spese : System.Web.UI.Page
 		Boolean bTestoObbligatorio = false;
 		string sMessaggioDiErrore = "";
 
-		// Legge il flag di commento obbligatorio su tipo spesa
-		using (SqlDataReader rdr = Database.GetReader("Select TestoObbligatorio, MessaggioDiErrore from ExpenseType where ExpenseType_Id = " + DDLTipoSpesa.SelectedValue, this.Page))
-		{
-			if (rdr != null)
-				while (rdr.Read())
+        // Legge il flag di commento obbligatorio su tipo spesa
+        DataTable dtRecord = Database.GetData("Select TestoObbligatorio, MessaggioDiErrore from ExpenseType where ExpenseType_Id = " + DDLTipoSpesa.SelectedValue, this.Page);
+
+    	if (dtRecord.Rows.Count > 0)
 				{
-					bTestoObbligatorio =  ( rdr["TestoObbligatorio"] == DBNull.Value  ) ? false : Convert.ToBoolean(rdr["TestoObbligatorio"]);
-					sMessaggioDiErrore = rdr["MessaggioDiErrore"].ToString();
-				} // endwhile
-		}  // using
+					bTestoObbligatorio =  (dtRecord.Rows[0]["TestoObbligatorio"] == DBNull.Value  ) ? false : Convert.ToBoolean(dtRecord.Rows[0]["TestoObbligatorio"]);
+					sMessaggioDiErrore = dtRecord.Rows[0]["MessaggioDiErrore"].ToString();
+				} 
 
 		if (TBtoValidate.Text.Trim().Length == 0 && bTestoObbligatorio) 
 			{ 
@@ -568,16 +559,16 @@ public partial class input_spese : System.Web.UI.Page
 	protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
 	{
 
-        Label LBdate = (Label)FVSpese.FindControl("LBdate");
+		Label LBdate = (Label)FVSpese.FindControl("LBdate");
 
-        DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
+		DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
-        if ( !Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page) )
-            // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
-            if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno non esistono progetti caricati');", true);
-            else
-                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno sono caricati altri progetti');", true);
-          
-    }
+		if ( !Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page) )
+			// non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
+			if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+				ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno non esistono progetti caricati');", true);
+			else
+				ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno sono caricati altri progetti');", true);
+		  
+	}
 }

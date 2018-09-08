@@ -87,13 +87,8 @@
             DSExpenses.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
 
             ' Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-            Database.OpenConnection()
-            Using rdr As SqlDataReader = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + NewTipoSpese.SelectedValue, Me.Page)
-                If Not (rdr Is Nothing) Then
-                    rdr.Read()
-                    DSExpenses.InsertParameters("TipoBonus_id").DefaultValue = rdr("TipoBonus_id")
-                End If
-            End Using
+            Dim dtExpenseType As DataRow = Database.GetRow("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + NewTipoSpese.SelectedValue, Me.Page)
+            DSExpenses.InsertParameters("TipoBonus_id").DefaultValue = dtExpenseType("TipoBonus_id")
 
             If NewStorno.Checked Then
                 DSExpenses.InsertParameters("Amount").DefaultValue = DSExpenses.InsertParameters("Amount").DefaultValue * -1
@@ -168,13 +163,8 @@
         End If
 
         ' Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-        Database.OpenConnection()
-        Using rdr As SqlDataReader = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + e.Command.Parameters("@ExpenseType_id").Value, Me.Page)
-            If Not (rdr Is Nothing) Then
-                rdr.Read()
-                e.Command.Parameters("@TipoBonus_id").Value = rdr("TipoBonus_id")
-            End If
-        End Using
+        Dim drExpenseType = Database.GetRow("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + e.Command.Parameters("@ExpenseType_id").Value, Me.Page)
+        e.Command.Parameters("@TipoBonus_id").Value = drExpenseType("TipoBonus_id")
 
         ' Audit    
         e.Command.Parameters("@LastModifiedBy").Value = Session("UserId")

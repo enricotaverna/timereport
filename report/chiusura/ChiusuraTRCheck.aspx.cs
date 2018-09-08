@@ -42,7 +42,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-ok.png";
                         break;
                     case 1:
-                        CheckTicket.Text = "Ticket: alcuni ticket assenti";
+                        CheckTicket.Text = ListaAnomalie.Count + " ticket o rimborsi travel assenti";
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
                         CheckTicketDettagli.NavigateUrl = "/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=01";
                         CheckTicketDettagli.Text = "[dettagli]";
@@ -60,7 +60,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                                                      Session["persons_id"].ToString(),
                                                      ref ListaAnomalie);
 
-        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : "Spesa caricata su commessa non presente nella giornata";
+        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : ListaAnomalie.Count + " spese caricate su commessa non presente nella giornata";
         CheckSpeseImg.ImageUrl = bCheckResult == 0 ? "/timereport/images/icons/50x50/icon-ok.png" : "/timereport/images/icons/50x50/icon-alert.png";
 
         if (bCheckResult != 0) {
@@ -74,21 +74,8 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
     } // Page_Load()      
 
 
-    protected bool ControllaSpese(int persons_id, int month, int year)
-    {
-
-        // loop su tutte le spese del mese, se trovo spese senza che nel giorno sia caricato il progetto 
-        // emetto un warning
-
-
-
-        return true;
-    }
-
         protected void InsertButton_Click(object sender, EventArgs e)
     {
-        Database.OpenConnection();
-
         string cmd;	   
     
         // verifica se esiste record per mese e persona
@@ -114,8 +101,6 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
         }
 
         Database.ExecuteSQL(cmd, this.Page);
-
-        Database.CloseConnection();
 
         Response.Redirect("/timereport/input.aspx");
 

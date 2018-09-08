@@ -58,9 +58,7 @@ public class WStimereport : System.Web.Services.WebService {
         // cancella record da DB
         try
         {
-            Database.OpenConnection();
             Database.ExecuteSQL("DELETE FROM expenses WHERE expenses_id=" + iIdSpesa.ToString(), null);
-            Database.CloseConnection();
         
             // estrae file associati all'id della spesa, data formato YYYYMMGG
             string[] filePaths = TrovaRicevuteLocale(iIdSpesa, sUsername, sDataSpesa);

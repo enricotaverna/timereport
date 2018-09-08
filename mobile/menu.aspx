@@ -477,7 +477,7 @@
                     //                alert(result.status + ' >> ' + result.responseText);
                     ////            } 
 
-                    function OreAjaxSubmit() {
+             function OreAjaxSubmit() {
 
                         var Activity;
 

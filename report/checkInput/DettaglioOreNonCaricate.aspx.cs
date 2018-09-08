@@ -32,15 +32,13 @@ protected void Page_Load(object sender, EventArgs e)
         DataTable dt = new DataTable();
         List<ClRecordLista> ListaReport = new List<ClRecordLista> { };
 
-        // apre connessione
-        Database.OpenConnection(); 
-
         // Legge record
-        using (SqlDataReader rdr = Database.GetReader("SELECT Persons.Name, Company.Name as CName, Persons.ContractHours, Persons.Mail FROM Persons INNER JOIN Company ON Persons.Company_id = Company.Company_id WHERE Persons_id = " + sPersons_id, this.Page))
-        {
-        if (rdr.HasRows) // record non trovato  
+        DataTable dtPerson = Database.GetData("SELECT Persons.Name, Company.Name as CName, Persons.ContractHours, Persons.Mail FROM Persons INNER JOIN Company ON Persons.Company_id = Company.Company_id WHERE Persons_id = " + sPersons_id, this.Page);
+
+        if (dtPerson.Rows.Count > 0) // record trovato  
                 {
-                rdr.Read();
+                DataRow rdr = dtPerson.Rows[0];
+
 	            iContractHours = Convert.ToInt16(rdr["ContractHours"]);	
                 lblMail.Text = rdr["mail"].ToString();
                 lblMail.NavigateUrl = "mailto:" + rdr["mail"].ToString();
@@ -48,7 +46,6 @@ protected void Page_Load(object sender, EventArgs e)
                 lblOre.Text = rdr["ContractHours"].ToString();
                 lblSocieta.Text = rdr["CName"].ToString();     
                 }
-        }    
                 
         // cicla sui giorni del mese
         object result = new object();
@@ -75,12 +72,8 @@ protected void Page_Load(object sender, EventArgs e)
                 }
         }
 
-        // Chiude connession
-        Database.CloseConnection();  
-
         // Carica Tabella ed effettua Bind con GridView
         CaricaTabella(ListaReport);
-
     }
 
 protected void CaricaTabella(List<ClRecordLista> ListaReport) 

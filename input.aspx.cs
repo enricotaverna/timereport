@@ -17,7 +17,7 @@ public partial class input : System.Web.UI.Page
     public int intMonth;
     public bool bTRChiuso;
     public DataTable dtHours;
-    public DataTable dtExpenses;
+    public DataTable dtenses;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -102,7 +102,6 @@ public partial class input : System.Web.UI.Page
     protected void ProcessDragDrop(string input)
     {
         string[] param = input.Split(new Char[] { ';' });
-        DataTable dt = new DataTable();
 
         // se TR è chiuso esce
         if (!Convert.ToBoolean(Session["InputScreenChangeMode"]))
@@ -111,14 +110,11 @@ public partial class input : System.Web.UI.Page
         if ((string)Session["type"] == "hours")
         {
 
-            // leggi record da copiare
-            Database.OpenConnection();
-            using (SqlDataReader rdr = Database.GetReader("Select projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment from hours where hours_id=" + param[1], this.Page))
-            {
-                if (rdr != null)
-                {
-                    dt.Load(rdr); // carica record
+            DataTable dt = Database.GetData("Select projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment from hours where hours_id=" + param[1], this.Page);
 
+                if (dt.Rows.Count > 0)
+                {
+ 
                     // formata alcuni campi per successiva scrittura                            
                     Double iHours = Convert.ToDouble(dt.Rows[0]["hours"]);
                     string strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
@@ -140,8 +136,6 @@ public partial class input : System.Web.UI.Page
                                          " )"
                                         , this.Page);
                 }
-                Database.CloseConnection();
-            } // using
 
             CaricaBufferOre(); // refresh ore
 
@@ -151,13 +145,10 @@ public partial class input : System.Web.UI.Page
         {
 
             // leggi record da copiare
-            Database.OpenConnection();
-            using (SqlDataReader rdr = Database.GetReader("Select projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id, AccountingDate, comment from Expenses where Expenses_id=" + param[1], this.Page))
-            {
-                if (rdr != null)
-                {
-                    dt.Load(rdr); // carica record
+            DataTable dt = Database.GetData("Select projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id, AccountingDate, comment from Expenses where Expenses_id=" + param[1], this.Page);
 
+            if (dt.Rows.Count > 0)    
+                {
                     // formata alcuni campi per successiva scrittura                            
                     double iAmount = Convert.ToDouble(dt.Rows[0]["Amount"]);
 
@@ -182,8 +173,6 @@ public partial class input : System.Web.UI.Page
                                          " )"
                                         , this.Page);
                 }
-            } // using
-            Database.CloseConnection();
 
             CaricaBufferSpese(); // refresh spese
 
@@ -197,33 +186,6 @@ public partial class input : System.Web.UI.Page
     protected void BindDDLProjects()
     {
 
-        // attivata MARS 
-        //SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-
-        //SqlCommand cmd;
-        //Database.OpenConnection();
-
-        // imposta selezione progetti in base all'utente
-        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-        //    cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
-        //else
-        //    cmd = new SqlCommand("SELECT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects " +
-        //                               " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-        //                               " WHERE ForcedAccounts.Persons_id=" + Session["persons_id"] +
-        //                               " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
-
-        //using (SqlDataReader dr = cmd.ExecuteReader())
-        //{
-
-        //    DDLProgetto.DataSource = dr;
-        //    DDLProgetto.Items.Clear();
-        //    //          DDLProgetto.Items.Add(new ListItem("--seleziona progetto--", "0"));
-        //    DDLProgetto.DataTextField = "iProgetto";
-        //    DDLProgetto.DataValueField = "Projects_Id";
-        //    DDLProgetto.DataBind();
-        //}
-
-
         DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
 
         DDLProgetto.DataSource = dtProgettiForzati;
@@ -234,8 +196,6 @@ public partial class input : System.Web.UI.Page
         // se in creazione imposta il default di progetto 
         if (Session["ProjectCodeDefault"] != null)
             DDLProgetto.SelectedValue = Session["ProjectCodeDefault"].ToString();
-
-        Database.CloseConnection();
 
     }
 
@@ -363,7 +323,7 @@ public partial class input : System.Web.UI.Page
         string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
 
         // seleziona tutte le ore da primo a ultimo del mese
-        string sQuery = "SELECT Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, CreatedBy, CreationDate " +
+        string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, CreatedBy, CreationDate " +
                         " FROM Hours INNER JOIN projects ON hours.projects_id=projects.projects_id LEFT OUTER JOIN Activity ON Activity.Activity_id = Hours.Activity_id " +
                         " WHERE hours.Persons_id=" + Session["Persons_id"] +
                         " AND hours.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
@@ -391,7 +351,7 @@ public partial class input : System.Web.UI.Page
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
         if (sQuery!="") // chiamata da scheda spese
-            dtExpenses = Database.GetData(sQuery, this.Page);
+            dtenses = Database.GetData(sQuery, this.Page);
 
     }
 
@@ -405,7 +365,7 @@ public partial class input : System.Web.UI.Page
         try
         {
             // costruisci il pach di ricerca: public + anno + mese + nome persona 
-            string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
+            string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
             // carica immagini
             filePaths = Directory
                 .GetFiles(TargetLocation, "fid-" + (iId == -1 ? "" : iId.ToString()) + "*.*")
@@ -484,7 +444,7 @@ public partial class input : System.Web.UI.Page
             Response.Write("<td >");
             strDate = intDayNumber.ToString() + "/" + Session["month"] + "/" + Session["year"];
 
-            DataRow[] drRow = dtExpenses.Select("[date] = '" + strDate + "'");
+            DataRow[] drRow = dtenses.Select("[date] = '" + strDate + "'");
 
             if (drRow.Count() > 0)
                 Response.Write("<table>");  // si usa tabelle per problemi di formattazione
@@ -538,17 +498,15 @@ public partial class input : System.Web.UI.Page
     protected string GetProject(string sDate)
     {
 
-        Database.OpenConnection();
-        using (SqlDataReader rdr = Database.GetReader("SELECT Projects_id FROM hours WHERE persons_id=" + Session["persons_id"] + " AND Date = " + ASPcompatility.FormatDateDb(sDate, false), this.Page))
-        {
-            if (rdr == null)
-                return "";
+        // 0208 FUNZIONE MIGRATA
 
-            while (rdr.Read())
-                return rdr["Projects_id"].ToString();
-            Database.CloseConnection();
-        }
-        return "";
+        DataRow[] drProgetto = dtHours.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
+
+        if (drProgetto.Count() == 0)
+            return "";
+        else
+            return drProgetto[0][0].ToString();
+
     }
 
     protected void OutputColumn(int intDayNumber)
@@ -607,7 +565,10 @@ public partial class input : System.Web.UI.Page
 
                     case "bonus":  // CALENDARIO SPECIALI
                                    // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
-                        if (!Database.RecordEsiste("SELECT * FROM Expenses WHERE Date=" + ASPcompatility.FormatDateDb(strDate, false) + " AND Persons_id = " + Session["Persons_id"] + " AND TipoBonus_id <> '' ", this.Page) & !bHoliday)
+                        DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(strDate) +"'");
+
+                        //                        if (!Database.RecordEsiste("SELECT * FROM Expenses WHERE Date=" + ASPcompatility.FormatDateDb(strDate, false) + " AND Persons_id = " + Session["Persons_id"] + " AND TipoBonus_id <> '' ", this.Page) & !bHoliday)
+                        if ( drFound.Count() == 0 && !bHoliday) // non ci sono bonus sul giorno e non è un festivo
                         {
                             Response.Write("<a href=input.aspx?action=ticket&date=" + strDate + "><img  align=right src=images/icons/16x16/restaurant.png  border=0></a>");
 

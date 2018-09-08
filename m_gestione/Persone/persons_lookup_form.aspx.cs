@@ -65,20 +65,16 @@ public partial class persons_lookup_form : System.Web.UI.Page
         //}
 
         // Recupera identificativo appena creato e lancia procedura per creazione automatica festivi
-        int newIdentity;
+        //int newIdentity;
 
-        Database.OpenConnection();
-
-        using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-        {
-            c.Open();
-            SqlCommand cmd = new SqlCommand("SELECT MAX(Persons_id) from Persons", c);
-            newIdentity = (int)cmd.ExecuteScalar();
-        }
+        //using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+        //{
+        //    c.Open();
+        //    SqlCommand cmd = new SqlCommand("SELECT MAX(Persons_id) from Persons", c);
+        //    newIdentity = (int)cmd.ExecuteScalar();
+        //}
 
         // CommonFunction.CreaFestiviAutomatici( Convert.ToInt16(newIdentity.ToString()) ); DA TESTARE !!!
-
-        Database.CloseConnection();
 
         Response.Redirect("Persons_lookup_list.aspx?messaggio=yes");
     }

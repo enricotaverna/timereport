@@ -96,35 +96,28 @@ public partial class report_ricevute_select : System.Web.UI.Page
     protected void Bind_DDLPersone()
     {
         DDLPersone.Items.Clear();
-        Database.OpenConnection();
 
-        using (SqlDataReader rdr = Database.GetReader("SELECT Persons.Persons_id, Persons.Name from Persons ORDER BY  Persons.Name DESC", this.Page))
+        DataTable dtPersons = Database.GetData("SELECT Persons.Persons_id, Persons.Name from Persons ORDER BY  Persons.Name DESC", this.Page);
+
+        foreach (DataRow dtRow in dtPersons.Rows) 
         {
-            if (rdr != null)
+
+            try
             {
-                 while (rdr.Read())
-                 {
 
-                     try
-                     {
+                // se esiste la directory popola l'item della DDL
+                string TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + DDLAnni.SelectedValue.ToString() + "\\" + DDLMesi.SelectedValue.ToString() + "\\" + dtRow["name"].ToString().Trim() + "\\";
 
-                         // se esiste la directory popola l'item della DDL
-                         string TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + DDLAnni.SelectedValue.ToString() + "\\" + DDLMesi.SelectedValue.ToString() + "\\" + rdr["name"].ToString().Trim() + "\\";
-
-                         if (Directory.Exists(TargetLocation))
-                             DDLPersone.Items.Insert(0, new ListItem(rdr["name"].ToString(), rdr["Persons_id"].ToString()));
-                     }
-                     catch (Exception exp)
-                     {
-                         //non fa niente ma evita il dump
-                     }
-
-                }
+                if (Directory.Exists(TargetLocation))
+                    DDLPersone.Items.Insert(0, new ListItem(dtRow["name"].ToString(), dtRow["Persons_id"].ToString()));
+            }
+            catch (Exception exp)
+            {
+                //non fa niente ma evita il dump
             }
 
-        }
 
-        Database.CloseConnection();
+        }
 
         // nessuna seleazione
         DDLPersone.Items.Insert(0, new ListItem("--- Tutte le persone ---", "")); 

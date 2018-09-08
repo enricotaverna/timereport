@@ -2,6 +2,7 @@
 Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Configuration
+Imports System.Web.Configuration
 Imports System.Web
 Imports System.Collections
 Imports System.Web.UI.WebControls
@@ -108,7 +109,7 @@ Public Class Auth
 
         ' sessione scaduta
         If HttpContext.Current.Session("persons_id") Is Nothing Then
-            HttpContext.Current.Response.Redirect("/timereport/default.asp")
+            HttpContext.Current.Response.Redirect("/timereport/default.aspx")
         End If
 
         ' carica da memoria
@@ -167,7 +168,7 @@ Public Class Utilities
 
         '          sessione scaduta
         If HttpContext.Current.Session("userLevel") Is Nothing Then
-            HttpContext.Current.Response.Redirect("/timereport/default.asp")
+            HttpContext.Current.Response.Redirect("/timereport/default.aspx")
         End If
 
         '          Mancato auth
@@ -193,7 +194,7 @@ Public Class Utilities
 
     End Sub
 
-    Public Shared Sub CreateMessageAlert(ByRef aspxPage As System.Web.UI.Page, _
+    Public Shared Sub CreateMessageAlert(ByRef aspxPage As System.Web.UI.Page,
                          ByVal strMessage As String, ByVal strKey As String)
 
         Dim strScript As String = "<script language=JavaScript>alert('" _
@@ -484,21 +485,14 @@ Public Class CommonFunction
         End If
 
         ' 1' step: cancella tutti i festivi automatici (solo quelli dal giorno attuale in avanti !!!)
-        Database.OpenConnection()
+        Dim dtPersons As DataTable = Database.GetData(SQLString, Nothing)
 
-        Using rdr As SqlDataReader = Database.GetReader(SQLString, Nothing)
-            If Not (rdr Is Nothing) Then
-                ' cicla su tutte le persone attive
-                While rdr.Read()
-
-                    ' cancella i record creati automaticamente con data >= data attuale
-                    SQLString = "DELETE FROM hours WHERE FestivoAutomatico = 1 AND Persons_id = " & rdr("Persons_id") & " AND Date >= " &
-                                ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"))
-                    Database.ExecuteSQL(SQLString, Nothing)
-
-                End While
-            End If
-        End Using
+        For Each rdr In dtPersons.Rows
+            ' cancella i record creati automaticamente con data >= data attuale
+            SQLString = "DELETE FROM hours WHERE FestivoAutomatico = 1 AND Persons_id = " & rdr("Persons_id") & " AND Date >= " &
+                        ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"))
+            Database.ExecuteSQL(SQLString, Nothing)
+        Next
 
         ' 2' step: crea i carichi automatici
 
@@ -510,13 +504,13 @@ Public Class CommonFunction
             SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.active = 1 AND Holiday.holiday_date >= " & ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"))
         End If
 
-        Using rdr As SqlDataReader = Database.GetReader(SQLString, Nothing)
-            If Not (rdr Is Nothing) Then
-                ' cicla su tutte le persone attive / date da creare
-                While rdr.Read()
+        dtPersons.Clear()
+        dtPersons = Database.GetData(SQLString, Nothing)
 
-                    ' cancella i record creati automaticamente con data >= data attuale
-                    Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, FestivoAutomatico) VALUES(" +
+        For Each rdr In dtPersons.Rows
+            ' cancella i record creati automaticamente con data >= data attuale
+            ' cancella i record creati automaticamente con data >= data attuale
+            Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, FestivoAutomatico) VALUES(" +
                                              ASPcompatility.FormatDateDb(rdr("holiday_date"), False) & " , " &
                                              ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings("FESTIVI_PROJECT")) & " , " &
                                              ASPcompatility.FormatStringDb(rdr("Persons_id").ToString()) & " , " &
@@ -531,11 +525,7 @@ Public Class CommonFunction
                                              ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), True) &
                                              "'1'" &
                                              " )", Nothing)
-                End While
-            End If
-        End Using
-
-        Database.CloseConnection()
+        Next
 
     End Sub
 
@@ -571,6 +561,10 @@ Public Class CheckChiusura
         Public Tipo As String
         Public Data As Date
         Public Descrizione As String
+        Public ExpenseCode As String
+        Public ProjectCode As String
+        Public Amount As Double
+        Public UnitOfMeasure As String
 
     End Class
 
@@ -583,9 +577,13 @@ Public Class CheckChiusura
 
         Dim f As Integer
         Dim sDate As String
+        Dim drRow As DataRow()
 
         CheckTicket = 0
         ListaAnomalie = New List(Of CheckAnomalia)
+
+        ' carica ticket caricati nel mese
+        Dim dtTicket As DataTable = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date from Expenses where persons_id=" + persons_id + " AND TipoBonus_id<>'0'", Nothing)
 
         ' cicla sui giorni del mese
         For f = 1 To System.DateTime.DaysInMonth(sAnno, sMese)
@@ -595,12 +593,13 @@ Public Class CheckChiusura
             If Weekday(CDate(sDate)) <> 1 And Weekday(CDate(sDate)) <> 7 Then
 
                 ' controlla che non sia festivo
-                If Not (Database.RecordEsiste("Select * from Holiday where holiday_date=" + ASPcompatility.FormatDateDb(sDate))) Then
+                If Not MyConstants.DTHoliday.Rows.Contains(sDate) Then
 
                     ' controlla che sia caricato un ticket
-                    If Not (Database.RecordEsiste("Select * from Expenses where date=" + ASPcompatility.FormatDateDb(sDate) + _
-                                                  " AND persons_id=" + persons_id + _
-                                                  " AND TipoBonus_id<>'0'")) Then
+                    drRow = Nothing
+                    drRow = dtTicket.Select("date = '" + sDate + "'")
+
+                    If drRow.Count = 0 Then
 
                         ' Alza anomalia e carica lista
                         CheckTicket = 1
@@ -635,27 +634,48 @@ Public Class CheckChiusura
         Dim dFirst As String = ASPcompatility.FormatDateDb("01/" + sMese + "/" + sAnno)
         Dim dLast As String = ASPcompatility.FormatDateDb(Date.DaysInMonth(sAnno, sMese).ToString + "/" + sMese + "/" + sAnno)
 
-        ' seleziona tutte le spese del mese
-        Dim dt As DataTable = Database.GetData("SELECT Projects_id, date FROM Expenses WHERE Persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, Nothing)
+        ' carica spese nel mese della persona per il controllo
+        Dim dtProgettiMese As DataTable = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date, Projects_id from Hours WHERE Persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, Nothing)
+
+        ' seleziona tutte le spese del mese, considera le spese standard e i rimborsi trasferta
+        Dim dt As DataTable = Database.GetData("SELECT a.Projects_id, Amount, date, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure FROM Expenses As a " +
+                                               " JOIN Projects As b On b.Projects_id  = a.Projects_id " +
+                                               " JOIN ExpenseType As c On c.ExpenseType_id  = a.ExpenseType_Id " +
+                                               " WHERE ( a.TipoBonus_Id = 0 Or a.TipoBonus_Id = 1 ) And Persons_id=" + persons_id + " And Date >= " + dFirst + " And Date <= " + dLast, Nothing)
+
+        ' se non ci sono stati carichi esce con errore
+        If dtProgettiMese.Rows.Count = 0 Then
+            Return (1)
+        End If
+
         Dim rs As DataRow
+        Dim drRows As DataRow()
+        Dim sdata As String
 
         If (dt IsNot Nothing) And dt.Rows.Count > 0 Then
 
             ' cicla sulla spese del mese
             For Each rs In dt.Rows
 
-                Dim sdata As String = ASPcompatility.FormatDateDb(String.Format("{0:dd/MM/yyyy}", rs("date")))
+                sdata = String.Format("{0:dd/MM/yyyy}", rs("date"))
 
                 ' verifica se esistono ore caricate per lo stesso progetto
-                If Not Database.RecordEsiste("SELECT * FROM hours WHERE date=" + sdata + " AND Projects_id=" + rs("Projects_id").ToString) Then
+
+                drRows = Nothing
+                drRows = dtProgettiMese.Select("date = '" + sdata + "' AND Projects_id = " + rs("Projects_id").ToString)
+
+                If drRows.Count = 0 Then
                     Dim a As CheckAnomalia = New CheckAnomalia()
                     a.Data = rs("date")
                     a.Tipo = "M"
                     a.Descrizione = "Spesa caricata su commessa non presente nel giorno"
+                    a.ExpenseCode = rs("ExpenseCode")
+                    a.ProjectCode = rs("ProjectCode")
+                    a.UnitOfMeasure = rs("UnitOfMeasure")
+                    a.Amount = rs("Amount")
+
                     ListaAnomalie.Add(a)
                 End If
-
-
             Next
 
         End If
@@ -672,158 +692,103 @@ End Class
 
 Public Class Database
 
-    Private Shared con As SqlConnection
-
-    Public Shared Sub OpenConnection()
-
-        If con Is Nothing Then
-            con = New SqlConnection(ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString)
-            con.Open()
-        End If
-
-        If con.State = ConnectionState.Closed Then
-            con = New SqlConnection(ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString)
-            con.Open()
-        End If
-
-    End Sub
-
-    Public Shared Sub CloseConnection()
-        con.Close()
-    End Sub
-
+    ' 02-09-2018 FUNZIONE MIGRATA
     Public Shared Function ExecuteScalar(ByVal cmdText As String, ByVal mypage As Page) As Object
 
-        Try
+        Dim connectionString = System.Configuration.ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString
+        Using connection As New SqlConnection(connectionString)
 
-            If con Is Nothing Then
-                OpenConnection()
-            ElseIf con.State = 0 Then
-                OpenConnection()
-            End If
+            Dim dtRecord As New DataTable()
+            Using cmd As SqlCommand = New SqlCommand(cmdText, connection)
 
-            Dim cmd As SqlCommand = New SqlCommand(cmdText, con)
-            ExecuteScalar = cmd.ExecuteScalar()
+                Try
 
-        Catch ex As Exception
-            ' Errore
-            ExecuteScalar = 0
+                    connection.Open() ' Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
+                    ExecuteScalar = cmd.ExecuteScalar()
 
-            If Not (mypage Is Nothing) Then
-                'ScriptManager.RegisterStartupScript(mypage, mypage.GetType(), "ShowStatus", "javascript:alert('Execute: " & ex.Message & "');", True)
+                Catch ex As Exception
+                    If Not (mypage Is Nothing) Then
+                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteScalar: " & ex.Message & "');", True)
+                    End If
+                    ExecuteScalar = 0
+                End Try
 
-                mypage.ClientScript.RegisterStartupScript(mypage.GetType(),
-                "MessageBox", "alert('Execute: " & ex.Message & "');", True)
-            End If
+            End Using
 
-        End Try
+        End Using
 
     End Function
 
+    ' 02-09-2018 FUNZIONE MIGRATA
     Public Shared Function ExecuteSQL(ByVal cmdText As String, ByVal mypage As Page) As Int16
 
-        Dim bOpenConnection As Boolean = False
+        Dim connectionString = System.Configuration.ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString
+        Using connection As New SqlConnection(connectionString)
 
-        Try
+            Dim dtRecord As New DataTable()
+            Using cmd As SqlCommand = New SqlCommand(cmdText, connection)
 
-            If con Is Nothing Then
-                OpenConnection()
-                bOpenConnection = True
-            ElseIf con.State = 0 Then
-                OpenConnection()
-            End If
+                Try
 
-            Dim cmd As SqlCommand = New SqlCommand(cmdText, con)
-            ExecuteSQL = cmd.ExecuteNonQuery()
+                    connection.Open() ' Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
+                    ExecuteSQL = cmd.ExecuteNonQuery()
 
-        Catch ex As Exception
-            ' Errore
-            ExecuteSQL = 0
+                Catch ex As Exception
+                    If Not (mypage Is Nothing) Then
+                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteSQL: " & ex.Message & "');", True)
+                    End If
+                    ExecuteSQL = 0
+                End Try
 
-            If Not (mypage Is Nothing) Then
-                'ScriptManager.RegisterStartupScript(mypage, mypage.GetType(), "ShowStatus", "javascript:alert('Execute: " & ex.Message & "');", True)
+            End Using
 
-                mypage.ClientScript.RegisterStartupScript(mypage.GetType(), _
-                "MessageBox", "alert('Execute: " & ex.Message & "');", True)
-            End If
-
-        End Try
-
-        If bOpenConnection Then
-            '           Se ha aperto la connessione la chiude
-            CloseConnection()
-        End If
+        End Using
 
     End Function
 
-    Public Shared Function GetReader(ByVal cmdText As String, ByVal mypage As Page) As SqlDataReader
-
-        If con Is Nothing Then
-            OpenConnection()
-        ElseIf con.State = 0 Then
-            OpenConnection()
-        End If
-
-        Try
-            Dim cmd As SqlCommand = New SqlCommand(cmdText, con)
-            GetReader = cmd.ExecuteReader()
-
-        Catch ex As Exception
-            ' Errore
-            GetReader = Nothing
-            If Not (mypage Is Nothing) Then
-                'ScriptManager.RegisterStartupScript(mypage, mypage.GetType(), "ShowStatus", "GetReader:alert('Execute: " & ex.Message & "');", True)
-
-                mypage.ClientScript.RegisterStartupScript(mypage.GetType(), _
-                "MessageBox", "alert('GetReader: " & ex.Message & "');", True)
-            End If
-        End Try
-
-        ' restituisce null se non trova niente, all'uscita richiede un rdr.Read() per leggere contenuti 
-
-    End Function
-
+    ' 02-09-2018 FUNZIONE MIGRATA
     Public Shared Function RecordEsiste(ByVal cmdText As String) As Boolean
         Return RecordEsiste(cmdText, Nothing)
     End Function
 
+    ' 02-09-2018 FUNZIONE MIGRATA
     Public Shared Function RecordEsiste(ByVal cmdText As String, ByVal mypage As Page) As Boolean
+        ' 02-09-2018 FUNZIONE MIGRATA
         Dim result As Boolean = False
 
-        Try
+        Dim connectionString = System.Configuration.ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString
+        Using connection As New SqlConnection(connectionString)
 
-            OpenConnection()
+            Dim dtRecord As New DataTable()
+            Using da As New SqlDataAdapter(cmdText, connection)
 
-            Dim cmd As SqlCommand = New SqlCommand(cmdText, con)
-            Using rdr As SqlDataReader = cmd.ExecuteReader
+                Try
 
-                If Not (rdr Is Nothing) Then
+                    connection.Open() ' Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
+                    da.Fill(dtRecord)
 
-                    If rdr.Read() Then
+                    If dtRecord.Rows.Count = 1 Then
                         result = True
                     Else
                         result = False
                     End If
-                End If
+
+                Catch ex As Exception
+                    If Not (mypage Is Nothing) Then
+                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE RecordEsiste: " & ex.Message & "');", True)
+                    End If
+                    result = False
+                End Try
 
             End Using
 
-        Catch ex As Exception
-            ' Errore
-            If Not (mypage Is Nothing) Then
-                'ScriptManager.RegisterStartupScript(mypage, mypage.GetType(), "ShowStatus", "javascript:alert('RecordEsiste: " & ex.Message & "');", True)
-                mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE: " & ex.Message & "');", True)
-            End If
-            result = False
-
-        Finally
-            CloseConnection()
-        End Try
+        End Using
 
         Return result
 
     End Function
 
+    ' 02-09-2018 FUNZIONE MIGRATA
     Public Shared Function GetData(ByVal cmdText As String, ByVal mypage As Page) As DataTable
 
         Dim dt As New DataTable()
@@ -842,7 +807,7 @@ Public Class Database
                     Catch ex As Exception
 
                         If Not (mypage Is Nothing) Then
-                            mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE: " & ex.Message & "');", True)
+                            mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE GetData: " & ex.Message & "');", True)
                         End If
 
                     End Try
@@ -852,6 +817,14 @@ Public Class Database
         End Using
 
         Return dt
+    End Function
+
+    ' 02-09-2018 FUNZIONE MIGRATA
+    Public Shared Function GetRow(ByVal cmdText As String, ByVal mypage As Page) As DataRow
+
+        Dim dtTable As DataTable = Database.GetData(cmdText, mypage)
+        GetRow = dtTable.Rows(0)
+
     End Function
 
 End Class
@@ -968,24 +941,35 @@ Public Class ASPcompatility
 
     Public Shared Function GetRows(ByVal sSQLstring As String) As System.Data.DataRowCollection
 
-        Dim connStr As String
-        Dim conn As SqlConnection
-        Dim Adapter As SqlDataAdapter
         Dim ds As DataSet
 
-        connStr = ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString
-        conn = New SqlConnection(connStr)
+        Dim connectionString = System.Configuration.ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString
+        Using connection As New SqlConnection(connectionString)
 
-        Adapter = New SqlDataAdapter(sSQLstring, conn)
+            Using Adapter As New SqlDataAdapter(sSQLstring, connection)
 
-        ds = New DataSet()
-        Adapter.Fill(ds)
+                Try
 
-        If ds.Tables(0).Rows.Count = 0 Then
-            GetRows = Nothing
-        Else
-            GetRows = ds.Tables(0).Rows
-        End If
+                    ds = New DataSet()
+                    Adapter.Fill(ds)
+
+                    If ds.Tables(0).Rows.Count = 0 Then
+                        GetRows = Nothing
+                    Else
+                        GetRows = ds.Tables(0).Rows
+                    End If
+
+                Catch ex As Exception
+                    GetRows = Nothing
+                    'If Not (mypage Is Nothing) Then
+                    '    mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE: " & ex.Message & "');", True)
+                    'End If
+
+                End Try
+
+            End Using
+
+        End Using
 
     End Function
 

@@ -56,32 +56,30 @@ public partial class report_Straordinarit_list : System.Web.UI.Page
         if (DL_societa.SelectedValue != "all")
             sWhere = "c.company_id = " + DL_societa.SelectedValue.ToString() + " AND ";
 
-        sSelect = "select b.Name as Nome, c.Name as Societa, a.Date as data, sum(a.Hours) as ore, b.ContractHours as OreContratto, sum(a.Hours) - b.ContractHours as straordinario from MSSql12155.Hours as a " +
-                  " left join MSSql12155.Persons as b on b.Persons_id = a.Persons_id " +
-                  " left join MSSql12155.Company as c on c.Company_id = b.Company_id " +
-                  " left join MSSql12155.Projects as d on d.Projects_id = a.Projects_id " +
+        sSelect = "select b.Name as Nome, c.Name as Societa, a.Date as data, sum(a.Hours) as ore, b.ContractHours as OreContratto, sum(a.Hours) - b.ContractHours as straordinario from Hours as a " +
+                  " left join Persons as b on b.Persons_id = a.Persons_id " +
+                  " left join Company as c on c.Company_id = b.Company_id " +
+                  " left join Projects as d on d.Projects_id = a.Projects_id " +
                   " where " + sWhere + " a.date >= " + sDataInizio + " and a.date <= " + sDataFine + " GROUP BY a.date, b.Name, c.name, b.ContractHours ORDER BY b.Name, a.date";
 
         // Esegue Select e popola DataTable  
-        Database.OpenConnection();
+        DataTable dtHours = Database.GetData(sSelect, this.Page);
 
-        using (SqlDataReader rdr = Database.GetReader(sSelect, this.Page))
+        foreach (DataRow rdr in dtHours.Rows)
         {
-                
-            // Loop sulle persone selezionate
-            while (rdr != null && rdr.Read())
-            {
 
-                DataRow dr = dt.NewRow();
-                dr["Nome"] = rdr["Nome"];
-                dr["Società"] = rdr["Societa"];
-                dr["Data"] = ((DateTime)rdr["Data"]).ToString("d");
-                dr["Ore caricate"] = Convert.ToDecimal(rdr["ore"]).ToString("0.00");
-                dr["Ore Contratto"] = Convert.ToDecimal(rdr["OreContratto"]).ToString("0.00");
-                dr["Straordinario"] = Convert.ToDecimal(rdr["straordinario"]).ToString("0.00");
+            if (rdr["Nome"] == DBNull.Value)
+                continue;
 
-                dt.Rows.Add(dr);
-            }
+            DataRow dr = dt.NewRow();
+            dr["Nome"] = rdr["Nome"];
+            dr["Società"] = rdr["Societa"];
+            dr["Data"] = ((DateTime)rdr["Data"]).ToString("d");
+            dr["Ore caricate"] = Convert.ToDecimal(rdr["ore"]).ToString("0.00");
+            dr["Ore Contratto"] = Convert.ToDecimal(rdr["OreContratto"]).ToString("0.00");
+            dr["Straordinario"] = Convert.ToDecimal(rdr["straordinario"]).ToString("0.00");
+
+            dt.Rows.Add(dr);
         }
 
         // sort

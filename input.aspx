@@ -14,7 +14,7 @@
 <script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.js"></script>
-
+    
 <!-- ToolTip jquey add-in  -->
 <script type="text/javascript" src="/timereport/include/jquery/tooltip/modernizr.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/tooltip/jquery.smallipop.min.js"></script>
@@ -396,7 +396,6 @@
 			FindExpenses(31);
         Response.Write("</tr>");
 
-        Database.CloseConnection();
 	}
 
             %>

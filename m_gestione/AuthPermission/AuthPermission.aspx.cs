@@ -64,8 +64,6 @@ public partial class m_gestione_AuthPermission_AuthPermission : Page
     {
 
         // cancella precedenti assegnazioni
-        Database.OpenConnection();
-
         Database.ExecuteScalar("DELETE FROM AuthPermission WHERE UserLevel_id = " + DDLUserLevel.SelectedValue, this);
 
         // loop sugli elementi selezionati
@@ -78,9 +76,7 @@ public partial class m_gestione_AuthPermission_AuthPermission : Page
                                        "VALUES ( '" + DDLUserLevel.SelectedValue + "' , '" + item.Value + "')", this);
             }
         }
-
-        Database.CloseConnection();
-
+        
         // emette messaggio di conferma salvataggio
         string message = "Salvataggio effettuato";
         ClientScript.RegisterStartupScript(this.GetType(), "Popup", "ShowPopup('" + message + "');", true);

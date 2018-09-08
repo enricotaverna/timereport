@@ -26,8 +26,6 @@
         Dim i, f As Integer
         Dim idProgetto As Integer
         Dim idSpesa As Integer
-        Dim aProgettiForzati As System.Data.DataRowCollection
-        Dim aSpeseForzate As System.Data.DataRowCollection
 
         ' record layout
         ' Risorsa (0); Data (1);Progetto (2); Tipo Spesa (3);Valore (4);Pagato (5);Storno (6); Note (7)
@@ -92,8 +90,6 @@
         Dim iTipoBonus_id As Integer
         Dim aDateBonus As New ArrayList ' usato per verificare doppi bonus su stesso giorno
 
-        Database.OpenConnection() ' ???
-
         For Each dr In dt.Rows
 
             ' indice
@@ -135,7 +131,7 @@
 
             ' valori flag                               
             If dr(PAGATO).ToString.Trim <> "" And
-        dr(PAGATO).ToString <> "X" And dr(PAGATO).ToString <> "x" Then
+               dr(PAGATO).ToString <> "X" And dr(PAGATO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg4").ToString ' ": valore flag 'PAGATO con cc' non riconosciuto"
                 Continue For
@@ -143,7 +139,7 @@
 
             ' valori flag                               
             If dr(STORNO).ToString <> "" And
-        dr(STORNO).ToString <> "X" And dr(STORNO).ToString <> "x" Then
+               dr(STORNO).ToString <> "X" And dr(STORNO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg5").ToString ' ": valore flag 'STORNO' non riconosciuto"
                 Continue For
@@ -151,7 +147,7 @@
 
             ' valori flag                               
             If dr(FATTURA).ToString.Trim <> "" And
-           dr(FATTURA).ToString <> "X" And dr(FATTURA).ToString <> "x" Then
+               dr(FATTURA).ToString <> "X" And dr(FATTURA).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg6").ToString ' ": valore flag 'FATTURA' non riconosciuto"
                 Continue For
@@ -165,11 +161,12 @@
             End If
 
             ' tipo spesa aperta per persona
-            aSpeseForzate = Session("SpeseForzate")
+            Dim aSpeseForzate As DataTable
+            aSpeseForzate = Session("dtSpeseForzate")
 
-            For f = 0 To (aSpeseForzate.Count - 1)
-                If aSpeseForzate.Item(f).Item(1).ToString.Trim = dr(TIPOSPESA).ToString.Trim Then
-                    idSpesa = CInt(aSpeseForzate.Item(f).Item(0))
+            For f = 0 To (aSpeseForzate.Rows.Count - 1)
+                If aSpeseForzate.Rows.Item(f).Item(1).ToString.Trim = dr(TIPOSPESA).ToString.Trim Then
+                    idSpesa = CInt(aSpeseForzate.Rows.Item(f).Item(0))
                     Exit For
                 End If
             Next
@@ -181,14 +178,8 @@
             End If
 
             ' 08/2014 Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-            Using rdr As SqlDataReader = Database.GetReader("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + idSpesa.ToString, Me.Page)
-                If Not (rdr Is Nothing) Then
-                    rdr.Read()
-                    iTipoBonus_id = rdr("TipoBonus_id")
-                Else
-                    iTipoBonus_id = 0
-                End If
-            End Using
+            Dim drExpenseType As DataRow = Database.GetRow("Select TipoBonus_id from ExpenseType where ExpenseType_id=" + idSpesa.ToString, Me.Page)
+            iTipoBonus_id = drExpenseType("TipoBonus_id")
 
             ' Se la spesa è un bonus la quantità deve essere uno
             If iTipoBonus_id > 0 And dr(VALORE) <> 1 Then
@@ -229,12 +220,13 @@
 
             ' Fine                                      
 
+            Dim aProgettiForzati As DataTable
             If idProgetto = 0 Then ' non precedentemente impostato in caso di ticket restaurant
-                aProgettiForzati = Session("ProgettiForzati")
+                aProgettiForzati = Session("dtProgettiForzati")
 
-                For f = 0 To (aProgettiForzati.Count - 1)
-                    If aProgettiForzati.Item(f).Item(1).ToString.Trim = dr(PROGETTO).ToString.Trim Then
-                        idProgetto = CInt(aProgettiForzati.Item(f).Item(0))
+                For f = 0 To (aProgettiForzati.Rows.Count - 1)
+                    If aProgettiForzati.Rows.Item(f).Item(1).ToString.Trim = dr(PROGETTO).ToString.Trim Then
+                        idProgetto = CInt(aProgettiForzati.Rows.Item(f).Item(0))
                         Exit For
                     End If
                 Next
