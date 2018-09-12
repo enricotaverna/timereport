@@ -199,7 +199,7 @@
                 </div>
 
                 <div class="buttons">
-                    <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="sottomettiResource1" />
+<%--                    <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="sottomettiResource1" />--%>
                     <asp:Button ID="download" runat="server"   Text="<%$ Resources:timereport, EXPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="downloadResource1" />
                 </div>
 

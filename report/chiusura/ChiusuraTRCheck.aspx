@@ -33,6 +33,11 @@
 
 <head runat="server">
     <title> Chiusura TimeReport </title>
+    <style type="text/css">
+        .auto-style1 {
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
@@ -50,29 +55,43 @@
         <br />
 
         <!-- *** ORE ***  -->
-        <div class="input nobottomborder">
-            <asp:Image ID="CheckOreImg" runat="server" ImageAlign="Middle" meta:resourcekey="CheckOreImgResource1" />
+        <table class="TabellaLista" >
+            <tr>
+                <td >
+            <asp:Image ID="CheckOreImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckOreImgResource1" Width="25px" />
+                </td>
+                <td>
             <asp:Label ID="CheckOre" runat="server" Text="Ore Caricate" meta:resourcekey="CheckOreResource1"></asp:Label>
+                </td>
+                <td>
             <asp101:ProgressBar id="pbarIEesque" runat="server" Style = "IEesque" Width = 100 />
             <asp:Label ID="CheckOrePerc" runat="server" meta:resourcekey="CheckOrePercResource1"></asp:Label>
-        </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+            <asp:Image ID="CheckTicketImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckTicketImgResource1"  Width="25px"  />
+                </td>
+                <td>
+            <asp:Label ID="CheckTicket" runat="server" Text="Check Ticket" meta:resourcekey="CheckTicketResource1"></asp:Label> </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>
+            <asp:Image ID="CheckSpeseImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1"  Width="25px"  />
+                </td>
+                <td>
+            <asp:Label ID="CheckSpese" runat="server" Text="Check Spese" meta:resourcekey="CheckSpeseResource1"></asp:Label> </td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
 
         <br />
         <!-- *** BONUS / TICKET ***  -->
-        <div class="input nobottomborder">
-            <asp:Image ID="CheckTicketImg" runat="server" ImageAlign="Middle" meta:resourcekey="CheckTicketImgResource1"  />
-            <asp:Label ID="CheckTicket" runat="server" Text="Check Ticket" meta:resourcekey="CheckTicketResource1"></asp:Label> &nbsp; &nbsp;
-            <asp:HyperLink ID="CheckTicketDettagli" runat="server" meta:resourcekey="CheckTicketDettagliResource1">[CheckTicketDettagli]</asp:HyperLink>
-        </div>
 
         <br />
 
         <!-- *** SPESE ***  -->
-        <div class="input nobottomborder">
-            <asp:Image ID="CheckSpeseImg" runat="server" ImageAlign="Middle" meta:resourcekey="CheckSpeseImgResource1"  />
-            <asp:Label ID="CheckSpese" runat="server" Text="Check Spese" meta:resourcekey="CheckSpeseResource1"></asp:Label> &nbsp; &nbsp;
-            <asp:HyperLink ID="CheckSpeseDettagli" runat="server" meta:resourcekey="CheckSpeseDettagliResource1">[CheckSpeseDettagli]</asp:HyperLink>
-        </div>
 
         <!-- *** BOTTONI ***  -->
         <div class="buttons">            

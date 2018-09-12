@@ -111,12 +111,12 @@
 <%--    <meta name="apple-mobile-web-app-capable" content="yes" />--%>
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <!-- style sheets -->
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+    <link rel="stylesheet" href="/timereport/include/jquery/jquery.mobile-1.1.1.min.css" />
     <link rel="stylesheet" href="./css/TimereportMobilev2.css" />
     <!-- jquery mobile -->
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="/timereport/include/jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="./js/customscript.js"></script> 
-    <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+    <script src="/timereport/include/jquery/jquery.mobile-1.1.1.min.js"></script>
     <!-- jquery mobile FINE -->
     <script>
     <!-- elimina barra -->   
@@ -171,9 +171,7 @@
                 data-theme="b" Text="Login" />
             &nbsp;<br />
             <br /> 
-            <span class='ui-body ui-body-c'>
-            IOS11: L&#39;aggiornamento a IOS11 rende impossibile scattare foto dall&#39;interno della WebApp. Per ripristinare la funzionalità accedere 
-            alla app direttamente da Safari e NON salvare una icona sull'Home Page</span>
+ 
         </form>
 
         <div data-role="footer" style="position:absolute; width:100%;bottom: 0; left:0;">

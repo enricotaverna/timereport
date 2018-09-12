@@ -42,10 +42,8 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-ok.png";
                         break;
                     case 1:
-                        CheckTicket.Text = ListaAnomalie.Count + " ticket o rimborsi travel assenti";
+                        CheckTicket.Text = "<a href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=01'>" + ListaAnomalie.Count + " ticket o rimborsi</a>" + " travel assenti";
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
-                        CheckTicketDettagli.NavigateUrl = "/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=01";
-                        CheckTicketDettagli.Text = "[dettagli]";
                         break;
                     case 2:
                         // non usato
@@ -60,13 +58,8 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                                                      Session["persons_id"].ToString(),
                                                      ref ListaAnomalie);
 
-        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : ListaAnomalie.Count + " spese caricate su commessa non presente nella giornata";
+        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : "<a href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=02'>" +  ListaAnomalie.Count + " spese caricate</a> su commessa non presente nella giornata";
         CheckSpeseImg.ImageUrl = bCheckResult == 0 ? "/timereport/images/icons/50x50/icon-ok.png" : "/timereport/images/icons/50x50/icon-alert.png";
-
-        if (bCheckResult != 0) {
-            CheckSpeseDettagli.NavigateUrl = "/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=02";
-            CheckSpeseDettagli.Text = "[dettagli]";
-            }
 
         // imposta indirizzo stampa ricevute
         btStampaRicevute.OnClientClick = "window.open('/timereport/report/ricevute/ricevute_list.aspx?mese=" + Session["Month"] + "&anno=" + Session["Year"] + "')";

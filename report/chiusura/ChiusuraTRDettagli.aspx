@@ -42,7 +42,7 @@
     <form id="NOME_FORM" runat="server"  >
        
         <!-- *** GRID ***  -->
-        <asp:GridView ID="GV_anomalie" runat="server" CssClass="GridView" GridLines="None" >
+        <asp:GridView ID="GV_anomalie" runat="server" CssClass="TabellaLista" GridLines="None" >
             <HeaderStyle CssClass="GV_header" />
             <FooterStyle CssClass="GV_footer" />
             <RowStyle CssClass="GV_row" />
@@ -63,7 +63,7 @@
     <!-- **** FOOTER **** -->  
     <div id="WindowFooter">       
         <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa   <%= DateTime.Now.Year %></div> 
+        <div  id="WindowFooter-L"> Aeonvis Spa    <%= DateTime.Now.Year %></div> 
         <div  id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>              
         <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>      
     </div> 

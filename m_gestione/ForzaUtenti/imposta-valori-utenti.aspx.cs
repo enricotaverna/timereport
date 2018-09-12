@@ -96,7 +96,7 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
         // imposta default
         DataTable dtForcedAccounts = Database.GetData("Select * from ForcedAccounts where persons_id=" + sPersonaSelezionata, this.Page);
 
-        foreach (ListItem li in LBSpese.Items)
+        foreach (ListItem li in LBProgetti.Items)
         {
             DataRow[] drRow = dtForcedAccounts.Select("projects_id = " + li.Value.ToString());
 

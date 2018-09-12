@@ -127,8 +127,8 @@
 									var tc = '080203';
 									var tz = 'userset';
 								</script>
-								<script type="text/javascript" src="http://www.currency.me.uk/remote/ER-ERC-1.php"></script>
-								<small>Source: <a href="http://www.exchangerates.org.uk" target="_new">ExchangeRates.org.uk</a></small>
+								<script type="text/javascript" src="https://www.currency.me.uk/remote/ER-ERC-1.php"></script>
+								<small>Source: <a href="https://www.exchangerates.org.uk" target="_new">ExchangeRates.org.uk</a></small>
 								<!-- EXCHANGERATES.ORG.UK  EXCHANGE RATE CONVERTER END -->
 							</div> <!-- End of Currency Converter script -->
 						

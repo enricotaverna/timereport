@@ -580,16 +580,20 @@ Public Class CheckChiusura
         Dim drRow As DataRow()
 
         CheckTicket = 0
-        ListaAnomalie = New List(Of CheckAnomalia)
+        ListaAnomalie.Clear()
+
+        Dim dFirst As String = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, "0") + "/" + sAnno)
+        Dim dLast As String = ASPcompatility.FormatDateDb(Date.DaysInMonth(sAnno, sMese).ToString + "/" + sMese + "/" + sAnno)
 
         ' carica ticket caricati nel mese
-        Dim dtTicket As DataTable = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date from Expenses where persons_id=" + persons_id + " AND TipoBonus_id<>'0'", Nothing)
+        Dim dtTicket As DataTable = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date from Expenses where persons_id=" + persons_id + " AND TipoBonus_id<>'0' AND date >= " + dFirst + " AND date <= " + dLast, Nothing)
 
         ' cicla sui giorni del mese
         For f = 1 To System.DateTime.DaysInMonth(sAnno, sMese)
-            sDate = f & "/" & sMese & "/" & sAnno
+            sDate = f & "/" & sMese.PadLeft(2, "0") & "/" & sAnno
 
             ' giorno lavorativo
+
             If Weekday(CDate(sDate)) <> 1 And Weekday(CDate(sDate)) <> 7 Then
 
                 ' controlla che non sia festivo
@@ -613,7 +617,6 @@ Public Class CheckChiusura
 
                     End If
 
-
                 End If
 
             End If
@@ -631,7 +634,7 @@ Public Class CheckChiusura
 
         ListaAnomalie.Clear()
 
-        Dim dFirst As String = ASPcompatility.FormatDateDb("01/" + sMese + "/" + sAnno)
+        Dim dFirst As String = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, "0") + "/" + sAnno)
         Dim dLast As String = ASPcompatility.FormatDateDb(Date.DaysInMonth(sAnno, sMese).ToString + "/" + sMese + "/" + sAnno)
 
         ' carica spese nel mese della persona per il controllo
@@ -641,7 +644,7 @@ Public Class CheckChiusura
         Dim dt As DataTable = Database.GetData("SELECT a.Projects_id, Amount, date, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure FROM Expenses As a " +
                                                " JOIN Projects As b On b.Projects_id  = a.Projects_id " +
                                                " JOIN ExpenseType As c On c.ExpenseType_id  = a.ExpenseType_Id " +
-                                               " WHERE ( a.TipoBonus_Id = 0 Or a.TipoBonus_Id = 1 ) And Persons_id=" + persons_id + " And Date >= " + dFirst + " And Date <= " + dLast, Nothing)
+                                               " WHERE ( a.TipoBonus_Id = 0 Or a.TipoBonus_Id = 1 ) And Persons_id=" + persons_id + " And Date >= " + dFirst + " And Date <= " + dLast + " ORDER BY date", Nothing)
 
         ' se non ci sono stati carichi esce con errore
         If dtProgettiMese.Rows.Count = 0 Then
