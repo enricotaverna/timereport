@@ -11,9 +11,9 @@
 <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
 
 <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
-<script src="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 <script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
@@ -276,7 +276,7 @@
 
                                         if (fld[cName].ToString().IndexOf("_Id") > 0 || fld[cName].ToString().IndexOf("_id") > 0)
                                         {
-                                            Response.Write("<div class=InputcontentDDL style=width:200px><select name=" + fld[cName].ToString() + ">");
+                                            Response.Write("<label class=dropdown style=width:200px><select name=" + fld[cName].ToString() + ">");
                                             Response.Write("<option value=0> nessun valore </option>");
 
                                             string strLookUpTable = fld[cName].ToString().Substring(0, fld[cName].ToString().Length - 3);
@@ -293,7 +293,7 @@
 
                                                 Response.Write("<option value=" + drRow[0].ToString() + " " + flagnbh + ">" + drRow[1].ToString() + "</option>");
                                             }
-                                            Response.Write("</select></div> </div>");
+                                            Response.Write("</select></label> </div>");
                                         }
                                         else
                                             Response.Write("<div class=inputcontent><input size=70  type=text name=" + fld[cName] + " value=" + sValue + "></div> </div>");

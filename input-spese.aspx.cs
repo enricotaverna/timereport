@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;  
+using System.Web.UI.HtmlControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
@@ -13,340 +12,294 @@ using System.Threading;
 
 public partial class input_spese : System.Web.UI.Page
 {
-	// attivata MARS .
-	private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+    // attivata MARS .
+    private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
-	public string lProject_id, lExpenseType_id;
-	public int lTipoBonus_id;
-	public string lDataSpesa, lExpense_id;
+    public string lProject_id, lExpenseType_id;
+    public int lTipoBonus_id;
+    public string lDataSpesa, lExpense_id;
 
-	protected void Page_Load(object sender, EventArgs e)
-	{
+    protected void Page_Load(object sender, EventArgs e)
+    {
 
-		Auth.CheckPermission("DATI", "SPESE");
+        Auth.CheckPermission("DATI", "SPESE");
+       
+        //      Modo di default è insert, se richiamata con id va in change / display
+        if (IsPostBack)
+        {
+            if (Request.QueryString["action"].ToString() != "new")
+            {
+                // recupera record per settare default sulle DDL al momento del Bind
+                Get_record(Request.QueryString["expenses_id"].ToString());
+                Trova_ricevute(Request.QueryString["expenses_id"]);
+            }
 
-		// Evidenzia campi form in errore
-		Page.ClientScript.RegisterOnSubmitStatement(this.GetType(), "val", "fnOnUpdateValidators();");
+            return;
+        }
 
-		//      Modo di default è insert, se richiamata con id va in change / display
-		if (IsPostBack)
-		{
-			if (Request.QueryString["action"].ToString() != "new") 
-			{ 
-				// recupera record per settare default sulle DDL al momento del Bind
-				Get_record(Request.QueryString["expenses_id"].ToString());   
-				Trova_ricevute(Request.QueryString["expenses_id"]);
-			}
+        // di default il box revicevute non è visibile
+        BoxRicevute.Visible = false;
 
-			return;
-		}
+        //      in caso di update recupera il valore del progetto e attività
+        if (Request.QueryString["expenses_id"] != null)
+        {
+            // recupera record per settare default sulle DDL al momento del Bind
+            Get_record(Request.QueryString["expenses_id"].ToString());
 
-		// di default il box revicevute non è visibile
-		BoxRicevute.Visible = false;
+            //              disabilita form in caso di cutoff
+            Label LBdate = (Label)FVSpese.FindControl("LBdate");
+            
+            if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]) || lTipoBonus_id > 0)
+                FVSpese.ChangeMode(FormViewMode.ReadOnly);
+            else
+                FVSpese.ChangeMode(FormViewMode.Edit);
 
-		//      in caso di update recupera il valore del progetto e attività
-		if (Request.QueryString["expenses_id"] != null)
-		{
-			// recupera record per settare default sulle DDL al momento del Bind
-			Get_record(Request.QueryString["expenses_id"].ToString());
+            // recupera immagini Ricevute e visualizza box se ce ne sono
+            Trova_ricevute(Request.QueryString["expenses_id"]);
 
-			//              disabilita form in caso di cutoff
-			Label LBdate = (Label)FVSpese.FindControl("LBdate");
+        }
+        else // insert
+        {
+            FVSpese.ChangeMode(FormViewMode.Insert);
 
-			// spegne/accende capo amount in base al valore di TipoBpnus_id
-			TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
-			DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
-			DropDownList DDLTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
-			CheckBox CBInvoice = (CheckBox)FVSpese.FindControl("CBInvoice");
-			CheckBox CBCompanyPayed = (CheckBox)FVSpese.FindControl("CBCompanyPayed");
-			Label LBInvoice = (Label)FVSpese.FindControl("LBInvoice");
-			Label LBCompanyPayed = (Label)FVSpese.FindControl("LBCompanyPayed");
-  
-			if (lTipoBonus_id > 0) {
-				TBAmount.Enabled = false;
-				DDLprogetto.Enabled = false;
-				DDLTipoSpesa.Enabled = false;
-				CBInvoice.Visible = false;
-				CBCompanyPayed.Visible = false;
-				LBInvoice.Visible = false;
-				LBCompanyPayed.Visible = false;
-				
-				// spegne carta credito su spesa bonus
-				SpegniCartaCredito();
-			}
+            Label LBdate = (Label)FVSpese.FindControl("LBdate");
+            LBdate.Text = Request.QueryString["date"];
 
-			if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]))
-				FVSpese.ChangeMode(FormViewMode.ReadOnly);
-			else
-				FVSpese.ChangeMode(FormViewMode.Edit);
+            Label LBperson = (Label)FVSpese.FindControl("LBperson");
+            LBperson.Text = (string)Session["UserName"];
 
-			// recupera immagini Ricevute e visualizza box se ce ne sono
-			Trova_ricevute(Request.QueryString["expenses_id"]);
+            TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
+            if (Convert.ToInt16(Session["TipoBonus_IdDefault"]) > 0)
+            {
+                TBAmount.Enabled = false;
+                TBAmount.Text = "1";
+            }
+            else
+            {
+                TBAmount.Enabled = true;
+                TBAmount.Text = "";
+            }
+        }
 
-		}
-		else // insert
-		{
-			FVSpese.ChangeMode(FormViewMode.Insert);
-			
-			Label LBdate = (Label)FVSpese.FindControl("LBdate");
-			LBdate.Text = Request.QueryString["date"];
+    }
 
-			Label LBperson = (Label)FVSpese.FindControl("LBperson");
-			LBperson.Text = (string)Session["UserName"];
+    // *** TROVA RICEVUTE ****
+    // Legge la directory nel formato ANNO/MESE/NOTE UTENTE e elenca tutte le ricevute il cui nome file
+    // inizia con l'Id della spesa visualizzate 
+    protected void Trova_ricevute(string strExpenses_Id)
+    {
 
-			TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
-			if (Convert.ToInt16(Session["TipoBonus_IdDefault"]) > 0) {
-				TBAmount.Enabled = false;
-				TBAmount.Text = "1"; }
-			else {
-				TBAmount.Enabled = true;
-				TBAmount.Text = "";}
-		}
+        // rende visibile il box
+        BoxRicevute.Visible = true;
 
-	}
+        // se display rende non visibile il bottone
+        if (FVSpese.CurrentMode == FormViewMode.ReadOnly)
+            divBottoni.Visible = false;
 
-	// SPEGNE IL CONTROLLO CARTA CREDITO - NON PIU' NECESSARIO
-	protected void SpegniCartaCredito()
-	{
-		Label LBCBCreditCard = (Label)FVSpese.FindControl("LBCBCreditCard");
-		CheckBox CBCreditCard = (CheckBox)FVSpese.FindControl("CBCreditCard");
+        // restituisce array con nome dei file o null se non si sono ricevute
+        string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), Session["UserName"].ToString().Trim(), lDataSpesa);
 
-		CBCreditCard.Visible = false;
-		LBCBCreditCard.Visible = false;
-	}
+        // Se non esistono immagini torna indietro
+        if (filePaths == null || filePaths.Length == 0)
+            return;
 
-	// *** TROVA RICEVUTE ****
-	// Legge la directory nel formato ANNO/MESE/NOTE UTENTE e elenca tutte le ricevute il cui nome file
-	// inizia con l'Id della spesa visualizzate 
-	protected void Trova_ricevute(string strExpenses_Id)
-	{
+        // loop per stampare immagini
+        string stWebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + lDataSpesa.Substring(0, 4) + "/" + lDataSpesa.Substring(4, 2) + "/" + Session["UserName"].ToString().Trim() + "/";
+        string stFile = "";
 
-		// rende visibile il box
-		BoxRicevute.Visible = true;
+        for (int i = 0; i < filePaths.Length; i++)
+        {
+            stFile = stWebPath + Path.GetFileName(filePaths[i]);
 
-		// se display rende non visibile il bottone
-		if (FVSpese.CurrentMode == FormViewMode.ReadOnly)
-			divBottoni.Visible = false;
+            // aggiunge riga    
+            HtmlTableRow row = new HtmlTableRow();
+            row.ID = stFile;
 
-		// restituisce array con nome dei file o null se non si sono ricevute
-		string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), Session["UserName"].ToString().Trim(), lDataSpesa);
-		
-		// Se non esistono immagini torna indietro
-		if (filePaths==null || filePaths.Length == 0)
-			return;
+            // aggiunge le tre celle : immagine + tasto download + tasto cancella
+            HtmlTableCell cell1 = new HtmlTableCell();
+            HtmlTableCell cell2 = new HtmlTableCell();
+            HtmlTableCell cell3 = new HtmlTableCell();
 
-		// loop per stampare immagini
-		string stWebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + lDataSpesa.Substring(0, 4) + "/" + lDataSpesa.Substring(4, 2) + "/" + Session["UserName"].ToString().Trim() + "/";
-		string stFile="";
-		
-		for (int i=0;i < filePaths.Length; i++) {
-			stFile = stWebPath + Path.GetFileName(filePaths[i]);
+            // se PDF o TIFF mette icona corrispondente
+            string stFileimg;
+            if (filePaths[i].EndsWith("pdf"))
+                stFileimg = "/timereport/images/icons/other/pdf.png";
+            else
+                stFileimg = stFile;
 
-			// aggiunge riga    
-			HtmlTableRow row = new HtmlTableRow();
-			row.ID = stFile;
+            cell1.InnerHtml = "<a  href='" + stFile + "' download='" + Path.GetFileName(filePaths[i]) + "'><img height=45 src='" + stFileimg + "' /></a>";
+            cell1.Width = "50px";
+            cell1.Align = "center";
+            row.Cells.Add(cell1);
 
-			// aggiunge le tre celle : immagine + tasto download + tasto cancella
-			HtmlTableCell cell1 = new HtmlTableCell();
-			HtmlTableCell cell2 = new HtmlTableCell();
-			HtmlTableCell cell3 = new HtmlTableCell();
-			
-			// se PDF o TIFF mette icona corrispondente
-			string stFileimg;
-			if (filePaths[i].EndsWith("pdf"))
-				stFileimg = "/timereport/images/icons/other/pdf.png";
-			else
-				stFileimg = stFile;
+            cell2.InnerHtml = "<a href='" + stFile + "' download='" + Path.GetFileName(filePaths[i]) + "'><img height=20 src='/timereport/images/icons/other/download-50.png' /></a>";
+            cell2.Width = "40px";
+            row.Cells.Add(cell2);
 
-			cell1.InnerHtml = "<a  href='" + stFile + "' download='" + Path.GetFileName(filePaths[i]) + "'><img height=45 src='" + stFileimg + "' /></a>";
-			cell1.Width = "50px";
-			cell1.Align = "center";
-			row.Cells.Add(cell1);
+            cell3.InnerHtml = "<a href='#' onclick='cancella_ricevuta(\"" + stFile + "\");'><img height=20 src='/timereport/images/icons/other/empty_trash-50.png' /></a>";
+            cell3.Width = "40px";
+            row.Cells.Add(cell3);
 
-			cell2.InnerHtml = "<a href='" + stFile + "' download='" + Path.GetFileName(filePaths[i]) + "'><img height=20 src='/timereport/images/icons/other/download-50.png' /></a>";
-			cell2.Width = "40px";
-			row.Cells.Add(cell2);
+            TabellaRicevute.Rows.Add(row);
 
-			cell3.InnerHtml = "<a href='#' onclick='cancella_ricevuta(\"" + stFile + "\");'><img height=20 src='/timereport/images/icons/other/empty_trash-50.png' /></a>";
-			cell3.Width = "40px";
-			row.Cells.Add(cell3);
+        } //  next 
 
-			TabellaRicevute.Rows.Add(row);
+    }
 
-		} //  next 
+    // riceve in input id spesa, nome user, data spesa (YYYYMMGG) e restutuisce array con nome file
+    // Se id spesa = -1 allora estrae tutte le spese del mese per l'utente
+    public static string[] TrovaRicevuteLocale(int iId, string sUserName, string sData)
+    {
 
-	}
-	
-	// riceve in input id spesa, nome user, data spesa (YYYYMMGG) e restutuisce array con nome file
-	// Se id spesa = -1 allora estrae tutte le spese del mese per l'utente
-	public static string[] TrovaRicevuteLocale(int iId, string sUserName, string sData)
-	{
+        string[] filePaths = null;
 
-		string[] filePaths = null;
+        try
+        {
+            // costruisci il pach di ricerca: public + anno + mese + nome persona 
+            string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
+            // carica immagini
+            filePaths = Directory
+                .GetFiles(TargetLocation, "fid-" + (iId == -1 ? "" : iId.ToString()) + "*.*")
+                                .Where(file => file.ToLower().EndsWith("jpg") || file.ToLower().EndsWith("tiff") || file.ToLower().EndsWith("pdf") || file.ToLower().EndsWith("png") || file.ToLower().EndsWith("jpeg") || file.ToLower().EndsWith("gif") || file.ToLower().EndsWith("bmp"))
+                                .ToArray();
+            return (filePaths);
+        }
+        catch (Exception e)
+        {
+            //non fa niente ma evita il dump
+            return (null);
+        }
 
-		try
-		{
-			// costruisci il pach di ricerca: public + anno + mese + nome persona 
-			string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
-			// carica immagini
-			filePaths = Directory
-				.GetFiles(TargetLocation, "fid-" + (iId == -1 ? "" : iId.ToString()) + "*.*")
-								.Where(file => file.ToLower().EndsWith("jpg") || file.ToLower().EndsWith("tiff") || file.ToLower().EndsWith("pdf") || file.ToLower().EndsWith("png") || file.ToLower().EndsWith("jpeg") || file.ToLower().EndsWith("gif") || file.ToLower().EndsWith("bmp"))
-								.ToArray();
-			return (filePaths);
-		}
-		catch (Exception e)
-		{
-			//non fa niente ma evita il dump
-			return (null);
-		}
+    }
 
-	}
+    protected void Get_record(string strExpenses_Id)
+    {
 
-	protected void Get_record(string strExpenses_Id)
-	{
+        DataRow dr = Database.GetRow("SELECT Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.ExpenseType_id, Expenses.TipoBonus_id, Expenses.Date FROM Expenses where expenses_id = " + strExpenses_Id, null);
 
-		SqlCommand cmd = new SqlCommand("SELECT Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.ExpenseType_id, Expenses.TipoBonus_id, Expenses.Date FROM Expenses where expenses_id = " + strExpenses_Id, conn);
+        lProject_id = dr["Projects_id"].ToString(); // projects_id - usata per dare default a DDL
+        lExpenseType_id = dr["ExpenseType_id"].ToString(); // ExpenseType_id - - usata per dare default a DDL
+        lTipoBonus_id = Convert.ToInt16(dr["TipoBonus_id"].ToString());  // usata per dare gestire stato/valore campo Amount
+        lExpense_id = dr["Expenses_Id"].ToString();
+        lDataSpesa = ((DateTime)dr["date"]).ToString("yyyyMMdd");
 
-		conn.Open();
+    }
 
-		using (SqlDataReader dr = cmd.ExecuteReader()) 
-		{         
-			dr.Read();
+    protected void Bind_DDLprogetto()
+    {
+        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+        DropDownList ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
-			lProject_id = dr["Projects_id"].ToString(); // projects_id - usata per dare default a DDL
-			lExpenseType_id = dr["ExpenseType_id"].ToString(); // ExpenseType_id - - usata per dare default a DDL
-			lTipoBonus_id = Convert.ToInt16(dr["TipoBonus_id"].ToString());  // usata per dare gestire stato/valore campo Amount
-			lExpense_id = dr["Expenses_Id"].ToString();
-			lDataSpesa = ((DateTime)dr["date"]).ToString("yyyyMMdd");
-		}
+        ddlProject.Items.Clear();
 
-		conn.Close();
-	}
+        foreach (DataRow drRow in dtProgettiForzati.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+            if ( drRow["BloccoCaricoSpese"].ToString() != "True" ) // solo se carico spese è ammesso
+                ddlProject.Items.Add(liItem);
+        }
 
-	protected void Bind_DDLprogetto()
-	{
+        ddlProject.DataTextField = "DescProgetto";
+        ddlProject.DataValueField = "Projects_Id";
+        ddlProject.DataBind();
 
-		DropDownList ddlProject;
-		DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+        if (lProject_id != "")
+            ddlProject.SelectedValue = lProject_id;
 
-        //conn.Open();
+        // se in creazione imposta il default di progetto 
+        if (FVSpese.CurrentMode == FormViewMode.Insert)
+        {
+            // prima cerca progetto sul giorno, se non lo trova mette ultimo default
+            DataRow drRecord = Database.GetRow("SELECT Projects_id FROM Hours WHERE persons_id = " + Session["persons_id"] + " AND date = " + ASPcompatility.FormatDateDb(Request["date"]), this.Page);
 
-        //SqlCommand cmd;
+            if (drRecord != null)
+                ddlProject.SelectedValue = drRecord["Projects_id"].ToString();
+            else
+                ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
+        }
+    }
 
-        //// imposta selezione progetti in base all'utente
-
-        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-        //	cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
-        //else
-        //	cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
-        //							   " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-        //							   " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
-        //							   " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
-
-        //using (SqlDataReader dr = cmd.ExecuteReader()) {
-
-        ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
-
-		ddlProject.DataSource = dtProgettiForzati;
-		ddlProject.Items.Clear();
-		ddlProject.DataTextField = "DescProgetto";
-		ddlProject.DataValueField = "Projects_Id";
-		ddlProject.DataBind();
-		
-		if (lProject_id != "")
-			ddlProject.SelectedValue = lProject_id;
-
-		// se in creazione imposta il default di progetto 
-		if (FVSpese.CurrentMode == FormViewMode.Insert)
-			ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
-
-		//}
-		//conn.Close();
-	}
-
-	protected void Bind_DDLTipoSpesa()
-	{
+    protected void Bind_DDLTipoSpesa()
+    {
 
         DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
-        DropDownList ddlTipoSpesa;
+        DropDownList ddlTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
         String sTipoBonus_sel = "";
 
-        //conn.Open();
-        //SqlCommand cmd;
-
         // 08/2014 se viene richiamato da pagina bonus cambia il flag per il biding
-        if (lTipoBonus_id > 0) 
-			sTipoBonus_sel = "";
-		else
-			sTipoBonus_sel = " AND TipoBonus_Id = 0 ";
+        if (lTipoBonus_id > 0)
+            sTipoBonus_sel = "";
+        else
+            sTipoBonus_sel = " AND TipoBonus_Id = 0 ";
+        
+        ddlTipoSpesa.Items.Clear();
 
-        // imposta selezione progetti in base all'utente
+        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
+        foreach (DataRow drRow in dtSpeseForzate.Rows)
+        {
 
-        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-        //	cmd = new SqlCommand("SELECT ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ExpenseType WHERE active = 'true' AND TipoBonus_Id = 0 ORDER BY ExpenseCode", conn);
-        //else
-        //	cmd = new SqlCommand("SELECT ExpenseType.ExpenseType_Id, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione  FROM ExpenseType " +
-        //							   " INNER JOIN ForcedExpensesPers ON ExpenseType.ExpenseType_id = ForcedExpensesPers.ExpenseType_id " +
-        //							   " WHERE ForcedExpensesPers.Persons_id=" + Session["persons_id"] +
-        //							   " AND active = 'true' " + sTipoBonus_sel + " ORDER BY ExpenseType.ExpenseCode", conn);
+            // in INSERT e EDIT non aggiunge le spese di tipo bonus
+            if ( drRow["TipoBonus_id"].ToString() == "0" || FVSpese.CurrentMode == FormViewMode.ReadOnly  )
+            {
+                ListItem liItem = new ListItem(drRow["descrizione"].ToString(), drRow["ExpenseType_Id"].ToString());
+                liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
+                if (drRow["TestoObbligatorio"].ToString() == "True")
+                    liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
+                else
+                    liItem.Attributes.Add("data-desc-message", "");
 
-        //using (SqlDataReader dr = cmd.ExecuteReader())
-            //{ 
-            	ddlTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
+                ddlTipoSpesa.Items.Add(liItem);
+            }
 
-            //	ddlTipoSpesa.DataSource = dr;
-            ddlTipoSpesa.DataSource = dtSpeseForzate;
-        	ddlTipoSpesa.Items.Clear();
-        	ddlTipoSpesa.DataTextField = "descrizione";
-        	ddlTipoSpesa.DataValueField = "ExpenseType_Id";
-        	ddlTipoSpesa.DataBind();
+        }
+
+        ddlTipoSpesa.DataTextField = "descrizione";
+        ddlTipoSpesa.DataValueField = "ExpenseType_Id";
+        ddlTipoSpesa.DataBind();
 
         if (lExpenseType_id != "")
-				ddlTipoSpesa.SelectedValue = lExpenseType_id;
+            ddlTipoSpesa.SelectedValue = lExpenseType_id;
 
-			// se in creazione imposta il default di progetto 
-			if (FVSpese.CurrentMode == FormViewMode.Insert)
-				ddlTipoSpesa.SelectedValue = (string)Session["ExpenseTypeDefault"];
-		//}
+        // se in creazione imposta il default di progetto 
+        if (FVSpese.CurrentMode == FormViewMode.Insert)
+            ddlTipoSpesa.SelectedValue = (string)Session["ExpenseTypeDefault"];
 
-		//conn.Close();
-	}
+    }
 
-	protected void DSSpese_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
-	{
-		//      Chiamato in aggiornamento e inserimento record rende negativo il valore delle ore
-		//      nel caso sia valorizzato il flag storno         
-		double iCalc = 0;
+    protected void DSSpese_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
+    {
+        //      Chiamato in aggiornamento e inserimento record rende negativo il valore delle ore
+        //      nel caso sia valorizzato il flag storno         
+        double iCalc = 0;
 
-		CheckBox CBcancel = (CheckBox)FVSpese.FindControl("CBcancel");
+        CheckBox CBcancel = (CheckBox)FVSpese.FindControl("CBcancel");
 
-		if (CBcancel.Checked)
-		{
-			iCalc = Convert.ToDouble(e.Command.Parameters["@Amount"].Value) * (-1);
-			e.Command.Parameters["@Amount"].Value = iCalc;
-		}
-		else
-		{
-			e.Command.Parameters["@Amount"].Value = Convert.ToDouble(e.Command.Parameters["@Amount"].Value);
-		}
+        if (CBcancel.Checked)
+        {
+            iCalc = Convert.ToDouble(e.Command.Parameters["@Amount"].Value) * (-1);
+            e.Command.Parameters["@Amount"].Value = iCalc;
+        }
+        else
+        {
+            e.Command.Parameters["@Amount"].Value = Convert.ToDouble(e.Command.Parameters["@Amount"].Value);
+        }
 
-		//      Forza i valori da passare alla select di insert. essendo le dropdown in
-		//      dipendenza non si riesce a farlo tramite un normale bind del controllo
+        //      Forza i valori da passare alla select di insert. essendo le dropdown in
+        //      dipendenza non si riesce a farlo tramite un normale bind del controllo
 
-		DropDownList ddlList = (DropDownList)FVSpese.FindControl("DDLprogetto");
-		e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
+        DropDownList ddlList = (DropDownList)FVSpese.FindControl("DDLprogetto");
+        e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
 
-		DropDownList ddlList1 = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
-		if (ddlList1.SelectedValue != null)
-			e.Command.Parameters["@ExpenseType_id"].Value = ddlList1.SelectedValue;
+        DropDownList ddlList1 = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
+        if (ddlList1.SelectedValue != null)
+            e.Command.Parameters["@ExpenseType_id"].Value = ddlList1.SelectedValue;
 
         // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
         DataTable dtTipoSpesa = (DataTable)Session["dtTipoSpesa"];
         DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + ddlList1.SelectedValue);
 
         if (dr.Count() == 1)  // dovrebbe essere sempre così
-            e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32( dr[0]["TipoBonus_id"].ToString() );
+            e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32(dr[0]["TipoBonus_id"].ToString());
         else
             e.Command.Parameters["@TipoBonus_id"].Value = 0;
 
@@ -358,217 +311,124 @@ public partial class input_spese : System.Web.UI.Page
 
         // solo insert
         if (FVSpese.CurrentMode == FormViewMode.Insert)
-		{
-			e.Command.Parameters["@persons_id"].Value = Session["persons_id"];
-			Label LBdate = (Label)FVSpese.FindControl("LBdate");
-			e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
-			// Audit
-			e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
-			e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
-		}
+        {
+            e.Command.Parameters["@persons_id"].Value = Session["persons_id"];
+            Label LBdate = (Label)FVSpese.FindControl("LBdate");
+            e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
+            // Audit
+            e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+        }
 
-		// if in change
-		if (FVSpese.CurrentMode == FormViewMode.Edit)
-		{
-			// Audit
-			e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];
-			e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
-		}
-	}
+        // if in change
+        if (FVSpese.CurrentMode == FormViewMode.Edit)
+        {
+            // Audit
+            e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+        }
+    }
 
-	protected void FVSpese_modechanging(object sender, FormViewModeEventArgs e)
-	{
-		//      se premuto tasto cancel torna indietro
-		if (e.CancelingEdit)
-			Response.Redirect("input.aspx");
-	}
+    protected void FVSpese_modechanging(object sender, FormViewModeEventArgs e)
+    {
+        //      se premuto tasto cancel torna indietro
+        if (e.CancelingEdit)
+            Response.Redirect("input.aspx");
+    }
 
-	protected void FVSpese_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
-	{
-		Response.Redirect("input.aspx");
-	}
+    protected void FVSpese_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
+    {
+        Response.Redirect("input.aspx");
+    }
 
-	protected void FVSpese_DataBound(object sender, EventArgs e)
-	{
+    protected void FVSpese_DataBound(object sender, EventArgs e)
+    {
 
-		// Attiva bottone ricevute solo per beta tester
-		//if ( !Convert.ToBoolean(Session["BetaTester"]) && FVSpese.CurrentMode == FormViewMode.Insert)
-		//    ((Button)FVSpese.FindControl("RicevuteButton")).Visible = false;
+        // Attiva bottone ricevute solo per beta tester
+        //if ( !Convert.ToBoolean(Session["BetaTester"]) && FVSpese.CurrentMode == FormViewMode.Insert)
+        //    ((Button)FVSpese.FindControl("RicevuteButton")).Visible = false;
 
-		//      formattta il campo numerico delle spese, nel DB le spese stornate sono negative
-		if (Request.QueryString["action"] == "fetch")
-		{
-			TextBox TBSpese = (TextBox)FVSpese.FindControl("TBAmount");
-			double SpeseValue = Math.Abs(Convert.ToDouble(TBSpese.Text));
-			TBSpese.Text = SpeseValue.ToString();
-		}
+        //      formattta il campo numerico delle spese, nel DB le spese stornate sono negative
+        if (Request.QueryString["action"] == "fetch")
+        {
+            TextBox TBSpese = (TextBox)FVSpese.FindControl("TBAmount");
+            double SpeseValue = Math.Abs(Convert.ToDouble(TBSpese.Text));
+            TBSpese.Text = SpeseValue.ToString();
+        }
 
-		if (Request.QueryString["expenses_id"] != null)
-		{
-			//              Valorizza progetto e attività
-			Bind_DDLprogetto();
-			Bind_DDLTipoSpesa();
+        if (Request.QueryString["expenses_id"] != null)
+        {
+            //              Valorizza progetto e attività
+            Bind_DDLprogetto();
+            Bind_DDLTipoSpesa();
 
-		}
-		else // insert
-		{
-			Bind_DDLprogetto();
-			Bind_DDLTipoSpesa();
-		}
-			
-		//      se livello autorizzativo è inferiore a 4 spegne il campo competenza
-		if (!Auth.ReturnPermission("ADMIN", "CUTOFF"))
-		{
-			Label LBAccountingDate = (Label)FVSpese.FindControl("LBAccountingDate");
-			TextBox TBAccountingDate = (TextBox)FVSpese.FindControl("TBAccountingDate");
-			Label LBAccountingDateDisplay = (Label)FVSpese.FindControl("LBAccountingDateDisplay");
+        }
+        else // insert
+        {
+            Bind_DDLprogetto();
+            Bind_DDLTipoSpesa();
+        }
 
-			// se display
-			LBAccountingDate.Visible = false;
+        //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
+        if (!Auth.ReturnPermission("ADMIN", "CUTOFF"))
+        {
+            Label LBAccountingDate = (Label)FVSpese.FindControl("LBAccountingDate");
+            TextBox TBAccountingDate = (TextBox)FVSpese.FindControl("TBAccountingDate");
 
-			if (TBAccountingDate != null)
-				TBAccountingDate.Visible = false;
-
-			if (LBAccountingDateDisplay != null)
-				LBAccountingDateDisplay.Visible = false;
-		}
-
-	}
-
-	protected void DDLTipoSpesa_SelectedIndexChanged(object sender, EventArgs e)
-	{
-	    // 0208 FUNZIONE MIGRATA: disattivata in quanto non più usata
-        
-        //TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
-		//DropDownList DDlspesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
-
-		//if (DDlspesa.SelectedValue == "")
-		//	return;
-
-  ////      // se la spesa è di tipo bonus mette 1 di default alla quantità e spegne il campo
-  ////      // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-
-  //        // NB: dtSpeseForzate  contiene solo le spese NON bonus/ticket
-  //        DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
-
-  //        DataRow[] drItems = dtSpeseForzate.Select("ExpenseType_id = " + DDlspesa.SelectedValue);
-
-  //        if (drItems.Count() == 0)
-  //          {
-  //              // entry non trovata è un Bonus/Ticket
-  //              TBAmount.Text = "1";
-  //              TBAmount.Enabled = false;
-  //          }
-  //          else if (!TBAmount.Enabled)
-  //          {
-  //          // entry trovata spesa normale
-  //              TBAmount.Text = "";
-  //              TBAmount.Enabled = true;
-  //          }
+            // se display
+            LBAccountingDate.Visible = false;
+            TBAccountingDate.Visible = false;
+        }
 
     }
 
     // recupera la chiave primaria inserita e richiama la pagina in modifica
     protected void DSSpese_Inserted(object sender, SqlDataSourceStatusEventArgs e)
-	{
-		int newIdentity;
+    {
+        int newIdentity;
 
-		// se aggiornamento ha avuto luogo recupera l'ultimo Id della spesa inserita e richiama la pagina in aggiornamento per
-		// consentire il caricamento delle spese
-		if (e.Exception == null)
-		{
+        // se aggiornamento ha avuto luogo recupera l'ultimo Id della spesa inserita e richiama la pagina in aggiornamento per
+        // consentire il caricamento delle spese
+        if (e.Exception == null)
+        {
 
-		// se premuto il tasto "Ricevute" rimanda sulla stessa pagina aprendola in modifica in modo da poter caricare le rivevute   
-			if (!String.IsNullOrEmpty(Request.Form["FVSpese$RicevuteButton"])) 
-			{ 
-			using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-				{
-				c.Open();
-				SqlCommand cmd = new SqlCommand("SELECT MAX(Expenses_id) from Expenses where Persons_Id=" + e.Command.Parameters["@Persons_id"].Value, c);
-				newIdentity = (int)cmd.ExecuteScalar();
-				}
-				 Response.Redirect("input-spese.aspx?action=fetch&expenses_id=" + newIdentity.ToString() );
-			}
-			else
-				Response.Redirect("input.aspx");
-		}
-		else
-			Response.Redirect("input.aspx");
-	} // DSSpese_Inserted
+            // se premuto il tasto "Ricevute" rimanda sulla stessa pagina aprendola in modifica in modo da poter caricare le rivevute   
+            if (!String.IsNullOrEmpty(Request.Form["FVSpese$RicevuteButton"]))
+            {
+                using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+                {
+                    c.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT MAX(Expenses_id) from Expenses where Persons_Id=" + e.Command.Parameters["@Persons_id"].Value, c);
+                    newIdentity = (int)cmd.ExecuteScalar();
+                }
+                Response.Redirect("input-spese.aspx?action=fetch&expenses_id=" + newIdentity.ToString());
+            }
+            else
+                Response.Redirect("input.aspx");
+        }
+        else
+            Response.Redirect("input.aspx");
+    } // DSSpese_Inserted
 
-	protected void CV_DDLprogetto_ServerValidate(object source, ServerValidateEventArgs args)
-	{
-		ValidationClass c = new ValidationClass();
-		DropDownList DDLtoValidate = (DropDownList)FVSpese.FindControl("DDLprogetto");
+    protected override void InitializeCulture()
+    {
+        // Imposta la lingua della pagina
+        Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
+    }
 
-		Boolean bBloccoCaricoSpese = false;
+    protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
+    {
 
-        // Legge il flag di spesa bloccata su anagrafica progetto
-        DataTable dtRecord = Database.GetData("Select BloccoCaricoSpese from Projects where Projects_Id = " + DDLtoValidate.SelectedValue, this.Page);
+        Label LBdate = (Label)FVSpese.FindControl("LBdate");
 
-        if (dtRecord.Rows.Count > 0)
-                bBloccoCaricoSpese = (dtRecord.Rows[0]["BloccoCaricoSpese"] == DBNull.Value) ? false : Convert.ToBoolean(dtRecord.Rows[0]["BloccoCaricoSpese"]);
+        DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
-		if (bBloccoCaricoSpese) 
-			{ 
-			// errore
-			args.IsValid = false;
+        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+            // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
+            if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioNonEsisteProgetto") + "'); } );", true);
+            else
+                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
 
-			//      cambia colore del campo in errore
-			c.SetErrorOnField(args.IsValid, FVSpese, "DDLprogetto");
-			}
-	}
-
-	protected void CV_TBComment_ServerValidate(object source, ServerValidateEventArgs args)
-	{
-		ValidationClass c = new ValidationClass();
-		TextBox TBtoValidate = (TextBox)FVSpese.FindControl("TBComment");
-		DropDownList DDLTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
-		CustomValidator CV_TBComment = (CustomValidator)FVSpese.FindControl("CV_TBComment");
-	   
-		Boolean bTestoObbligatorio = false;
-		string sMessaggioDiErrore = "";
-
-        // Legge il flag di commento obbligatorio su tipo spesa
-        DataTable dtRecord = Database.GetData("Select TestoObbligatorio, MessaggioDiErrore from ExpenseType where ExpenseType_Id = " + DDLTipoSpesa.SelectedValue, this.Page);
-
-    	if (dtRecord.Rows.Count > 0)
-				{
-					bTestoObbligatorio =  (dtRecord.Rows[0]["TestoObbligatorio"] == DBNull.Value  ) ? false : Convert.ToBoolean(dtRecord.Rows[0]["TestoObbligatorio"]);
-					sMessaggioDiErrore = dtRecord.Rows[0]["MessaggioDiErrore"].ToString();
-				} 
-
-		if (TBtoValidate.Text.Trim().Length == 0 && bTestoObbligatorio) 
-			{ 
-			args.IsValid = false;
-
-			// imposta il messaggio di errore letto dal tipo spesa
-			CV_TBComment.ErrorMessage = sMessaggioDiErrore;
-
-			//      cambia colore del campo in errore
-			c.SetErrorOnField(args.IsValid, FVSpese, "TBComment");
-			}
-	}
-
-	protected override void InitializeCulture()
-	{
-		// Imposta la lingua della pagina
-		Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
-	}
-
-	protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
-	{
-
-		Label LBdate = (Label)FVSpese.FindControl("LBdate");
-
-		DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
-
-		if ( !Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page) )
-			// non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
-			if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-				ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno non esistono progetti caricati');", true);
-			else
-				ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "ShowPopup('Su questo giorno sono caricati altri progetti');", true);
-		  
-	}
+    }
 }

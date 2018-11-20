@@ -6,10 +6,10 @@
 <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
+<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 <!-- INCLUDE JS TIMEREPORT   -->
 <script src="/timereport/include/javascript/timereport.js"></script>
@@ -44,7 +44,7 @@
 
 	<form id="form1" runat="server">
 
-	 <table  width="100%" style="font-size: 8pt;border-style:solid;border-size:1px" > <!--**** Tabella principale ***-->  
+	 <table  width="100%" style="font-size: 8pt;" > <!--**** Tabella principale ***-->  
 										
 					<tr> <!--**** finestra principale ***-->  
 					
@@ -151,7 +151,15 @@
 	<!-- **** FOOTER **** -->  
 	<div id="WindowFooter">       
 		<div ></div>        
-		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div> 
+		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %>
+            <% If Session("persons_id") = 1 Then
+                    Dim sConn = ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString.ToString()
+                    Response.Write("&nbsp; " + sConn.Substring(12, 13) + "&nbsp; " + sConn.Substring(36, 20))
+                End If
+
+            %>
+
+		</div> 
 		<div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
 		<div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session("UserName")  %></div>        
 	 </div> 

@@ -182,10 +182,10 @@
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
  
 <!-- Jquery per date picker  -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script>    $(function () { $('.datepickclass').datepicker($.datepicker.regional['it']); }); </script>
 <!-- FINE Jquery per date picker  -->
 <script>

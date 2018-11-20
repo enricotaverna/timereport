@@ -43,8 +43,8 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
         string anno = Request.QueryString["anno"].ToString();
 
         string datada = "01/" + mese + "/" + anno;
-        string dataa = ASPcompatility.LastDay(Convert.ToInt16(mese), Convert.ToInt16(anno)) ;
-        
+        string dataa = ASPcompatility.LastDay(Convert.ToInt16(mese), Convert.ToInt16(anno)) + "/" + mese + "/" + anno;
+
         // valorizza parametri SQLdatasource      
         SQLDSricevute.SelectParameters["datada"].DefaultValue = datada;
         SQLDSricevute.SelectParameters["dataa"].DefaultValue = dataa;

@@ -19,12 +19,9 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
 
         Auth.CheckPermission("MASTERDATA", "WBS");
 
-        // Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(this.GetType(), "val", "fnOnUpdateValidators();");
-
-
         if (!IsPostBack )
         {
+
             prevPage = Request.UrlReferrer.ToString();
 
             if (Request.QueryString["Activity_id"] != null )
@@ -35,9 +32,7 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
 //          popola dropdownlist progetto
             LoadDDLprogetto();
 
-//          in caso di update recupera il valore della Fase
-            if (Request.QueryString["Phase_Id"] != null)
-                Bind_ddlFase();
+            Bind_ddlFase();
 
         }
 

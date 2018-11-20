@@ -10,9 +10,6 @@
 
         Auth.CheckPermission("MASTERDATA", "CUSTOMER")
 
-        ' Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(Me.GetType, "val", "fnOnUpdateValidators();")
-
         If (Not IsPostBack) Then
             If Len(Request.QueryString("CodiceCliente")) > 0 Then
                 SchedaClienteForm.ChangeMode(FormViewMode.Edit)
@@ -36,48 +33,28 @@
         Response.Redirect("customer_lookup_list.aspx")
     End Sub
 
-    Sub ValidaCliente_ServerValidate(ByVal sender As Object, ByVal args As ServerValidateEventArgs)
-
-        Dim c = New ValidationClass
-        ' true se non esiste già il record
-        args.IsValid = Not c.CheckExistence("CodiceCliente", args.Value, "Customers")
-
-        ' Evidenzia campi form in errore
-        c.SetErrorOnField(args.IsValid, SchedaClienteForm, "CodiceClienteTextBox")
-
-    End Sub
-
 </script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- Style -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+     
+<!-- Jquery   -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+
+<!-- Menù  -->
+<script language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session("userLevel")%> type =text/javascript></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
 <head id="Head1" runat="server">
     <title>Crea Cliente</title>
-    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
 </head>
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session("userLevel")%> type =text/javascript></SCRIPT>
-<script language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></script>  
-
- <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
-<script src="/timereport/include/jquery/jquery-ui.js"></script> 
-<script src="/timereport/include/javascript/timereport.js"></script>  
-
-<script>
-$(function () {
-
-    $("#SchedaClienteForm_FlagAttivoCheckBox").addClass("css-checkbox");
-    $("#SchedaClienteForm_disFlagAttivoCheckBox").addClass("css-checkbox");
-    $("#SchedaClienteForm_disFlagAttivoCheckBox").attr("disabled", true);
-
-    // abilitate tab view
-    $("#tabs").tabs();
-
-    // gestione validation summary su validator custom (richiede timereport.js)//
-    displayAlert();
-
-});
-</script>
 
 <body>
 
@@ -85,15 +62,15 @@ $(function () {
  
 <div id="MainWindow"> 
 
-<div id="FormWrap" style="width:485px">
+<div id="FormWrap" >
 
-    <form id="form1" runat="server" class="StandardForm" >
+    <form id="FormCliente" runat="server" class="StandardForm">
 
     <asp:FormView ID="SchedaClienteForm" runat="server" DataKeyNames="CodiceCliente" 
         DataSourceID="CustomerDataSource" DefaultMode="Insert" 
         OnItemInserted="SchedaClienteForm_ItemInserted" 
         OnModeChanging="SchedaClienteForm_ModeChanging"  
-        OnItemUpdated="SchedaClienteForm_ItemUpdated" >
+        OnItemUpdated="SchedaClienteForm_ItemUpdated"  width="100%">
 
             <EditItemTemplate>
                
@@ -101,26 +78,29 @@ $(function () {
                
                   <ul>
                     <li><a href="#tabs-1">Dati generali</a></li>
-                    <li><a href="#tabs-2">Sede</a></li>
-                    <li><a href="#tabs-3">Note</a></li>
+                    <li><a href="#tabs-2">Sede Operativa</a></li>
+                    <li><a href="#tabs-3">Sede Legale</a></li>
+                    <li><a href="#tabs-4">Note</a></li>
                   </ul>
 
-               <div id="tabs-1" style="height:460px;width:100%"> 
+               <div id="tabs-1" style="height:360px;width:100%"> 
 
                <!-- *** TEXT BOX ***  --> 
                <div class="input nobottomborder"> 
                     <div class="inputtext">Codice cliente: </div> 
                         <asp:TextBox class="ASPInputcontent" ID="CodiceClienteTextBox" runat="server" Columns="10" 
-                                MaxLength="10" Text='<%# Bind("CodiceCliente") %>' Enabled="False" />					
-                        <asp:CheckBox  ID="FlagAttivoCheckBox" runat="server"  Checked='<%# Bind("FlagAttivo") %>' />
-					    <asp:Label  AssociatedControlId="FlagAttivoCheckBox" class="css-label" ID="Label3" runat="server" Text="Trasferta">Attivo</asp:Label>      
+                                MaxLength="10" Text='<%# Bind("CodiceCliente") %>' Enabled="False" />	
+                   
+                    <!-- *** CHECK BOX  ***  -->                   
+	                    <asp:CheckBox ID="FlagAttivoCheckBox" runat="server" Checked='<%# Bind("FlagAttivo") %>' />
+	                    <asp:Label  AssociatedControlId="FlagAttivoCheckBox" runat="server" >Attivo</asp:Label>    
                </div>   
 
                <!-- *** TEXT BOX ***  --> 
                <div class="input nobottomborder"> 
                     <div class="inputtext">Nome</div> 
-                        <asp:TextBox ID="TextBox1" runat="server" class="ASPInputcontent" Text='<%# Bind("Nome1") %>' Columns="30" MaxLength="40" />
-                        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Inserire il nome del cliente" ControlToValidate="TextBox1" Display="none"></asp:RequiredFieldValidator>                    
+                        <asp:TextBox ID="TextBox1" runat="server" class="ASPInputcontent" Text='<%# Bind("Nome1") %>' Columns="30" MaxLength="40"
+                                                   data-parsley-errors-container="#valMsg" data-parsley-required="true" />
                </div>   
 
                <!-- *** TEXT BOX ***  --> 
@@ -130,7 +110,7 @@ $(function () {
                </div>   
 
                 <!-- *** TEXT BOX ***  --> 
-                <div class="input nobottomborder">                 
+                <div class="input ">                 
                     <div class="inputtext">Cod.Fisc.</div>
                     <asp:TextBox class="ASPInputcontent" ID="TextBox4" runat="server" Text='<%# Bind("CodiceFiscale") %>' Columns="16" MaxLength="16" />    
                 </div>    
@@ -138,50 +118,51 @@ $(function () {
                 <!-- *** SELECT ***  -->
 				<div class="input nobottomborder">                        
 				        <div class="inputtext">Metodo pag.</div>  
-                        <div class="InputcontentDDL" style="width:265px" >
+                        <label class="dropdown" style="width:265px" >
                              <asp:DropDownList ID="DropDownList1" runat="server" 
                                 DataSourceID="metododipagamento" DataTextField="Descrizione"  AppendDataBoundItems="True" 
                                 DataValueField="MetodoPagamento"  
                                 SelectedValue='<%# Bind("MetodoPagamento") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-                        </div>
+                        </label>
                 </div>  
 
                 <!-- *** Termini di pagamento ***  -->
-				<div class="input ">
+				<div class="input">
 				        <div class="inputtext">Termini pag.</div>  
 
-				        <div class="InputcontentDDL" style="width:265px">
+				        <label class="dropdown" style="width:265px">
                            <asp:DropDownList ID="DropDownList2" runat="server" 
                                 DataSourceID="terminidipagamento" DataTextField="Descrizione" 
                                 DataValueField="TerminiPagamento"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("TerminiPagamento") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
+				        </label>
                 </div>  
 
                 <!-- *** Manager ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Manager</div>  
 
-				        <div class="InputcontentDDL" style="width:265px">
+				        <label class="dropdown" style="width:265px">
                             <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="Manager" 
                                 DataTextField="Name" DataValueField="Persons_id"  AppendDataBoundItems="True" 
-                                SelectedValue='<%# Bind("ClientManager_id") %>'  >
+                                SelectedValue='<%# Bind("ClientManager_id") %>'  
+                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                             </asp:DropDownList>
-                        </div>
+                        </label>
                 </div>  
 
                  </div> <%--tabs-1--%>
 
-               <!-- *** SEDE LEGALE ***  --> 
-               <div id="tabs-2" style="height:460px;width:100%">
+               <!-- *** SEDE OPERATIVA ***  --> 
+               <div id="tabs-2" style="height:360px;width:100%">
                
                 <!-- *** Via ***  --> 
                <div class="input nobottomborder"> 
-                    <div class="inputtext">Sede</div> 
+                    <div class="inputtext">Via</div> 
                     <asp:TextBox class="ASPInputcontent" ID="TextBox5" runat="server" text='<%# Bind("SedeLegaleVia1") %>' Columns="30" MaxLength="50" />               
                </div>      
                     
@@ -199,14 +180,19 @@ $(function () {
                </div> 
 
                <!-- *** Nazione ***  --> 
-               <div class="input"> 
+               <div class="input nobottomborder"> 
                     <div class="inputtext">Nazione</div> 
                         <asp:TextBox class="ASPInputcontent" ID="TextBox11" Text='<%# Bind("SedeLegaleNazione")  %>' runat="server" Columns="20" MaxLength="20" />
                </div> 
 
+               </div> <%--tabs-2--%>
+
+               <!-- *** SEDE LEGALE ***  --> 
+               <div id="tabs-3" style="height:360px;width:100%">
+
                 <!-- *** Via ***  --> 
                <div class="input nobottomborder"> 
-                    <div class="inputtext">Sede legale</div> 
+                    <div class="inputtext">Via</div> 
                     <asp:TextBox class="ASPInputcontent" ID="TextBox13" runat="server" Text='<%# Bind("SedeOperativaVia1") %>' Columns="30" MaxLength="50" />
                </div>   
 
@@ -229,15 +215,15 @@ $(function () {
                     <asp:TextBox class="ASPInputcontent" ID="TextBox12" runat="server" Text='<%# Bind("SedeOperativaNazione") %>' Columns="20" MaxLength="20" />
                </div> 
                
-               </div> <%--tab-2--%>
+               </div> <%--tab-3--%>
                
                 <!-- *** NOTE ***  --> 
-               <div id="tabs-3" style="height:460px;width:100%">                 
+               <div id="tabs-4" style="height:360px;width:100%">                 
                                              
                 <!-- *** Note ***  --> 
                <div class="input nobottomborder" style="height:220px"> 
                     <div class="inputtext">Note</div> 
-                    <asp:TextBox  ID="TextBox22" Text='<%# Bind("Note") %>' runat="server" rows=5 Columns="30" TextMode="MultiLine" CssClass="textarea" /> 
+                    <asp:TextBox  ID="TextBox22" Text='<%# Bind("Note") %>' runat="server" rows="5" Columns="30" TextMode="MultiLine" CssClass="textarea" /> 
                </div>  
                                                                                        
                 </div> <%--tab-3 --%>
@@ -246,8 +232,9 @@ $(function () {
 
             	<!-- *** BOTTONI  ***  -->
                <div class="buttons">
+                <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
                 <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton"   Text="<%$ appSettings: SAVE_TXT %>" />
-                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />               
+                <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate="" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />               
                </div>               
 
             </EditItemTemplate>
@@ -258,31 +245,31 @@ $(function () {
                
                   <ul>
                     <li><a href="#tabs-1">Dati generali</a></li>
-                    <li><a href="#tabs-2">Sede</a></li>
-                    <li><a href="#tabs-3">Note</a></li>
+                    <li><a href="#tabs-2">Sede Operativa</a></li>
+                    <li><a href="#tabs-3">Sede Legale</a></li>
+                    <li><a href="#tabs-4">Note</a></li>
                   </ul>
 
-               <div id="tabs-1" style="height:460px;width:100%"> 
+               <div id="tabs-1" style="height:360px;width:100%"> 
 
                <!-- *** TEXT BOX ***  --> 
                <div class="input nobottomborder"> 
                     <div class="inputtext">Codice cliente: </div> 
                         
-                        <asp:TextBox ID="CodiceClienteTextBox" runat="server" class="ASPInputcontent" Columns="10" MaxLength="10" Text='<%# Bind("CodiceCliente") %>' />
-                        <asp:CheckBox  ID="FlagAttivoCheckBox" runat="server"  Checked='<%# Bind("FlagAttivo") %>' />
-					    <asp:Label  AssociatedControlId="FlagAttivoCheckBox" class="css-label" ID="Label3" runat="server" Text="Trasferta">Attivo</asp:Label> 
-                
-                        <asp:CustomValidator ID="ValidaCliente" runat="server"  ErrorMessage="Codice cliente già esistente" Display="none" OnServerValidate="ValidaCliente_ServerValidate" ControlToValidate="CodiceClienteTextBox"></asp:CustomValidator>   
-                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="CodiceClienteTextBox" Display="none" ErrorMessage="Inserire il codice cliente"></asp:RequiredFieldValidator>
-
-                </div>                   
-                
+                        <asp:TextBox ID="CodiceClienteTextBox" runat="server" class="ASPInputcontent" Columns="10" MaxLength="10" Text='<%# Bind("CodiceCliente") %>' 
+                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-trigger-after-failure="focusout" data-parsley-codiceUnico="" />
+                   
+                        <!-- *** CHECK BOX  ***  -->
+	                    <asp:CheckBox ID="FlagAttivoCheckBox" runat="server" Checked='<%# Bind("FlagAttivo") %>' />
+	                    <asp:Label  AssociatedControlId="FlagAttivoCheckBox" runat="server" >Attivo</asp:Label>       
+                   
+                </div>                                
 
                <!-- *** TEXT BOX ***  --> 
                <div class="input nobottomborder"> 
                     <div class="inputtext">Nome</div> 
-                        <asp:TextBox ID="TextBox1" runat="server" class="ASPInputcontent" Text='<%# Bind("Nome1") %>' Columns="30" MaxLength="40" />
-                        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Inserire il nome del cliente" style="float:none" ControlToValidate="TextBox1" Display="none"></asp:RequiredFieldValidator>                    
+                        <asp:TextBox ID="TextBox1" runat="server" class="ASPInputcontent" Text='<%# Bind("Nome1") %>' Columns="30" MaxLength="40" 
+                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" />
                </div>   
 
                <!-- *** TEXT BOX ***  --> 
@@ -292,7 +279,7 @@ $(function () {
                </div>   
 
                 <!-- *** TEXT BOX ***  --> 
-                <div class="input nobottomborder">                 
+                <div class="input ">                 
                     <div class="inputtext">Cod.Fisc.</div>
                     <asp:TextBox class="ASPInputcontent" ID="TextBox4" runat="server" Text='<%# Bind("CodiceFiscale") %>' Columns="16" MaxLength="16" />    
                 </div>    
@@ -300,48 +287,48 @@ $(function () {
                 <!-- *** SELECT ***  -->
 				<div class="input nobottomborder">                        
 				        <div class="inputtext">Metodo pag.</div>  
-                        <div class="InputcontentDDL" style="width:265px" >
+                        <label class="dropdown" style="width:265px" >
                              <asp:DropDownList ID="DropDownList1" runat="server" 
                                 DataSourceID="metododipagamento" DataTextField="Descrizione"  AppendDataBoundItems="True" 
                                 DataValueField="MetodoPagamento"  
                                 SelectedValue='<%# Bind("MetodoPagamento") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-                        </div>
+                        </label>
                 </div>  
 
                 <!-- *** Termini di pagamento ***  -->
 				<div class="input ">
 				        <div class="inputtext">Termini pag.</div>  
 
-				        <div class="InputcontentDDL" style="width:265px">
+				        <label class="dropdown" style="width:265px">
                            <asp:DropDownList ID="DropDownList2" runat="server" 
                                 DataSourceID="terminidipagamento" DataTextField="Descrizione" 
                                 DataValueField="TerminiPagamento"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("TerminiPagamento") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
+				        </label>
                 </div>  
 
                 <!-- *** Manager ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Manager</div>  
 
-				        <div class="InputcontentDDL" style="width:265px">
+				        <label class="dropdown" class="dropdown" style="width:265px">
                             <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="Manager" 
                                 DataTextField="Name" DataValueField="Persons_id"  AppendDataBoundItems="True" 
-                                SelectedValue='<%# Bind("ClientManager_id") %>'  >
+                                SelectedValue='<%# Bind("ClientManager_id") %>' 
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
- 				        </div>
-                        <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ErrorMessage="Selezionare nome manager" ControlToValidate="DropDownList3" Display="None"></asp:RequiredFieldValidator>
+ 				        </label>
                 </div>  
 
                  </div> <%--tabs-1--%>
 
-               <!-- *** SEDE LEGALE ***  --> 
-               <div id="tabs-2" style="height:460px;width:100%">
+               <!-- *** SEDE OPERTIVA ***  --> 
+               <div id="tabs-2" style="height:360px;width:100%">
                
                 <!-- *** Via ***  --> 
                <div class="input nobottomborder"> 
@@ -363,14 +350,15 @@ $(function () {
                </div> 
 
                <!-- *** Nazione ***  --> 
-               <div class="input"> 
+               <div class="input nobottomborder"> 
                     <div class="inputtext">Nazione</div> 
                         <asp:TextBox class="ASPInputcontent" ID="TextBox11" Text='<%# Bind("SedeLegaleNazione")  %>' runat="server" Columns="20" MaxLength="20" />
                </div> 
 
-               <div class="input nobottomborder"> 
-               <div class="inputtext" style="font-weight:bold">Sede legale</div> 
-               </div>
+               </div> <%--tabs-2--%>
+
+               <!-- *** SEDE LEGALE ***  --> 
+               <div id="tabs-3" style="height:360px;width:100%">
 
                 <!-- *** Via ***  --> 
                <div class="input nobottomborder"> 
@@ -397,15 +385,15 @@ $(function () {
                     <asp:TextBox class="ASPInputcontent" ID="TextBox12" runat="server" Text='<%# Bind("SedeOperativaNazione") %>' Columns="20" MaxLength="20" />
                </div> 
                
-               </div> <%--tab-2--%>
+               </div> <%--tab-3--%>
                
                 <!-- *** NOTE ***  --> 
-               <div id="tabs-3" style="height:460px;width:100%">                 
+               <div id="tabs-4" style="height:360px;width:100%">                 
                                              
                 <!-- *** Note ***  --> 
                <div class="input nobottomborder"> 
                     <div class="inputtext">Note</div> 
-                    <asp:TextBox  ID="TextBox22" Text='<%# Bind("Note") %>' runat="server" Columns="30" TextMode="MultiLine" CssClass="textarea" /> 
+                    <asp:TextBox  ID="TextBox22" Text='<%# Bind("Note") %>' runat="server" rows="5" Columns="30" TextMode="MultiLine" CssClass="textarea" /> 
                </div>  
                                                                                        
                 </div> <%--tab-3 --%>
@@ -414,8 +402,9 @@ $(function () {
 
                <!-- *** BOTTONI  ***  -->
                <div class="buttons">
+                <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
                 <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>"/>
-                <asp:Button ID="InsertCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />               
+                <asp:Button ID="InsertCancelButton" runat="server" formnovalidate="" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />               
                </div>   
 
             </InsertItemTemplate>
@@ -426,8 +415,6 @@ $(function () {
 
         </asp:FormView>
 
-        <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
-
     </form>     
 
   </div> <!-- END FormWrap -->
@@ -437,12 +424,58 @@ $(function () {
     <!-- **** FOOTER **** -->  
     <div id="WindowFooter">       
         <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div> 
+        <div  id="WindowFooter-L"> Aeonvis Spa <%= Year(Now())  %></div> 
         <div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
         <div id="WindowFooter-R">Utente: <%= Session("UserName")  %></div>        
      </div>  
 
+<script type="text/javascript">
+$(function () {
+
+    $(":checkbox").addClass("css-checkbox"); // post rendering dei checkbox in ASP.NET
+   
+    $("#tabs").tabs(); // abilitate tab view
+
+        // *** controllo che non esista lo stesso codice utente *** //
+    window.Parsley.addValidator('codiceunico', function (value, requirement) {
+        var response = false;
+        var dataAjax = "{ sKey: 'CodiceCliente', " +
+                       " sValkey: '" + value  + "', " + 
+                       " sTable: 'Customers'  }";
+
+                    $.ajax({
+                        url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
+                        data: dataAjax,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        type: 'post',
+                        async: false,
+                        success: function (data) {
+                            if (data.d == true) // esiste, quindi errore
+                                response = false;
+                            else
+                                response = true;
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                        }
+                    });
+                    return response;
+         }, 32)
+        .addMessage('en', 'codiceunico', 'Customer code already exists')
+        .addMessage('it', 'codiceunico', 'Codice cliente già esistente');
+
+    // *** Esclude i controlli nascosti *** 
+    $('#FormCliente').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+    });
+
+});
+</script>
+
 </body>
+
       <asp:SqlDataSource ID="CustomerDataSource" runat="server" 
             ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
             DeleteCommand="DELETE FROM [Customers] WHERE [CodiceCliente] = @CodiceCliente" 

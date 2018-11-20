@@ -21,9 +21,6 @@ public partial class CostRateAnno_lookup_form : System.Web.UI.Page
         if (!Auth.ReturnPermission("MASTERDATA", "COSTRATE"))
             Auth.CheckPermission("REPORT", "ECONOMICS");
 
-        // Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(this.GetType(), "val", "fnOnUpdateValidators();");
-
         // Inizializza
         InitForm();
 

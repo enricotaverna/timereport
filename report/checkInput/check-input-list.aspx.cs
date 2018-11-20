@@ -164,16 +164,17 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
  
             if (dtHours.Rows.Count > 0 )
             {
-
-                DataRow rdr = dtHours.Rows[0];
-
-                CheckGiorni curr = new CheckGiorni();
-                curr.persons_id = rdr["persons_id"].ToString();
-                curr.giorno = Convert.ToDateTime(rdr["date"]).Day;
-                curr.ore = Convert.ToInt16(rdr["hours"]);
                 
-                // carica lista
-                lCheckGiorni.Add(curr);                        
+                foreach (DataRow rdr in dtHours.Rows)
+                    {
+                    CheckGiorni curr = new CheckGiorni();
+                    curr.persons_id = rdr["persons_id"].ToString();
+                    curr.giorno = Convert.ToDateTime(rdr["date"]).Day;
+                    curr.ore = Convert.ToInt16(rdr["hours"]);
+                
+                    // carica lista
+                    lCheckGiorni.Add(curr);  
+                     }     
             }
  
     } // CaricaOreMese

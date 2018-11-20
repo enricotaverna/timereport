@@ -10,23 +10,12 @@
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
+<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
-<script src="/timereport/include/javascript/timereport.js"></script>
-
-<script>
-
-    // JQUERY
-    $(function () {
-
-        // gestione validation summary su validator custom (richiede timereport.js)//
-        displayAlert();
-
-    });
-
-</script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -48,20 +37,25 @@
 
         <!-- *** OLD PWD ***  -->
         <div class="input nobottomborder">
-            <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Vecchia Password" meta:resourcekey="Label1Resource1"></asp:Label>
-            <asp:TextBox CssClass="ASPInputcontent" ID="TBOldPwd" runat="server" MaxLength="10" meta:resourcekey="TBOldPwdResource1" />
+            <asp:Label CssClass="inputtext" style="width:160px" runat="server" Text="Vecchia Password" meta:resourcekey="Label1Resource1"></asp:Label>
+            <asp:TextBox CssClass="ASPInputcontent" ID="TBOldPwd" runat="server" MaxLength="10" 
+                data-parsley-errors-container="#valMsg"  data-parsley-required="true" data-parsley-username="" data-parsley-trigger-after-failure="focusout"
+                meta:resourcekey="TBOldPwdResource1" />
         </div>
 
         <!-- *** NEW PWD1 ***  -->
         <div class="input nobottomborder">
-            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Nuova Password" meta:resourcekey="Label2Resource1"></asp:Label>
-            <asp:TextBox CssClass="ASPInputcontent" ID="TBNewPwd1" runat="server" MaxLength="10" meta:resourcekey="TBNewPwd1Resource1" />
+            <asp:Label CssClass="inputtext" style="width:160px"  runat="server" Text="Nuova Password" meta:resourcekey="Label2Resource1"></asp:Label>
+            <asp:TextBox CssClass="ASPInputcontent" ID="TBNewPwd1" runat="server" minlength="3" MaxLength="10" 
+                         data-parsley-errors-container="#valMsg"  data-parsley-required="true" meta:resourcekey="TBNewPwd1Resource1" />
         </div>
 
         <!-- *** NEW PWD2 ***  -->
         <div class="input nobottomborder">
-            <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Conferma Pwd" meta:resourcekey="Label3Resource1"></asp:Label>
-            <asp:TextBox CssClass="ASPInputcontent" ID="TBNewPwd2" runat="server" MaxLength="10" meta:resourcekey="TBNewPwd2Resource1" />
+            <asp:Label CssClass="inputtext" style="width:160px"  runat="server" Text="Conferma Password" meta:resourcekey="Label3Resource1"></asp:Label>
+            <asp:TextBox CssClass="ASPInputcontent" ID="TBNewPwd2" runat="server" minlength="3" MaxLength="10" 
+                         data-parsley-errors-container="#valMsg"  data-parsley-equalto="#TBNewPwd1" data-parsley-required="true" 
+                         meta:resourcekey="TBNewPwd2Resource1" />
         </div>
 
        <div class="input nobottomborder">
@@ -70,22 +64,11 @@
 
         <!-- *** BOTTONI ***  -->
         <div class="buttons">
+            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
             <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" OnClick="InsertButton_Click" meta:resourcekey="InsertButtonResource1"       /> 
-            <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" meta:resourcekey="UpdateCancelButtonResource1"    />                    
+            <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" meta:resourcekey="UpdateCancelButtonResource1"  formnovalidate  />                    
         </div>
- 
-        <!-- **** VALIDAZIONI **** -->  
-        <asp:CustomValidator ID="CV_OldPwd" runat="server" 
-        OnServerValidate="ValidaOldPwd" Display="None" 
-        ErrorMessage="Vecchia password non corrisponde" ControlToValidate="TBOldPwd" ValidateEmptyText="True" SetFocusOnError="True" meta:resourcekey="CV_OldPwdResource1"></asp:CustomValidator>    
-
-        <!-- **** VALIDAZIONI **** -->  
-        <asp:CustomValidator ID="CV_NewPwd" runat="server" 
-        OnServerValidate="ValidaNewPwd" Display="None" 
-        ControlToValidate="TBNewPwd1" ValidateEmptyText="True" SetFocusOnError="True" meta:resourcekey="CV_NewPwdResource1"></asp:CustomValidator> 
-        
-        <asp:ValidationSummary ID="ValidationSummary" runat="server" ShowMessageBox="True" ShowSummary="False" meta:resourcekey="ValidationSummaryResource1" />
-
+       
     </form>
     
     </div> <%-- END FormWrap  --%> 
@@ -103,9 +86,47 @@
         <div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session["UserName"]  %></div>    
     </div> 
 
+    <script type="text/javascript">
 
+        // Lingua
+        window.Parsley.setLocale('<%=Session["lingua"]%>');
+
+        // *** Validazione che richiama un servizio, bisogna mettere il tag data-parsley-username sull'elemento del form *** //
+         window.Parsley.addValidator('username', function (value, requirement) {
+                    var response = false;
+                    var dataAjax = "{ sPassword: '" + value +"' , " + " sUserName: '<%=Session["persons_id"]%>' }"
+
+                    $.ajax({
+                        url: "/timereport/webservices/WStimereport.asmx/CheckPassword",
+                        data: dataAjax,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        type: 'post',
+                        async: false,
+                        success: function(data) {
+                            if (data.d == "false")
+                                response = false;
+                            else
+                                response = true;
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                        }
+                    });
+                    return response;
+         }, 32)
+                .addMessage('en', 'username', 'Password not valid')
+                .addMessage('it', 'username', 'Password non valida');
+
+        $('#FVMain').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+        </script>
 
 </body>
+
 </html>
 
 

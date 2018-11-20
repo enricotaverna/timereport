@@ -4,12 +4,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-     <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>  
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>   
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
-<script src="/timereport/include/javascript/timereport.js"></script> 
+<!-- Style -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+     
+<!-- Jquery   -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+
+<!-- Menù  -->
+<script language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <head id="Head1" runat="server">
     <title>Controllo Progetto</title>
@@ -18,21 +26,6 @@
 
     </head>
 
-    <script>
-        $(function () {
-
-            // validation summary su validator custom
-            displayAlert();
-
-            // datepicker
-            $("#TBDataReport").datepicker($.datepicker.regional['it']);
-
-        });
-</script>
-
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></script>    
-    
 <body>    
 
     <div id="TopStripe"></div> 
@@ -41,7 +34,7 @@
 
     <div id="FormWrap"  >
  
-    <form id="form1" runat="server"  class="StandardForm">    
+    <form id="FormProgetto" runat="server"  class="StandardForm">    
    
     
     <div class="formtitle" >Controllo Progetto</div>                  
@@ -49,40 +42,39 @@
     <!--  *** PROGETTO *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Progetto</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLProgetti" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged"  >        
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
 
     <!--  *** ATTIVITA' *** -->            
     <div class="input nobottomborder ">
           <div class="inputtext">Attività</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLAttivita" runat="server"  
                         AppendDataBoundItems="True" AutoPostBack="True"  >                         
                     </asp:DropDownList>
-          </div>
+          </label>
     </div> 
 
     <!--  *** MANAGER *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Manager</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
                         AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone"> 
                    <asp:ListItem Value="0">-- tutti i manager --</asp:ListItem>                        
                     </asp:DropDownList>
-          </div>
+          </label>
     </div> 
 
     <!--  **** DATA REPORT ** -->
     <div class="input">
         <asp:Label ID="Label5" CssClass="inputtext" runat="server"  Text="Data Report:"></asp:Label>
-        <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBDataReport"   runat="server"  MaxLength="10" Rows="12" Columns="10" />
- <%--       <asp:RangeValidator ID="RangeValidator1" runat="server" ControlToValidate="TBDataReport" Display="none" ErrorMessage="Formato data inizio progetto non corretto" MaximumValue="31/12/9999" MinimumValue="01/01/2000" Type="Date" ></asp:RangeValidator>--%>
-        <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" ErrorMessage="Inserire data report" ControlToValidate="TBDataReport" Display="none"></asp:RequiredFieldValidator>
+        <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBDataReport"   runat="server"  MaxLength="10" Rows="12" Columns="10" 
+            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" data-parsley-required="true" />
     </div> 
 
     <!--  **** DATA REPORT ** -->
@@ -96,15 +88,14 @@
 
     </div> 
                             
-    <div class="buttons">        
+    <div class="buttons">    
+            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
             <asp:Button ID="report" runat="server" Text="<%$ appSettings: REPORT_TXT %>" CssClass="orangebutton"  CommandName="report" OnClick="sottometti_Click" />    
-            <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="document.location.href='/timereport/menu.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
+            <asp:Button ID="CancelButton" runat="server" formnovalidate="" CssClass="greybutton" OnClientClick="document.location.href='/timereport/menu.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
  
     </div>
     
     </div> <%-- END FormWrap  --%> 
-
-    <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
 
     </form>
 
@@ -125,6 +116,21 @@
         </SelectParameters>
     </asp:SqlDataSource>
 
+<script type="text/javascript">
+        $(function () {
+
+            // datepicker
+            $("#TBDataReport").datepicker($.datepicker.regional['it']);
+        });
+
+        // *** Esclude i controlli nascosti *** 
+        $('#FormProgetto').parsley({
+                excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+</script>
+
 </body>
+
 </html>
 

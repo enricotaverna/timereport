@@ -5,10 +5,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
      <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>  
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script> 
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>   
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 <script src="/timereport/include/javascript/timereport.js"></script> 
 
 <head id="Head1" runat="server">
@@ -37,53 +37,53 @@
     <!--  *** PERSONA *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Persona</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLPersone" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True"  >        
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
 
     <!--  *** SOCIETA *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Società</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLSocieta" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="SQLDSSocieta" DataTextField="Name" DataValueField="Company_id" >        
                         <asp:ListItem Value="" Text="--- Tutte le società ---" />
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
 
     <!--  *** PERSONA *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Tipo Spesa</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLTipoSpesa" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="SQLDSTipoSpesa" DataTextField="NomeSpesa" DataValueField="ExpenseType_Id" >        
                         <asp:ListItem Value="" Text="--- Tutte le spese ---" />     
                </asp:DropDownList>
-          </div>
+          </label>
     </div>  
        
     <!--  *** MESE *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Mese</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLMesi" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLMesi_SelectedIndexChanged"    >        
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
 
     <!--  *** ANNO *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Anno</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLAnni" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLAnni_SelectedIndexChanged"  >        
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
                             
     <div class="buttons">        

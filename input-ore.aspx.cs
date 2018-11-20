@@ -17,7 +17,6 @@ public partial class input_ore : System.Web.UI.Page
     private DropDownList ddlActivity;
    
     // attivata MARS 
-    private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
     public string lProject_id, lActivity_id;
 
@@ -25,9 +24,6 @@ public partial class input_ore : System.Web.UI.Page
     {
 
         Auth.CheckPermission("DATI", "ORE");
-
-        // Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(this.GetType(), "val", "fnOnUpdateValidators();");
       
 //      Modo di default è insert, se richiamata con id va in change / display
         if (IsPostBack)
@@ -78,48 +74,40 @@ public partial class input_ore : System.Web.UI.Page
     protected void Get_record(string strHours_Id)
     {
 
-        SqlCommand cmd = new SqlCommand("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, Hours.CreatedBy, Hours.AccountingDate FROM Hours LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, conn);
+        DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, Hours.CreatedBy, Hours.AccountingDate FROM Hours LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
 
-        conn.Open();
-
-        SqlDataReader dr = cmd.ExecuteReader();
-        dr.Read();
-
-        lProject_id = dr["Projects_id"].ToString(); // projects_id
-        lActivity_id = dr["Activity_id"].ToString(); // activity_id
-
-        conn.Close();
+        lProject_id = drRecord["Projects_id"].ToString(); // projects_id
+        lActivity_id = drRecord["Activity_id"].ToString(); // activity_id
     }
 
     protected void Bind_DDLprogetto()
     {
 
-        //conn.Open();
-
-        //SqlCommand cmd;
-
-        //// imposta selezione progetti in base all'utente
-
-        //if (Convert.ToInt32(Session["ForcedAccount"]) != 1)
-        //    cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
-        //else
-        //    cmd = new SqlCommand("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS iProgetto, ProjectCode FROM Projects " +
-        //                               " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-        //                               " WHERE ( ForcedAccounts.Persons_id=" + Session["persons_id"] + " OR Projects.Always_available = 'true')" +
-        //                               " AND active = 'true' ORDER BY Projects.ProjectCode", conn);
-
-        //SqlDataReader dr = cmd.ExecuteReader();
-
-
         DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
         ddlProject = (DropDownList)FVore.FindControl("DDLprogetto");
 
-        ddlProject.DataSource = dtProgettiForzati;
         ddlProject.Items.Clear();
-        ddlProject.Items.Add(new ListItem(GetLocalResourceObject("DDLprogetto.testo").ToString(), "0"));             
+        ddlProject.Items.Add(new ListItem(GetLocalResourceObject("DDLprogetto.testo").ToString(), ""));
+
+        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
+        foreach (DataRow drRow in dtProgettiForzati.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+            liItem.Attributes.Add("data-ActivityOn", drRow["ActivityOn"].ToString());
+            liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
+
+            if (drRow["TestoObbligatorio"].ToString() == "True")
+                liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
+            else
+                liItem.Attributes.Add("data-desc-message", "");
+
+            ddlProject.Items.Add(liItem);
+        }
+
         ddlProject.DataTextField = "DescProgetto";
         ddlProject.DataValueField = "Projects_Id";
         ddlProject.DataBind();
+
         if (lProject_id != "")
             ddlProject.SelectedValue = lProject_id;
 
@@ -127,49 +115,58 @@ public partial class input_ore : System.Web.UI.Page
         if (FVore.CurrentMode == FormViewMode.Insert)
             ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
 
-        //conn.Close();
-    }
+     }
 
     public void Bind_DDLAttivita()
     {
-        conn.Open();
 
-        DropDownList ddlprogetto = (DropDownList)FVore.FindControl("DDLProgetto");
+        DropDownList ddlActivity = (DropDownList)FVore.FindControl("DDLHidden");
 
-        SqlCommand cmd = new SqlCommand("select Activity_id, ActivityCode + '  ' + left(Name,20) AS iActivity FROM Activity where Projects_id='" + ddlprogetto.SelectedValue + "' AND active = 'true' ORDER BY ActivityCode", conn);
-        SqlDataReader dr = cmd.ExecuteReader();
+        DropDownList ddlActivity_temp = (DropDownList)FVore.FindControl("DDLAttivita");
 
-        ddlActivity = (DropDownList)FVore.FindControl("DDLAttivita");
-        ddlActivity.DataSource = dr;
+        DataTable dtAct = Database.GetData("select Activity_id, ActivityCode + '  ' + left(a.Name,20) AS DescActivity, a.Projects_id FROM Activity as a JOIN Projects as b ON b.Projects_id = a.Projects_id where b.active = 'true' AND a.active = 'true' ORDER BY ActivityCode", null);
+
         ddlActivity.Items.Clear();
-        ddlActivity.Items.Add(new ListItem(GetLocalResourceObject("DDLAttivita.testo").ToString(), ""));   
+        ddlActivity_temp.Items.Clear();
+
+        ListItem liEmpty = new ListItem("-- selezionare un valore --", "");
+        ddlActivity.Items.Add(liEmpty);
+        ddlActivity_temp.Items.Add(liEmpty);
+
+        foreach (DataRow drRow in dtAct.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescActivity"].ToString(), drRow["Activity_id"].ToString());
+            liItem.Attributes.Add("data-projects_id", drRow["Projects_id"].ToString());
+            ddlActivity.Items.Add(liItem);
+            ddlActivity_temp.Items.Add(liItem);
+
+        }
+
         ddlActivity.DataTextField = "iActivity";
         ddlActivity.DataValueField = "Activity_id";
         ddlActivity.DataBind();
+
+        ddlActivity_temp.DataTextField = "iActivity";
+        ddlActivity_temp.DataValueField = "Activity_id";
+        ddlActivity_temp.DataBind();
 
         if (lActivity_id != "")
             ddlActivity.SelectedValue = lActivity_id;
         else
             ddlActivity.SelectedValue = "";
 
-        ddlActivity.Visible = true;
+        //ddlActivity.Visible = true;
 
         // Se il progetto prevede attività rende il controllo visibile 
-        if (!dr.HasRows)
-            ddlActivity.Enabled = false;
-        else
-            ddlActivity.Enabled = true;
+        //if (dtAct.Rows.Count > 0 && FVore.CurrentMode != FormViewMode.ReadOnly)
+        //    ddlActivity.Enabled = true;
+        //else
+        //    ddlActivity.Enabled = false;
 
         // se in creazione imposta il default di progetto 
-        if (FVore.CurrentMode == FormViewMode.Insert & dr.HasRows)
+        if (FVore.CurrentMode == FormViewMode.Insert & dtAct.Rows.Count > 0)
             ddlActivity.SelectedValue = (string)Session["ActivityDefault"];
 
-        conn.Close();
-    }
-
-    protected void DDLProgetto_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        Bind_DDLAttivita();
     }
 
     protected void FVore_modechanging(object sender, FormViewModeEventArgs e)
@@ -270,48 +267,12 @@ public partial class input_ore : System.Web.UI.Page
         {
             Label LBAccountingDate = (Label)FVore.FindControl("LBAccountingDate");
             TextBox TBAccountingDate = (TextBox)FVore.FindControl("TBAccountingDate");
-            Label LBAccountingDateDisplay = (Label)FVore.FindControl("LBAccountingDateDisplay");
 
             // se display
             LBAccountingDate.Visible = false;
+            TBAccountingDate.Visible = false;
 
-            if (TBAccountingDate != null)
-                TBAccountingDate.Visible = false;
-
-            if (LBAccountingDateDisplay != null)
-                LBAccountingDateDisplay.Visible = false;
         }     
-    }
-
-    protected void CV_TBComment_ServerValidate(object source, ServerValidateEventArgs args)
-    {
-        ValidationClass c = new ValidationClass();
-        TextBox TBtoValidate = (TextBox)FVore.FindControl("TBComment");
-        DropDownList DDLprogetto = (DropDownList)FVore.FindControl("DDLprogetto");
-        CustomValidator CV_TBComment = (CustomValidator)FVore.FindControl("CV_TBComment");
-
-        Boolean bTestoObbligatorio = false;
-        string sMessaggioDiErrore = "";
-
-        // Legge il flag di commento obbligatorio su tipo spesa
-        DataTable dtRecord = Database.GetData("Select TestoObbligatorio, MessaggioDiErrore from Projects where Projects_Id = " + DDLprogetto.SelectedValue, this.Page);
-
-        if (dtRecord.Rows.Count > 0)
-                {
-                    bTestoObbligatorio = (dtRecord.Rows[0]["TestoObbligatorio"] == DBNull.Value) ? false : Convert.ToBoolean(dtRecord.Rows[0]["TestoObbligatorio"]);
-                    sMessaggioDiErrore = dtRecord.Rows[0]["MessaggioDiErrore"].ToString();
-                } // endwhile
-
-        if (TBtoValidate.Text.Trim().Length == 0 && bTestoObbligatorio)
-        {
-            args.IsValid = false;
-
-            // imposta il messaggio di errore letto dal tipo spesa
-            CV_TBComment.ErrorMessage = sMessaggioDiErrore;
-
-            //      cambia colore del campo in errore
-            c.SetErrorOnField(args.IsValid, FVore, "TBComment");
-        }
     }
 
     protected override void InitializeCulture()

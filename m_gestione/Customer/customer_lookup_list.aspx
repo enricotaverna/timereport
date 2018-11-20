@@ -26,6 +26,8 @@
 
         SqlDataSource1.SelectCommand = "SELECT Persons.Name, Customers.* FROM Customers LEFT OUTER  JOIN Persons ON Customers.ClientManager_id = Persons.Persons_id" & sWhere
 
+        SqlDataSource1.SelectCommand = SqlDataSource1.SelectCommand + " ORDER BY CodiceCliente"
+
     End Sub
 
     Protected Sub GridView1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -85,9 +87,9 @@
 </head>
 
     <!-- Jquery -->
-    <link rel="stylesheet" href="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.css" />
+    <link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.js"></script>    
+    <script src="/timereport/include/jquery/jquery-ui.min.js"></script>    
 
     <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session("userLevel")%> type =text/javascript></SCRIPT> 
     <script language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></script>    
@@ -182,7 +184,7 @@
             ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
             DeleteCommand="DELETE FROM [Customers] WHERE [CodiceCliente] = @CodiceCliente" 
             InsertCommand="INSERT INTO [Customers] ([CodiceCliente], [Nome1], [PIVA], [FlagAttivo], [CodiceFiscale], [SedeLegaleVia1], [SedeLegaleCitta], [SedeLegaleProv], [SedeLegaleCAP], [SedeLegaleNazione], [SedeOperativaVia1], [SedeOperativaCitta], [SedeOperativaProv], [SedeOperativaCAP], [SedeOperativaNazione], [MetodoPagamento], [TerminiPagamento], [ClientManager_id], [Note]) VALUES (@CodiceCliente, @Nome1, @PIVA, @FlagAttivo, @CodiceFiscale, @SedeLegaleVia1, @SedeLegaleCitta, @SedeLegaleProv, @SedeLegaleCAP, @SedeLegaleNazione, @SedeOperativaVia1, @SedeOperativaCitta, @SedeOperativaProv, @SedeOperativaCAP, @SedeOperativaNazione, @MetodoPagamento, @TerminiPagamento, @ClientManager_id, @Note)" 
-            SelectCommand="SELECT Persons.Name, Customers.* FROM Customers INNER JOIN Persons ON Customers.ClientManager_id = Persons.Persons_id" 
+            SelectCommand="SELECT Persons.Name, Customers.* FROM Customers INNER JOIN Persons ON Customers.ClientManager_id = Persons.Persons_id ORDER BY Customers.CodiceCliente" 
             UpdateCommand="UPDATE [Customers] SET [Nome1] = @Nome1, [PIVA] = @PIVA, [FlagAttivo] = @FlagAttivo, [CodiceFiscale] = @CodiceFiscale, [SedeLegaleVia1] = @SedeLegaleVia1, [SedeLegaleCitta] = @SedeLegaleCitta, [SedeLegaleProv] = @SedeLegaleProv, [SedeLegaleCAP] = @SedeLegaleCAP, [SedeLegaleNazione] = @SedeLegaleNazione, [SedeOperativaVia1] = @SedeOperativaVia1, [SedeOperativaCitta] = @SedeOperativaCitta, [SedeOperativaProv] = @SedeOperativaProv, [SedeOperativaCAP] = @SedeOperativaCAP, [SedeOperativaNazione] = @SedeOperativaNazione, [MetodoPagamento] = @MetodoPagamento, [TerminiPagamento] = @TerminiPagamento, [ClientManager_id] = @ClientManager_id, [Note] = @Note WHERE [CodiceCliente] = @CodiceCliente">
             <SelectParameters>
               <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue"

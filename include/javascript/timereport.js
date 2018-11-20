@@ -31,7 +31,3 @@
         });
     };
 
-    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(
-                    function () {
-                        displayAlert();
-                    });

@@ -42,7 +42,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-ok.png";
                         break;
                     case 1:
-                        CheckTicket.Text = "<a href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=01'>" + ListaAnomalie.Count + " ticket o rimborsi</a>" + " travel assenti";
+                        CheckTicket.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=01'>" + ListaAnomalie.Count + " ticket o rimborsi</a>" + " travel assenti";
                         CheckTicketImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
                         break;
                     case 2:
@@ -58,7 +58,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                                                      Session["persons_id"].ToString(),
                                                      ref ListaAnomalie);
 
-        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : "<a href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=02'>" +  ListaAnomalie.Count + " spese caricate</a> su commessa non presente nella giornata";
+        CheckSpese.Text = bCheckResult == 0 ? "Carichi spese controllati" : "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=02'>" +  ListaAnomalie.Count + " spese caricate</a> su commessa non presente nella giornata";
         CheckSpeseImg.ImageUrl = bCheckResult == 0 ? "/timereport/images/icons/50x50/icon-ok.png" : "/timereport/images/icons/50x50/icon-alert.png";
 
         // imposta indirizzo stampa ricevute
@@ -66,8 +66,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
 
     } // Page_Load()      
 
-
-        protected void InsertButton_Click(object sender, EventArgs e)
+    protected void InsertButton_Click(object sender, EventArgs e)
     {
         string cmd;	   
     

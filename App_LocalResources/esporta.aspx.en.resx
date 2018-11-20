@@ -123,14 +123,14 @@
   <data name="CBLProgettiResource1.ToolTip" xml:space="preserve">
     <value />
   </data>
-  <data name="CBPersoneDisattiveResource1.Text" xml:space="preserve">
-    <value>include not active resources</value>
+  <data name="CBPersoneDisattive.Text" xml:space="preserve">
+    <value>na</value>
   </data>
   <data name="CBPersoneDisattiveResource1.ToolTip" xml:space="preserve">
     <value />
   </data>
-  <data name="CBProgettiDisattiviResource1.Text" xml:space="preserve">
-    <value>include not active projects</value>
+  <data name="CBProgettiDisattivi.Text" xml:space="preserve">
+    <value>na</value>
   </data>
   <data name="CBProgettiDisattiviResource1.ToolTip" xml:space="preserve">
     <value />
@@ -213,7 +213,7 @@
   <data name="ListItemResource9.Value" xml:space="preserve">
     <value>6</value>
   </data>
-  <data name="mieoreResource1.Text" xml:space="preserve">
+  <data name="CBmieore.Text" xml:space="preserve">
     <value>Only my data</value>
   </data>
   <data name="mieoreResource1.ToolTip" xml:space="preserve">

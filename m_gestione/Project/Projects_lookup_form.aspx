@@ -10,9 +10,6 @@
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs)
 
-        ' Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(Me.GetType, "val", "fnOnUpdateValidators();")
-
         '	Autorizzazione su tutti o sui progetti assegnati
         If Not Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL") Then
             Auth.CheckPermission("MASTERDATA", "PROJECT_FORCED")
@@ -20,29 +17,23 @@
 
         If (Not IsPostBack) Then
             If Len(Request.QueryString("Projectcode")) > 0 Then
-                SchedaProgettoForm.ChangeMode(FormViewMode.Edit)
-                SchedaProgettoForm.DefaultMode = FormViewMode.Edit
+                FVProgetto.ChangeMode(FormViewMode.Edit)
+                FVProgetto.DefaultMode = FormViewMode.Edit
             End If
             prevPage = Request.UrlReferrer.ToString()
         End If
 
-        ' se manager solo display NON + VALIDO MANAGER PUO' MODIFICARE
-        'If Session("userlevel") = MyConstants.AUTH_MANAGER Then
-        '    SchedaProgettoForm.ChangeMode(FormViewMode.ReadOnly)
-        '    SchedaProgettoForm.DefaultMode = FormViewMode.ReadOnly
-        'End If
-
     End Sub
 
-    Protected Sub SchedaProgettoForm_ItemUpdated(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewUpdatedEventArgs)
+    Protected Sub FVProgetto_ItemUpdated(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewUpdatedEventArgs)
         Response.Redirect(prevPage)
     End Sub
 
-    Protected Sub SchedaProgettoForm_ItemInserted(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewInsertedEventArgs)
+    Protected Sub FVProgetto_ItemInserted(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewInsertedEventArgs)
         Response.Redirect("projects_lookup_list.aspx?messaggio=yes")
     End Sub
 
-    Protected Sub SchedaProgettoForm_ModeChanging(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewModeEventArgs)
+    Protected Sub FVProgetto_ModeChanging(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.FormViewModeEventArgs)
         If (e.CancelingEdit = True) Then
             Response.Redirect(prevPage)
         End If
@@ -55,24 +46,7 @@
         args.IsValid = Not c.CheckExistence("ProjectCode", args.Value, "Projects")
 
         ' Evidenzia campi form in errore
-        c.SetErrorOnField(args.IsValid, SchedaProgettoForm, "ProjectCodeTextBox")
-
-    End Sub
-
-    ' Se progetto è fixed il dato (revenue, margine) diventa obbligatorio
-    Sub ValidaProgettoFixed(ByVal sender As CustomValidator, ByVal args As ServerValidateEventArgs)
-
-        Dim c As Object = New ValidationClass
-        Dim dl As DropDownList = SchedaProgettoForm.FindControl("DDLTipoContratto")
-
-        ' true se non esiste già il record
-        If dl.SelectedValue = ConfigurationManager.AppSettings("CONTRATTO_FIXED") And args.Value = "" Then
-            args.IsValid = False
-            ' Evidenzia campi form in errore
-            c.SetErrorOnField(args.IsValid, SchedaProgettoForm, sender.ControlToValidate)
-        Else
-            args.IsValid = True
-        End If
+        c.SetErrorOnField(args.IsValid, FVProgetto, "TBProgetto")
 
     End Sub
 
@@ -81,12 +55,17 @@
     End Sub
 </script>
 
+ <!-- Style -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+
  <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>  
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>   
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
-<script src="/timereport/include/javascript/timereport.js"></script> 
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>    
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -96,43 +75,7 @@
 
 </head>
 
-<script>
-$(function () {
-
-// abilitate tab view
-    $("#tabs").tabs();
-
-    // stile checkbox form    
-    $("#SchedaProgettoForm_ActiveCheckBox").addClass("css-checkbox");
-    $("#SchedaProgettoForm_ActivityOn").addClass("css-checkbox");
-    $("#SchedaProgettoForm_AlwaysAvailableCheckBox").addClass("css-checkbox");
-    $("#SchedaProgettoForm_SpeseForfaitCheckBox").addClass("css-checkbox"); 
-    $("#SchedaProgettoForm_BloccoCaricoSpeseCheckBox").addClass("css-checkbox");
-
-    // stile checkbox form in ReadOnly   
-    $("#SchedaProgettoForm_DisActivityOn").addClass("css-checkbox")
-    $("#SchedaProgettoForm_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
-    $("#SchedaProgettoForm_DisSpeseForfaitCheckBox").addClass("css-checkbox");
-    $("#SchedaProgettoForm_DisActiveCheckBox").addClass("css-checkbox");
-    $("#SchedaProgettoForm_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
-
-    $("#SchedaProgettoForm_DisActivityOn").attr("disabled", true);
-    $("#SchedaProgettoForm_DisAlwaysAvailableCheckBox").attr("disabled", true);
-    $("#SchedaProgettoForm_DisSpeseForfaitCheckBox").attr("disabled", true);
-    $("#SchedaProgettoForm_DisActiveCheckBox").attr("disabled", true);
-    $("#SchedaProgettoForm_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
-
-// validation summary su validator custom
-    displayAlert();
-
-// datepicker
-    $("#SchedaProgettoForm_TBAttivoDa").datepicker($.datepicker.regional['it']);
-    $("#SchedaProgettoForm_TBAttivoA").datepicker($.datepicker.regional['it']);
-
-});
-</script>
-
-<script language=JavaScript src= "/timereport/include/menu/menu_array.js" type=text/javascript></script>
+<script language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" type=text/javascript></script>
 <script language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></script>  
 
 <body>
@@ -143,12 +86,12 @@ $(function () {
 
 <div id="FormWrap" style="width:496px">
 
-    <form id="form1" runat="server" class="StandardForm">
+    <form id="formProgetto" runat="server" class="StandardForm">
 
-        <asp:FormView ID="SchedaProgettoForm" runat="server" DataKeyNames="Projects_Id" 
-            DataSourceID="projects" OnItemUpdated="SchedaProgettoForm_ItemUpdated" 
-            OnItemInserted="SchedaProgettoForm_ItemInserted" 
-            OnModeChanging="SchedaProgettoForm_ModeChanging"  
+        <asp:FormView ID="FVProgetto" runat="server" DataKeyNames="Projects_Id" 
+            DataSourceID="projects" OnItemUpdated="FVProgetto_ItemUpdated" 
+            OnItemInserted="FVProgetto_ItemInserted" 
+            OnModeChanging="FVProgetto_ModeChanging"  
             DefaultMode="Insert" width="100%">
             
             <EditItemTemplate>
@@ -167,7 +110,7 @@ $(function () {
                   <!-- *** CODICE PROGETTO ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Codice: </div>
-                    <asp:TextBox ID="ProjectCodeTextBox" runat="server"  class="ASPInputcontent"
+                    <asp:TextBox ID="TBProgetto" runat="server"  class="ASPInputcontent"
                                 Text='<%# Bind("ProjectCode") %>' Enabled="False" Columns="12"  
                                 MaxLength="10" />
                     <asp:CheckBox ID="ActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>' />
@@ -178,83 +121,84 @@ $(function () {
 				  <div class="input"  >
 				    <div class="inputtext">Progetto: </div>
                             <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' 
-                                Columns="26" MaxLength="50" class="ASPInputcontent"/>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="Inserire descrizione progetto" ControlToValidate="NameTextBox" Display="none"></asp:RequiredFieldValidator>
+                                Columns="26" MaxLength="50" class="ASPInputcontent"
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" />
 				  </div>  
 
                 <!-- *** CODICE CLIENTE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Cliente:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente" 
                                 DataTextField="Nome1" DataValueField="CodiceCliente"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("CodiceCliente") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>   
-				        </div>
+				        </label>
 				    </div>  
 
                 <!-- *** CODICE MANAGER ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Manager:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager" 
                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                SelectedValue='<%# Bind("ClientManager_id") %>' >
+                                SelectedValue='<%# Bind("ClientManager_id") %>'
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>     
-				        </div>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" ErrorMessage="Inserire nome manager" ControlToValidate="DDLManager" Display="none"></asp:RequiredFieldValidator> 
+				        </label>
 				    </div>  
 
                 <!-- *** TIPO PROGETTO ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Tipo progetto:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto" 
                                 DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                SelectedValue='<%# Bind("ProjectType_Id") %>' >
+                                SelectedValue='<%# Bind("ProjectType_Id") %>' 
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                  <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator9" runat="server" ErrorMessage="Inserire il tipo progetto" ControlToValidate="DDLTipoProgetto" Display="none"></asp:RequiredFieldValidator> 
-				    </div>  
+				        </label>
+ 				    </div>  
 
                 <!-- *** CANALE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Canale:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale" 
                                 DataTextField="Name" DataValueField="Channels_Id"  AppendDataBoundItems="True" 
-                                SelectedValue='<%# Bind("Channels_Id") %>'  >
+                                SelectedValue='<%# Bind("Channels_Id") %>' 
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" runat="server" ErrorMessage="Inserire il canale" ControlToValidate="DDLCanale" Display="none"></asp:RequiredFieldValidator> 
+				        </label>
  				    </div>  
 
                 <!-- *** SOCIETA ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Società:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa" 
                                 DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("Company_id") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>				       
-				    </div>  
+				    </label>  
                 </div>
 
                 <!-- *** CHECKBOX ***  -->
                  <div class="input nobottomborder">
                         <div class="inputtext">&nbsp;</div>   
                         
-                        <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%# bind("ActivityOn") %>' />
-                        <asp:Label  AssociatedControlId="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>                              
-
                         <asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
-                        <asp:Label  AssociatedControlId="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>  
+                        <asp:Label  AssociatedControlId="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo" ></asp:Label>  
+                  
+                        <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%#Bind("ActivityOn") %>' />
+                        <asp:Label  AssociatedControlId="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS" style="padding-right:40px"></asp:Label>                              
 
+                        <br />
                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%# bind("BloccoCaricoSpese") %>' />
                         <asp:Label  AssociatedControlId="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>   
                              
@@ -267,16 +211,15 @@ $(function () {
                 <!-- *** TIPO CONTRATTO ***  -->
 				<div class="input ">
 				        <div class="inputtext">Contratto: </div>  
-                        <div class="InputcontentDDL" >
+                        <label class="dropdown" >
                         <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="TipoContratto" DataTextField="Descrizione" 
                                 DataValueField="TipoContratto_id" 
-                                SelectedValue='<%# Bind("TipoContratto") %>'>
+                                SelectedValue='<%# Bind("TipoContratto_id") %>'
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                         <asp:ListItem  Value="" Text="Selezionare un valore"/>
                         </asp:DropDownList>		
-                        </div>		       
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator8" runat="server" ControlToValidate="DDLTipoContratto" ErrorMessage="Inserire tipo contratto" Display="None" InitialValue=""></asp:RequiredFieldValidator>
-
+                        </label>		       
                 </div>  
 
                  <div class="SeparatoreForm">Budget</div>   
@@ -284,26 +227,32 @@ $(function () {
                   <!-- *** IMPORTO REVENUE ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Revenue: </div>
-                    <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget") %>' />
-                    <asp:CustomValidator ID="ValidaProgettoFixed" runat="server" Display="none" ErrorMessage="Inserisci importo revenue" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBRevenueBudget" ValidateEmptyText="True"></asp:CustomValidator>   
+                    <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number"/>
+                    <label>€</label>
 				  </div>  
 
                   <!-- *** IMPORTO BUDGET ABAP ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Budget ABAP: </div>
-                    <asp:TextBox ID="TBBudgetABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP")%>' />
+                    <asp:TextBox ID="TBBudgetABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP", "{0:#####}")%>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"  />
+                    <label>€</label>
 				  </div> 
 
                   <!-- *** GG BUDGET ABAP ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Bdg GG ABAP: </div>
-                    <asp:TextBox ID="TBBudgetGGABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP")%>' />
+                    <asp:TextBox ID="TBBudgetGGABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP")%>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
 				  </div> 
   
                   <!-- *** IMPORTO SPESE ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Spese: </div>
-                    <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget") %>' />
+                    <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                    <label>€</label>
                     <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                     <asp:Label  AssociatedControlId="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
 				  </div>                                                       
@@ -311,12 +260,9 @@ $(function () {
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' />
-                    <asp:CustomValidator ID="CustomValidator1" runat="server" Display="none" ErrorMessage="Inserisci margine target" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBMargine" ValidateEmptyText="True"></asp:CustomValidator>   
-                    <asp:RangeValidator ID="RangeValidator3" runat="server" 
-                        ControlToValidate="TBMargine" Display="none" 
-                        ErrorMessage="Inserire un valore tra 0 e 1" MaximumValue="1" 
-                        MinimumValue="0" Type="Double" ></asp:RangeValidator>
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                                  data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent"  /> 
+                    <label>%</label>
                   </div> 
  
                 <div class="SeparatoreForm">Durata</div>
@@ -324,18 +270,15 @@ $(function () {
                 <!-- *** DATA INIZIO  ***  -->
                 <div class="input nobottomborder">
                     <asp:Label ID="Label4" CssClass="inputtext" runat="server" Text="Data inizio:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" />
-                    <asp:RangeValidator ID="RangeValidator1" runat="server" 
-                        ControlToValidate="TBAttivoDa" Display="none" 
-                        ErrorMessage="Formato data inizio progetto non corretto" MaximumValue="31/12/9999" 
-                        MinimumValue="01/01/2000" Type="Date" ></asp:RangeValidator>
+                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" 
+                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                 </div>
 
                  <!-- *** DATA FINE  ***  -->
                 <div class="input nobottomborder">
                     <asp:Label ID="Label5" CssClass="inputtext" runat="server"  Text="Data fine:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" />
-                    <asp:CustomValidator ID="CustomValidator2" runat="server" Display="none" ErrorMessage="Inserisci data fine progetto" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBAttivoA" ValidateEmptyText="True"></asp:CustomValidator>   
+                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
+                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                 </div>    
                      
                 </div> <!-- *** TAB 2 ***  -->
@@ -353,26 +296,26 @@ $(function () {
                   <!-- *** Metodo di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Metodo di pag: </div> 
-                        <div class="InputcontentDDL" > 
+                        <label class="dropdown" > 
                         <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="MetodoPagamento" DataTextField="Descrizione" 
                                 DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>		       
-				        <</div>
+				        </label>
                    </div> 
                            
                   <!-- *** Termini di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Termini di pag: </div>  
-                        <div class="InputcontentDDL" >    
+                        <label class="dropdown" >    
                             <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="TerminiPagamento" DataTextField="Descrizione" 
                                 DataValueField="TerminiPagamento" 
                                 SelectedValue='<%# Bind("TerminiPagamento") %>'>
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>       
-				        </div>
+				        </label>
                    </div> 
 
                   <div class="SeparatoreForm">Actual</div>
@@ -380,22 +323,28 @@ $(function () {
                   <!-- *** Importo Revenue Fatturate ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Revenue: </div>
-                            <asp:TextBox ID="RevenueFatturateTextBox" runat="server"  class="ASPInputcontent"
-                                Text='<%# Bind("RevenueFatturate") %>' />
+                      <asp:TextBox ID="RevenueFatturateTextBox" runat="server"  class="ASPInputcontent"
+                                Text='<%# Bind("RevenueFatturate", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                      <label>€</label>
 				  </div> 
 
                   <!-- *** Importo Spese Fatturate ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Spese: </div>
                                <asp:TextBox ID="SpeseFatturateTextBox" runat="server" class="ASPInputcontent"
-                                      Text='<%# Bind("SpeseFatturate") %>' />
+                                      Text='<%# Bind("SpeseFatturate", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                                <label>€</label>
 				  </div> 
                             
                   <!-- *** Importo Incassato ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Incassato: </div>
                                 <asp:TextBox ID="IncassatoTextBox" runat="server" class="ASPInputcontent"
-                                      Text='<%# Bind("Incassato") %>' />
+                                      Text='<%# Bind("Incassato", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                                <label>€</label>
 				  </div> 
                                                                
                 </div> <!-- *** TAB 3 ***  -->
@@ -424,13 +373,13 @@ $(function () {
                 
                 <!-- *** BOTTONI  ***  -->
                <div class="buttons">
+                <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
                 <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>"/>
-                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" />               
+                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />               
                </div>                   
    
             </EditItemTemplate>
-
-           
+          
             <InsertItemTemplate>
 
                 <div id="tabs">
@@ -447,113 +396,114 @@ $(function () {
                   <!-- *** CODICE PROGETTO ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Codice: </div>
-                            <asp:TextBox ID="ProjectCodeTextBox" runat="server"  class="ASPInputcontent" Text='<%# Bind("ProjectCode") %>' Columns="12" MaxLength="10" />
+                            <asp:TextBox ID="TBProgetto" runat="server"  class="ASPInputcontent" Text='<%# Bind("ProjectCode") %>' Columns="12" MaxLength="10"
+                                         data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-trigger-after-failure="focusout" data-parsley-codiceUnico="" />
                              <asp:CheckBox ID="ActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>' />
-					        <asp:Label  AssociatedControlId="ActiveCheckBox" class="css-label" ID="Label3" runat="server" Text="attivo"></asp:Label>                      
-                            <asp:CustomValidator ID="ValidaProgetto" runat="server" Display="none" ErrorMessage="Codice progetto già esistente" OnServerValidate="ValidaProgetto_ServerValidate" ControlToValidate="ProjectCodeTextBox"></asp:CustomValidator>   
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="ProjectCodeTextBox" Display="none" ErrorMessage="Inserire il codice progetto"></asp:RequiredFieldValidator>
+					         <asp:Label  AssociatedControlId="ActiveCheckBox" class="css-label" ID="Label3" runat="server" Text="attivo"></asp:Label>                      
 				  </div>  
 
                   <!-- *** NOME PROGETTO ***  -->
 				  <div class="input"  >
 				    <div class="inputtext">Progetto: </div>
-                    <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' Columns="26" MaxLength="50" class="ASPInputcontent"/>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ErrorMessage="Inserire descrizione progetto" ControlToValidate="NameTextBox" Display="none"></asp:RequiredFieldValidator>
+                    <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' Columns="26" MaxLength="50" class="ASPInputcontent"
+                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" />
 				  </div>  
 
                 <!-- *** CODICE CLIENTE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Cliente:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DropDownList10" runat="server" DataSourceID="cliente" 
                                 DataTextField="Nome1" DataValueField="CodiceCliente"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("CodiceCliente") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>   
-				        </div>
+                        </label>
 				    </div>  
 
                 <!-- *** CODICE MANAGER ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Manager:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager" 
                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                SelectedValue='<%# Bind("ClientManager_id") %>'  >
+                                SelectedValue='<%# Bind("ClientManager_id") %>' 
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>  
-	    			        </div>
-	                          <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Inserire nome manager" ControlToValidate="DDLManager" Display="none"></asp:RequiredFieldValidator>   
+	    			     </label>
   			    </div>  
 
                 <!-- *** TIPO PROGETTO ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Tipo progetto:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto" 
                                 DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                SelectedValue='<%# Bind("ProjectType_Id") %>' >
+                                SelectedValue='<%# Bind("ProjectType_Id") %>' 
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                  <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
- 				        </div>
-                           <asp:RequiredFieldValidator ID="RequiredFieldValidator9" runat="server" ErrorMessage="Inserire il tipo progetto" ControlToValidate="DDLTipoProgetto" Display="none"></asp:RequiredFieldValidator> 
+ 				        </label>
 				    </div>  
 
                 <!-- *** CANALE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Canale:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale" 
                                 DataTextField="Name" DataValueField="Channels_Id"  AppendDataBoundItems="True" 
-                                SelectedValue='<%# Bind("Channels_Id") %>'  >
+                                SelectedValue='<%# Bind("Channels_Id") %>'  
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ErrorMessage="Inserire il canale" ControlToValidate="DDLCanale" Display="none"></asp:RequiredFieldValidator> 
+				        </label>
 				    </div>  
 
                 <!-- *** SOCIETA ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Società:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DropDownList14" runat="server" DataSourceID="societa" 
                                 DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("Company_id") %>' >
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>				       
-				    </div>  
+				    </label>  
                 </div>
 
                 <!-- *** CHECKBOX ***  -->
                  <div class="input nobottomborder">
                         <div class="inputtext">&nbsp;</div> 
                         <asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
-                        <asp:Label  AssociatedControlId="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label> 
+                        <asp:Label  AssociatedControlId="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo" style="padding-right:40px"></asp:Label> 
                                                                        
                         <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%# bind("ActivityOn") %>' />
-                        <asp:Label  AssociatedControlId="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>           
+                        <asp:Label  AssociatedControlId="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS" ></asp:Label>           
                      
+                        <br />
+
                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%# bind("BloccoCaricoSpese") %>' />
                         <asp:Label  AssociatedControlId="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>                         
      
                 </div>
 
-                 </div> <!-- *** TAB 1 ***  -->
+                </div> <!-- *** TAB 1 ***  -->
 
                 <div id="tabs-2" style="height:460px;width:100%"> 
                 
                 <!-- *** TIPO CONTRATTO ***  -->
 				<div class="input ">
 				        <div class="inputtext">Contratto: </div>  
-                        <div class="InputcontentDDL" style="width:250px">
+                        <label class="dropdown" style="width:250px">
                         <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"  
                                 DataSourceID="TipoContratto" DataTextField="Descrizione" 
                                 DataValueField="TipoContratto_id" 
-                                SelectedValue='<%# Bind("TipoContratto") %>'>
+                                SelectedValue='<%# Bind("TipoContratto_id") %>'
+                                data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                         <asp:ListItem  Value="" Text="Selezionare un valore"/>
                         </asp:DropDownList>		
-                        </div>
-                <asp:RequiredFieldValidator ID="RequiredFieldValidator8" runat="server" ControlToValidate="DDLTipoContratto" ErrorMessage="Inserire tipo contratto" Display="None" InitialValue=""></asp:RequiredFieldValidator>		       
+                        </label>
                 </div>  
 
                   <div class="SeparatoreForm">Budget</div>
@@ -561,27 +511,31 @@ $(function () {
                   <!-- *** IMPORTO REVENUE ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Revenue: </div>
-                    <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget") %>'  />
-                    <asp:CustomValidator ID="ValidaProgettoFixed" runat="server" Display="none" ErrorMessage="Inserisci importo revenue" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBRevenueBudget" ValidateEmptyText="True"></asp:CustomValidator>   
-
+                    <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number"/>
+                    <label>€</label>
 				  </div>  
 
                   <!-- *** IMPORTO BUDGET ABAP ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Budget ABAP: </div>
-                    <asp:TextBox ID="TBBudgetABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP") %>'  />
+                    <asp:TextBox ID="TBBudgetABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP", "{0:#####}") %>'  
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>                    <label>€</label>
 				  </div>  
   
                  <!-- *** GG BUDGET ABAP ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Bdg GG ABAP: </div>
-                    <asp:TextBox ID="TBBudgetGGABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP")%>' />
+                    <asp:TextBox ID="TBBudgetGGABAP" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP")%>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
 				  </div> 
 
                   <!-- *** IMPORTO SPESE ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Spese: </div>
-                    <asp:TextBox ID="TextBox4"  class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget") %>' />
+                    <asp:TextBox ID="TextBox4"  class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                    <label>€</label>
                     <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                     <asp:Label  AssociatedControlId="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
 				  </div>                                                       
@@ -589,12 +543,9 @@ $(function () {
                   <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine" columns="5" class="ASPInputcontent" runat="server" Text='<%# Bind("MargineTarget") %>' />
-                    <asp:CustomValidator ID="CustomValidator1" runat="server" Display="none" ErrorMessage="Inserisci margine target" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBMargine" ValidateEmptyText="True"></asp:CustomValidator>   
-                    <asp:RangeValidator ID="RangeValidator3" runat="server" 
-                        ControlToValidate="TBMargine" Display="none" 
-                        ErrorMessage="Inserire un valore tra 0 e 1" MaximumValue="1" 
-                        MinimumValue="0" Type="Double" ></asp:RangeValidator>
+                    <asp:TextBox ID="TBMargine" columns="5" class="ASPInputcontent" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                                  data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent"   /> 
+                    <label>%</label>
                   </div> 
  
                 <div class="SeparatoreForm">Durata</div>
@@ -602,18 +553,15 @@ $(function () {
                 <!-- *** DATA INIZIO  ***  -->
                 <div class="input nobottomborder">
                     <asp:Label ID="Label4" CssClass="inputtext" runat="server" Text="Data inizio:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" />
-                    <asp:RangeValidator ID="RangeValidator1" runat="server" 
-                        ControlToValidate="TBAttivoDa" Display="none" 
-                        ErrorMessage="Formato data inizio progetto non corretto" MaximumValue="31/12/9999" 
-                        MinimumValue="01/01/2000" Type="Date" ></asp:RangeValidator>
+                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" 
+                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                 </div>
 
                  <!-- *** DATA FINE  ***  -->
                 <div class="input nobottomborder">
                     <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data fine:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" />
-                    <asp:CustomValidator ID="CustomValidator2" runat="server" Display="none" ErrorMessage="Inserisci data fine progetto" OnServerValidate="ValidaProgettoFixed" ControlToValidate="TBAttivoA" ValidateEmptyText="True"></asp:CustomValidator>   
+                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
+                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                 </div>
                                    
                 </div> <!-- *** TAB 2 ***  -->
@@ -631,26 +579,26 @@ $(function () {
                   <!-- *** Metodo di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Metodo di pag:</div> 
-                        <div class="InputcontentDDL" > 
+                        <label class="dropdown" > 
                         <asp:DropDownList ID="DropDownList15" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="MetodoPagamento" DataTextField="Descrizione" 
                                 DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>		       
-				        <</div>
+				        </label>
                    </div> 
                            
                   <!-- *** Termini di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Termini di pag:</div>  
-                        <div class="InputcontentDDL" >    
+                        <label class="dropdown" >    
                             <asp:DropDownList ID="DropDownList16" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="TerminiPagamento" DataTextField="Descrizione" 
                                 DataValueField="TerminiPagamento" 
                                 SelectedValue='<%# Bind("TerminiPagamento") %>'>
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>       
-				        </div>
+				        </label>
                    </div> 
 
                 <div class="SeparatoreForm">Actual</div>
@@ -659,21 +607,27 @@ $(function () {
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Revenue: </div>
                             <asp:TextBox ID="TextBox6" runat="server"  class="ASPInputcontent"
-                                Text='<%# Bind("RevenueFatturate") %>' />
+                                Text='<%# Bind("RevenueFatturate", "{0:#####}") %>'
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                    <label>€</label>
 				  </div> 
 
                   <!-- *** Importo Spese Fatturate ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Spese: </div>
                                <asp:TextBox ID="TextBox7" runat="server" class="ASPInputcontent"
-                                      Text='<%# Bind("SpeseFatturate") %>' />
+                                      Text='<%# Bind("SpeseFatturate", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                                   <label>€</label>
 				  </div> 
                             
                   <!-- *** Importo Incassato ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Incassato: </div>
                                 <asp:TextBox ID="TextBox8" runat="server" class="ASPInputcontent"
-                                      Text='<%# Bind("Incassato") %>' />
+                                      Text='<%# Bind("Incassato", "{0:#####}") %>' 
+                                 data-parsley-errors-container="#valMsg" data-parsley-type="number"/>
+                    <label>€</label>
 				  </div>
                                               
                 </div> <!-- *** TAB 3 ***  -->
@@ -703,8 +657,9 @@ $(function () {
                 
                 <!-- *** BOTTONI  ***  -->
                <div class="buttons">
+                <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
                 <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>"   />
-                <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" />               
+                <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />               
                </div>                   
 
             </InsertItemTemplate>
@@ -724,7 +679,7 @@ $(function () {
                   <!-- *** CODICE PROGETTO ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Codice: </div>
-                    <asp:TextBox ID="ProjectCodeTextBox" runat="server"  class="ASPInputcontent"
+                    <asp:TextBox ID="TBProgetto" runat="server"  class="ASPInputcontent"
                                 Text='<%# Bind("ProjectCode") %>' Enabled="False" Columns="12"  
                                 MaxLength="10" />
                     <asp:CheckBox ID="DisActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>' />
@@ -741,61 +696,61 @@ $(function () {
                 <!-- *** CODICE CLIENTE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Cliente:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente" 
                                 DataTextField="Nome1" DataValueField="CodiceCliente"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("CodiceCliente") %>' Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>   
-				        </div>
+				        </label>
 				    </div>  
 
                 <!-- *** CODICE MANAGER ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Manager:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager" 
                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
                                 SelectedValue='<%# Bind("ClientManager_id") %>' Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>     
-				        </div>
+				        </label>
 				    </div>  
 
                 <!-- *** TIPO PROGETTO ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Tipo progetto:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                             <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto" 
                                 DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
                                 SelectedValue='<%# Bind("ProjectType_Id") %>' Enabled="False">
                                  <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
+				        </label>
 				    </div>  
 
                 <!-- *** CANALE ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Canale:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale" 
                                 DataTextField="Name" DataValueField="Channels_Id"  AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("Channels_Id") %>'  Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>
-				        </div>
+				        </label>
  				    </div>  
 
                 <!-- *** SOCIETA ***  -->
 				<div class="input nobottomborder">
 				        <div class="inputtext">Società:</div>  
-				        <div class="InputcontentDDL" >
+				        <label class="dropdown" >
                              <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa" 
                                 DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True" 
                                 SelectedValue='<%# Bind("Company_id") %>' EnableTheming="True" Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>				       
-				    </div>  
+				    </label>  
                 </div>
 
                 <!-- *** CHECKBOX ***  -->
@@ -821,14 +776,14 @@ $(function () {
                 <!-- *** TIPO CONTRATTO ***  -->
 				<div class="input ">
 				        <div class="inputtext">Contratto: </div>  
-                        <div class="InputcontentDDL" >
+                        <label class="dropdown" >
                         <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="TipoContratto" DataTextField="Descrizione" 
                                 DataValueField="TipoContratto_id" 
-                                SelectedValue='<%# Bind("TipoContratto") %>' Enabled="False">
+                                SelectedValue='<%# Bind("TipoContratto_id") %>' Enabled="False">
                         <asp:ListItem  Value="" Text="Selezionare un valore"/>
                         </asp:DropDownList>		
-                        </div>		       
+                        </label>		       
                 </div>  
 
                  <div class="SeparatoreForm">Budget</div>   
@@ -862,8 +817,9 @@ $(function () {
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' Enabled="False" />
-                  </div> 
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' Enabled="False" 
+                                 data-parsley-errors-container="#valMsg"  data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1'   /> 
+				  </div> 
  
                 <div class="SeparatoreForm">Durata</div>
 
@@ -894,26 +850,26 @@ $(function () {
                   <!-- *** Metodo di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Metodo di pag: </div> 
-                        <div class="InputcontentDDL" > 
+                        <label class="dropdown" > 
                         <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="MetodoPagamento" DataTextField="Descrizione" 
                                 DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>' Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>		       
-				        <</div>
+				        <</label>
                    </div> 
                            
                   <!-- *** Termini di pagamento ***  -->
 				  <div class="input nobottomborder">
 				        <div class="inputtext">Termini di pag: </div>  
-                        <div class="InputcontentDDL" >    
+                        <label class="dropdown" >    
                             <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True" 
                                 DataSourceID="TerminiPagamento" DataTextField="Descrizione" 
                                 DataValueField="TerminiPagamento" 
                                 SelectedValue='<%# Bind("TerminiPagamento") %>' Enabled="False">
                                 <asp:ListItem  Value="" Text="Selezionare un valore"/>
                             </asp:DropDownList>       
-				        </div>
+				        </label>
                    </div> 
 
                   <div class="SeparatoreForm">Actual</div>
@@ -966,14 +922,12 @@ $(function () {
                 
                 <!-- *** BOTTONI  ***  -->
                <div class="buttons">
-                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" />               
+                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton"  Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />               
                </div>                   
 
             </ItemTemplate>
         
         </asp:FormView>
-
-        <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
 
     </form>
 
@@ -992,9 +946,9 @@ $(function () {
            <asp:SqlDataSource ID="projects" runat="server" 
             ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
             DeleteCommand="DELETE FROM [Projects] WHERE [Projects_Id] = @Projects_Id" 
-            InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, TipoContratto, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineTarget, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @TipoContratto, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineTarget, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore )" 
+            InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, TipoContratto_id, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineTarget, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @TipoContratto_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineTarget/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore )" 
             SelectCommand="SELECT * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)" 
-            UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, TipoContratto = @TipoContratto, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineTarget=@MargineTarget, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore  WHERE (Projects_Id = @Projects_Id)" OnInserting="projects_Inserting">
+            UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineTarget=@MargineTarget/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore  WHERE (Projects_Id = @Projects_Id)" OnInserting="projects_Inserting">
             <SelectParameters>
                 <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode" 
                     Type="String" />
@@ -1012,7 +966,7 @@ $(function () {
                 <asp:Parameter Name="Always_available" Type="Boolean" />
                 <asp:Parameter Name="BloccoCaricoSpese" Type="Boolean" />
                 <asp:Parameter Name="ClientManager_id" Type="Int32" />
-                <asp:Parameter Name="TipoContratto" Type="Int32" />
+                <asp:Parameter Name="TipoContratto_id" Type="Int32" />
                 <asp:Parameter Name="RevenueBudget" Type="Decimal" />
                 <asp:Parameter Name="BudgetABAP" Type="Decimal" />
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
@@ -1044,7 +998,7 @@ $(function () {
                 <asp:Parameter Name="Always_available" Type="Boolean" />
                 <asp:Parameter Name="BloccoCaricoSpese" Type="Boolean" />
                 <asp:Parameter Name="ClientManager_id" Type="Int32" />
-                <asp:Parameter Name="TipoContratto" Type="Int32" />
+                <asp:Parameter Name="TipoContratto_id" Type="Int32" />
                 <asp:Parameter Name="RevenueBudget" Type="Decimal" />
                 <asp:Parameter Name="BudgetABAP" Type="Decimal" />
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
@@ -1102,5 +1056,124 @@ $(function () {
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
         SelectCommand="SELECT * FROM [TerminiPagamento]"></asp:SqlDataSource>
 
+<script type="text/javascript">
+
+    $(function () {
+
+// abilitate tab view
+    $("#tabs").tabs();
+
+    // stile checkbox form    
+    $(":checkbox").addClass("css-checkbox");
+
+    // stile checkbox form in ReadOnly   
+    $("#FVProgetto_DisActivityOn").addClass("css-checkbox")
+    $("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
+    $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
+    $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
+    $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
+
+    $("#FVProgetto_DisActivityOn").attr("disabled", true);
+    $("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);
+    $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
+    $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
+    $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
+
+// datepicker
+    $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
+    $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
+
+// formatta il campo percentuale
+    var percentDecimal =  $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
+    if (percentDecimal != "") {
+        var percentCent = parseFloat(percentDecimal) * 100;
+        $("#FVProgetto_TBMargine").val(percentCent);
+    } 
+
+    Parsley.addMessages('it', {
+            required: "Completare i campi obbligatori"
+    });
+
+    // *** controllo che non esista lo stesso codice utente *** //
+    window.Parsley.addValidator('codiceunico', function (value, requirement) {
+        var response = false;
+        var dataAjax = "{ sKey: 'ProjectCode', " +
+                       " sValkey: '" + value  + "', " + 
+                       " sTable: 'Projects'  }";
+
+                    $.ajax({
+                        url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
+                        data: dataAjax,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        type: 'post',
+                        async: false,
+                        success: function (data) {
+                            if (data.d == true) // esiste, quindi errore
+                                response = false;
+                            else
+                                response = true;
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                        }
+                    });
+                    return response;
+         }, 32)
+        .addMessage('en', 'codiceunico', 'Project code already exists')
+        .addMessage('it', 'codiceunico', 'Codice progetto già esistente');
+
+    // validazione campo revenue in caso il progetto sia FIXED
+    window.Parsley.addValidator("requiredIf", {
+        validateString: function (value, requirement) {
+
+            // se inserito deve essere un numero
+            if (isNaN(value) && !!value) {
+                window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                return false;
+            }
+
+            if (jQuery("#FVProgetto_DDLTipoContratto option:selected").text() == "FIXED") {
+
+                // se FIXED verifica obbligatorietà
+                if (!value)  {
+                    window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
+                    return false;
+                }
+
+                // se number verifica tipo
+                if ( requirement == "number")
+                    if ( !isNaN(value) ) //  compilato e numerico
+                        return true;
+                    else {
+                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                        return false;
+                    }
+
+                // se percent
+                if (requirement == "percent")
+                    if ( !isNaN(value) && value > 0 && value <= 100 ) //  compilato e numerico
+                        return true;
+                    else {
+                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero tra 1 e 100");
+                        return false;
+                    }    
+            }
+
+            return true;
+        },
+        priority: 33
+    })
+ 
+    // *** attiva validazione campi form
+    $('#formProgetto').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+    });
+
+    });
+</script>
+
 </body>
+
 </html>

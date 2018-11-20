@@ -2,28 +2,25 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!-- Jquery   -->
       
- <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
-<script src="/timereport/include/javascript/timereport.js"></script>
+<!-- Style -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+     
+<!-- Jquery   -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 
-<script>
-    $(function () {
-
-        // validation summary su validator custom
-        displayAlert();
-
-    });
-</script>
+<!-- Menù  -->
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Phase</title>
-    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
 </head>
-    <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-    <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
 <body>
 
 <div id="TopStripe"></div>  
@@ -32,7 +29,7 @@
 
 <div id="FormWrap" >
 
-    <form id="form1" runat="server"  >
+    <form id="FormPhase" runat="server"  >
 
     <asp:FormView ID="SchedaFase" runat="server" DataKeyNames="Phase_id" 
         DataSourceID="DSPhase" EnableModelValidation="True" DefaultMode="Insert"
@@ -53,22 +50,23 @@
 	           <!-- *** DESCRIZIONE ***  --> 
                <div class="input nobottomborder"> 
                      <div class="inputtext">Descrizione: </div> 
-                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" />
-                     <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ErrorMessage="Inserisci la descrizione" ControlToValidate="NameTextBox" Display="none"></asp:RequiredFieldValidator>
+                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" 
+                                                                  data-parsley-Maxlength ="40" data-parsley-errors-container="#valMsg" data-parsley-required="true" />
                </div>   
 
                	<!-- *** PROGETTO ***  -->
 	            <div class="input nobottomborder">                        
 	                <div class="inputtext">Progetto:</div>  
-                    <div class="InputcontentDDL"  >
+                    <label class="dropdown"  >
                         <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>'></asp:DropDownList>
-                    </div>
+                    </label>
                 </div>  
                 			
 	           <!-- *** BOTTONI  ***  -->
                <div class="buttons">
-                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" />
-                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" />            
+                    <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
+                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton"  />
+                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true"/>            
                </div>  
 
         </EditItemTemplate>
@@ -81,32 +79,33 @@
                <!-- *** DESCRIZIONE ***  --> 
                <div class="input nobottomborder"> 
                      <div class="inputtext">Codice fase: </div> 
-                     <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent"/> 
-                     <asp:CustomValidator ID="ValidaFase" runat="server" Display="none" ErrorMessage="Codice fase già esistente" OnServerValidate="ValidaFase_ServerValidate" ControlToValidate="PhaseCodeTextBox"></asp:CustomValidator>
-                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" Display="none" runat="server" ControlToValidate="PhaseCodeTextBox" ErrorMessage="Inserisci il codice fase"></asp:RequiredFieldValidator>
+                     <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent"
+                                          data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+
                </div>   
 
                <!-- *** DESCRIZIONE ***  --> 
                <div class="input nobottomborder"> 
                      <div class="inputtext">Descrizione: </div> 
-                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" />
-                     <asp:RequiredFieldValidator ID="RequiredFieldValidator3" Display="none" runat="server" ErrorMessage="Inserisci descrizione fase" ControlToValidate="NameTextBox"></asp:RequiredFieldValidator>
+                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" 
+                                  data-parsley-errors-container="#valMsg" data-parsley-required="true" />
                </div>   
 
                 <!-- *** PROGETTO ***  -->
 	            <div class="input nobottomborder">                        
 	                <div class="inputtext">Progetto:</div>  
-                        <div class="InputcontentDDL" style="width:245px" >
-                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True">
+                        <label class="dropdown" style="width:245px" >
+                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True"
+                                              data-parsley-errors-container="#valMsg" data-parsley-required="true" >
                             <asp:ListItem  Value="" Text="-- Selezionare un valore --"/></asp:DropDownList>
-                        </div>
-                        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" Display="none" runat="server" ErrorMessage="Inserisci il codice progetto" ControlToValidate="DropDownList1"></asp:RequiredFieldValidator>
+                        </label>
                 </div>   
 
                <!-- *** BOTTONI  ***  -->
                <div class="buttons">
+                 <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
                  <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" />
-                 <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" />                
+                 <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true"/>                
                 </div>  
 
         </InsertItemTemplate>
@@ -116,8 +115,6 @@
         </ItemTemplate>
 
     </asp:FormView>
-     
-    <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
 
     </form>
 
@@ -169,6 +166,15 @@
         </SelectParameters>
     </asp:SqlDataSource>
 
-</body>
+<script type="text/javascript">
+
+    // *** Esclude i controlli nascosti *** 
+    $('#FormPhase').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+</script>
+
+</body >
 
 </html>

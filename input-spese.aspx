@@ -2,24 +2,20 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-
-<style>
-	.bar {
-		height: 18px;
-		background: green;
-	}
-</style>
+<link href="/timereport/include/newstyle.css" rel="stylesheet" /> 
+<link href="/timereport/include/standard/uploader/uploader.css" rel="stylesheet"  />
 
 <!-- Menù  -->
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery per date picker  -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="include/jquery/jquery-1.9.0.min.js"></script> 
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 <!-- Jquery per Uploader  -->
 <script src="/timereport/include/standard/uploader/jquery.ui.widget.js"></script>
@@ -31,36 +27,18 @@
 <script src="/timereport/include/standard/uploader/jquery.fileupload-image.js"></script>
 <script src="/timereport/include/standard/uploader/jquery.fileupload-validate.js"></script>
 
-<!-- Jquery per messaggio errore validatore custom  -->
-<script src="/timereport/include/javascript/timereport.js"></script> 
-
-<link rel="stylesheet" href="/timereport/include/standard/uploader/uploader.css" />
-
 <script>
-
+        
 	$(function () {
 
 		$("#FVSpese_TBAccountingDate").datepicker($.datepicker.regional['it']);
 
-		$("#FVSpese_CBcancel").addClass("css-checkbox");
-		$("#FVSpese_CBInvoice").addClass("css-checkbox");
-		$("#FVSpese_CBCreditCard").addClass("css-checkbox");
-		$("#FVSpese_CBCompanyPayed").addClass("css-checkbox");
+        $(":checkbox").addClass("css-checkbox"); // post rendering dei checkbox in ASP.NET
 
-		$("#FVSpese_disCBcancel").addClass("css-checkbox");
 		$("#FVSpese_disCBcancel").attr("disabled", true);
-
-		$("#FVSpese_disCBInvoice").addClass("css-checkbox");
 		$("#FVSpese_disCBInvoice").attr("disabled", true);
-
-		$("#FVSpese_disCBCreditCard").addClass("css-checkbox");
 		$("#FVSpese_disCBCreditCard").attr("disabled", true);
-
-		$("#FVSpese_disCBCompanyPayed").addClass("css-checkbox");
 		$("#FVSpese_disCBCompanyPayed").attr("disabled", true);
-
-		// validation summary su validator custom
-		displayAlert();
 
 	});
 
@@ -148,16 +126,16 @@
 
 	<div id="MainWindow">
 
-		<div id="FormWrap">
+		<div id="FormWrap" class="StandardForm">
 
-			<form id="form1" runat="server">
+			<form id="form1" runat="server" data-parsley-validate>
 
 				<asp:FormView ID="FVSpese" runat="server" DataKeyNames="Expenses_Id"
 					DataSourceID="DSspese" align="center" DefaultMode="Edit"
-					CssClass="StandardForm" OnDataBound="FVSpese_DataBound"
+					 OnDataBound="FVSpese_DataBound" CellPadding="0"
 					OnItemUpdated="FVSpese_ItemUpdated" OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1">
 
-					<%--        INSERT--%>
+					<%--  INSERT   --%>
 					<InsertItemTemplate>
 
 						<div class="formtitle"><asp:Literal runat="server" Text="<%$ Resources:inserimento_spese%>" /></div>
@@ -172,24 +150,21 @@
 						<!-- *** DDL Progetto ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:progetto%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
 									AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
 								</asp:DropDownList>
-							</div>
+							</label>
 						</div>
 						
-						<asp:CustomValidator ID="CV_DDLprogetto" runat="server" Display="None" ErrorMessage="Carico spese non ammesso" ControlToValidate="DDLprogetto" OnServerValidate="CV_DDLprogetto_ServerValidate" meta:resourcekey="CV_DDLprogettoResource2"    ></asp:CustomValidator>
-
 						<!-- *** DDL Tipo Spesa ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:tipo%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
-									AutoPostBack="True" OnDataBound="DDLTipoSpesa_SelectedIndexChanged"
-									OnSelectedIndexChanged="DDLTipoSpesa_SelectedIndexChanged" meta:resourcekey="DDLTipoSpesaResource2">
+									meta:resourcekey="DDLTipoSpesaResource2">
 								</asp:DropDownList>
-							</div>
+							</label>
 						</div>
 
 						<!-- *** Valore e storno ***  -->
@@ -197,78 +172,64 @@
 
 							<asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource2"></asp:Label>
 							<span class="input2col">
-								<asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource2" />
+								<asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" 
+                                  meta:resourcekey="TBAmountResource2" 
+                                  data-parsley-errors-container="#valMsg" data-parsley-required="true"  data-parsley-pattern="^(\d*\,)?\d+$"/>
 							</span>
-
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="TBAmount" Display="None"
-								ErrorMessage="Inserire un importo" meta:resourcekey="RequiredFieldValidator3Resource2"  ></asp:RequiredFieldValidator>
-
-							<asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server"
-								ControlToValidate="TBAmount" Display="None"
-								ErrorMessage="Inserire un valore numerico"
-								ValidationExpression="(^\d*\,?\d*[1-9]+\d*$)|(^[1-9]+\d*\,\d*$)" meta:resourcekey="RegularExpressionValidator2Resource1"  ></asp:RegularExpressionValidator>
 
 						</div>
 
-						<!-- *** Flag Fattura / CC ***  -->
-						<div class="input nobottomborder"  >
-
-							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
-
-							<span class="input2col">
-								<asp:CheckBox ID="CBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' meta:resourcekey="CBInvoiceResource2" />
-								<asp:Label AssociatedControlID="CBInvoice" CssClass="css-label" ID="Label3" runat="server" Text="Fattura" meta:resourcekey="Label3Resource1"></asp:Label>
-							</span>
-
-							<asp:CheckBox ID="CBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>' meta:resourcekey="CBCreditCardResource2" />
-							<asp:Label AssociatedControlID="CBCreditCard" CssClass="css-label" ID="LBCBCreditCard" runat="server" Text="C.Cred. Azienda" meta:resourcekey="LBCBCreditCardResource2"></asp:Label>
-
-						</div>
-
-						
-						<!-- *** Flag Storno / Pagato Azienda ***  -->
+						<!-- *** Flag ***  -->
 						<div class="input"  >
 
 							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
+							<span class="inputtext">&nbsp;</span>
 
-							<span class="input2col">
-								<asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CBcancelResource2" />
-								<asp:Label AssociatedControlID="CBcancel" CssClass="css-label" ID="Label8" runat="server" Text="Storno" meta:resourcekey="Label8Resource1"></asp:Label>
-							</span>
-
-							<asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>' meta:resourcekey="CBCompanyPayedResource2" />
-							<asp:Label AssociatedControlID="CBCompanyPayed" CssClass="css-label" ID="Label9" runat="server" Text="Bonifico Azienda" meta:resourcekey="Label9Resource1"></asp:Label>
+                            <!-- *** Flag Fattura / Carta Credito ***  -->
+                            <span class="input2col">
+						    <asp:CheckBox ID="CBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="CBInvoice" meta:resourcekey="Label3Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="CBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>'/>	
+                            <asp:Label runat="server" AssociatedControlID="CBCreditCard" meta:resourcekey="LBCBCreditCardResource2"></asp:Label>
+					
+	                        <br />
+	                        
+                            <!-- *** Flag Storno / Pagato Azienda ***  -->
+                            <span class="input2col"> 
+    						<asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>'/>	
+                            <asp:Label  runat="server" AssociatedControlID="CBCompanyPayed"  meta:resourcekey="Label9Resource1"></asp:Label>
 
 						</div>
 
 						<!-- *** TB Comment ***  -->
 						<div class="input nobottomborder">
 							<asp:Label CssClass="inputtext" ID="LbComment" runat="server" Text="Nota" meta:resourcekey="LbCommentResource2"></asp:Label>
-							<asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource2" />
+							<asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource2" 
+                                         data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-testo-obbligatorio="true"   />
 						</div>
-						<asp:CustomValidator ID="CV_TBComment" runat="server" Display="None" ErrorMessage="Inserire una nota di commento" ControlToValidate="TBComment" OnServerValidate="CV_TBComment_ServerValidate" ValidateEmptyText="True" meta:resourcekey="CV_TBCommentResource2"  ></asp:CustomValidator>
-
+			
 						<!-- *** TB Competenza ***  -->
 						<div class="input nobottomborder">
 							<asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource2"></asp:Label>
-							<asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource2" />
-							<asp:RangeValidator ID="RangeValidator2" runat="server" Display="None"
-								ErrorMessage="Inserire una data competenza valida" ControlToValidate="TBAccountingDate"
-								Type="Date" MaximumValue="31/12/9999" MinimumValue="1/1/2000" meta:resourcekey="RangeValidator2Resource2"></asp:RangeValidator>
+							<asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource2" 
+                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
 						</div>
 
 						<!-- *** Bottoni ***  -->
 						<div class="buttons">
+                            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
 							<asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>"  />
 							<asp:Button ID="RicevuteButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, TICKETS %>"  />
-							<asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>"   />
+							<asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>"  formnovalidate />
 						</div>
 
 					</InsertItemTemplate>
 
-					<%--        EDIT--%>
+					<%--  EDIT  --%>
 					<EditItemTemplate>
 
 						<div class="formtitle">
@@ -287,23 +248,21 @@
 						<!-- *** DDL Progetto ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:progetto%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"  OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged"
 									AutoPostBack="True" meta:resourcekey="DDLprogettoResource1">
 								</asp:DropDownList>
-							</div>
+							</label>
 						</div>
-
-						<asp:CustomValidator ID="CV_DDLprogetto" runat="server" Display="None" ErrorMessage="Carico spese non ammesso" ControlToValidate="DDLprogetto" OnServerValidate="CV_DDLprogetto_ServerValidate" meta:resourcekey="CV_DDLprogettoResource1"    ></asp:CustomValidator>
-
+						 
 						<!-- *** DDL Tipo Spesa ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:tipo%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
-									AutoPostBack="True" OnSelectedIndexChanged="DDLTipoSpesa_SelectedIndexChanged" meta:resourcekey="DDLTipoSpesaResource1">
+									meta:resourcekey="DDLTipoSpesaResource1">
 								</asp:DropDownList>
-							</div>
+							</label>
 						</div>
 
 						<!-- *** Valore e storno ***  -->
@@ -311,72 +270,57 @@
 
 							<asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource1"></asp:Label>
 							<span class="input2col">
-								<asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource1" />
+								<asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource1" 
+                                             data-parsley-errors-container="#valMsg" data-parsley-required="true"  data-parsley-pattern="^(\d*\,)?\d+$" />
 							</span>
-
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="TBAmount" Display="None"
-								ErrorMessage="Importo deve essere un valore numerico" meta:resourcekey="RequiredFieldValidator3Resource1"  ></asp:RequiredFieldValidator>
-
-							<asp:RegularExpressionValidator ID="Validator" runat="server"
-								ControlToValidate="TBAmount" Display="None"
-								ErrorMessage="Inserire un valore numerico"
-								ValidationExpression="(^\d*\,?\d*[1-9]+\d*$)|(^[1-9]+\d*\,\d*$)" meta:resourcekey="ValidatorResource1"  ></asp:RegularExpressionValidator>
 
 						</div>
 
-						<!-- *** Flag Fattura / CC ***  -->
-						<div class="input nobottomborder">
+                        <!-- *** Flag ***  -->
+						<div class="input"  >
 
 							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
+							<span class="inputtext">&nbsp;</span>
 
-							<span class="input2col">
-								<asp:CheckBox ID="CBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' meta:resourcekey="CBInvoiceResource1" />
-								<asp:Label AssociatedControlID="CBInvoice" CssClass="css-label" ID="LbInvoice" runat="server" Text="Fattura" meta:resourcekey="LbInvoiceResource1"></asp:Label>
-							</span>
-							
-							<asp:CheckBox ID="CBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>' meta:resourcekey="CBCreditCardResource1" />
-							<asp:Label AssociatedControlID="CBCreditCard" CssClass="css-label" ID="LBCBCreditCard" runat="server" Text="C.Cred. Azienda" meta:resourcekey="LBCBCreditCardResource1"></asp:Label>
-
-						</div>
-
-						<!-- *** Flag Storno / Pagato Azienda ***  -->
-						<div class="input">
-
-							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
-
-							<span class="input2col">
-								<asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CBcancelResource1" />
-								<asp:Label AssociatedControlID="CBcancel" CssClass="css-label" ID="Label5" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
-							</span>
-
-							<asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>' meta:resourcekey="CBCompanyPayedResource1" />
-							<asp:Label AssociatedControlID="CBCompanyPayed" CssClass="css-label" ID="LBCompanyPayed" runat="server" Text="Bonifico Azienda" meta:resourcekey="LBCompanyPayedResource1"></asp:Label>
+                            <!-- *** Flag Fattura / Carta Credito ***  -->
+                            <span class="input2col">
+						    <asp:CheckBox ID="CBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="CBInvoice" meta:resourcekey="Label3Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="CBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>'/>	
+                            <asp:Label runat="server" AssociatedControlID="CBCreditCard" meta:resourcekey="LBCBCreditCardResource2"></asp:Label>
+					
+	                        <br />
+	                        
+                            <!-- *** Flag Storno / Pagato Azienda ***  -->
+                            <span class="input2col"> 
+    						<asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>'/>	
+                            <asp:Label  runat="server" AssociatedControlID="CBCompanyPayed"  meta:resourcekey="Label9Resource1"></asp:Label>
 
 						</div>
 
 						<!-- *** TB Comment ***  -->
 						<div class="input nobottomborder">
 							<asp:Label CssClass="inputtext" ID="LbComment" runat="server" Text="Nota" meta:resourcekey="LbCommentResource1"></asp:Label>
-							<asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource1" />
+							<asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource1"  
+                                         data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-testo-obbligatorio="true"   />
 						</div>
-						<asp:CustomValidator ID="CV_TBComment" runat="server" Display="None" ErrorMessage="Inserire una nota di commento" ControlToValidate="TBComment" OnServerValidate="CV_TBComment_ServerValidate" ValidateEmptyText="True" meta:resourcekey="CV_TBCommentResource1" ></asp:CustomValidator>
-
-
+		
 						<!-- *** TB Competenza ***  -->
 						<div class="input nobottomborder">
 							<asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource1"></asp:Label>
-							<asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource1" />
-							<asp:RangeValidator ID="RangeValidator2" runat="server" Display="None"
-								ErrorMessage="Inserire una data competenza valida" ControlToValidate="TBAccountingDate"
-								Type="Date" MaximumValue="31/12/9999" MinimumValue="1/1/2000" meta:resourcekey="RangeValidator2Resource1"></asp:RangeValidator>
+							<asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource1" 
+                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
 						</div>
 
 						<!-- *** Bottoni ***  -->
 						<div class="buttons">
+                            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>                                
 							<asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
-							<asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" />
+							<asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" formnovalidate />
 						</div>
 
 					</EditItemTemplate>
@@ -401,21 +345,21 @@
 						<!-- *** DDL Progetto ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:progetto%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-									AutoPostBack="True" Enabled="False" meta:resourcekey="DDLprogettoResource3">
+									AutoPostBack="True" Enabled="False" meta:resourcekey="DDLprogettoResource3" >
 								</asp:DropDownList>
-							</div>
+							 </label>
 						</div>
 
 						<!-- *** DDL Tipo Spesa ***  -->
 						<div class="input nobottomborder">
 							<div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:tipo%>" /></div>
-							<div class="InputcontentDDL" style="width: 265px">
+							<label class="dropdown">
 								<asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
 									AutoPostBack="True" Enabled="False" meta:resourcekey="DDLTipoSpesaResource3">
 								</asp:DropDownList>
-							</div>
+							</label>
 						</div>
 
 						<!-- *** Valore e storno ***  -->
@@ -427,41 +371,31 @@
 									Text='<%# Bind("Amount") %>' Columns="6" Enabled="False" meta:resourcekey="TBAmountResource3" />
 							</span>
 
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="TBAmount" Display="None"
-								ErrorMessage="Importo deve essere un valore numerico" meta:resourcekey="RequiredFieldValidator3Resource3"  ></asp:RequiredFieldValidator>
-
 						</div>
 
-						<!-- *** Flag Fattura / CC ***  -->
-						<div class="input nobottomborder" >
+                        <!-- *** Flag ***  -->
+						<div class="input"  >
 
 							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
+							<span class="inputtext">&nbsp;</span>
 
-							<span class="input2col">
-								<asp:CheckBox ID="disCBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' meta:resourcekey="disCBInvoiceResource1" />
-								<asp:Label AssociatedControlID="disCBInvoice" CssClass="css-label" ID="Label3"
-									runat="server" Text="Fattura" meta:resourcekey="Label3Resource2"></asp:Label>
-							</span>
-
-							<asp:CheckBox ID="disCBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>' meta:resourcekey="disCBCreditCardResource1" />
-							<asp:Label AssociatedControlID="disCBCreditCard" CssClass="css-label" ID="Label4" runat="server" Text="C.Cred. Azienda" meta:resourcekey="Label4Resource1"></asp:Label>
-
-						</div>
-
-						<!-- *** Flag Storno / Pagato azienda ***  -->
-						<div class="input" >
-
-							<!-- *** posizionamento ***  -->
-							<div class="inputtext">&nbsp;</div>
-
-							<span class="input2col">
-								<asp:CheckBox ID="disCBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="disCBcancelResource1" />
-								<asp:Label AssociatedControlID="disCBcancel" CssClass="css-label" ID="Label5" runat="server" Text="Storno" meta:resourcekey="Label5Resource2"></asp:Label>
-							</span>
-
-							<asp:CheckBox ID="disCBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>' meta:resourcekey="disCBCompanyPayedResource1" />
-							<asp:Label AssociatedControlID="disCBCompanyPayed" CssClass="css-label" ID="Label6" runat="server" Text="Bonifico Azienda" meta:resourcekey="Label6Resource1"></asp:Label>
+                            <!-- *** Flag Fattura / Carta Credito ***  -->
+                            <span class="input2col">
+						    <asp:CheckBox ID="disCBInvoice" runat="server" Checked='<%# Bind("InvoiceFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="disCBInvoice" meta:resourcekey="Label3Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="disCBCreditCard" runat="server" Checked='<%# Bind("CreditCardPayed") %>'/>	
+                            <asp:Label runat="server" AssociatedControlID="disCBCreditCard" meta:resourcekey="LBCBCreditCardResource2"></asp:Label>
+					
+	                        <br />
+	                        
+                            <!-- *** Flag Storno / Pagato Azienda ***  -->
+                            <span class="input2col"> 
+    						<asp:CheckBox ID="disCBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' />
+	                        <asp:Label runat="server" AssociatedControlID="disCBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
+                            </span>
+    						<asp:CheckBox ID="disCBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>'/>	
+                            <asp:Label  runat="server" AssociatedControlID="disCBCompanyPayed"  meta:resourcekey="Label9Resource1"></asp:Label>
 
 						</div>
 
@@ -475,8 +409,8 @@
 
 						<!-- *** TB Competenza ***  -->
 						<div class="input nobottomborder">
-							<asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" Enabled="False" meta:resourcekey="LBAccountingDateResource3"></asp:Label>
-							<asp:Label ID="LBAccountingDateDisplay" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' CssClass="ASPInputcontent" Columns="8" Width="100px" meta:resourcekey="LBAccountingDateDisplayResource1"></asp:Label>
+							<asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza"  meta:resourcekey="LBAccountingDateResource3"></asp:Label>
+							<asp:TextBox ID="TBAccountingDate" runat="server" Enabled="False" Text='<%# Bind("AccountingDate","{0:d}") %>' CssClass="ASPInputcontent" Columns="8" Width="100px" meta:resourcekey="LBAccountingDateDisplayResource1"></asp:TextBox>
 						</div>
 
 						<!-- *** Bottoni ***  -->
@@ -539,12 +473,10 @@
 				</asp:SqlDataSource>
 				<%--        EDIT--%>
 
-				<asp:ValidationSummary ID="ValidationSummary" runat="server" ShowMessageBox="True" ShowSummary="False" meta:resourcekey="ValidationSummaryResource1" />
-
 				<!-- **** UPLOAD FILE *** -->
-				<div runat="server" id="BoxRicevute">
+				<div runat="server" id="BoxRicevute"  class="StandardForm">
 					<!--  Tabella viene caricata da server se ci sono file nella directory  -->
-					<table id="TabellaRicevute" runat="server">
+					<table id="TabellaRicevute"  runat="server" style="border-collapse: collapse">
 						<tr>
 							<th colspan="3" class="formtitle"><asp:Literal runat="server" Text="<%$ Resources:giustificativi%>" /></th>
 						</tr>
@@ -585,5 +517,47 @@
         <div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session["UserName"]  %></div>      
      </div>  
 
+    <script type="text/javascript">
+
+        // ***  Controllo che esista un commento se il progetto lo richiede ***
+        window.Parsley.addValidator('testoObbligatorio', {
+            validateString: function (value) {
+
+                var flagObbligatorio = $("#FVSpese_DDLTipoSpesa option:selected").attr("data-desc-obbligatorio");
+                var messaggio = $("#FVSpese_DDLTipoSpesa option:selected").attr("data-desc-message");
+
+                //debugger;
+
+                // progetto richiede commento ed il commento è vuoto
+                if (flagObbligatorio == "True" && $("#FVSpese_TBComment").val().length == 0)
+                    return $.Deferred().reject(messaggio);
+                else
+                    return true;
+            },
+            messages: {
+                en: "insert a comment",
+                it: "inserire un commento"
+            }
+        });
+
+        // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
+        function ShowPopup(message) {
+            $(function () {
+                $("#dialog").html(message);
+                $("#dialog").dialog({
+                    title: "Messaggio",
+                    buttons: {
+                        Close: function () {
+                            $(this).dialog('close');
+                        }
+                    },
+                    modal: true
+                });
+            });
+        };
+
+    </script>
+
 </body>
+
 </html>

@@ -10,23 +10,11 @@
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
+<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 <script src="/timereport/include/javascript/timereport.js"></script>
-
-<script>
-
-    // JQUERY
-
-    // gestione validation summary su validator custom (richiede timereport.js)//
-    $(function () {
-        // gestione validation summary su validator custom (richiede timereport.js)//
-        displayAlert();
-    });
-
-</script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -55,11 +43,11 @@
         <!-- *** DDL XXXX ***  -->
         <div class="input nobottomborder">
             <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="*** TESTO_SELEZIONE ***"></asp:Label>
-            <div class="InputcontentDDL">
+            <label class="dropdown">
                 <asp:DropDownList ID="DDLNOME_CONTROLLO" runat="server" AppendDataBoundItems="True" AutoPostBack="true" >
                 <asp:ListItem Value="">-- seleziona un valore --</asp:ListItem>
                 </asp:DropDownList>
-            </div>      
+            </label>      
         </div>
 
         <!-- *** TEXTBOX MULTILINE ***  -->

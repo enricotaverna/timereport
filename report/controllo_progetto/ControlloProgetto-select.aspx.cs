@@ -262,20 +262,13 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (Auth.ReturnPermission("REPORT","PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             cmd = new SqlCommand("SELECT a.Projects_Id, a.ProjectCode + ' ' + left(a.Name,20) AS Descrizione FROM Projects as a" +
                                  " INNER JOIN ForcedAccounts as b ON b.Projects_id = a.Projects_id " + 
-                                 " WHERE a.active = 'true' AND a.TipoContratto=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] +
+                                 " WHERE a.active = 'true' AND a.TipoContratto_id=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] +
                                  "  AND  b.Persons_id = " + Session["persons_id"] + 
                                  " ORDER BY a.ProjectCode", conn);
 
         // Se ADMIN imposta tutti i progetti di tipo FIXED 
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-             cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects WHERE active = 'true' AND TipoContratto=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] + " ORDER BY ProjectCode", conn);
-
-        //// Se EMPLOYEE imposta tutti i progetti di tipo FIXED di cui è reporter 
-        //if (Convert.ToInt16(Session["userLevel"]) == (Int16)MyConstants.AUTH_EMPLOYEE)
-        //    cmd = new SqlCommand("SELECT DISTINCT a.Projects_Id, a.ProjectCode + ' ' + left(a.Name,20) AS Descrizione FROM Projects as a " + 
-        //                     " INNER JOIN ProjectReporter as b ON a.Projects_id = b.Projects_id " +
-        //                     " WHERE a.active = 'true' AND b.Persons_id = " + Session["persons_id"].ToString()  + " AND a.TipoContratto=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] +
-        //                     " ORDER BY Descrizione", conn);
+             cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects WHERE active = 'true' AND TipoContratto_id=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] + " ORDER BY ProjectCode", conn);
 
         SqlDataReader dr = cmd.ExecuteReader();
 

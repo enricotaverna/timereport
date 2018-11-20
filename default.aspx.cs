@@ -12,7 +12,6 @@ public partial class defaultAspx : System.Web.UI.Page
 {
 	protected void Page_Load(object sender, EventArgs e)
 	{
-
         
         if ( Request["user"] != null )
 				TBusername.Text = Request["user"].ToString();
@@ -20,9 +19,8 @@ public partial class defaultAspx : System.Web.UI.Page
 		if (Request["password"] != null)
 			TBpassword.Text = Request["password"].ToString();
 
-		if (Request["debug"] != null) { 
+		if (Request["debug"] != null) 
 			Session["debug"] = Request["debug"].ToString();
-        }
 
         // in caso di postback                  
 
@@ -103,13 +101,11 @@ public partial class defaultAspx : System.Web.UI.Page
                     }
                 }
             }
-        
-  
+          
            // inizializza alcune variabili        
             Session["NoActive"] = 1;
 			Session["NoPersActive"] = 1;
 
-			// carica variabile di sessione con spese forzate
 			// Carica spese e progetti possibili
 			DataTable dtProgettiForzati = null;
             DataTable dtSpeseForzate = null;
@@ -117,40 +113,27 @@ public partial class defaultAspx : System.Web.UI.Page
 				
 			if (Convert.ToInt32(Session["ForcedAccount"]) != 0)  {
 				//** A.1 Carica progetti possibili
-				// Right join: includes all the forced projects plus the ones with the flag always_available on							
-				//ProgettiForzati = ASPcompatility.GetRows("SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name,  Projects.Always_available FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode");
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode", this.Page);
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn  FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode", this.Page);
 
 				//** A.2 Carica spese possibili				
-				//if ( Convert.ToInt32(Session["ExpensesProfile_id"]) > 0) { 
-				//	//** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
-				//	SpeseForzate = ASPcompatility.GetRows("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.Name FROM ForcedExpensesProf RIGHT JOIN ExpenseType ON ForcedExpensesProf.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ( ( ForcedExpensesProf.ExpensesProfile_id=" + Session["ExpensesProfile_id"] + " ) ) ORDER BY ExpenseType.ExpenseCode");
-    //                dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione  FROM ForcedExpensesProf RIGHT JOIN ExpenseType ON ForcedExpensesProf.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE((ForcedExpensesProf.ExpensesProfile_id = " + Session["ExpensesProfile_id"] + ")) ORDER BY ExpenseType.ExpenseCode", this.Page);
-    //            }
-
+				//** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
                 // carica spese forzate per persona                
-					//SpeseForzate = ASPcompatility.GetRows("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.Name FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ( ( ForcedExpensesPers.Persons_id=" + Session["Persons_id"] + " ) ) ORDER BY ExpenseType.ExpenseCode");
-                    dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE((ExpenseType.TipoBonus_id = 0 AND ForcedExpensesPers.Persons_id = " + Session["Persons_id"] + ")) ORDER BY ExpenseType.ExpenseCode", this.Page);
+                    dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ForcedExpensesPers.Persons_id = " + Session["Persons_id"] + " ORDER BY ExpenseType.ExpenseCode", this.Page);
 
                 // se non ha trovato spese forzate sulla persona, a questo punto carica tutto
                     if (dtSpeseForzate.Rows.Count == 0) {   
-						//SpeseForzate = ASPcompatility.GetRows("SELECT ExpenseType_Id, ExpenseCode, Name FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode");
-                        dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ExpenseType WHERE TipoBonus_id = 0 AND active = 1 ORDER BY ExpenseCode", this.Page);
+                        dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore,TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
                     }
                 }
 			else  {
-				//** B.1 tutti i progetti attivi		
-				//ProgettiForzati = ASPcompatility.GetRows("SELECT Projects_Id, ProjectCode, Name  FROM Projects WHERE active = 1 ORDER BY ProjectCode");
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto  FROM Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
+				//** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn  FROM Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
 				//** B.2 tutte le spese attive 							
-				//SpeseForzate = ASPcompatility.GetRows("SELECT ExpenseType_Id, ExpenseCode, Name  FROM ExpenseType WHERE active=1");
-                dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
+                dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
             }
 
-        //Session["ProgettiForzati"] = ProgettiForzati; // DA ELIMINARE
 		Session["dtProgettiForzati"] = dtProgettiForzati;
         Session["dtSpeseForzate"] = dtSpeseForzate;
-        //Session["SpeseForzate"] = SpeseForzate; // DA ELIMINARE
 
         // Carica in buffer tipo spesa
         dtTipoSpesa = Database.GetData("Select ExpenseType_id, TipoBonus_id from ExpenseType", this.Page);
@@ -166,14 +149,6 @@ public partial class defaultAspx : System.Web.UI.Page
         if (MyConstants.DTHoliday.Rows.Count == 0)
             MyConstants.DTHoliday = Database.GetData("SELECT Holiday_date FROM Holiday", this.Page);
           
-        // using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-		//{
-		//c.Open();
-		//SqlCommand cmd = new SqlCommand("SELECT Holiday_date FROM Holiday", c);
-		//using (SqlDataAdapter dad = new SqlDataAdapter(cmd))
-		//	 dad.Fill(MyConstants.DTHoliday);
-		//}
-
 		MyConstants.DTHoliday.PrimaryKey = new DataColumn[] { MyConstants.DTHoliday.Columns["Holiday_date"] };
 		//*** Carica datatable con giorni di ferie (FINE)   
 

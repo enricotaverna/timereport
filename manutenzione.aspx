@@ -6,10 +6,10 @@
 <link rel="stylesheet" href="/timereport/include/jquery/tooltip/jquery.smallipop.min.css" type="text/css" media="all" title="Screen"/>
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
+<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">

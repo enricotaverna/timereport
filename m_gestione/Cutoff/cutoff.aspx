@@ -2,31 +2,19 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
- <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
+<!-- Style -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+     
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 
-<script>
-
-    // JQUERY
-    $(function () {
-
-        // gestione validation summary su validator custom (richiede timereport.js)//
-        displayAlert();
-
-    });
-
-</script>
+<!-- Menù  -->
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -42,34 +30,28 @@
 
     <div id="FormWrap">
 
-    <form id="form" runat="server" class="standardform" enableviewstate="True" >
+    <form id="cutoffForm" runat="server" class="standardform" enableviewstate="True" >
 
         <div class="formtitle"><asp:Literal runat="server" Text="Cutoff" /> </div> 
 
         <asp:FormView ID="FVMain" runat="server" DataSourceID="dsOptions" CssClass="StandardForm" width="100%" DefaultMode="Edit" >
             <EditItemTemplate>
 
-<%--        <!-- *** Periodo ***  -->
-        <div class="input nobottomborder">
-            <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Periodo" meta:resourcekey="Label1Resource1"></asp:Label>
-            <asp:TextBox CssClass="ASPInputcontent" ID="periodo" runat="server" MaxLength="10" Text='<%# Bind("cutoffPeriod") %>'    />
-        </div>--%>
-
         <!-- *** Periodo ***  -->
         <div class="input nobottomborder">                        
 	                <div class="inputtext">Periodo:</div>  
-                    <div class="InputcontentDDL"  >
+                    <label class="dropdown"  >
                         <asp:DropDownList runat="server" ID="DDLPeriodo"  DataValueField="cutoffPeriod"  SelectedValue='<%# Bind("cutoffPeriod") %>'  >
                         <asp:ListItem Text="15 del mese" Value="1"></asp:ListItem>
                         <asp:ListItem Text="Fine Mese" Value="2"></asp:ListItem>
                         </asp:DropDownList>
-                    </div>
+                    </label>
         </div>  
 
         <!-- *** Mese ***  -->
         <div class="input nobottomborder">                        
 	                <div class="inputtext">Mese:</div>  
-                    <div class="InputcontentDDL"  >
+                    <label class="dropdown"  >
                         <asp:DropDownList runat="server" ID="DDLMese"  DataValueField="cutoffMonth" SelectedValue='<%# Bind("cutoffMonth")%>'   >
                         <asp:ListItem Text="Gennaio" Value="1"></asp:ListItem>
                         <asp:ListItem Text="Febbraio" Value="2"></asp:ListItem>
@@ -84,17 +66,19 @@
                         <asp:ListItem Text="Novembre" Value="11"></asp:ListItem>
                         <asp:ListItem Text="Dicembre" Value="12"></asp:ListItem>
                         </asp:DropDownList>
-                    </div>
+                    </label>
         </div>
 
         <!-- *** Anno ***  -->
         <div class="input nobottomborder">
             <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Anno" meta:resourcekey="Label3Resource1"></asp:Label>
-            <asp:TextBox CssClass="ASPInputcontent" ID="TBAnno" runat="server" MaxLength="10" Text='<%# Bind("cutoffYear") %>'   />
+            <asp:TextBox CssClass="ASPInputcontent" ID="TBAnno" runat="server" MaxLength="5" Text='<%# Bind("cutoffYear") %>'  
+                         data-parsley-required="true" data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-min="2018" Columns="5" />
         </div>
 
         <!-- *** BOTTONI ***  -->
         <div class="buttons">
+            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
             <asp:Button ID="InsertButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" /> 
             <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click"   />                    
         </div>
@@ -133,7 +117,17 @@
 
 </asp:sqldatasource>
 
+<script type="text/javascript">
+
+// *** Esclude i controlli nascosti *** 
+   $('#cutoffForm').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+   });
+
+</script>
+
 </body>
+
 </html>
 
 

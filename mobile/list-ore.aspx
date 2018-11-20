@@ -14,12 +14,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
     <!-- style sheets -->
-    <link rel="stylesheet" href="/timereport/include/jquery/jquery.mobile-1.1.1.min.css" />
-    <link rel="stylesheet" href="./css/TimereportMobilev2.css" />
+    <link rel="stylesheet" href="/timereport/include/jquery/1.7.1/jquery.mobile-1.1.1.min.css" />
+    <link href="/timereport/include/TimereportMobilev2.css" rel="stylesheet" />
+    
     <!-- jquery mobile -->
-    <script src="/timereport/include/jquery/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="./js/customscript.js"></script> 
-    <script src="/timereport/include/jquery/jquery.mobile-1.1.1.min.js"></script>
+    <script src="/timereport/include/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="/timereport/include/javascript/customscript.js"></script>
+    <script src="/timereport/include/jquery/1.7.1/jquery.mobile-1.1.1.min.js"></script>
     <!-- jquery mobile FINE -->
 
     <script>

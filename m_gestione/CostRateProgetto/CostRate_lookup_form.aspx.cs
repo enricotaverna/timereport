@@ -10,9 +10,6 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        // Evidenzia campi form in errore
-        Page.ClientScript.RegisterOnSubmitStatement(this.GetType(), "val", "fnOnUpdateValidators();");
-
         //	Deve avere almeno il reporting economics per visualizzare
         //  Se ha Masterdata Costrate può anche modificar
         if (!Auth.ReturnPermission("MASTERDATA", "COSTRATE"))

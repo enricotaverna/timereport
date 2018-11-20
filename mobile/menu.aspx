@@ -21,12 +21,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
     <!-- style sheets -->
-    <link rel="stylesheet" href="/timereport/include/jquery/jquery.mobile-1.1.1.min.css" />
-    <link rel="stylesheet" href="./css/TimereportMobilev2.css" />
+    <link rel="stylesheet" href="/timereport/include/jquery/1.7.1/jquery.mobile-1.1.1.min.css" />
+    <link href="/timereport/include/TimereportMobilev2.css" rel="stylesheet" />
     <!-- jquery mobile -->
-    <script src="/timereport/include/jquery/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="./js/customscript.js"></script> 
-    <script src="/timereport/include/jquery/jquery.mobile-1.1.1.min.js"></script>
+    <script src="/timereport/include/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="/timereport/include/javascript/customscript.js"></script>
+    <script src="/timereport/include/jquery/1.7.1/jquery.mobile-1.1.1.min.js"></script>
     <!-- jquery mobile FINE -->
 
     <!-- bottone back su sottomenu -->
@@ -35,15 +35,15 @@
             $.mobile.page.prototype.options.addBackBtn = true;
         });
     </script>
-    <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-    <script type="text/javascript" src="./js/jquery.validate.js"></script>
-    <script type="text/javascript" src="./js/additional-methods.js"></script>
+    <script type="text/javascript" src="/timereport/include/javascript/mobile/jquery.validate.js"></script>
+    <script type="text/javascript" src="/timereport/include/javascript/mobile/additional-methods.js"></script>
     <!-- jquery mobile FINE -->
     
     <!-- jquery Resize immagine prima upload -->
-    <script src="./js/resize/exif.js"></script>
-    <script src="./js/resize/binaryajax.js"></script>
-    <script src="./js/resize/canvasResize.js"></script>
+
+    <script src="/timereport/include/resize/exif.js"></script>
+    <script src="/timereport/include/resize/binaryajax.js"></script>
+    <script src="/timereport/include/resize/canvasResize.js"></script>
     <!-- jquery Resize immagine prima upload FINE -->
 
     <script>
@@ -55,26 +55,6 @@
 
          $(document).ready(function () {
               
-             //          **** popola dropdown TIPO ORE ****  NON PIU' USATO, TIPO ORE DEFAULTATO A 1
-             //$.ajax({
-             //    type: "POST",
-             //    url: "aggiornav2.asmx/GetTipoOreList",
-             //    contentType: "application/json; charset=utf-8",
-             //    dataType: "json",
-             //    data: "",
-             //    success: function (response) {
-             //        var ddl1 = (response.d == undefined) ? response : response.d; // compatibilità ASP.NET 2.0
-             //        for (var i = 0; i < ddl1.length; i++) {
-             //            var selectOption = $(document.createElement('option'));
-             //            $('#ore_TipoOre_Id').append(selectOption.val(ddl1[i].TipoOreId).html(ddl1[i].TipoOreName));
-             //        }
-             //        $("#ore_TipoOre_Id").val( $("#ore_TipoOre_Id option:first-child").val() ); // default
-             //    },
-             //    error: function (xhr, textStatus, errorThrown) {
-             //        alert(xhr.responseText);
-             //    }
-             //});
-
              //            *** popola dropdown PROGETTI ***
              $.ajax({
                  type: "POST",

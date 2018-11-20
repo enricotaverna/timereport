@@ -191,10 +191,9 @@
             <asp:BoundField DataField="ActivityCode" HeaderText="Attività" SortExpression="ActivityCode" />                          
             <asp:BoundField DataField="Name" HeaderText="Descrizione" SortExpression="Name" />
             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active"/> 
-            <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
-            <asp:BoundField DataField="Fase" HeaderText="Fase" SortExpression="Fase" />                                 
-            <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue" ReadOnly="True" SortExpression="RevenueBudget" />
-            <asp:BoundField DataField="MargineTarget" HeaderText="Margine" ReadOnly="True" SortExpression="MargineTarget" />
+            <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />                           
+            <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="RevenueBudget" dataformatstring="{0:n0}"  />
+            <asp:BoundField DataField="MargineTarget" HeaderText="Margine" ReadOnly="True" SortExpression="MargineTarget" dataformatstring="{0:P1}" />
             <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image"
                 DeleteImageUrl="/timereport/images/icons/16x16/trash.gif" SelectImageUrl="/timereport/images/icons/16x16/modifica.gif" />
             <asp:CommandField />

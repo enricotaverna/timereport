@@ -21,7 +21,6 @@ public partial class input : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        string cmd;
 
         Auth.CheckPermission("DATI", "ORE");
         Auth.CheckPermission("DATI", "SPESE");
@@ -40,55 +39,6 @@ public partial class input : System.Web.UI.Page
 
         if ((string)Session["type"] == "bonus")
             BindDDLProjects();
-
-        // delete item
-        if ((string)Request.QueryString["action"] == "delete")
-        {
-
-            // get the name of the key field
-            if ((string)Session["type"] == "hours")
-                Database.ExecuteSQL("DELETE FROM hours WHERE hours_id=" + Request.QueryString["record_Id"], this.Page);
-            else if ((string)Session["type"] == "expenses" || (string)Session["type"] == "bonus")
-                CancellaRecordSpese(Request.QueryString["record_Id"]);
-
-            Response.Redirect("input.aspx"); // refresh pagina dopo delete
-        }
-
-        // inserisce record x ticket restaurant
-        if ((string)Request.QueryString["action"] == "ticket")
-        {
-
-            cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id) " +
-                      "values (" +
-                      ASPcompatility.FormatDateDb(Request.QueryString["date"], false) + " ," +
-                      "'" + ConfigurationManager.AppSettings["TICKET_REST_PROJECT"] + "' ," +
-                      "'" + Session["persons_id"] + "' ," +
-                      "'" + ConfigurationManager.AppSettings["TICKET_REST_EXPENSE"] + "' ," +
-                      "'1' ," +
-                      "'' ," +
-                      "'false' ," +
-                      "'false' ," +
-                      "'false' ," +
-                      "'false' ," +
-                      "'" + Session["userId"] + "' ," +
-                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
-                      "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TKTREST"] + "' )";
-            Database.ExecuteSQL(cmd, this.Page);
-
-            Response.Redirect("input.aspx"); // refresh pagina dopo insert
-
-        }
-
-    }
-
-    // CancellaRecordSpese: prende in input l'id della spese, cancella il record e le ricevute allegate
-    protected void CancellaRecordSpese(string sId)
-    {
-
-        // cancella record
-        Database.ExecuteSQL("DELETE FROM expenses WHERE expenses_id=" + sId, this.Page);
-
-        // chiama web service che cancella tutte le ricevute
 
     }
 
@@ -226,8 +176,7 @@ public partial class input : System.Web.UI.Page
     protected void SetVariables()
     {
 
-        String[] aDaysName = new String[7] { "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica" };
-
+        
         // *** Imposta default dei form *****
         DSBonus.SelectParameters["TipoBonus_Id"].DefaultValue = ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"];
 
@@ -248,13 +197,13 @@ public partial class input : System.Web.UI.Page
             Session["year"] = Request.QueryString["year"];
 
         if (Request.QueryString["month"] != null)
-            Session["month"] = Request.QueryString["month"];
+            Session["month"] = Request.QueryString["month"].PadLeft(2, '0');
 
         if (Session["year"] == null)
             Session["year"] = DateTime.Now.Year;
 
         if (Session["month"] == null)
-            Session["month"] = DateTime.Now.Month;
+            Session["month"] = DateTime.Now.Month.ToString().PadLeft(2, '0');
 
         // se sulla vista spese ed è forzato un refresh bufferizza l'elenco delle ricevute
         if ((string)Session["type"] != "hours" && !String.IsNullOrEmpty((string)Session["RefreshRicevuteBuffer"]))
@@ -287,10 +236,9 @@ public partial class input : System.Web.UI.Page
 
         List<int> iList = new List<int>();
         int iStart;
-        string sMeseFormattato = Session["month"].ToString().Length == 1 ? "0" + Session["month"].ToString() : Session["month"].ToString();
-
+ 
         // legge i file nel mese / utente
-        string[] filePaths = TrovaRicevuteLocale(-1, Session["username"].ToString(), (string)(Session["year"].ToString() + sMeseFormattato + "01"));
+        string[] filePaths = TrovaRicevuteLocale(-1, Session["username"].ToString(), Session["year"].ToString() + Session["month"].ToString() + "01");
 
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
@@ -385,18 +333,18 @@ public partial class input : System.Web.UI.Page
     {
 
         string strTooltip = "";
-        string strDate;
+        string sDate, sISODate;
         float iOre = 0;
 
         if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
         {
-            Response.Write("<td class=hours >");
-            strDate = intDayNumber.ToString() + "/" + Session["month"] + "/" + Session["year"];
 
-            DataRow[] drRow = dtHours.Select("[date] = '" + strDate + "'");
+            sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
+            sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
 
-            if (drRow.Count() > 0)
-                Response.Write("<table>");  // si usa tabelle per problemi di formattazione
+            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
+
+            DataRow[] drRow = dtHours.Select("[date] = '" + sDate + "'");
 
             // cerca sulla versione bufferizzate dtHours
             foreach (DataRow rdr in drRow)
@@ -412,16 +360,17 @@ public partial class input : System.Web.UI.Page
                              "<br><br>" + rdr["comment"];
 
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
-                Response.Write("<tr><td width=100%><a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + "</a> : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + "</td>");
+                Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
 
-                if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
-                    Response.Write("<td><a href=input.aspx?action=delete&record_id=" + rdr["Hours_id"] + "><img style='padding-right:5px' src=images/icons/16x16/trash.gif width=16 height=14 border=0></a></td></tr>");
-                else
-                    Response.Write("</tr>");
+                        Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G")  + " " + GetLocalResourceObject("oreUOM") + "</a>");
+                        if (Convert.ToBoolean(Session["InputScreenChangeMode"])) 
+                            Response.Write("<a href=# onclick='CancellaId(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+
+                    Response.Write("</div>"); // TRore
             }
 
             if (drRow.Count() > 0)
-                Response.Write("</table></td>");
+                Response.Write("</td>");   // class=hours
             else
                 Response.Write("&nbsp;</td>");
 
@@ -432,7 +381,7 @@ public partial class input : System.Web.UI.Page
     {
 
         string strTooltip = "";
-        string strDate;
+        string sDate, sISODate;
         float fSpese = 0;
         string strIconaRicevuta;
 
@@ -441,13 +390,12 @@ public partial class input : System.Web.UI.Page
 
         if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
         {
-            Response.Write("<td >");
-            strDate = intDayNumber.ToString() + "/" + Session["month"] + "/" + Session["year"];
+            sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
+            sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
 
-            DataRow[] drRow = dtenses.Select("[date] = '" + strDate + "'");
+            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");            
 
-            if (drRow.Count() > 0)
-                Response.Write("<table>");  // si usa tabelle per problemi di formattazione
+            DataRow[] drRow = dtenses.Select("[date] = '" + sDate + "'");
 
             // cerca sulla versione bufferizzate dtHours
             foreach (DataRow rdr in drRow)
@@ -474,20 +422,18 @@ public partial class input : System.Web.UI.Page
                     strIconaRicevuta = "";
 
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
-                // l'id sull'elemento TR serve per cancellare la riga a seguito chiamata WS, vedi function CancellaSpesa 
-                Response.Write("<tr id=TR" + rdr["expenses_id"] + "><td width=100%><a id=" + rdr["expenses_id"] + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + rdr["expenses_id"] + " >" + strIconaRicevuta + rdr["ProjectCode"] + ":" + rdr["ExpenseCode"] + "</a> : " + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] + "</td>");
+                Response.Write("<div class=TRitem id=TRitm" + rdr["expenses_id"] + ">");
 
-                if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
-                    //  OLD chiamata a input.asp >> Response.Write("<td><a href=input.aspx?action=delete&record_id=" + rdr["expenses_id"] + "><img style='padding-right:5px' src=images/icons/16x16/trash.gif width=16 height=14 border=0></a></td></tr>");
-                    //  Chiamata a WS per cancellazione spese e ricevute
-                    Response.Write("<td><a href=# onclick='CancellaSpesa(" + rdr["expenses_id"] + ", \"" + ((DateTime)rdr["date"]).ToString("yyyyMMdd") + "\")'><img style='padding-right:5px' src=images/icons/16x16/trash.gif width=16 height=14 border=0></a></td></tr>");
-                else
-                    Response.Write("</tr>");
+                    Response.Write("<a id=" + rdr["expenses_id"] + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + rdr["expenses_id"] + " >" + strIconaRicevuta + rdr["ProjectCode"] + ":" + rdr["ExpenseCode"] + " : " + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] + "</a>");
+                    if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
+                        Response.Write("<a  align=right href=# onclick='CancellaId(" + rdr["expenses_id"] +")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+
+                Response.Write("</div>"); // TRexp
 
             }
 
             if (drRow.Count() > 0)
-                Response.Write("</table></td>");
+                Response.Write("</td>");
             else
                 Response.Write("&nbsp;</td>");
 
@@ -512,31 +458,33 @@ public partial class input : System.Web.UI.Page
     protected void OutputColumn(int intDayNumber)
     {
 
-        string strDate = "";
+        string sDate, sISODate;
         string strProject;
         int intDayWeek = 0;
         Boolean bHoliday = false;
 
+        sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"]; // DD/MM/YYYY
+        sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD 
+
         if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
         {
 
-            strDate = intDayNumber.ToString() + "/" + Session["month"] + "/" + Session["year"];
-            intDayWeek = (int)Convert.ToDateTime(strDate).DayOfWeek;
+            intDayWeek = (int)Convert.ToDateTime(sDate).DayOfWeek;
             // look if it's an holiday	
             //if (Database.RecordEsiste("SELECT * FROM Holiday WHERE holiday_date=" + ASPcompatility.FormatDateDb(strDate ))) {
-            if (MyConstants.DTHoliday.Rows.Contains(strDate))
+            if (MyConstants.DTHoliday.Rows.Contains(sDate))
             {
-                Response.Write("<td class=noWorkDays title=" + strDate + " >");
+                Response.Write("<td id='hdr" + sISODate + "' class=noWorkDays title=" + sDate + " >");
                 bHoliday = true;
             }
             else if (intDayWeek == 6 || intDayWeek == 0)
             {
-                Response.Write("<td class=noWorkDays title=" + strDate + " >");
+                Response.Write("<td id='hdr" + sISODate + "'class=noWorkDays title=" + sDate + " >");
                 bHoliday = true;
             }
             else
             {
-                Response.Write("<td class=WorkDays title=" + strDate + " >");
+                Response.Write("<td id='hdr" + sISODate + "'class=WorkDays title=" + sDate + " >");
                 bHoliday = false;
             }
 
@@ -549,34 +497,42 @@ public partial class input : System.Web.UI.Page
 
         // se cutoff non è passato si possono creare nuove entries
 
-        if (strDate != "")
+        if (sDate != "")
             if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
             {
 
                 switch ((string)Session["type"])
                 {
                     case "hours":  // CALENDARIO DATE
-                        Response.Write("<a href=input-ore.aspx?action=new&date=" + strDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
+                        Response.Write("<a  align=right href=input-ore.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
                         break;
 
                     case "expenses": // CALENDARIO SPESE
-                        Response.Write("<a href=input-spese.aspx?action=new&date=" + strDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
+                        Response.Write("<a  align=right href=input-spese.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
                         break;
 
                     case "bonus":  // CALENDARIO SPECIALI
                                    // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
-                        DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(strDate) +"'");
+                        DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
 
                         //                        if (!Database.RecordEsiste("SELECT * FROM Expenses WHERE Date=" + ASPcompatility.FormatDateDb(strDate, false) + " AND Persons_id = " + Session["Persons_id"] + " AND TipoBonus_id <> '' ", this.Page) & !bHoliday)
-                        if ( drFound.Count() == 0 && !bHoliday) // non ci sono bonus sul giorno e non è un festivo
+                        if ( !bHoliday) // giorno on è un festivo
                         {
-                            Response.Write("<a href=input.aspx?action=ticket&date=" + strDate + "><img  align=right src=images/icons/16x16/restaurant.png  border=0></a>");
 
-                            strProject = GetProject(strDate);
+                            string sDisplay="";
+
+                            if (drFound.Count() != 0) // se ci sono item le icone viaggio e ticket vengono spente
+                                sDisplay = "style='display:none'";
+
+                            // id hdrIcn usato per nascondere le icone
+                            Response.Write("<span " + sDisplay + " id='hdrIcon" + sISODate + "'><a href='#' class='tktRest' restDate='" + sISODate + "'><img align=right src=images/icons/16x16/restaurant.png  border=0></a>");
+
+                            strProject = GetProject(sDate);
 
                             // il titolo del link viene impostato uguale alla data per essere poi impostato da javascript nella finestra modale
-                            Response.Write("<a title=" + strDate + ";" + strProject + " href=#dialog name=modal><img align=right src=images/icons/16x16/travel.png border=0></a>");
+                            Response.Write("<a title=" + sDate + ";" + strProject + " href=#dialog name=modal><img align=right src=images/icons/16x16/travel.png border=0></a><span>");
                         }
+
                         break;
                 }
 

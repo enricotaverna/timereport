@@ -5,214 +5,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-
-
-<link rel="stylesheet" href="/timereport/include/jquery/tooltip/jquery.smallipop.min.css" type="text/css" media="all" title="Screen" />
+<link rel="stylesheet" href="/timereport/include/jquery/tooltip/jquery.smallipop.css" type="text/css" />
 
 <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.js"></script>
-    
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+     
 <!-- ToolTip jquey add-in  -->
-<script type="text/javascript" src="/timereport/include/jquery/tooltip/modernizr.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/tooltip/jquery.smallipop.min.js"></script>
-
-<style>
-    .ui-draggable-helper {
-        border: 1px dashed #000;
-        font-weight: bold;
-        background: #fff;
-        padding: 4px;
-        box-shadow: 5px 5px 5px #888;
-    }
-</style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title><asp:Literal runat="server" Text="<%$ Resources:Titolo%>" /></title>
 </head>
 
-<script>
-
-    function DoPostBack() {
-        __doPostBack('Button2', 'My Argument');
-    }
-
-    // ***** CANCELLA SPESA E RICEVUTE *****
-    // riceve in input Id spesa e data (YYYYMMGG) e chiama WS per cancellazione
-    function CancellaSpesa(iId, sData) {
-
-        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{'iIdSpesa': '" + iId +
-                  "' , 'sUsername': '<%= Session["username"]%>"  +
-                  "' , 'sDataSpesa': '" + sData + "'   }";
-
-        $.ajax({
-
-            type: "POST",
-            url: "/timereport/webservices/WStimereport.asmx/CancellaSpesaERicevuta",
-            data: values,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-
-            // se tutto va bene
-            success: function (msg) {
-                // se call OK cancella la riga della tabella corrispondente alla ricevuta
-                var Risultato = (msg.d == undefined) ? msg : msg.d; // compatibilità ASP.NET 2.0
-
-                if (Risultato == "OK" || Risultato==null) {
-                    var elemtohide = document.getElementById("TR" + iId);
-                    elemtohide.style.display = "none";
-                }
-                else
-                    alert(Risultato);
-            },
-
-            // in caso di errore
-            error: function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            }
-
-        }); // ajax
-
-    } // cancella_ricevuta
-
-    $(document).ready(function () {
-
-        // drag & drop
-        // draggable attaccato alla classe Hours è l'elemento che si muove
-        $(".hours").draggable({
-            cursor: "move",
-            appendTo: "body",
-            helper: "clone",
-            revert: "invalid",
-            start: function (e, ui) {
-                $(ui.helper).addClass("ui-draggable-helper");
-            }
-        });
-
-        // droppable è l'elemento che riceve
-        $(".noWorkDays").droppable({
-            hoverClass: "noWorkDaysHover",
-            drop: function (event, ui) {
-                /* concatena data e numero record e triggera postback */
-                par1 = $(this).attr("title");
-                par2 = ui.draggable.attr("id");
-                __doPostBack("drag&drop", par1.concat(";", par2));
-            }
-        });
-
-        // draggable attaccato alla classe Hours è l'elemento che si muove
-        $(".WorkDays").droppable({
-            hoverClass: "WorkDaysHover",
-            drop: function (event, ui) {
-                /* concatena data e numero record e triggera postback */
-                par1 = $(this).attr("title");
-                par2 = ui.draggable.attr("id");               
-                __doPostBack("drag&drop", par1.concat(";",par2));                                
-            }
-        });
-
-        // tooltip : hideDelay default 500, riduce tempo prima che sia nascosto il tooltip
-        $('.hours').smallipop({
-            hideDelay: 100
-        });
-
-        //select all the a tag with name equal to modal
-        $('a[name=modal]').click(function (e) {
-            //Cancel the link behavior
-            e.preventDefault();
-
-            //Get the A tag
-            var id = $(this).attr('href');
-
-            var aData = $(this).attr('title').split(";");
-
-            // setta il valore del campo Hidden con la data cliccata 
-            $("#refDate").val(aData[0]);
-
-            // setta il progetto come default
-            $("#DDLProgetto").val(aData[1]);
-
-            //Get the screen height and width
-            var maskHeight = $(document).height();
-            var maskWidth = $(window).width();
-
-            //Set heigth and width to mask to fill up the whole screen
-            $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
-
-            //transition effect		
-            $('#mask').fadeIn(200);
-            $('#mask').fadeTo("fast", 0.8);
-
-            //Get the window height and width
-            var winH = $(window).height();
-            var winW = $(window).width();
-
-            //Set the popup window to center
-            $(id).css('top', winH / 2 - $(id).height() / 2);
-            $(id).css('left', winW / 2 - $(id).width() / 2);
-
-            //transition effect
-            $(id).fadeIn(200);
-
-        });
-
-        //if close button is clicked
-        $('.window .close').click(function (e) {
-            //Cancel the link behavior
-            e.preventDefault();
-
-            $('#mask').hide();
-            $('.window').hide();
-        });
-
-        //if mask is clicked
-        $('#mask').click(function () {
-            $(this).hide();
-            $('.window').hide();
-        });
-
-        $(window).resize(function () {
-
-            var box = $('#boxes .window');
-
-            //Get the screen height and width
-            var maskHeight = $(document).height();
-            var maskWidth = $(window).width();
-
-            //Set height and width to mask to fill up the whole screen
-            $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
-
-            //Get the window height and width
-            var winH = $(window).height();
-            var winW = $(window).width();
-
-            //Set the popup window to center
-            box.css('top', winH / 2 - box.height() / 2);
-            box.css('left', winW / 2 - box.width() / 2);
-
-        });
-
-    });
-
-    </script>
-
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!--**** Stili per effetto dialog box ***-->
 <style>
-    #mask {
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: 9000;
-        background-color: #000;
-        display: none;
-    }
 
     #boxes .window {
         position: fixed;
@@ -328,12 +141,12 @@
               Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>"+ GetLocalResourceObject("BUONI") + "</a>");
 				
         %>
-        <table width="90%" align="center" style="border-collapse: separate; border-spacing: 10px 0px; border-top-left-radius: 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
+        <table width="90%" align="center" style="border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
             <!--        lascia righa vuota-->
             <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
+                <td class="hours">&nbsp;</td>
+                <td class="hours">&nbsp;</td>
+                <td class="hours">&nbsp;</td> 
             </tr>
             <%          
 			
@@ -433,20 +246,20 @@
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Rimborso" meta:resourcekey="Label7Resource1"></asp:Label>
-                        <div class="InputcontentDDL">
+                        <label class="dropdown">
                             <asp:DropDownList ID="DDLBonus" runat="server" AppendDataBoundItems="True"
                                 DataSourceID="DSBonus" DataTextField="Descrizione"
                                 DataValueField="ExpenseType_Id" meta:resourcekey="DDLBonusResource1">
                             </asp:DropDownList>
-                        </div>
+                        </label>
                     </div>
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Progetto" meta:resourcekey="Label1Resource1"></asp:Label>
-                        <div class="InputcontentDDL">
+                        <label class="dropdown">
                             <asp:DropDownList ID="DDLProgetto" runat="server" AppendDataBoundItems="True" meta:resourcekey="DDLProgettoResource1">
                             </asp:DropDownList>
-                        </div>
+                        </label>
                     </div>
 
                     <div class="buttons">
@@ -477,6 +290,299 @@
 
     <!-- Mask to cover the whole screen -->
     <div id="mask"></div>
+
+    <script type="text/javascript">
+
+    //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB
+    function CancellaId(Id) {
+
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+            var values = "{'Id': '" + Id + "'  }";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/CancellaId",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                // se tutto va bene
+                success: function (msg) {
+                    // funzione restituisce 
+                    // d[0] true / false per esito
+                    // d[1] "" se ore, aaaammgg se spese
+                    if (msg.d[0] == "true") {
+
+                        var elemtohide = document.getElementById("TRitm" + Id);
+                        elemtohide.remove();
+
+                        if (msg.d[1] != "") {
+                            var hdrIcon = "#hdrIcon" + msg.d[1]; // yyyymmdd in caso di ticket                  
+                            $(hdrIcon).show(); // accende icone travel
+                        }
+                    }
+                    else
+                        alert(Risultato);
+                },
+
+                // in caso di errore
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+
+            }); // ajax
+        } //CANCELLA_ID 
+
+    //TICKETREST : inserisce il ticket restaurant ed aggiorna la pagina Web          
+    $('.tktRest').on('click', function (e) {
+
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+                var values = "{'insDate': '" + $(this).attr("restDate") + "' , " +
+                             " 'personsId': '" + <%= Session["persons_id"] %> + "'   } ";
+                var refThis = $(this);
+
+                refThis.addClass("HdrDisabled"); // evita doppio click
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/CreaTicket",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d > 0) {
+                        var strTooltip = "";
+                        var isoDate = refThis.attr("restDate"); // formato aaaammgg
+
+                        var idItem = "#TDitm" + isoDate ;    //id dell'elemento td che contiene gli item
+                        var idIcon = "#hdrIcon" + isoDate; //id delle icone di viaggio e ticket
+
+                        // visualizza la stringa con il ticket creato
+                        var htmlString = "<div class=TRitem id=TRitm" + msg.d + ">";
+                        htmlString = htmlString + "<a id=" + msg.d + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + msg.d + " >ZZ90101:BPA : 1 BP</a>";
+                        htmlString = htmlString + "<a href=# onclick='CancellaId(" + msg.d + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
+                        htmlString = htmlString + "</div>";
+                        $(idItem).html(htmlString);
+
+                        // spegne le icone sulla testata della colonna e disattiva dragp & drop
+                        $(idIcon).hide();
+                        $("#hdr" + isoDate).removeClass("ui-droppable");
+
+                        refThis.removeClass("HdrDisabled"); // riattiva il bottone dopo il submit
+
+                        // richiama la funzione per abilitare il drag&drop sul nuovo item
+                        $(".hours").draggable({
+                                cursor: "move",
+                                appendTo: "body",
+                                helper: "clone",
+                                revert: "invalid",
+                                start: function (e, ui) {
+                                    $(ui.helper).addClass("ui-draggable-helper");
+                                        }
+                        });
+
+                        }
+                        else
+                            alert(Risultato);
+                    },
+
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(xhr.responseText);
+                    }
+
+                }); // ajax
+
+    }); //TICKETREST
+
+
+    // cursore in attesa durante chiamata ajax
+    $(document).ajaxStart(function ()
+    {
+    $('body').addClass('ajaxLoading');
+
+    }).ajaxComplete(function () {
+
+    $('body').removeClass('ajaxLoading');
+
+    });
+
+    $(document).ready(function () {
+
+        // drag & drop
+        // draggable attaccato alla classe Hours è l'elemento che si muove
+        $(".hours").draggable({
+            cursor: "move",
+            appendTo: "body",
+            helper: "clone",
+            revert: "invalid",
+            start: function (e, ui) {
+                $(ui.helper).addClass("ui-draggable-helper");
+            }
+        });
+
+        // droppable è l'elemento che riceve
+        $(".noWorkDays, .WorkDays").droppable({
+            hoverClass: "noWorkDaysHover",
+            drop: function (event, ui) {
+
+                var strTooltip = "";
+                var values = "{'sId': '" + ui.draggable.attr("id") + "' , " +
+                             " 'sInsDate': '" + $(this).attr("title") + "'   } ";
+                var refThis = $(this);
+                var sSessione = "<%= Session["type"]  %>";
+
+                // chiama Ajax per creare il nuovo record
+                $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/ProcessDragDrop",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d != "") { // msg.d[0] = testo da stampare, msg.d[1] = id dell'ora
+
+                        var itemDate = refThis.attr("title").substr(6, 4) + refThis.attr("title").substr(3, 2) + refThis.attr("title").substr(0, 2); // formato yyyymmdd
+                        var idItem = "#TDitm" + itemDate ;    //id dell'elemento td che contiene gli item
+
+                        // visualizza la stringa con il ticket creato
+                            if ($(idItem).html() == "&nbsp;")
+                                $(idItem).html("");
+
+                            var htmlString = $(idItem).html() + "<div class=TRitem id=TRitm" + msg.d[1] + ">";
+
+                            if (sSessione == "hours")
+                                htmlString = htmlString + "<a id=" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-ore.aspx?action=fetch&hours_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+                            else            
+                                htmlString = htmlString + "<a id=" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-spese.aspx?action=fetch&expenses_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+
+                        htmlString = htmlString + "<a href=# onclick='CancellaId(" + msg.d[1] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
+                        htmlString = htmlString + "</div>";
+                        $(idItem).html(htmlString);
+
+                        // in caso di ticket spegne l'icona della valigia e disattiva il dragp&drop
+                        var idIcon = "#hdrIcon" + itemDate; 
+                        $("#hdr" + itemDate).removeClass("ui-droppable");
+                        $(idIcon).hide();
+
+                        // richiama la funzione per abilitare il drag&drop sul nuovo item
+                        $(".hours").draggable({
+                                cursor: "move",
+                                appendTo: "body",
+                                helper: "clone",
+                                revert: "invalid",
+                                start: function (e, ui) {
+                                    $(ui.helper).addClass("ui-draggable-helper");
+                                        }
+                        });
+
+                        }
+                    else
+                        alert("Errore: dato non inserito");
+                    },
+
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(xhr.responseText);
+                    }
+
+                }); // ajax
+
+            }
+        });
+
+        // tooltip : hideDelay default 500, riduce tempo prima che sia nascosto il tooltip
+        $('.hours').smallipop({
+            hideDelay: 100,
+            theme: 'blue',
+            popupDelay: 500
+        });
+
+        //select all the a tag with name equal to modal
+        $('a[name=modal]').click(function (e) {
+            //Cancel the link behavior
+            e.preventDefault();
+
+            //Get the A tag
+            var id = $(this).attr('href');
+
+            var aData = $(this).attr('title').split(";");
+
+            // setta il valore del campo Hidden con la data cliccata 
+            $("#refDate").val(aData[0]);
+
+            // setta il progetto come default
+            $("#DDLProgetto").val(aData[1]);
+
+            //Get the screen height and width
+            var maskHeight = $(document).height();
+            var maskWidth = $(window).width();
+
+            //Set heigth and width to mask to fill up the whole screen
+            $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+
+            //transition effect		
+            $('#mask').fadeIn(200);
+            $('#mask').fadeTo("fast", 0.8);
+
+            //Get the window height and width
+            var winH = $(window).height();
+            var winW = $(window).width();
+
+            //Set the popup window to center
+            $(id).css('top', winH / 2 - $(id).height() / 2);
+            $(id).css('left', winW / 2 - $(id).width() / 2);
+
+            //transition effect
+            $(id).fadeIn(200);
+
+        });
+
+        //if close button is clicked
+        $('.window .close').click(function (e) {
+            //Cancel the link behavior
+            e.preventDefault();
+
+            $('#mask').hide();
+            $('.window').hide();
+        });
+
+        //if mask is clicked
+        $('#mask').click(function () {
+            $(this).hide();
+            $('.window').hide();
+        });
+
+        $(window).resize(function () {
+
+            var box = $('#boxes .window');
+
+            //Get the screen height and width
+            var maskHeight = $(document).height();
+            var maskWidth = $(window).width();
+
+            //Set height and width to mask to fill up the whole screen
+            $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+
+            //Get the window height and width
+            var winH = $(window).height();
+            var winW = $(window).width();
+
+            //Set the popup window to center
+            box.css('top', winH / 2 - box.height() / 2);
+            box.css('left', winW / 2 - box.width() / 2);
+
+        });
+
+    });
+
+    </script>
 
 </body>
 

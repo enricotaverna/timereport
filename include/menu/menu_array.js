@@ -164,7 +164,8 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	else
 		addmenu(menu=["Report",
 		,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese", "/timereport/esporta.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese", "/timereport/esporta.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Attività", "/timereport//report/attivita/ReportAttivita-select.aspx", , , 1
 		, "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
 		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
 		])	
@@ -247,27 +248,27 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 
 	addmenu(menu=["Persone",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
-//	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Crea Profili Spese", "/timereport/lookup_list.asp?TableName=ExpensesProfile&SortField=Name&FieldNumber=1&CheckTable=ForcedExpensesProf&init=true",,,1	
-//	,"<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Associa spese a profili", "/timereport/m_gestione/selection-profilo.asp",,,1	
 	,"<img src=/timereport/images/icons/16x16/persone.gif border=0>&nbsp;Persone", "/timereport/m_gestione/Persone/persons_lookup_list.aspx",,,1
-	,"<img src=/timereport/images/icons/16x16/lock.gif border=0>&nbsp;Forza progetti e spese", "/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx",,,1
+    , "<img src=/timereport/images/icons/16x16/lock.gif border=0>&nbsp;Forza progetti e spese", "/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Calendari", "/timereport/m_gestione/Calendario/Calendario_list.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_B_ACTY.gif  border=0>&nbsp;Genera Festivi", "/timereport/m_gestione/Calendario/GeneraFestivi-select.aspx", , , 1
 	])
 
 	addmenu(menu=["Tabelle",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Autorizzazioni", "/timereport/m_gestione/AuthPermission/AuthPermission.aspx", , , 1
-	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Contratto", "/timereport/lookup_list.asp?TableName=TipoContratto&SortField=Descrizione&FieldNumber=1&init=true", , , 1
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Metodo di Pagamento", "/timereport/lookup_list.asp?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=1&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.asp?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=1&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Spese", "/timereport/lookup_list.asp?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true",,,1
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Giorni non lavorativi", "/timereport/lookup_list.asp?TableName=Holiday&SortField=Holiday_date&FieldNumber=1&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Società", "/timereport/lookup_list.asp?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons_Projects&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Ruoli", "/timereport/lookup_list.asp?TableName=Roles&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo progetti", "/timereport/lookup_list.asp?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo ore", "/timereport/lookup_list.asp?TableName=HourType&SortField=HourTypeCode&FieldNumber=2&CheckTable=Hours&init=true",,,1
-	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Canali", "/timereport/lookup_list.asp?TableName=Channels&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true", , , 1
+        , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Contratto", "/timereport/lookup_list.aspx?TableName=TipoContratto&CheckTable=Projects&SortField=Descrizione&FieldNumber=1&init=true", , , 1
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Metodo di Pagamento", "/timereport/lookup_list.aspx?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=2&init=true",,,1	
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.aspx?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=2&init=true",,,1	
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Spese", "/timereport/lookup_list.aspx?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true",,,1
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Giorni non lavorativi", "/timereport/lookup_list.aspx?TableName=Holiday&SortField=Holiday_date&FieldNumber=1&init=true",,,1	
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Società", "/timereport/lookup_list.aspx?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons_Projects&init=true",,,1	
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Ruoli", "/timereport/lookup_list.aspx?TableName=Roles&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo progetti", "/timereport/lookup_list.aspx?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true",,,1	
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo ore", "/timereport/lookup_list.aspx?TableName=HourType&SortField=HourTypeCode&FieldNumber=2&CheckTable=Hours&init=true",,,1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Canali", "/timereport/lookup_list.aspx?TableName=Channels&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true", , , 1
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Messaggi", "/timereport/m_gestione/messaggi/messaggi_lookup_list.aspx", , , 1
-	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Bonus", "/timereport/lookup_list.asp?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true", , , 1
+	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Bonus", "/timereport/lookup_list.aspx?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true", , , 1
 ])
 
 

@@ -15,12 +15,6 @@ public partial class Esporta : System.Web.UI.Page
             ASPcompatility.SelectYears(ref DDLToYear);
             ASPcompatility.SelectMonths(ref DDLFromMonth, Session["lingua"].ToString());
             ASPcompatility.SelectMonths(ref DDLToMonth, Session["lingua"].ToString());
-        
-            //if (Session["debug"].ToString() == "11") {
-            //    string sWhereClause = sWhereClause = Build_where();
-            //    Response.Write(sWhereClause);
-            //}
-
         }
     }
 
@@ -46,23 +40,11 @@ public partial class Esporta : System.Web.UI.Page
         bool bProgettiSelezionati = !string.IsNullOrEmpty(sListaProgettiSel) ;
         bool bPersoneSelezionate = !string.IsNullOrEmpty(sListaPersoneSel);
 
-        //// se progetti selezionati imposta la where sui codici della listbox
-        //if (bProgettiSelezionati)
-        //    sWhereClause = "ProjectCode IN (" + sListaProgettiSel + " )";
-        //else // se nessun progetto selezionato e non ho le autorizzazioni limito i progetti a quelli che posso vedere
-        //    if ( !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-        //            sWhereClause = "ProjectCode IN (" + sListaProgettiAll + " )";
-
-        //if (!string.IsNullOrEmpty(Utilities.ListSelections(CBLPersone)))
-        //    sWhereClause = Addclause(sWhereClause, "Persons_id IN (" + Utilities.ListSelections(CBLPersone) + " )");
-        //else if (!Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
-        //    sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"].ToString());
-
         // *** ADMIN
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
             if (bProgettiSelezionati) // sono stati selezionati dei progetti
-                sWhereClause = "ProjectCode IN (" + sListaProgettiSel + " )";
+                sWhereClause = "Projects_id IN (" + sListaProgettiSel + " )";
 
             if (bPersoneSelezionate)
                 sWhereClause = "Persons_id IN (" + sListaPersoneSel + " )";
@@ -75,7 +57,7 @@ public partial class Esporta : System.Web.UI.Page
         {
 
         // solo sue ore e spese su progetti abilitati
-        sWhereClause = "ProjectCode IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
+        sWhereClause = "Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
         sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"]);
 
         } // *** CONSULENTE / ESTERNO
@@ -90,27 +72,27 @@ public partial class Esporta : System.Web.UI.Page
 
             if (bPersoneSelezionate)
                 sWhereClause = 
-                    " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + 
-                    "   AND ProjectCode IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
+                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     "   AND Persons_id IN (" + sListaPersoneSel + ")" +
                     " ) OR " +
                     " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + 
-                    "   AND ProjectCode IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     "   AND Persons_id = " + Session["persons_id"] +
                     " ) ) ";
             else
                 sWhereClause = 
-                    " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + 
-                    "   AND ProjectCode IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
+                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     " ) OR " +
-                    " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + 
-                    "   AND ProjectCode IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
+                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     "   AND Persons_id = " + Session["persons_id"] +
                     " ) ) ";
 
         } // *** MANAGER / TEAM LEADER
 
-        if (mieore.Checked)
+        if (CBmieore.Checked)
             sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"]);
 
         if (DDLClienti.SelectedValue != "")
@@ -125,7 +107,10 @@ public partial class Esporta : System.Web.UI.Page
         if (!string.IsNullOrEmpty(sWhereClause))
             sWhereClause = sWhereClause + " AND ";
 
-        sWhereClause = sWhereClause + " date >= " + ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(DDLFromMonth.SelectedValue), Convert.ToInt16(DDLFromYear.SelectedValue))) + " AND date <= " + ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)));
+        string fd = ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(DDLFromMonth.SelectedValue), Convert.ToInt16(DDLFromYear.SelectedValue)));
+        string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)) +"/" + DDLToMonth.SelectedValue + "/" + DDLToYear.SelectedValue);                     
+
+        sWhereClause = sWhereClause + " date >= " + fd + " AND date <= " + ld ;
 
         return sWhereClause;
 
@@ -138,10 +123,6 @@ public partial class Esporta : System.Web.UI.Page
 
         sWhereClause = Build_where();
 
-        //Response.Write(sWhereClause);
-
-        //Response.End();
-  
         if (Request.Params["download"] != null)
         {
             switch (RBTipoReport.SelectedIndex)
@@ -155,7 +136,7 @@ public partial class Esporta : System.Web.UI.Page
                 case 1:
                 case 3:
                 case 5:
-                    ScaricaSpese("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
+                    Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
                     break;
             }
 
@@ -187,32 +168,32 @@ public partial class Esporta : System.Web.UI.Page
         }
     }
 
-    // Carica Dataset, verifica presenza giustificativi, scarica excel
-    protected void ScaricaSpese(string sqlCommand)
-    {
+    //// Carica Dataset, verifica presenza giustificativi, scarica excel
+    //protected void ScaricaSpese(string sqlCommand)
+    //{
 
-        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+    //    SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
-        using (conn)
-        {
-            /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
-            SqlDataAdapter da = new SqlDataAdapter(sqlCommand, conn);
-            SqlCommandBuilder builder = new SqlCommandBuilder(da);
+    //    using (conn)
+    //    {
+    //        /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
+    //        SqlDataAdapter da = new SqlDataAdapter(sqlCommand, conn);
+    //        SqlCommandBuilder builder = new SqlCommandBuilder(da);
 
-            DataSet ds = new DataSet("export");
-            da.Fill(ds, "export");
+    //        DataSet ds = new DataSet("export");
+    //        da.Fill(ds, "export");
 
-            int iUltimaColonna = ds.Tables["export"].Columns.Count - 1;
+    //        int iUltimaColonna = ds.Tables["export"].Columns.Count - 1;
 
-            // Verifica per ogni dato estratto se ci sono giustificativi
-            foreach (DataRow row in ds.Tables["export"].Rows)
-                row[iUltimaColonna] = "PROVA";
+    //        // Verifica per ogni dato estratto se ci sono giustificativi
+    //        foreach (DataRow row in ds.Tables["export"].Rows)
+    //            row[iUltimaColonna] = "PROVA";
 
-            // scarica il dataset in formato XLS
-            Utilities.EsportaDataSetExcel(ds);
-        }
+    //        // scarica il dataset in formato XLS
+    //        Utilities.EsportaDataSetExcel(ds);
+    //    }
 
-    }
+    //}
 
     // Carica DDL persone
     protected void CBLPersone_Load(object sender, System.EventArgs e)
@@ -222,15 +203,17 @@ public partial class Esporta : System.Web.UI.Page
         // Emplyee, Esterno: solo se stessi
         // Il reporter può essere unemployee
 
+         
+
         if (Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
             DSPersone.SelectCommand = "SELECT [Persons_id], [Name] FROM [Persons] " + (CBPersoneDisattive.Checked == false ? " WHERE Active = 1 " : "") + " ORDER BY [Name]";
         else
         {
             DSPersone.SelectCommand = "SELECT [Persons_id], [Name] FROM [Persons] WHERE Persons_id = " + Session["persons_id"] + " ORDER BY [Name]";
-            //CBLPersone.Visible = false;
+            CBLPersone.Visible = false;
             CBPersoneDisattive.Visible = false;
-            DivPersone.Visible = false;
-            DivProgetti.Visible = false;
+            //DivPersone.Visible = false;
+            //DivProgetti.Visible = false;
         }
 
     }
@@ -240,10 +223,10 @@ public partial class Esporta : System.Web.UI.Page
     {
 
         if ( Auth.ReturnPermission("REPORT","PROJECT_ALL") )
-            DSProgetti.SelectCommand = "SELECT ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " + (CBProgettiDisattivi.Checked == false ? " WHERE Active = 1 " : "") + " ORDER BY ProjectCode";
+            DSProgetti.SelectCommand = "SELECT Projects_id, ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " + (CBProgettiDisattivi.Checked == false ? " WHERE Active = 1 " : "") + " ORDER BY ProjectCode";
 
         if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL") )
-            DSProgetti.SelectCommand = "SELECT DISTINCT a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a" +
+            DSProgetti.SelectCommand = "SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a" +
                                        " INNER JOIN ForcedAccounts as b ON a.Projects_id = b.Projects_id " +
                                        " WHERE b.persons_id = " + Session["persons_id"] +
                                        (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") + " ORDER BY ProjectCode";

@@ -19,71 +19,70 @@
 
     <div id="MainWindow">
 
-    <div id="FormWrap"  >
+    <div id="FormWrap" class="StandardForm" >
  
-    <form id="form1" runat="server"  class="StandardForm">    
-   
-    
-    <div class="formtitle" >Report</div>                  
+    <form id="form1" runat="server"  >     
+      
+    <div  class="formtitle">Report</div>              
 
     <div class="input nobottomborder">
           <div class="inputtext">Progetto</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLProgetti" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" 
                    onselectedindexchanged="DDLProgetti_SelectedIndexChanged" >            
                         <asp:ListItem  Value="" Text="Selezionare un valore"/>
                     </asp:DropDownList>
-          </div>
+          </label>
     </div>  
 
     <div class="input nobottomborder">
           <div class="inputtext">Fasi</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLFasi" runat="server"  
                    AppendDataBoundItems="True" AutoPostBack="True" 
                    onselectedindexchanged="DDLFasi_SelectedIndexChanged"  >
                         <asp:ListItem  Value="" Text="Selezionare un valore"/>  
                     </asp:DropDownList>
-          </div>
+          </label>
     </div> 
 
      <div class="input ">
           <div class="inputtext">Attività</div>   
-          <div class="InputcontentDDL">
+          <label class="dropdown">
                <asp:DropDownList ID="DDLAttivita" runat="server"  
                         AppendDataBoundItems="True" AutoPostBack="True"  >
                     <asp:ListItem  Value="" Text="Selezionare un valore"/>                            
                     </asp:DropDownList>
-          </div>
+          </label>
     </div> 
 
     <!-- *** Valore & storno***  -->
     <div class="input nobottomborder">
         <div class="inputtext">Dalla data</div>
-        <div class="InputcontentDDL" style="float:left;width:150px"><asp:DropDownList runat="server" id="DDLFromMonth"> </asp:DropDownList></div>
+        <label class="dropdown" >
+            <asp:DropDownList style="width:150px" runat="server" id="DDLFromMonth"> </asp:DropDownList>
+        </label>
                   
-        <span class="InputcontentDDL" style="position:relative;left:30px;float:left;width:100px">
-            <asp:DropDownList  runat="server" id="DDLFromYear"></asp:DropDownList>          
-        </span>
+        <label class="dropdown" >
+            <asp:DropDownList style="width:100px" runat="server" id="DDLFromYear"></asp:DropDownList>          
+        </label>
     </div>  
 
     <div class="input">
         <div class="inputtext">Alla data</div>
-        <div class="InputcontentDDL" style="float:left;width:150px"><asp:DropDownList  runat="server" ID="DDLToMonth"></asp:DropDownList></div>      
-        <span class="InputcontentDDL" style="position:relative;left:30px;float:left;width:100px">
-            <asp:DropDownList   runat="server" ID="DDLToYear"> </asp:DropDownList>         
-        </span>
+        <label class="dropdown" ><asp:DropDownList style="width:150px" runat="server" ID="DDLToMonth"></asp:DropDownList></label>      
+        <label class="dropdown" >
+            <asp:DropDownList style="width:100px" runat="server" ID="DDLToYear"> </asp:DropDownList>         
+        </label>
     </div>  
 
     <div class="input nobottomborder">
          <div class="inputtext">Estrazione</div>
-         <div class="Inputcontent">
                     <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" >
                         <asp:ListItem Selected="True" Value="1">Totali attività</asp:ListItem>
                         <asp:ListItem Value="2">Dettaglio Persone</asp:ListItem>
                     </asp:RadioButtonList>
-    </div>     
     </div>
                             
     <div class="buttons">        
@@ -92,10 +91,10 @@
             <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
  
     </div>
-    
-    </div> <%-- END FormWrap  --%> 
 
     </form>
+    
+    </div> <%-- END FormWrap  --%> 
 
     </div> <!-- END MainWindow -->
     

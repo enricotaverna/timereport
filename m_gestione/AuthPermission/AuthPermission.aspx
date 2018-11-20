@@ -11,11 +11,11 @@
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<%--<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>--%>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<%--<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>--%>
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script src="../../include/jquery/sumoselect/jquery.sumoselect.js"></script> 
 
 <!-- INCLUDE JS TIMEREPORT   -->

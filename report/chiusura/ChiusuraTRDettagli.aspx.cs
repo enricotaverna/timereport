@@ -44,7 +44,6 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
             }
         }
     
-
         if (Request.QueryString["type"] == "02") // check spese 
         {
             CheckChiusura.CheckSpese(Session["Month"].ToString(),
@@ -76,7 +75,6 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
             }
 
         }
-
 
         GV_anomalie.DataSource = dt;
         GV_anomalie.DataBind();

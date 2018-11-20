@@ -3,17 +3,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!-- Jquery   -->
       
  <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>    
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.js"></script>  
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 <script src="/timereport/include/javascript/timereport.js"></script>
 
 <script>
     $(function () {
-
-        // validation summary su validator custom
-        displayAlert();
 
         $("#SchedaCostRate_TBDataDa").datepicker($.datepicker.regional['it']);
 
@@ -50,22 +47,22 @@
                <!-- *** PERSONA ***  --> 
                 <div class="input nobottomborder">                        
 	                <div class="inputtext">Persona:</div>  
-                        <div class="InputcontentDDL" style="width:245px" >
+                        <label class="dropdown" style="width:245px" >
                             <asp:DropDownList ID="DDLPersona" runat="server" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id" SelectedValue='<%# Bind("Persons_id") %>' AppendDataBoundItems="True">
                             <asp:ListItem Value="">-- seleziona persona --</asp:ListItem>
                             </asp:DropDownList>
-                        </div>
+                        </label>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator5" Display="none" runat="server" ErrorMessage="Inserisci il codice persona" ControlToValidate="DDLPersona"></asp:RequiredFieldValidator>
                 </div>    
 
                 <!-- *** PROGETTO ***  -->
 	            <div class="input nobottomborder">                        
 	                <div class="inputtext">Progetto:</div>  
-                        <div class="InputcontentDDL" style="width:245px" >
+                        <label class="dropdown" style="width:245px" >
                             <asp:DropDownList ID="DDLProgetto" runat="server" DataSourceID="DSProgetti" DataTextField="NomeProgetto" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True">
                             <asp:ListItem Value="">-- seleziona progetto --</asp:ListItem>
                             </asp:DropDownList>
-                        </div>
+                        </label>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" Display="none" runat="server" ErrorMessage="Inserisci il codice progetto" ControlToValidate="DDLProgetto"></asp:RequiredFieldValidator>
                 </div>   
 
@@ -92,19 +89,19 @@
                <!-- *** PERSONA ***  --> 
                 <div class="input nobottomborder">                        
 	                <div class="inputtext">Persona:</div>  
-                        <div class="InputcontentDDL" style="width:245px" >
+                        <label class="dropdown" style="width:245px" >
                             <asp:DropDownList ID="Persons_id" runat="server" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id" SelectedValue='<%# Bind("Persons_id") %>' AppendDataBoundItems="True" Enabled="False">
                             </asp:DropDownList>
-                        </div>
+                        </label>
                 </div>    
 
                 <!-- *** PROGETTO ***  -->
 	            <div class="input nobottomborder">                        
 	                <div class="inputtext">Progetto:</div>  
-                        <div class="InputcontentDDL" style="width:245px" >
+                        <label class="dropdown" style="width:245px" >
                             <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProgetti" DataTextField="NomeProgetto" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True" Enabled="False">
                             </asp:DropDownList>
-                        </div>
+                        </label>
                 </div>   
 
                <!-- *** Cost Rate ***  --> 

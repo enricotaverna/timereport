@@ -11,9 +11,9 @@
 <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
 
 <!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.css" />
-<script src="/timereport/mobile/js/jquery-1.6.4.js"></script>
-<script src="/timereport/include/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <SCRIPT language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></SCRIPT>

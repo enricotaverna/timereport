@@ -58,7 +58,7 @@ function popi(v1,lyr,el)
 		o_img=timo.src;
 		ima=o_img.split(".");
 		enD=ima.length;
-		if(ima[enD-2].indexOf("_over")==-1)ima[enD-2]=ima[enD-2]+"_over";
+		if(ima[enD-2].indexOf("_over")==-1)ima[enD-2]=ima[enD-2]+"";
 		nsrc="";
 		for(eD=0;eD<enD;eD++){nsrc=nsrc+ima[eD]+"."}
 		nsrc=nsrc.substring(0,nsrc.length-1);

@@ -10,32 +10,6 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 
     }
 
-    protected void ValidaOldPwd(object source, ServerValidateEventArgs args)
-    {
-            if ( !Database.RecordEsiste("SELECT * FROM Persons WHERE Persons_id = " + Session["persons_id"] + " AND password='" + TBOldPwd.Text +"'"))
-            args.IsValid = false;
-        else
-            args.IsValid = true;
-    }
-
-    protected void ValidaNewPwd(object source, ServerValidateEventArgs args)
-    {
-        args.IsValid = true;
-
-        if ( TBNewPwd1.Text != TBNewPwd2.Text)
-        {
-            CV_NewPwd.ErrorMessage = GetLocalResourceObject("ErroreMatch").ToString();
-            args.IsValid = false;
-        }
-
-        if (TBNewPwd1.Text.Length < 4 )
-        {
-            CV_NewPwd.ErrorMessage = GetLocalResourceObject("Errorelunghezza").ToString();
-            args.IsValid = false;
-        }
-
-    }
-
     protected void InsertButton_Click(object sender, EventArgs e)
     {
         if (Page.IsValid)

@@ -567,4 +567,10 @@
   <data name="inserimento_spese" xml:space="preserve">
     <value>Inserimento spese</value>
   </data>
+  <data name="messaggioAltriProgetti" xml:space="preserve">
+    <value>Su questo giorno è stata caricata una commessa differente per le ore</value>
+  </data>
+  <data name="messaggioNonEsisteProgetto" xml:space="preserve">
+    <value>Su questo giorno non sono state caricate commesse</value>
+  </data>
 </root>
