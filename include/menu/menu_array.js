@@ -168,7 +168,8 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
         , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Attività", "/timereport//report/attivita/ReportAttivita-select.aspx", , , 1
 		, "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
 		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
-		])	
+        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Ore Per Mese", "/timereport/report/Rdl/OrePerMese.aspx", , , 1
+        ])	
 
 	if (sUserLevel == AUTH_EXTERNAL)
 		addmenu(menu=["Inserisci",
@@ -262,7 +263,7 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
     , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.aspx?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=2&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Spese", "/timereport/lookup_list.aspx?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true",,,1
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Giorni non lavorativi", "/timereport/lookup_list.aspx?TableName=Holiday&SortField=Holiday_date&FieldNumber=1&init=true",,,1	
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Società", "/timereport/lookup_list.aspx?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons_Projects&init=true",,,1	
+	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Società", "/timereport/lookup_list.aspx?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Ruoli", "/timereport/lookup_list.aspx?TableName=Roles&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo progetti", "/timereport/lookup_list.aspx?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo ore", "/timereport/lookup_list.aspx?TableName=HourType&SortField=HourTypeCode&FieldNumber=2&CheckTable=Hours&init=true",,,1

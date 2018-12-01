@@ -92,7 +92,7 @@
                             <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
                             <span class="input2col">
                                 <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-required="true" />
+                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
                             </span>
 
                             <!-- *** Checkboc Storno ***  -->
@@ -170,7 +170,7 @@
                             <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
                             <span class="input2col">
                                 <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-required="true" />
+                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
                             </span>
 
                             <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />

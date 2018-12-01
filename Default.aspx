@@ -1,4 +1,4 @@
-﻿<%@      Language="C#" AutoEventWireup="true" CodeFile="default.aspx.cs" Inherits="defaultAspx" %>
+﻿<%@ Language="C#" AutoEventWireup="true" CodeFile="default.aspx.cs" Inherits="defaultAspx" %>
  
 <!DOCTYPE html>
 

@@ -42,13 +42,29 @@
     <div class="formtitle" >Genera Record Festivi</div>                  
 
     <!--  *** PERSONE *** -->     
-         <div class="input nobottomborder ">
+    <div class="input nobottomborder ">
     <span style="position:absolute"> 
 
           <div class="inputtext"  >Persone</div>   
 
           <span> 
           <asp:Listbox class="select2-auth" ID="LBPersone" data-parsley-required="true" data-parsley-errors-container="#valMsg" SelectionMode="Multiple" multiple="multiple"  runat="server" AppendDataBoundItems="True" DataSourceID="DS_Persone" DataTextField="Name" DataValueField="Persons_id" OnDataBound="LBPersone_DataBinding"   >        
+          </asp:Listbox></span>
+
+    </span>  
+    </div>
+
+    <!-- *** spazio bianco nel form ***  -->
+    <p style="margin-bottom: 50px;"></p>
+    
+        <!--  *** LIVELLO  *** -->     
+    <div class="input nobottomborder ">
+    <span style="position:absolute"> 
+
+          <div class="inputtext">Tipo utente</div>   
+
+          <span> 
+          <asp:Listbox class="select2-auth" ID="LBLivello" data-parsley-required="true" data-parsley-errors-container="#valMsg" SelectionMode="Multiple" multiple="multiple"  runat="server" AppendDataBoundItems="True" DataSourceID="DSLivello" DataTextField="Name" DataValueField="UserLevel_id" OnDataBound="LBLivello_DataBinding"   >        
           </asp:Listbox></span>
 
     </span>  </div>
@@ -103,6 +119,10 @@
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>
+    </asp:SqlDataSource>
+
+    <asp:SqlDataSource ID="DSLivello" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
+        SelectCommand="SELECT UserLevel_id, Name FROM AuthUserLevel ORDER BY UserLevel_id" >        
     </asp:SqlDataSource>
 
 <script type="text/javascript">

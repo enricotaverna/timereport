@@ -197,9 +197,10 @@
                         <asp:Literal runat="server" Text="<%$ Resources:estrazione%>" /></div>
                     <div class="Inputcontent">
                         <asp:RadioButtonList ID="RBTipoReport" runat="server" meta:resourcekey="RBTipoReportResource1">
-                            <%--                        <asp:ListItem Selected="True" Value="1" meta:resourcekey="ListItemResource4">Dettaglio ore</asp:ListItem>
-                            <asp:ListItem Value="2" meta:resourcekey="ListItemResource5">Dettaglio Spese</asp:ListItem>
                             <asp:ListItem Value="3" meta:resourcekey="ListItemResource6">Totali ore</asp:ListItem>
+                            <%--
+                            <asp:ListItem Selected="True" Value="1" meta:resourcekey="ListItemResource4">Dettaglio ore</asp:ListItem>
+                            <asp:ListItem Value="2" meta:resourcekey="ListItemResource5">Dettaglio Spese</asp:ListItem>
                             <asp:ListItem Value="4" meta:resourcekey="ListItemResource7">Totali Spese</asp:ListItem>--%>
                             <asp:ListItem Value="5" meta:resourcekey="ListItemResource8" Selected="True">Ore</asp:ListItem>
                             <asp:ListItem Value="6" meta:resourcekey="ListItemResource9">Spese</asp:ListItem>
@@ -208,7 +209,7 @@
                 </div>
 
                 <div class="buttons">
-                    <%--                    <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="sottomettiResource1" />--%>
+                    <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="sottomettiResource1" />
                     <asp:Button ID="download" runat="server" Text="<%$ Resources:timereport, EXPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="downloadResource1" />
                 </div>
 

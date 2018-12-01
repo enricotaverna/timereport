@@ -125,17 +125,17 @@ public partial class Esporta : System.Web.UI.Page
 
         if (Request.Params["download"] != null)
         {
-            switch (RBTipoReport.SelectedIndex)
+            switch (RBTipoReport.SelectedValue)
             {
 
-                case 0:
-                case 2:
-                case 4:
+                case "0":
+                case "2":
+                case "4":
                     Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
                     break;
-                case 1:
-                case 3:
-                case 5:
+                case "1":
+                case "3":
+                case "5":
                     Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
                     break;
             }
@@ -143,25 +143,25 @@ public partial class Esporta : System.Web.UI.Page
         }
         else
         {
-            switch (RBTipoReport.SelectedIndex)
+            switch (RBTipoReport.SelectedValue)
             {
 
-                case 0:
+                case "0":
                     Response.Redirect("/timereport/report/generated/EstraiOresmry.asp?reset=1&whereclause=" + sWhereClause);
                     break;
-                case 1:
+                case "1":
                     Response.Redirect("/timereport/report/generated/EstraiSpesesmry.asp?reset=1&whereclause=" + sWhereClause);
                     break;
-                case 2:
+                case "2":
                     Response.Redirect("/timereport/report/generated/TotaliOresmry.asp?reset=1&whereclause=" + sWhereClause);
                     break;
-                case 3:
-                    Response.Redirect("/timereport/report/generated/TotaliSpesesmry.asp?reset=1&whereclause=" + sWhereClause);
+                case "3":
+                    Response.Redirect("/timereport/report/rdlc/OrePerMese.aspx?whereclause=" + sWhereClause);
                     break;
-                case 4:
+                case "4":
                     Response.Redirect("/timereport/report/generated/CrossGiorniMesectb.asp?reset=1&whereclause=" + sWhereClause);
                     break;
-                case 5:
+                case "5":
                     Response.Redirect("/timereport/report/generated/CrossSpeseMesectb.asp?reset=1&whereclause=" + sWhereClause);
                     break;
             }

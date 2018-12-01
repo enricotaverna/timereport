@@ -131,9 +131,9 @@
 	
 	<div id="MainWindow">
 
-	<div id="FormWrap"> 
+	<div id="FormWrap" class="StandardForm"> 
 	
-<form name="form1" runat="server" method="post" action="lookup_detail.aspx" class="StandardForm">
+<form name="form1" runat="server" method="post" action="lookup_detail.aspx" >
 
 		<!-- *** TITOLO FORM ***  --> 
 		<div class="formtitle">Edit Tabella</div> 

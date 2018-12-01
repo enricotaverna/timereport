@@ -29,9 +29,9 @@
 
     <div id="MainWindow">
 
-    <div id="FormWrap">
+    <div id="FormWrap" class="standardform" >
 
-    <form id="FVMain" runat="server" class="standardform" >
+    <form id="FVMain" runat="server" >
 
         <div class="formtitle"><asp:Literal runat="server" Text="<%$ Resources:titolo%>" /> </div> 
 

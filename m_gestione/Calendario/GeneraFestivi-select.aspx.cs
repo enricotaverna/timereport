@@ -18,11 +18,38 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
         Auth.CheckPermission("CONFIG", "TABLE");
 
         // Popola Drop Down con lista progetti
-        if (!IsPostBack) {
+        if (!IsPostBack)
+        {
             // Popola dropdown con i valori          
             Bind_DDLMesi();
             Bind_DDLAnni();
         }
+        else
+        {
+            // salva default di selezione
+            SaveSelections();
+        }
+    }
+
+    protected void SaveSelections()
+    {
+        List<string> lsValoriSelezionati = new List<string>();
+        List<string> lsLivelliSelezionati = new List<string>();
+
+        lsValoriSelezionati.Clear();
+        foreach (ListItem i in LBPersone.Items) {
+            if (i.Selected)
+                lsValoriSelezionati.Add(i.Value.ToString());
+        }
+        Session["ValoriSelezionati"] = lsValoriSelezionati;
+
+        lsLivelliSelezionati.Clear();
+        foreach (ListItem i in LBLivello.Items)
+        {
+            if (i.Selected)
+                lsLivelliSelezionati.Add(i.Value.ToString());
+        }
+        Session["LivelliSelezionati"] = lsLivelliSelezionati;
 
     }
 
@@ -37,7 +64,6 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
     {
 
         string dataA, dataDa;
-        List<string> lsValoriSelezionati = new List<string>();
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
 
         // crea dataset export per risultati della procedura
@@ -79,11 +105,27 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
             if (!itPersona.Selected)
                 continue;
 
-            lsValoriSelezionati.Add(itPersona.Value.ToString());
-
             // recupera il calendario associtato alla persona
-            DataRow drCal = Database.GetRow("SELECT calendar_id, name FROM Persons WHERE persons_id=" + ASPcompatility.FormatStringDb(itPersona.Value.ToString()) ,null);
+            DataRow drCal = Database.GetRow("SELECT calendar_id, name,userLevel_id, contractHours FROM Persons WHERE persons_id=" + ASPcompatility.FormatStringDb(itPersona.Value.ToString()), null);
             string sCal = drCal["calendar_id"].ToString();
+            string iUserLevel = drCal["userLevel_id"].ToString();
+            int iContractHours = (int)drCal["contractHours"];
+
+            bool bSkip = false;                
+            foreach ( ListItem i in LBLivello.Items)
+            {
+                    if (i.Value == iUserLevel && !i.Selected)
+                    {
+                        bSkip = true;
+                        continue;
+                    }
+            }
+
+            if (bSkip)
+                {
+                    addRecord(ds, drCal["name"] + ": non selezionato per update.", "O");
+                    continue;
+                }
 
             // carica tutte i record della persona nel periodo
             cmd = "SELECT FORMAT(date,'dd/MM/yyyy') as date FROM Hours AS a " +
@@ -119,7 +161,7 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
                                                                        ConfigurationManager.AppSettings["FESTIVI_PROJECT"]  + 
                                                                        "', '1'," + 
                                                                        ASPcompatility.FormatDateDb(drFestivo["calDay"].ToString()) + 
-                                                                       " , '8' ," +
+                                                                       " , " + ASPcompatility.FormatNumberDB(iContractHours) + " ," +
                                                                        ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " + 
                                                                        ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"),true) + ")", connection))
                                 {
@@ -138,18 +180,15 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
 
                 if (bErr)
                     addRecord(ds, drCal["name"] + ": errore in creazione dei record.", "O");
+                else if (iTot == 0)
+                    addRecord(ds, drCal["name"] + ": nessun festivo nel calendario.", "O");
                 else if (iRec == iTot)
                     addRecord(ds, drCal["name"] + ": sono stati creati " + iRec.ToString() + " record.", "G");
                 else
                     addRecord(ds, drCal["name"] + ": festivi già caricati.", "O");
 
-                } // foreach Persons
+            } // foreach Persons
             }   // using connection
-
-        if (lsValoriSelezionati.Count > 0)
-            Session["ValoriSelezionati"] = lsValoriSelezionati;
-        else
-            Session["ValoriSelezionati"] = lsValoriSelezionati;
 
         // torna il dataset completo    
         return (ds);
@@ -217,7 +256,7 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
     {
         DDLAnno.Items.Clear();
 
-        for (int i = MyConstants.First_year; i <= MyConstants.Last_year; i++)
+        for (int i = MyConstants.Last_year-1; i <= MyConstants.Last_year+1; i++)
             DDLAnno.Items.Add(new ListItem(i.ToString(), i.ToString()));
 
         // default
@@ -254,4 +293,20 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
                         LBPersone.Items[i].Selected = true;
 
     }
+    protected void LBLivello_DataBinding(object sender, EventArgs e)
+    {
+
+        int i, i2;
+        List<string> lsValoriSelezionati;
+
+        lsValoriSelezionati = (List<string>)Session["LivelliSelezionati"];
+
+        if (lsValoriSelezionati != null)
+            for (i = 0; i < LBLivello.Items.Count; i++)
+                for (i2 = 0; i2 < lsValoriSelezionati.Count; i2++)
+                    if (LBLivello.Items[i].Value == lsValoriSelezionati[i2])
+                        LBLivello.Items[i].Selected = true;
+
+    }
+
 }
