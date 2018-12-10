@@ -32,9 +32,9 @@
 
     <div id="MainWindow">
 
-    <div id="FormWrap"  >
+    <div id="FormWrap" class="StandardForm" >
  
-    <form id="FormProgetto" runat="server"  class="StandardForm">    
+    <form id="FormProgetto" runat="server"  >    
    
     
     <div class="formtitle" >Controllo Progetto</div>                  

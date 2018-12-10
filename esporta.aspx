@@ -50,7 +50,7 @@
 
     <div id="MainWindow">
 
-        <form id="form1" runat="server">
+        <form id="form1" runat="server" >
 
             <!--**** Riquadro navigazione ***-->
             <div id="PanelWrap" style="width:90%;">
@@ -183,34 +183,57 @@
                 </div>
 
                 <!-- *** flag solo mie ore ***  -->
-                <div class="input nobottomborder">
+    <%--            <div class="input nobottomborder">
                 <div class="inputtext"></div>
                 <asp:CheckBox ID="CBmieore"  runat="server" />
                 <asp:Label AssociatedControlID="CBmieore" runat="server" Text="Solo i miei consuntivi" meta:resourcekey="CBmieore"></asp:Label>
-                </div>
+                </div>--%>
 
                 <!-- *** separatore ***  -->
-                <div class="input"></div>
 
+<%--                <div class="input"></div>--%>
+
+               
                 <div class="input nobottomborder">
                     <div class="inputtext">
-                        <asp:Literal runat="server" Text="<%$ Resources:estrazione%>" /></div>
-                    <div class="Inputcontent">
-                        <asp:RadioButtonList ID="RBTipoReport" runat="server" meta:resourcekey="RBTipoReportResource1">
-                            <asp:ListItem Value="3" meta:resourcekey="ListItemResource6">Totali ore</asp:ListItem>
-                            <%--
-                            <asp:ListItem Selected="True" Value="1" meta:resourcekey="ListItemResource4">Dettaglio ore</asp:ListItem>
-                            <asp:ListItem Value="2" meta:resourcekey="ListItemResource5">Dettaglio Spese</asp:ListItem>
-                            <asp:ListItem Value="4" meta:resourcekey="ListItemResource7">Totali Spese</asp:ListItem>--%>
-                            <asp:ListItem Value="5" meta:resourcekey="ListItemResource8" Selected="True">Ore</asp:ListItem>
-                            <asp:ListItem Value="6" meta:resourcekey="ListItemResource9">Spese</asp:ListItem>
+                        <asp:Literal runat="server" /></div>
+                    
+                    <span class="Inputcontent" 
+                          style="position:relative; padding-top:15px; border: 1px solid #C7C7C7;  
+                                 border-radius: 6px; 
+                                 margin-top:10px;   
+                                 float: left; line-height:24px ">
+                        <span style="position:absolute;top:-10px;left:5px;background-color:white;font-size:10pt">
+                        &nbspExport&nbsp</span>
+
+
+                        <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1"  RepeatColumns="1" Width="220px">
+                            <asp:ListItem Value="1" Text="<%$ Resources:exportore%>"  ></asp:ListItem>
+                            <asp:ListItem Value="2" Text="<%$ Resources:exportspese%>" ></asp:ListItem>
                         </asp:RadioButtonList>
-                    </div>
+                    </span>                    
+                    <span class="Inputcontent" 
+                          style="position:relative; padding-top:15px; border: 1px solid #C7C7C7;  
+                                 border-radius: 6px; 
+                                 margin-top:10px;   
+                                 margin-left:20px;
+                                 float: left; line-height:24px ">
+                        <span style="position:absolute;top:-10px;left:5px;background-color:white;font-size:10pt">
+                        &nbspReport&nbsp</span>
+
+                        <asp:RadioButtonList ID="RBTipoReport" runat="server" meta:resourcekey="RBTipoReportResource1"  RepeatColumns="2" Width="380px" >
+                            <asp:ListItem Value="3" Text="<%$ Resources:orepermese%>" ></asp:ListItem>
+                            <asp:ListItem Value="4" Text="<%$ Resources:spesepermese%>" ></asp:ListItem>
+                            <asp:ListItem Value="5" Text="<%$ Resources:dettaglioore%>" ></asp:ListItem>
+                            <asp:ListItem Value="6" Text="<%$ Resources:dettagliospese%>" ></asp:ListItem>
+                        </asp:RadioButtonList>
+                    </span>
+
                 </div>
 
                 <div class="buttons">
-                    <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="sottomettiResource1" />
-                    <asp:Button ID="download" runat="server" Text="<%$ Resources:timereport, EXPORT_TXT%>" CssClass="orangebutton" OnClick="sottometti_Click" meta:resourcekey="downloadResource1" />
+                   <%-- <asp:Button ID="sottometti" runat="server" Text="<%$ Resources:timereport, REPORT_TXT%>" CssClass="orangebutton" OnClick="Sottometti_Click" meta:resourcekey="sottomettiResource1" CausesValidation="False" />--%>
+                    <asp:Button ID="BTexec" runat="server" Text="<%$ Resources:timereport,EXEC_TXT%>" CssClass="orangebutton" OnClick="Sottometti_Click"  CausesValidation="False" />
                 </div>
 
             </div>
@@ -230,9 +253,18 @@
             <%= Session["UserName"]  %></div>
     </div>
 
+    <!-- Mask to cover the whole screen -->
+    <div id="mask"></div>
+
     <script>
 
+        $(window).unload(function(){});
+
         $(function () {
+
+            // reset cursore e finestra modale
+            document.body.style.cursor = 'default';
+             $('#mask').css({ 'width': 0, 'height': 0 });
 
             // attiva chosen
             $(".chosen-select").chosen({ width: "310px", height: "32px" });
@@ -254,7 +286,37 @@
             });
 
             
-            $("#CBmieore").addClass('css-checkbox'); // post rendering dei checkbox in ASP.NET
+            // $("#CBmieore").addClass('css-checkbox'); // post rendering dei checkbox in ASP.NET
+
+            // cancella selezione dei radiobutton in caso sia stato selezionato l'altro gruppo
+            $("#RBTipoExport").on('change', function () {
+                $("input[name=RBTipoReport]").prop('checked', false);                
+            })
+
+            $("#RBTipoReport").on('change', function () {
+                $("input[name=RBTipoExport]").prop('checked', false);                
+            })
+
+            $("#BTexec").click(function () {
+
+                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2)
+                    return;
+
+                //Get the screen height and width
+                var maskHeight = $(document).height();
+                var maskWidth = $(window).width();
+
+                //Set heigth and width to mask to fill up the whole screen
+                $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+
+                //transition effect		
+                //$('#mask').fadeIn(200);
+                $('#mask').fadeTo("fast", 0.5);
+
+
+                document.body.style.cursor = 'wait';
+            });
+
 
         });
 

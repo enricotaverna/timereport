@@ -211,7 +211,7 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             // se l'id spesa è lo stesso stampa il riferimento (uno o +)
             if (ogg.expenses_id ==  e.Row.Cells[0].Text)
                 //e.Row.Cells[12].Text = e.Row.Cells[12].Text + "<A href=#" + ogg.shortFileName + "> link </A><br/>";
-                e.Row.Cells[12].Text = e.Row.Cells[12].Text + "<A href='" +  ogg.filename + "'><img width=12px height=12px src=/timereport/images/icons/glyphicons/glyphicons-28-search.png></A>" + "&nbsp;<A href = '" + ogg.filename + "' download = '" + Path.GetFileName(ogg.filename) + "' ><img width=12px height=12px src=/timereport/images/icons/glyphicons/glyphicons-182-download-alt.png></A><br/> ";
+                e.Row.Cells[12].Text = e.Row.Cells[12].Text + "<A href='" +  ogg.filename + "'><img width=12px height=12px src=/timereport/images/icons/other/glyphicons-28-search.png></A>" + "&nbsp;<A href = '" + ogg.filename + "' download = '" + Path.GetFileName(ogg.filename) + "' ><img width=12px height=12px src=/timereport/images/icons/glyphicons/glyphicons-182-download-alt.png></A><br/> ";
         } //  next 
 
     }

@@ -117,116 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CBLPersoneResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CBLProgettiResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="CBPersoneDisattive.Text" xml:space="preserve">
     <value>na</value>
-  </data>
-  <data name="CBPersoneDisattiveResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="CBProgettiDisattivi.Text" xml:space="preserve">
     <value>na</value>
   </data>
-  <data name="CBProgettiDisattiviResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLClientiResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLFromMonthResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLFromYearResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLManagerResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLsocietaResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLToMonthResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLToYearResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="downloadResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="ListItemResource1.Text" xml:space="preserve">
     <value>Select a value</value>
-  </data>
-  <data name="ListItemResource1.Value" xml:space="preserve">
-    <value />
   </data>
   <data name="ListItemResource2.Text" xml:space="preserve">
     <value>Select a value</value>
   </data>
-  <data name="ListItemResource2.Value" xml:space="preserve">
-    <value />
-  </data>
   <data name="ListItemResource3.Text" xml:space="preserve">
     <value>Select a value</value>
   </data>
-  <data name="ListItemResource3.Value" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ListItemResource4.Text" xml:space="preserve">
-    <value>Hours details</value>
-  </data>
-  <data name="ListItemResource4.Value" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="ListItemResource5.Text" xml:space="preserve">
+  <data name="dettagliospese" xml:space="preserve">
     <value>Expenses details</value>
   </data>
-  <data name="ListItemResource5.Value" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="ListItemResource6.Text" xml:space="preserve">
-    <value>Hours Total</value>
-  </data>
-  <data name="ListItemResource6.Value" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="ListItemResource7.Text" xml:space="preserve">
-    <value>Expenses Total</value>
-  </data>
-  <data name="ListItemResource7.Value" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="ListItemResource8.Text" xml:space="preserve">
+  <data name="orepermese" xml:space="preserve">
     <value>Hours per month</value>
   </data>
-  <data name="ListItemResource8.Value" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="ListItemResource9.Text" xml:space="preserve">
+  <data name="spesepermese" xml:space="preserve">
     <value>Expenses per month</value>
-  </data>
-  <data name="ListItemResource9.Value" xml:space="preserve">
-    <value>6</value>
   </data>
   <data name="CBmieore.Text" xml:space="preserve">
     <value>Only my data</value>
-  </data>
-  <data name="mieoreResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="PageResource1.Title" xml:space="preserve">
-    <value>Export</value>
-  </data>
-  <data name="RBTipoReportResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="sottomettiResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="cliente" xml:space="preserve">
     <value>Customer</value>
@@ -245,5 +161,17 @@
   </data>
   <data name="societa" xml:space="preserve">
     <value>Company</value>
+  </data>
+  <data name="report" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="dettaglioore" xml:space="preserve">
+    <value>Hours details</value>
+  </data>
+  <data name="exportore" xml:space="preserve">
+    <value>Hours</value>
+  </data>
+  <data name="exportspese" xml:space="preserve">
+    <value>Expenses</value>
   </data>
 </root>

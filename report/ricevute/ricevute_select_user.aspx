@@ -43,9 +43,9 @@
 
     <div id="MainWindow">
 
-    <div id="FormWrap" style="width:200px">
+    <div id="FormWrap" style="width:200px" Class="StandardForm" >
 
-    <form id="NOME_FORM" runat="server" Class="StandardForm" >
+    <form id="NOME_FORM" runat="server" >
 
         <div class="formtitle">
                     

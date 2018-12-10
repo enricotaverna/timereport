@@ -29,7 +29,7 @@
 
     <div id="MainWindow">
 
-    <div id="FormWrap" class="standardform" >
+    <div id="FormWrap" class="StandardForm" >
 
     <form id="FVMain" runat="server" >
 

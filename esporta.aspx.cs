@@ -44,10 +44,10 @@ public partial class Esporta : System.Web.UI.Page
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
             if (bProgettiSelezionati) // sono stati selezionati dei progetti
-                sWhereClause = "Projects_id IN (" + sListaProgettiSel + " )";
+                sWhereClause = Addclause(sWhereClause, "Projects_id IN (" + sListaProgettiSel + " )" );
 
             if (bPersoneSelezionate)
-                sWhereClause = "Persons_id IN (" + sListaPersoneSel + " )";
+                sWhereClause = Addclause(sWhereClause, "Persons_id IN (" + sListaPersoneSel + " )");
         } // *** ADMIN
 
         // *** CONSULENTE / ESTERNO
@@ -92,8 +92,8 @@ public partial class Esporta : System.Web.UI.Page
 
         } // *** MANAGER / TEAM LEADER
 
-        if (CBmieore.Checked)
-            sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"]);
+        //if (CBmieore.Checked)
+        //    sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"]);
 
         if (DDLClienti.SelectedValue != "")
             sWhereClause = Addclause(sWhereClause, "CodiceCliente = " + ASPcompatility.FormatStringDb(DDLClienti.SelectedValue));
@@ -117,84 +117,49 @@ public partial class Esporta : System.Web.UI.Page
     }
 
     // Lancia report
-    protected void sottometti_Click(object sender, System.EventArgs e)
+    protected void Sottometti_Click(object sender, System.EventArgs e)
     {
         string sWhereClause = "";
 
         sWhereClause = Build_where();
 
-        if (Request.Params["download"] != null)
+        switch (RBTipoExport.SelectedValue)
         {
-            switch (RBTipoReport.SelectedValue)
-            {
 
-                case "0":
-                case "2":
-                case "4":
-                    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
-                    break;
-                case "1":
-                case "3":
-                case "5":
-                    Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
-                    break;
-            }
-
+            case "1":
+                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
+                break;
+            case "2":
+                Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
+                break;
         }
-        else
-        {
-            switch (RBTipoReport.SelectedValue)
-            {
 
-                case "0":
-                    Response.Redirect("/timereport/report/generated/EstraiOresmry.asp?reset=1&whereclause=" + sWhereClause);
-                    break;
-                case "1":
-                    Response.Redirect("/timereport/report/generated/EstraiSpesesmry.asp?reset=1&whereclause=" + sWhereClause);
-                    break;
-                case "2":
-                    Response.Redirect("/timereport/report/generated/TotaliOresmry.asp?reset=1&whereclause=" + sWhereClause);
-                    break;
-                case "3":
-                    Response.Redirect("/timereport/report/rdlc/OrePerMese.aspx?whereclause=" + sWhereClause);
+        switch (RBTipoReport.SelectedValue)
+        {
+            case "3":
+                    Session["SQL"] = "SELECT nomepersona, nomeprogetto, giorni, annomese FROM v_ore WHERE " + sWhereClause;
+                    Session["ReportPath"] = "OrePerMese.rdlc";
+                    Response.Redirect("report/rdlc/ReportExecute.aspx");
                     break;
                 case "4":
-                    Response.Redirect("/timereport/report/generated/CrossGiorniMesectb.asp?reset=1&whereclause=" + sWhereClause);
+                    Session["SQL"] = "SELECT persona, nomeprogetto, DescSpesa, importo, annomese FROM v_spese WHERE " + sWhereClause;
+                    Session["ReportPath"] = "SpesePerMese.rdlc";
+                    Response.Redirect("report/rdlc/ReportExecute.aspx");
                     break;
                 case "5":
-                    Response.Redirect("/timereport/report/generated/CrossSpeseMesectb.asp?reset=1&whereclause=" + sWhereClause);
+                    Session["SQL"] = "SELECT  * FROM v_ore WHERE " + sWhereClause;
+                    Session["ReportPath"] = "DettaglioOre.rdlc";
+                    Response.Redirect("report/rdlc/ReportExecute.aspx");
                     break;
-            }
+                case "6":
+                    Session["SQL"] = "SELECT  * FROM v_spese WHERE " + sWhereClause;
+                    Session["ReportPath"] = "DettaglioSpese.rdlc";
+                    Response.Redirect("report/rdlc/ReportExecute.aspx");
+                    break;
+
         }
     }
-
-    //// Carica Dataset, verifica presenza giustificativi, scarica excel
-    //protected void ScaricaSpese(string sqlCommand)
-    //{
-
-    //    SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-
-    //    using (conn)
-    //    {
-    //        /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
-    //        SqlDataAdapter da = new SqlDataAdapter(sqlCommand, conn);
-    //        SqlCommandBuilder builder = new SqlCommandBuilder(da);
-
-    //        DataSet ds = new DataSet("export");
-    //        da.Fill(ds, "export");
-
-    //        int iUltimaColonna = ds.Tables["export"].Columns.Count - 1;
-
-    //        // Verifica per ogni dato estratto se ci sono giustificativi
-    //        foreach (DataRow row in ds.Tables["export"].Rows)
-    //            row[iUltimaColonna] = "PROVA";
-
-    //        // scarica il dataset in formato XLS
-    //        Utilities.EsportaDataSetExcel(ds);
-    //    }
-
-    //}
-
+    
     // Carica DDL persone
     protected void CBLPersone_Load(object sender, System.EventArgs e)
     {

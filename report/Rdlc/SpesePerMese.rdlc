@@ -2,27 +2,31 @@
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
-    <DataSource Name="VistaOre">
+    <DataSource Name="VistaSpese">
       <ConnectionProperties>
         <DataProvider>System.Data.DataSet</DataProvider>
         <ConnectString>/* Local Connection */</ConnectString>
       </ConnectionProperties>
-      <rd:DataSourceID>1872dd2c-1a91-4fbb-8e3a-c0c749e76305</rd:DataSourceID>
+      <rd:DataSourceID>31c50e95-7d23-4ecb-8ed3-a2a30e276e8f</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="DataSetReport">
       <Query>
-        <DataSourceName>VistaOre</DataSourceName>
+        <DataSourceName>VistaSpese</DataSourceName>
         <CommandText>/* Local Query */</CommandText>
       </Query>
       <Fields>
-        <Field Name="Hours_Id">
-          <DataField>Hours_Id</DataField>
+        <Field Name="Expenses_id">
+          <DataField>Expenses_id</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
-        <Field Name="NomePersona">
-          <DataField>NomePersona</DataField>
+        <Field Name="Persona">
+          <DataField>Persona</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="NomeSocieta">
+          <DataField>NomeSocieta</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="ProjectCode">
@@ -33,25 +37,41 @@
           <DataField>NomeProgetto</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="PhaseCode">
-          <DataField>PhaseCode</DataField>
+        <Field Name="TipoProgetto">
+          <DataField>TipoProgetto</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="PhaseName">
-          <DataField>PhaseName</DataField>
+        <Field Name="CodiceCliente">
+          <DataField>CodiceCliente</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="ActivityCode">
-          <DataField>ActivityCode</DataField>
+        <Field Name="NomeCliente">
+          <DataField>NomeCliente</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="ActivityName">
-          <DataField>ActivityName</DataField>
+        <Field Name="Manager">
+          <DataField>Manager</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="DescTipoProgetto">
-          <DataField>DescTipoProgetto</DataField>
+        <Field Name="ExpenseCode">
+          <DataField>ExpenseCode</DataField>
           <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DescSpesa">
+          <DataField>DescSpesa</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="CreditCardPayed">
+          <DataField>CreditCardPayed</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="CompanyPayed">
+          <DataField>CompanyPayed</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="InvoiceFlag">
+          <DataField>InvoiceFlag</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
         </Field>
         <Field Name="Date">
           <DataField>Date</DataField>
@@ -61,20 +81,28 @@
           <DataField>fdate</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Hours">
-          <DataField>Hours</DataField>
-          <rd:TypeName>System.Decimal</rd:TypeName>
+        <Field Name="flagstorno">
+          <DataField>flagstorno</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
         </Field>
-        <Field Name="Giorni">
-          <DataField>Giorni</DataField>
-          <rd:TypeName>System.Decimal</rd:TypeName>
+        <Field Name="ConversionRate">
+          <DataField>ConversionRate</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
         </Field>
-        <Field Name="NomeSocieta">
-          <DataField>NomeSocieta</DataField>
+        <Field Name="AnnoMese">
+          <DataField>AnnoMese</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="HourTypeCode">
-          <DataField>HourTypeCode</DataField>
+        <Field Name="KM">
+          <DataField>KM</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="Importo">
+          <DataField>Importo</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="Comment">
+          <DataField>Comment</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Persons_id">
@@ -85,41 +113,9 @@
           <DataField>Projects_Id</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
-        <Field Name="CodiceCliente">
-          <DataField>CodiceCliente</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="NomeCliente">
-          <DataField>NomeCliente</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Company_id">
-          <DataField>Company_id</DataField>
+        <Field Name="idmanager">
+          <DataField>idmanager</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="NomeManager">
-          <DataField>NomeManager</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="IdManager">
-          <DataField>IdManager</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="flagstorno">
-          <DataField>flagstorno</DataField>
-          <rd:TypeName>System.Boolean</rd:TypeName>
-        </Field>
-        <Field Name="flagTrasferta">
-          <DataField>flagTrasferta</DataField>
-          <rd:TypeName>System.Boolean</rd:TypeName>
-        </Field>
-        <Field Name="AnnoMese">
-          <DataField>AnnoMese</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Comment">
-          <DataField>Comment</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="AccountingDateAnnoMese">
           <DataField>AccountingDateAnnoMese</DataField>
@@ -131,12 +127,12 @@
         </Field>
       </Fields>
       <rd:DataSetInfo>
-        <rd:DataSetName>VistaOre</rd:DataSetName>
-        <rd:SchemaPath>G:\01 Cloud\OneDrive\02 Development\timereport\App_Code\VistaOre.xsd</rd:SchemaPath>
-        <rd:TableName>v_ore</rd:TableName>
+        <rd:DataSetName>VistaSpese</rd:DataSetName>
+        <rd:SchemaPath>G:\01 Cloud\OneDrive\02 Development\timereport\App_Code\VistaSpese.xsd</rd:SchemaPath>
+        <rd:TableName>v_spese</rd:TableName>
         <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
         <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
-        <rd:TableAdapterName>v_oreTableAdapter</rd:TableAdapterName>
+        <rd:TableAdapterName>v_speseTableAdapter</rd:TableAdapterName>
       </rd:DataSetInfo>
     </DataSet>
   </DataSets>
@@ -150,7 +146,7 @@
                 <TablixCornerRow>
                   <TablixCornerCell>
                     <CellContents>
-                      <Textbox Name="Textbox28">
+                      <Textbox Name="Textbox45">
                         <CanGrow>true</CanGrow>
                         <KeepTogether>true</KeepTogether>
                         <Paragraphs>
@@ -166,7 +162,40 @@
                             <Style />
                           </Paragraph>
                         </Paragraphs>
-                        <rd:DefaultName>Textbox28</rd:DefaultName>
+                        <rd:DefaultName>Textbox45</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Color>LightGrey</Color>
+                            <Style>Solid</Style>
+                          </Border>
+                          <BackgroundColor>LightBlue</BackgroundColor>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="Textbox46">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>Tipo Spesa</Value>
+                                <Style>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style />
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>Textbox46</rd:DefaultName>
                         <Style>
                           <Border>
                             <Color>LightGrey</Color>
@@ -190,7 +219,7 @@
                   <Width>2.5cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.15604cm</Width>
+                  <Width>2.22618cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -199,31 +228,174 @@
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox8">
+                        <Textbox Name="Textbox55">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox8</rd:DefaultName>
+                          <rd:DefaultName>Textbox55</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>Linen</BackgroundColor>
+                            <BackgroundColor>White</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox44">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
+                                  <Style>
+                                    <Format>#,0</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox44</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>White</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.6cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox56">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
+                                  <Style>
+                                    <Format>#,0</Format>
+                                    <Color>Gray</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox56</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>White</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Importo">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
+                                  <Style>
+                                    <Format>#,0</Format>
+                                    <Color>Gray</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Importo</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>White</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.6cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox3">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>#,0</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>White</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -241,180 +413,17 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
+                                  <Value>=Sum(Fields!Importo.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox4</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>White</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.6cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox9">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
-                                  <Style>
-                                    <Format>0;(0)</Format>
-                                    <Color>Gray</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox9</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>Linen</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox32">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
-                                  <Style>
-                                    <Format>0;(0)</Format>
-                                    <Color>Gray</Color>
-                                  </Style>
-                                </TextRun>
-                                <TextRun>
-                                  <Value xml:space="preserve"> </Value>
-                                  <Style>
-                                    <Format>0;(0)</Format>
-                                    <Color>Gray</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <ListLevel>1</ListLevel>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox32</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>White</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.6cm</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox2">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
-                                  <Style>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Format>0;(0)</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox2</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>Linen</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox5">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!Giorni.Value)</Value>
-                                  <Style>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Format>0;(0)</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -439,14 +448,14 @@
                   <TablixHeader>
                     <Size>0.6cm</Size>
                     <CellContents>
-                      <Textbox Name="Textbox7">
+                      <Textbox Name="Textbox54">
                         <CanGrow>true</CanGrow>
                         <KeepTogether>true</KeepTogether>
                         <Paragraphs>
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>Totale </Value>
+                                <Value>Totale</Value>
                                 <Style>
                                   <FontWeight>Bold</FontWeight>
                                 </Style>
@@ -457,7 +466,7 @@
                             </Style>
                           </Paragraph>
                         </Paragraphs>
-                        <rd:DefaultName>Textbox7</rd:DefaultName>
+                        <rd:DefaultName>Textbox54</rd:DefaultName>
                         <Style>
                           <Border>
                             <Color>LightGrey</Color>
@@ -470,6 +479,7 @@
                           <PaddingBottom>2pt</PaddingBottom>
                         </Style>
                       </Textbox>
+                      <rd:Selected>true</rd:Selected>
                     </CellContents>
                   </TablixHeader>
                 </TablixMember>
@@ -495,12 +505,6 @@
                             <TextRuns>
                               <TextRun>
                                 <Value>=Fields!AnnoMese.Value</Value>
-                                <Style>
-                                  <FontWeight>Bold</FontWeight>
-                                </Style>
-                              </TextRun>
-                              <TextRun>
-                                <Value xml:space="preserve"> </Value>
                                 <Style>
                                   <FontWeight>Bold</FontWeight>
                                 </Style>
@@ -548,9 +552,9 @@
                   <TablixMembers>
                     <TablixMember>
                       <TablixHeader>
-                        <Size>7.65938cm</Size>
+                        <Size>7.37593cm</Size>
                         <CellContents>
-                          <Textbox Name="Textbox3">
+                          <Textbox Name="Textbox42">
                             <CanGrow>true</CanGrow>
                             <KeepTogether>true</KeepTogether>
                             <Paragraphs>
@@ -558,13 +562,15 @@
                                 <TextRuns>
                                   <TextRun>
                                     <Value>=Left(Fields!NomeProgetto.Value,35)</Value>
-                                    <Style />
+                                    <Style>
+                                      <FontWeight>Bold</FontWeight>
+                                    </Style>
                                   </TextRun>
                                 </TextRuns>
                                 <Style />
                               </Paragraph>
                             </Paragraphs>
-                            <rd:DefaultName>Textbox3</rd:DefaultName>
+                            <rd:DefaultName>Textbox42</rd:DefaultName>
                             <Style>
                               <Border>
                                 <Color>LightGrey</Color>
@@ -579,40 +585,75 @@
                           </Textbox>
                         </CellContents>
                       </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <TablixHeader>
+                            <Size>4.41029cm</Size>
+                            <CellContents>
+                              <Textbox Name="Textbox43">
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value />
+                                        <Style>
+                                          <FontWeight>Bold</FontWeight>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>Textbox43</rd:DefaultName>
+                                <Style>
+                                  <Border>
+                                    <Color>LightGrey</Color>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <BackgroundColor>Linen</BackgroundColor>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                        </TablixMember>
+                      </TablixMembers>
                       <KeepWithGroup>After</KeepWithGroup>
                     </TablixMember>
                     <TablixMember>
-                      <Group Name="NomePersona">
+                      <Group Name="Persona">
                         <GroupExpressions>
-                          <GroupExpression>=Fields!NomePersona.Value</GroupExpression>
+                          <GroupExpression>=Fields!Persona.Value</GroupExpression>
                         </GroupExpressions>
                       </Group>
                       <SortExpressions>
                         <SortExpression>
-                          <Value>=Fields!NomePersona.Value</Value>
+                          <Value>=Fields!Persona.Value</Value>
                         </SortExpression>
                       </SortExpressions>
                       <TablixHeader>
-                        <Size>7.65938cm</Size>
+                        <Size>7.37593cm</Size>
                         <CellContents>
-                          <Textbox Name="NomePersona">
-                            <CanGrow>true</CanGrow>
+                          <Textbox Name="Persona">
                             <KeepTogether>true</KeepTogether>
                             <Paragraphs>
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=Fields!NomePersona.Value</Value>
+                                    <Value>=Fields!Persona.Value</Value>
                                     <Style>
                                       <Color>Gray</Color>
                                     </Style>
                                   </TextRun>
                                 </TextRuns>
-                                <ListLevel>1</ListLevel>
                                 <Style />
                               </Paragraph>
                             </Paragraphs>
-                            <rd:DefaultName>NomePersona</rd:DefaultName>
+                            <rd:DefaultName>Persona</rd:DefaultName>
                             <Style>
                               <Border>
                                 <Color>LightGrey</Color>
@@ -627,16 +668,63 @@
                           </Textbox>
                         </CellContents>
                       </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <Group Name="DescSpesa">
+                            <GroupExpressions>
+                              <GroupExpression>=Fields!DescSpesa.Value</GroupExpression>
+                            </GroupExpressions>
+                          </Group>
+                          <SortExpressions>
+                            <SortExpression>
+                              <Value>=Fields!DescSpesa.Value</Value>
+                            </SortExpression>
+                          </SortExpressions>
+                          <TablixHeader>
+                            <Size>4.41029cm</Size>
+                            <CellContents>
+                              <Textbox Name="DescSpesa">
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value>=Left(Fields!DescSpesa.Value,20)</Value>
+                                        <Style>
+                                          <Color>Gray</Color>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>DescSpesa</rd:DefaultName>
+                                <Style>
+                                  <Border>
+                                    <Color>LightGrey</Color>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <BackgroundColor>Linen</BackgroundColor>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                        </TablixMember>
+                      </TablixMembers>
                       <Visibility>
                         <Hidden>true</Hidden>
-                        <ToggleItem>Textbox3</ToggleItem>
+                        <ToggleItem>Textbox42</ToggleItem>
                       </Visibility>
                     </TablixMember>
                   </TablixMembers>
                 </TablixMember>
                 <TablixMember>
                   <TablixHeader>
-                    <Size>7.65938cm</Size>
+                    <Size>7.37593cm</Size>
                     <CellContents>
                       <Textbox Name="Textbox1">
                         <CanGrow>true</CanGrow>
@@ -669,17 +757,53 @@
                       </Textbox>
                     </CellContents>
                   </TablixHeader>
+                  <TablixMembers>
+                    <TablixMember>
+                      <TablixHeader>
+                        <Size>4.41029cm</Size>
+                        <CellContents>
+                          <Textbox Name="Textbox2">
+                            <CanGrow>true</CanGrow>
+                            <KeepTogether>true</KeepTogether>
+                            <Paragraphs>
+                              <Paragraph>
+                                <TextRuns>
+                                  <TextRun>
+                                    <Value />
+                                    <Style>
+                                      <FontWeight>Bold</FontWeight>
+                                    </Style>
+                                  </TextRun>
+                                </TextRuns>
+                                <Style />
+                              </Paragraph>
+                            </Paragraphs>
+                            <rd:DefaultName>Textbox2</rd:DefaultName>
+                            <Style>
+                              <Border>
+                                <Color>LightGrey</Color>
+                                <Style>Solid</Style>
+                              </Border>
+                              <BackgroundColor>Linen</BackgroundColor>
+                              <PaddingLeft>2pt</PaddingLeft>
+                              <PaddingRight>2pt</PaddingRight>
+                              <PaddingTop>2pt</PaddingTop>
+                              <PaddingBottom>2pt</PaddingBottom>
+                            </Style>
+                          </Textbox>
+                        </CellContents>
+                      </TablixHeader>
+                    </TablixMember>
+                  </TablixMembers>
                   <KeepWithGroup>Before</KeepWithGroup>
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
-            <RepeatColumnHeaders>true</RepeatColumnHeaders>
-            <RepeatRowHeaders>true</RepeatRowHeaders>
             <DataSetName>DataSetReport</DataSetName>
-            <Top>8.73336cm</Top>
-            <Left>0.44662cm</Left>
+            <Top>8.24124cm</Top>
+            <Left>0.51541cm</Left>
             <Height>2.4cm</Height>
-            <Width>12.31542cm</Width>
+            <Width>16.5124cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -709,7 +833,7 @@
                 <ChartSeriesHierarchy>
                   <ChartMembers>
                     <ChartMember>
-                      <Label>Giorni</Label>
+                      <Label>Importo</Label>
                     </ChartMember>
                   </ChartMembers>
                 </ChartSeriesHierarchy>
@@ -719,7 +843,7 @@
                       <ChartDataPoints>
                         <ChartDataPoint>
                           <ChartDataPointValues>
-                            <Y>=Sum(Fields!Giorni.Value)</Y>
+                            <Y>=Sum(Fields!Importo.Value)</Y>
                           </ChartDataPointValues>
                           <ChartDataLabel>
                             <Style />
@@ -873,7 +997,7 @@
                             <Style>None</Style>
                           </Border>
                           <FontSize>8pt</FontSize>
-                          <Format>#,0;(#,0)</Format>
+                          <Format>n0</Format>
                           <Color>#5c5c5c</Color>
                         </Style>
                         <ChartAxisTitle>
@@ -1004,7 +1128,7 @@
                 </ChartLegends>
                 <ChartTitles>
                   <ChartTitle Name="Default">
-                    <Caption>Totale giornate per mese</Caption>
+                    <Caption>Spese per mese</Caption>
                     <Style>
                       <BackgroundGradientType>None</BackgroundGradientType>
                       <FontSize>12pt</FontSize>
@@ -1034,8 +1158,6 @@
                   </Style>
                 </ChartNoDataMessage>
                 <DataSetName>DataSetReport</DataSetName>
-                <Top>0.87524cm</Top>
-                <Left>0.44662cm</Left>
                 <Height>7cm</Height>
                 <Width>13cm</Width>
                 <Style>
@@ -1068,7 +1190,7 @@
                 <ChartSeriesHierarchy>
                   <ChartMembers>
                     <ChartMember>
-                      <Label>Giorni</Label>
+                      <Label>Importo</Label>
                     </ChartMember>
                   </ChartMembers>
                 </ChartSeriesHierarchy>
@@ -1078,7 +1200,7 @@
                       <ChartDataPoints>
                         <ChartDataPoint>
                           <ChartDataPointValues>
-                            <Y>=Sum(Fields!Giorni.Value)</Y>
+                            <Y>=Sum(Fields!Importo.Value)</Y>
                           </ChartDataPointValues>
                           <ChartDataLabel>
                             <Style />
@@ -1391,8 +1513,7 @@
                   </Style>
                 </ChartNoDataMessage>
                 <DataSetName>DataSetReport</DataSetName>
-                <Top>0.87524cm</Top>
-                <Left>14.67475cm</Left>
+                <Left>13.43955cm</Left>
                 <Height>7cm</Height>
                 <Width>13cm</Width>
                 <ZIndex>1</ZIndex>
@@ -1407,8 +1528,10 @@
               </Chart>
             </ReportItems>
             <KeepTogether>true</KeepTogether>
-            <Height>8.18127cm</Height>
-            <Width>31.19041cm</Width>
+            <Top>0.46397cm</Top>
+            <Left>0.51541cm</Left>
+            <Height>7.06999cm</Height>
+            <Width>26.43955cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -1417,12 +1540,12 @@
             </Style>
           </Rectangle>
         </ReportItems>
-        <Height>5.37306in</Height>
+        <Height>6.73456in</Height>
         <Style>
           <BackgroundColor>WhiteSmoke</BackgroundColor>
         </Style>
       </Body>
-      <Width>12.27969in</Width>
+      <Width>12.15339in</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
@@ -1442,5 +1565,5 @@
     </GridLayoutDefinition>
   </ReportParametersLayout>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>ac77f686-64dc-4eb8-92ed-d45a8fe07b3f</rd:ReportID>
+  <rd:ReportID>e0d36852-c49a-46aa-9212-9408df699294</rd:ReportID>
 </Report>

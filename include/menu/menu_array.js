@@ -165,10 +165,7 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 		addmenu(menu=["Report",
 		,,180,1,"",style1,,"",effect,,,,,,,,,,,,
         , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Ore e Spese", "/timereport/esporta.aspx", , , 1
-        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Attività", "/timereport//report/attivita/ReportAttivita-select.aspx", , , 1
 		, "<img src=/timereport/images/icons/16x16/giustificativi.gif border=0>&nbsp;Report giustificativi", "/timereport/report/ricevute/ricevute_select_user.aspx", , , 1
-		, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
-        , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Ore Per Mese", "/timereport/report/Rdl/OrePerMese.aspx", , , 1
         ])	
 
 	if (sUserLevel == AUTH_EXTERNAL)
@@ -245,7 +242,8 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	addmenu(menu = ["Report_manager",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
 	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Controllo progetto", "/timereport/report/controllo_progetto/ControlloProgetto-select.aspx", , , 1
-	])
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Attivita'", "/timereport//report/attivita/ReportAttivita-select.aspx", , , 1
+    ])
 
 	addmenu(menu=["Persone",
 	,,180,1,"",style1,,"",effect,,,,,,,,,,,,

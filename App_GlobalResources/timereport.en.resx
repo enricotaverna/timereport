@@ -120,6 +120,9 @@
   <data name="CANCEL_TXT" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="EXEC_TXT" xml:space="preserve">
+    <value>Execute</value>
+  </data>
   <data name="EXPORT_TXT" xml:space="preserve">
     <value>file export</value>
   </data>

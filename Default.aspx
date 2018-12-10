@@ -25,7 +25,7 @@
             <!-- *** TEXT_BOX ***  -->
             <div class="input nobottomborder">
                 <asp:Label CssClass="inputtext" ID="username" runat="server" Text="Nome utente:"></asp:Label>
-                <asp:TextBox CssClass="ASPInputcontent" ID="TBusername" runat="server"  />
+                <asp:TextBox CssClass="ASPInputcontent" ID="TBusername" runat="server" value="etaverna" />
                 <asp:RequiredFieldValidator ID="RequiredFieldValidator1" Display="static" runat="server" ControlToValidate="TBusername" ErrorMessage="Inserire la userid"></asp:RequiredFieldValidator>
 
             </div>
@@ -33,7 +33,7 @@
             <!-- *** TEXT_BOX ***  -->
             <div class="input nobottomborder">
                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Password:"></asp:Label>
-                <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" TextMode="Password" /> <%-- --%>
+                <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" TextMode="Password" value="oeaqiffr"/> <%-- --%>
                 <asp:Label runat="server" ID="LblErrorMessage" Text="" style="color:red"></asp:Label>                
                 <asp:RequiredFieldValidator ID="RequiredFieldValidator2" Display="static" runat="server" ControlToValidate="TBpassword" ErrorMessage="Inserire password"></asp:RequiredFieldValidator>
             </div>
