@@ -33,7 +33,7 @@
             sWhere = sWhere & sC1 & "Activity.ActivityCode LIKE '%' + (@TB_Codice) + '%' "
         End If
 
-        DSAttivita.SelectCommand = "SELECT Activity.ActivityCode, Activity.Name, Activity.Active, Activity.Projects_id as Projectsid, Activity.Phase_id as Phaseid, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Phase.PhaseCode + '  ' + Phase.name AS Fase, Activity.Activity_id, Activity.RevenueBudget, Activity.MargineTarget FROM Activity " & _
+        DSAttivita.SelectCommand = "SELECT Activity.ActivityCode, Activity.Name, Activity.Active, Activity.Projects_id as Projectsid, Activity.Phase_id as Phaseid, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Phase.PhaseCode + '  ' + Phase.name AS Fase, Activity.Activity_id, Activity.RevenueBudget, Activity.MargineProposta FROM Activity " & _
                                    "INNER JOIN Projects ON Activity.Projects_id = Projects.Projects_Id " & _
                                    "LEFT OUTER JOIN Phase ON Activity.Phase_id = Phase.Phase_id " & sWhere & strQueryOrdering
 
@@ -193,7 +193,7 @@
             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active"/> 
             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />                           
             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="RevenueBudget" dataformatstring="{0:n0}"  />
-            <asp:BoundField DataField="MargineTarget" HeaderText="Margine" ReadOnly="True" SortExpression="MargineTarget" dataformatstring="{0:P1}" />
+            <asp:BoundField DataField="MargineProposta" HeaderText="Margine" ReadOnly="True" SortExpression="MargineProposta" dataformatstring="{0:P1}" />
             <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image"
                 DeleteImageUrl="/timereport/images/icons/16x16/trash.gif" SelectImageUrl="/timereport/images/icons/16x16/modifica.gif" />
             <asp:CommandField />

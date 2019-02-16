@@ -68,9 +68,9 @@ public partial class CostRateAnno_lookup_form : System.Web.UI.Page
         DropDownList DDLAnno = (DropDownList)FVForm.FindControl("DDLAnno");
 
         // Popola dropdown Anno
-        for (int i = DateTime.Now.Year + 1; i > (DateTime.Now.Year - 5); i--)
+        for (int i = DateTime.Now.Year + 1; i > (DateTime.Now.Year - 5); i--) 
             DDLAnno.Items.Add(new ListItem(i.ToString(), i.ToString()));
-        
+
         // imposta di default anno corrente
         DDLAnno.Items[1].Selected=true;
     }

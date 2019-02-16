@@ -209,9 +209,13 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 
 	addmenu(menu = ["Amm_Economics",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-	, "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Cost rate per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
-	, "<img src=/timereport/images/icons/16x16/progetto.gif border=0>&nbsp;Cost rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
-	])
+	, "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;FLC per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Bill Rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report FLC", "/timereport/report/rdlc/CostRateReport.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_B_ACTY.gif border=0>&nbsp;Calcolo Revenue", "/timereport/report/EstraiRevenue/CalcolaRevenue.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/ReportRevenue.aspx", , , 1
+
+    ])
 
 	addmenu(menu = ["Amm_MassChange",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
@@ -221,8 +225,7 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 
 	addmenu(menu = ["Amm_Export",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/EstraiRevenue-select.aspx", , , 1
-	, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Straordinari", "/timereport/report/straordinari/Straordinari-select.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Straordinari", "/timereport/report/straordinari/Straordinari-select.aspx", , , 1
 	, "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Progetti e risorse attive", "/timereport/report/general-download.aspx?query=SELECT+Persons.Name+AS+NomePersona,+AuthUserLevel.name,+Persons.Attivo_da,+Persons.Attivo_fino,+Projects.ProjectCode,+Projects.Name+AS+NomeProgetto,+Projects.active+FROM+ForcedAccounts+INNER+JOIN+Persons+ON+Persons.Persons_id+=+ForcedAccounts.Persons_id+INNER+JOIN+AuthUserLevel+ON+AuthUserLevel.UserLevel_id+=+persons.UserLevel_id+INNER+JOIN+Projects+ON+Projects.Projects_id=ForcedAccounts.Projects_id+WHERE+Projects.active=1+and+Persons.active=1", , , 1
 	])
 
@@ -260,7 +263,6 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Metodo di Pagamento", "/timereport/lookup_list.aspx?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=2&init=true",,,1	
     , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.aspx?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=2&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Spese", "/timereport/lookup_list.aspx?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true",,,1
-	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Giorni non lavorativi", "/timereport/lookup_list.aspx?TableName=Holiday&SortField=Holiday_date&FieldNumber=1&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Società", "/timereport/lookup_list.aspx?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1	
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Ruoli", "/timereport/lookup_list.aspx?TableName=Roles&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true",,,1
 	,"<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo progetti", "/timereport/lookup_list.aspx?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true",,,1	

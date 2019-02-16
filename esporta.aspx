@@ -313,7 +313,6 @@
                 //$('#mask').fadeIn(200);
                 $('#mask').fadeTo("fast", 0.5);
 
-
                 document.body.style.cursor = 'wait';
             });
 

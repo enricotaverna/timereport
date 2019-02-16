@@ -4,44 +4,25 @@
 
 <!-- Jquery   -->
 <link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/jquery/multiselect/multi-select.css" media="screen" rel="stylesheet" type="text/css">
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
+
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script src="/timereport/include/javascript/timereport.js"></script>
+ <script src="/timereport/include/jquery/multiselect/jquery.multi-select.js" type="text/javascript"></script>
 
-<!-- Attiva finestra per messaggio di conferma slvataggio   -->
-<script>
-
-    // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
-    function ShowPopup(message) {
-        $(function () {
-            $("#dialog").html(message);
-            $("#dialog").dialog({
-                title: "Messaggio",
-                buttons: {
-                    Close: function () {
-                        $(this).dialog('close');
-                    }
-                },
-                modal: true 
-            });
-        });
-    };
-
-</script>
+<!-- Menu -->
+<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <html>
 
 <head>
-
-    <title>Lista utenti</title>
-
+    <title>Lista consulenti</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
 </head>
-
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <body>
 
@@ -49,74 +30,67 @@
 
     <div id="MainWindow">
 
-        <div id="FormWrap" style="width: 740px">
+        <div id="FormWrap" class="StandardForm" style="width: 740px">
 
             <!-- lo stile è cambiato per consentire l'adattamento  -->
-            <form name="form1" runat="server" class="StandardForm" style="overflow-y: visible">
+            <form name="form1" runat="server"  style="overflow-y: visible">
 
-                <!-- *** TITOLO FORM ***  -->
+                <div id="tabs" style="display:none">     
+                    
+                  <ul>
+                    <li><a href="#tabs-1">Progetti</a></li>
+                    <li><a href="#tabs-2">Spese</a></li>
+                  </ul>
+
+<%--                <!-- *** TITOLO FORM ***  -->
                 <div class="formtitle" style="width: 740px">
                     <asp:Label ID="lbNome" runat="server" Text="Consulente: "></asp:Label>
-                </div>
+                </div>--%>
 
-                <table width="70%" border="0" align="center" cellpadding="0" cellspacing="0" class="BoxDialogo">
+                <div id="tabs-1" style="height:420px;width:100%"> 
 
-                    <tr>
-                        <td width="40%">&nbsp;</td>
-                        <td width="40%">&nbsp;</td>
-                    </tr>
+                <!-- *** spazio bianco nel form ***  -->
+                <p style="margin-bottom: 20px;"></p>
 
-                    <tr>
-                        <td class="SeparatoreForm">Progetti</td>
-                        <td class="SeparatoreForm">Spese</td>
-                    </tr>
-
-                    <tr>
-                        <td style="text-align: left; vertical-align: top">
-                            <div align="center" style="width: 300px">
+                            <div align="center">
 
                                 <asp:ListBox ID="LBProgetti" runat="server" SelectionMode="Multiple"
                                     data-placeholder="seleziona uno o più valori" DataSourceID="DSProgetti"
-                                    DataTextField="ProjectName" DataValueField="Projects_Id" Rows="20" OnDataBound="LBProgetti_DataBound"></asp:ListBox>
+                                    DataTextField="ProjectName" DataValueField="Projects_Id" Rows="30" OnDataBound="LBProgetti_DataBound" ></asp:ListBox>
 
                             </div>
 
-                        </td>
-                        <td style="text-align: left; vertical-align: top">
-                            <div align="center" style="width: 300px">
+<%--                            <asp:Button ID="aspese" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aspese_Click"  />                                --%>
 
-                                <asp:ListBox ID="LBSpese" runat="server" SelectionMode="Multiple"
+                </div> <%--tabs-1--%>
+
+                <div id="tabs-2" style="height:420px;width:100%"> 
+
+                <!-- *** spazio bianco nel form ***  -->
+                <p style="margin-bottom: 20px;"></p>
+
+                            <div align="center">
+
+                                 <asp:ListBox ID="LBSpese" runat="server" SelectionMode="Multiple"
                                     data-placeholder="seleziona uno o più valori" DataSourceID="DSExpenseType"
                                     DataTextField="ExpenseTypeName" DataValueField="ExpenseType_Id" Rows="20" OnDataBound="LBSpese_DataBound"></asp:ListBox>
 
                             </div>
 
+<%--                            <asp:Button ID="aspese" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aspese_Click"  />                                --%>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <asp:Button ID="aprogetti" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aprogetti_Click"   />                                
-                        <td>
-                            <asp:Button ID="aspese" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aspese_Click"  />                                
-                    </tr>
-
-                </table>
-
-                <!-- *** spazio bianco nel form ***  -->
-                <p style="margin-bottom: 40px;"></p>
+                </div> <%--tabs-2--%>                        
 
                 <!-- *** BOTTONI ***  -->
                 <div class="buttons">
-                    <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClick="InsertButton_Click" />
+                    <asp:Button ID="BTSave" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClick="InsertButton_Click" />
+                    <asp:Button ID="BTreset" runat="server"  CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: RESET_TXT %>"   />                                
                     <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" />
                 </div>
 
             </form>
+
+            </div> <%--Tab view--%>
 
         </div>
         <!-- END FormWrap-->
@@ -135,8 +109,61 @@
         <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>
     </div>
 
-</body>
+</body> 
+
+<!-- Attiva finestra per messaggio di conferma slvataggio   -->
+<script>
+
+    // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
+    function ShowPopup(message) {
+        $(function () {
+            $("#dialog").html(message);
+            $("#dialog").dialog({
+                title: "Messaggio",
+                buttons: {
+                    Close: function () {
+                        $(this).dialog('close');
+                    }
+                },
+                modal: true
+            });
+        });
+    };
+
+    $('#LBProgetti').multiSelect({
+        selectableHeader: "<div class='multi-select-header'>progetti selezionabili</div>",
+        selectionHeader: "<div class='multi-select-header'>abilitazioni <%=Session["username"]%></div>",
+        dblClick : true
+    }
+    )
+    $('#LBSpese').multiSelect({
+        selectableHeader: "<div class='multi-select-header'>spese selezionabili</div>",
+        selectionHeader: "<div class='multi-select-header'>abilitazioni <%=Session["username"]%></div>",
+        dblClick : true
+    })
+
+    $("#tabs").tabs(); // abilitate tab view
+    $("#tabs").show();
+
+    $("#BTreset").click(function () {
+
+        if ($("#tabs-2").css("display") == "none" )  // selezionati progetti
+            $('#LBProgetti').multiSelect('deselect_all');
+        else // spese
+            $('#LBSpese').multiSelect('deselect_all');
+        return false;
+    });
+
+    $("#BTsave").click(function () {
+
+        $(":button").unbind('click');
+        document.body.style.cursor = 'wait';
+    });
+
+
+</script>
+
 </html>
 
-<asp:sqldatasource runat="server" connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>" selectcommand="SELECT ProjectCode + ' ' + left(Name,25) AS ProjectName, Projects_Id FROM Projects WHERE (Active = 1) ORDER BY ProjectName" id="DSProgetti"></asp:sqldatasource>
-<asp:sqldatasource runat="server" connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>" selectcommand="SELECT ExpenseCode + ' ' + left(Name,25) AS ExpenseTypeName, ExpenseType_Id FROM ExpenseType WHERE (Active = 1) ORDER BY ExpenseTypeName" id="DSExpenseType"></asp:sqldatasource>
+<asp:sqldatasource runat="server" connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>" selectcommand="SELECT ProjectCode + ' ' + left(Name,20) AS ProjectName, Projects_Id FROM Projects WHERE (Active = 1) ORDER BY ProjectName" id="DSProgetti"></asp:sqldatasource>
+<asp:sqldatasource runat="server" connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>" selectcommand="SELECT ExpenseCode + ' ' + left(Name,20) AS ExpenseTypeName, ExpenseType_Id FROM ExpenseType WHERE (Active = 1) ORDER BY ExpenseTypeName" id="DSExpenseType"></asp:sqldatasource>

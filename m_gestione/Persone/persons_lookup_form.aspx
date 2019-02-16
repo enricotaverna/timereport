@@ -178,7 +178,7 @@
                     <div class="input nobottomborder">
                         <asp:Label ID="Label12" CssClass="inputtext" runat="server" Text="Ore contratto:"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBContractHours" runat="server" Text='<%# Bind("ContractHours") %>' 
-                                     data-parsley-errors-container="#valMsg" required=""  data-parsley-type="integer" data-parsley-min="1" data-parsley-max="8" /> 
+                                     data-parsley-errors-container="#valMsg" required=""  data-parsley-type="integer" data-parsley-min="1"   /> 
                     </div>
 
                     <!-- *** Escludi da controllo economics  ***  -->
@@ -350,7 +350,7 @@
                     <div class="input nobottomborder">
                         <asp:Label ID="Label12" CssClass="inputtext" runat="server" Text="Ore contratto:"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBContractHours" runat="server" Text='<%# Bind("ContractHours") %>' 
-                                     data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-min="1" data-parsley-max="8" required=""/> 
+                                     data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-min="1" required=""/> 
                     </div>
 
                     <!-- *** Escludi da controllo economics  ***  -->

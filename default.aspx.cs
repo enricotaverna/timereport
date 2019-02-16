@@ -143,13 +143,13 @@ public partial class defaultAspx : System.Web.UI.Page
         Auth.LoadPermission(Session["persons_id"].ToString());
 
 		// forza il refresh del buffer delle spese
-		Session["RefreshRicevuteBuffer"] = "refresh";   
-		
-		// *** Carica datatable con giorni di ferie        
-        if (MyConstants.DTHoliday.Rows.Count == 0)
-            MyConstants.DTHoliday = Database.GetData("SELECT Holiday_date FROM Holiday", this.Page);
+		Session["RefreshRicevuteBuffer"] = "refresh";
+
+        // *** Carica datatable con giorni di ferie        
+        MyConstants.DTHoliday.Clear();
+        MyConstants.DTHoliday = Database.GetData("SELECT calDay FROM CalendarHolidays Where Calendar_id = " + Convert.ToInt16(Session["calendar_id"]), this.Page);
           
-		MyConstants.DTHoliday.PrimaryKey = new DataColumn[] { MyConstants.DTHoliday.Columns["Holiday_date"] };
+		MyConstants.DTHoliday.PrimaryKey = new DataColumn[] { MyConstants.DTHoliday.Columns["calDay"] };
 		//*** Carica datatable con giorni di ferie (FINE)   
 
         // lancia il menu principale
@@ -170,7 +170,8 @@ public partial class defaultAspx : System.Web.UI.Page
 		Session["UserId"] = rdr["UserId"].ToString();
 		Session["UserName"] = rdr["Name"];
 		Session["persons_id"] = rdr["persons_id"];
-		Session["nickname"] = rdr["nickname"];
+        Session["calendar_id"] = rdr["calendar_id"];
+        Session["nickname"] = rdr["nickname"];
 		Session["ColorScheme"] = rdr["ColorScheme"];
 		Session["lingua"] = rdr["Lingua"];
 		Session["BetaTester"] = string.IsNullOrEmpty(rdr["BetaTester"].ToString()) ? false :rdr["BetaTester"] ; // abilita nuove funzionalità

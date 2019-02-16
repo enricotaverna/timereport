@@ -101,7 +101,7 @@
             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget"  DataFormatString="{0:###,###}" />
             <asp:BoundField DataField="BudgetABAP" HeaderText="Bdg ABAP" SortExpression="BudgetABAP"  DataFormatString="{0:###,###}" />
             <asp:BoundField DataField="SpeseBudget" HeaderText="Spese Bdg" SortExpression="SpeseBudget"  DataFormatString="{0:###,###}"/>
-            <asp:BoundField DataField="MargineTarget" HeaderText="Margine Tgt" SortExpression="MargineTarget" dataformatstring="{0:P1}" />
+            <asp:BoundField DataField="MargineProposta" HeaderText="Margine Tgt" SortExpression="MargineProposta" dataformatstring="{0:P1}" />
             <asp:CheckBoxField  DataField="Active" HeaderText="Attivo" SortExpression="Active" />
             
             <asp:TemplateField >

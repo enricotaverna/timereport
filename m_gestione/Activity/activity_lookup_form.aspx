@@ -138,7 +138,7 @@
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineProposta") %>' 
                                  data-parsley-errors-container="#valMsg"  data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1'   /> 
                     <label>%</label>
                   </div> 
@@ -271,7 +271,7 @@
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineProposta") %>' 
                                  data-parsley-errors-container="#valMsg"  data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1'   /> 
                     <label>%</label>
                   </div> 
@@ -324,9 +324,9 @@
      </div>  
 
              <asp:SqlDataSource ID="DSattivita" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-            InsertCommand="INSERT INTO Activity(ActivityCode, Name, Phase_id, Projects_id, Active, Comment, Responsable_id, RevenueBudget, BudgetABAP, BudgetGGABAP , SpeseBudget, MargineTarget, DataInizio, DataFine) VALUES (@ActivityCode, @Name, @Phase_id, @Projects_id, @active, @comment, @Responsable_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @MargineTarget/100, @DataInizio, @DataFine)"
+            InsertCommand="INSERT INTO Activity(ActivityCode, Name, Phase_id, Projects_id, Active, Comment, Responsable_id, RevenueBudget, BudgetABAP, BudgetGGABAP , SpeseBudget, MargineProposta, DataInizio, DataFine) VALUES (@ActivityCode, @Name, @Phase_id, @Projects_id, @active, @comment, @Responsable_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @MargineProposta/100, @DataInizio, @DataFine)"
             SelectCommand="SELECT * FROM [Activity] WHERE ([Activity_id] = @Activity_id)"
-            UpdateCommand="UPDATE Activity SET ActivityCode = @ActivityCode, Name = @Name, Phase_id = @Phase_id, Projects_id = @Projects_id, Active = @active, Comment = @comment, Responsable_id = @Responsable_id, RevenueBudget=@RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP, SpeseBudget=@SpeseBudget, MargineTarget=@MargineTarget/100, DataInizio=@DataInizio, DataFine=@DataFine WHERE (Activity_id = @Activity_id)">
+            UpdateCommand="UPDATE Activity SET ActivityCode = @ActivityCode, Name = @Name, Phase_id = @Phase_id, Projects_id = @Projects_id, Active = @active, Comment = @comment, Responsable_id = @Responsable_id, RevenueBudget=@RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP, SpeseBudget=@SpeseBudget, MargineProposta=@MargineProposta/100, DataInizio=@DataInizio, DataFine=@DataFine WHERE (Activity_id = @Activity_id)">
             <InsertParameters>
                 <asp:Parameter Name="ActivityCode" Type="String" />
                 <asp:Parameter Name="Name" Type="String" />
@@ -339,7 +339,7 @@
                 <asp:Parameter Name="BudgetABAP" Type="Decimal" />
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
                 <asp:Parameter Name="SpeseBudget" Type="Decimal" />
-                <asp:Parameter Name="MargineTarget" Type="Decimal" />
+                <asp:Parameter Name="MargineProposta" Type="Decimal" />
                 <asp:Parameter Name="DataFine" Type="DateTime" />
                 <asp:Parameter Name="DataInizio" Type="DateTime" />
             </InsertParameters>
@@ -359,7 +359,7 @@
                 <asp:Parameter Name="BudgetABAP" Type="Decimal" />
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
                 <asp:Parameter Name="SpeseBudget" Type="Decimal" />
-                <asp:Parameter Name="MargineTarget" Type="Decimal" />
+                <asp:Parameter Name="MargineProposta" Type="Decimal" />
                 <asp:Parameter Name="DataFine" Type="DateTime" />
                 <asp:Parameter Name="DataInizio" Type="DateTime" />
             </UpdateParameters>

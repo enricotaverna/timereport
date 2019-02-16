@@ -378,6 +378,24 @@ a, a:visited, a:hover, a:active {
     border-bottom: 0;
     margin: 10px 30px 10px 10px;
 }
+
+#ModalWindow .window {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 440px;
+    height: 200px;
+    display: none;
+    z-index: 9999;
+    padding: 20px;
+}
+
+#ModalWindow #dialog {
+    width: 450px;
+    height: 150px;
+    padding: 0px;
+}
+
 /*#endregion*/
 
 /*#region Bottoni*/
@@ -773,6 +791,11 @@ a, a:visited, a:hover, a:active {
     box-shadow: 5px 5px 5px #888;
     transform: rotate(3deg);
     opacity: 0.8;
+}
+
+.multi-select-header {
+    background-color: lightgray;
+    padding: 2px;
 }
 
 /*#endregion*/

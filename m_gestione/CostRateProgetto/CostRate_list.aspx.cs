@@ -32,17 +32,17 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
         string strQueryOrdering = " ORDER BY Projects.ProjectCode ";
 
         // Si imposta valore della selezione se DDL impostata "OR" si verifica il valore di default della DDL
-        sWhere = " WHERE ( ForcedAccounts.Persons_id = @Persons_id OR @Persons_id = '0' ) AND " +
-                        "( ForcedAccounts.Projects_id = @Projects_id OR @Projects_id = '0' ) AND " +
+        sWhere = " WHERE ( ProjectCostRate.Persons_id = @Persons_id OR @Persons_id = '0' ) AND " +
+                        "( ProjectCostRate.Projects_id = @Projects_id OR @Projects_id = '0' ) AND " +
                         "( b.Persons_Id = @Manager_id OR @Manager_id  = '0' ) AND " +
                         " Projects.active = 1";
 
         // se manager limita i progetti visibili
         sWhere = !Auth.ReturnPermission("REPORT", "PROJECT_ALL") ? sWhere + " AND ClientManager_id=" + Session["Persons_id"] : sWhere;
 
-        DSForcedAccounts.SelectCommand = "SELECT ForcedAccounts_id, ForcedAccounts.Projects_id, Projects.ProjectCode, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Persons.Name AS NomePersona, CostRate, b.name AS NomeManager FROM ForcedAccounts " +
-                                   " INNER JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id " +
-                                   " INNER JOIN Persons ON ForcedAccounts.Persons_id = Persons.Persons_Id " +
+        DSForcedAccounts.SelectCommand = "SELECT ProjectCostRate_id, ProjectCostRate.Projects_id, Projects.ProjectCode, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Persons.Name AS NomePersona, BillRate, b.name AS NomeManager FROM ProjectCostRate " +
+                                   " INNER JOIN Projects ON ProjectCostRate.Projects_id = Projects.Projects_Id " +
+                                   " INNER JOIN Persons ON ProjectCostRate.Persons_id = Persons.Persons_Id " +
                                    " INNER JOIN Persons as b ON b.Persons_Id = Projects.ClientManager_id " + 
                                    sWhere + strQueryOrdering;
 
@@ -72,7 +72,7 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
 
     protected void GV_ForcedAccounts_SelectedIndexChanged(object sender, System.EventArgs e)
     {
-        Response.Redirect("CostRate_lookup_form.aspx?ForcedAccounts_id=" + GV_ForcedAccounts.SelectedValue);
+        Response.Redirect("CostRate_lookup_form.aspx?ProjectCostRate_id=" + GV_ForcedAccounts.SelectedValue);
     }
 
     // al cambio di DDL salva il valore 
@@ -107,7 +107,7 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
             GridViewRow row = GV_ForcedAccounts.Rows[index];
 
             // controlli passati, cancella il record
-            Database.ExecuteSQL("DELETE FROM ForcedAccounts WHERE ForcedAccounts_id=" + row.Cells[0].Text, lPage);
+            Database.ExecuteSQL("DELETE FROM ProjectCostRate WHERE ProjectCostRate_id=" + row.Cells[0].Text, lPage);
 
             // forza refresh
             GV_ForcedAccounts.DataBind();

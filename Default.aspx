@@ -11,6 +11,9 @@
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
     <html xmlns="http://www.w3.org/1999/xhtml">
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>Timereport</title>
 
     <body>
 

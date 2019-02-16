@@ -54,9 +54,9 @@
             <!-- *** ANNO ***  -->
 	            <div class="input">                        
 	                <div class="inputtext">Anno:</div>  
-                    <label class="dropdown" style="width:150px" >
+                    <label class="dropdown"  >
                                 <asp:DropDownList ID="DDLAnno" runat="server" AppendDataBoundItems="True"
-                                SelectedValue='<%# Bind("Anno") %>' OnDataBinding="DDLAnno_DataBinding" >
+                                SelectedValue='<%# Bind("Anno") %>' OnDataBinding="DDLAnno_DataBinding" style="width:150px" >
                                 </asp:DropDownList>                    
                     </label>
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" Display="none" runat="server" ErrorMessage="Inserisci anno" ControlToValidate="DDLAnno"></asp:RequiredFieldValidator>
@@ -73,6 +73,12 @@
                                 ErrorMessage="Inserire un valore numerico"
                                 ValidationExpression="(^\d*\,?\d*[1-9]+\d*$)|(^[1-9]+\d*\,\d*$)">
                 </asp:RegularExpressionValidator>
+
+               <!-- *** COMMENT ***  -->
+                <div class="input nobottomborder">
+                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Nota"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBComment" runat="server" Text='<%# Bind("Comment") %>' Columns="32" MaxLength="40" />
+                </div>
                      
                 <!-- *** BOTTONI  ***  -->
                 <div class="buttons">
@@ -111,6 +117,13 @@
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBCostRate" runat="server"  style="width:140px" Text='<%# Bind("CostRate") %>' Enabled="False" />
                 </div>
 
+                <!-- *** COMMENT ***  -->
+                <div class="input nobottomborder">
+                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Nota"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBComment" runat="server" Text='<%# Bind("Comment") %>' Columns="32" MaxLength="40" />
+                </div>
+ 
+
                 <!-- *** BOTTONI  ***  -->
                 <div class="buttons">
                     <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CausesValidation="False" CommandName="Cancel"  Text="<%$ appSettings: CANCEL_TXT %>" />             
@@ -137,19 +150,12 @@
      </div>  
  
     <asp:SqlDataSource ID="DSPersonCostRate" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
-        InsertCommand="INSERT INTO [PersonsCostRate] ([Persons_id], [Anno], [CostRate]) VALUES (@Persons_id, @Anno, @CostRate)" 
         SelectCommand="SELECT * FROM [PersonsCostRate] WHERE PersonsCostRate_id = @PersonsCostRate_id" 
-        UpdateCommand="UPDATE [PersonsCostRate] SET [Persons_id] = @Persons_id, [Anno] = @Anno, [CostRate] = @CostRate WHERE [PersonsCostRate_id] = @PersonsCostRate_id"
-        >
+        UpdateCommand="UPDATE [PersonsCostRate] SET [Persons_id] = @Persons_id, [Anno] = @Anno, [CostRate] = @CostRate, [Comment] = @Comment  WHERE [PersonsCostRate_id] = @PersonsCostRate_id"        >
         <SelectParameters>
             <asp:QueryStringParameter  Name="PersonsCostRate_id" QueryStringField="PersonsCostRate_id" />
         </SelectParameters>        
  
-        <InsertParameters>
-            <asp:Parameter Name="Persons_id" Type="Int32" />
-            <asp:Parameter Name="Anno" Type="Int32" />
-            <asp:Parameter Name="CostRate" Type="Decimal" />
-        </InsertParameters>
         <UpdateParameters>
             <asp:Parameter Name="Persons_id" Type="Int32" />
             <asp:Parameter Name="Anno" Type="Int32" />
@@ -163,4 +169,5 @@
     </asp:SqlDataSource>
 
 </body>
+
 </html>

@@ -42,7 +42,7 @@ public partial class m_CostRateAnno_lookup_list : System.Web.UI.Page
                        " ( Persons.Active = @DDLFlattivo OR @DDLFlattivo = '99' ) AND " +
                        " anno = @anno ";
 
-        DSElenco.SelectCommand = "SELECT DISTINCT PersonsCostRate_id, PersonsCostRate.Persons_id, Persons.name as NomePersona, Anno, PersonsCostRate.CostRate " +
+        DSElenco.SelectCommand = "SELECT DISTINCT PersonsCostRate_id, PersonsCostRate.Persons_id, Persons.name as NomePersona, Anno, PersonsCostRate.CostRate, Comment " +
                                          " FROM PersonsCostRate " +
                                          " INNER JOIN Persons ON Persons.persons_id = PersonsCostRate.persons_id "  +
                                   sWhere + strQueryOrdering;
@@ -64,10 +64,20 @@ public partial class m_CostRateAnno_lookup_list : System.Web.UI.Page
          if (Session["DDLFlattivo"] != null)
              DDLFlattivo.SelectedValue = Session["DDLFlattivo"].ToString();
 
-         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-         if (Session["DDLanno"] != null)
-             DDLAnno.SelectedValue = Session["DDLanno"].ToString();
-      }
+        // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
+        if (Session["DDLanno"] != null)
+        {
+            DDLAnnoModale.SelectedValue = Session["DDLanno"].ToString();
+            DDLAnno.SelectedValue = Session["DDLanno"].ToString();
+        }
+        else
+        {
+            DDLAnnoModale.SelectedValue = DateTime.Now.Year.ToString();
+            DDLAnno.SelectedValue = DateTime.Now.Year.ToString();
+
+        }
+
+    }
     
     // Lancia form di dettaglio
     protected void GVElenco_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -102,25 +112,19 @@ public partial class m_CostRateAnno_lookup_list : System.Web.UI.Page
     protected void DDLAnno_SelectedIndexChanged(object sender, System.EventArgs e)
     {
         DropDownList ddl = (DropDownList)sender;
-        Session["DDLAnno"] = ddl.SelectedIndex;
+        Session["DDLAnno"] = ddl.SelectedValue;
     }
 
     // popola DDL Anno
     protected void DDLAnno_DataBinding()
     {
-
-        DropDownList DDLAnno = (DropDownList)form1.FindControl("DDLAnno");
-
         // Popola dropdown Anno
         for (int i = DateTime.Now.Year + 1; i > (DateTime.Now.Year - 5); i--)
+        {
             DDLAnno.Items.Add(new ListItem(i.ToString(), i.ToString()));
-
-        // imposta di default anno corrente
-        if (Session["DDLAnno"] != null)
-            DDLAnno.Items[Convert.ToInt16(Session["DDLAnno"])].Selected = true;
-        else
-            DDLAnno.Items[1].Selected = true;
-
+            DDLAnnoModale.Items.Add(new ListItem(i.ToString(), i.ToString()));
+        }
+        
     }
 
 }

@@ -128,6 +128,30 @@ public class WStimereport : System.Web.Services.WebService {
         return sRet;
     }
 
+    // Crea CostRateAnno
+    // Richiamata da finestra modale su lista CostRateAnno_list
+    [WebMethod(EnableSession = true)]
+    public void CreaCostRateAnno(string sPersonsId, string sAnno, float fCostRate, string sComment)
+    {
+
+        string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
+
+        // se presente un record per la stessa chiave lo cancella       
+        string cmdText = "DELETE FROM PersonsCostRate WHERE " +
+                  " Persons_id = '" + sPersonsId + "' AND " +
+                  " Anno = '" + sAnno + "'; ";
+
+        // crea nuovo record
+        cmdText = cmdText + "INSERT INTO PersonsCostRate (Persons_id, Anno, CostRate, Comment) " +
+                  "values ( '" + sPersonsId + "' ," +
+                            "'" + sAnno + "' ," +
+                            "'" + fCostRate + "' ," +
+                            "'" + sComment +"' )";
+        Database.ExecuteSQL(cmdText,null);
+
+        return;
+    }
+
     //  **** CREA TICKET ***** 
     // Richiamata da input.aspx - vista bonus, inserisce ticket restaurant al click sull'icona
     [WebMethod(EnableSession = true)]
@@ -223,7 +247,7 @@ public class WStimereport : System.Web.Services.WebService {
         string[] aRet = new string[2]; // parametri tornati dalla funzione
         int newIdentity;
         DataTable dt;
-            string strAccountingDate = "";
+        string strAccountingDate = "";
 
 
         // se TR è chiuso esce

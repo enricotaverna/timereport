@@ -49,9 +49,9 @@
 	
 	<div id="MainWindow">
 	
-    <div id="FormWrap">
+    <div id="FormWrap" class="StandardForm">
 
-    <form name="form1" runat="server" method="post" action="imposta-valori-utenti.aspx"  class="StandardForm">
+    <form name="form1" runat="server" method="post" action="imposta-valori-utenti.aspx"  >
 
     <!-- *** TITOLO FORM ***  -->
 	<div class="formtitle">Selezionare</div> 

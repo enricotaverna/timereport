@@ -115,7 +115,7 @@
             <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />
             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget" />
             <asp:BoundField DataField="SpeseBudget" HeaderText="Spese Bdg" SortExpression="SpeseBudget" />
-            <asp:BoundField DataField="MargineTarget" HeaderText="Margine Tgt" SortExpression="MargineTarget" />
+            <asp:BoundField DataField="MargineProposta" HeaderText="Margine Tgt" SortExpression="MargineProposta" />
             <asp:CheckBoxField  DataField="Active" HeaderText="Attivo" SortExpression="Active" />
             
             <asp:TemplateField >

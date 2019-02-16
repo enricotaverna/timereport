@@ -496,7 +496,7 @@ public partial class input : System.Web.UI.Page
 
         // se cutoff non è passato si possono creare nuove entries
 
-        if (sDate != "")
+        if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
             if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
             {
 

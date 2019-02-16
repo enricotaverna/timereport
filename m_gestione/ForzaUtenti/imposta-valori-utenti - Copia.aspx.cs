@@ -25,7 +25,7 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
 
             // recupera nome                        
             DataRow drPersons = Database.GetRow("Select Name from Persons where Persons_id=" + sPersonaSelezionata, this.Page);
-  //          lbNome.Text = lbNome.Text + drPersons["name"];
+            lbNome.Text = lbNome.Text + drPersons["name"];
 
         }
 
@@ -105,5 +105,18 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
         }
 
     }
-    
+
+    protected void aprogetti_Click(object sender, EventArgs e)
+    {
+        // reset i valori selezionati
+        foreach (ListItem li in LBProgetti.Items)
+                li.Selected = false;
+    }
+
+    protected void aspese_Click(object sender, EventArgs e)
+    {
+        // reset i valori selezionati
+        foreach (ListItem li in LBSpese.Items)
+            li.Selected = false;
+    }
 }

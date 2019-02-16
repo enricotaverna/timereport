@@ -84,7 +84,7 @@
  
 <div id="MainWindow"> 
 
-<div id="FormWrap" style="width:496px">
+<div id="FormWrap" >
 
     <form id="formProgetto" runat="server" class="StandardForm">
 
@@ -110,8 +110,8 @@
                   <!-- *** CODICE PROGETTO ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Codice: </div>
-                    <asp:TextBox ID="TBProgetto" runat="server"  class="ASPInputcontent"
-                                Text='<%# Bind("ProjectCode") %>' Enabled="False" Columns="12"  
+                    <asp:TextBox ID="TBProgetto" runat="server"  class="ASPInputcontent" Enabled="False"
+                                Text='<%# Bind("ProjectCode") %>'  Columns="12"  
                                 MaxLength="10" />
                     <asp:CheckBox ID="ActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>' />
 					<asp:Label  AssociatedControlId="ActiveCheckBox" class="css-label" ID="Label3" runat="server" Text="progetto attivo"></asp:Label>
@@ -260,26 +260,30 @@
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' 
                                   data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent"  /> 
                     <label>%</label>
                   </div> 
+
+				  <div class="input nobottomborder">
+				    <div class="inputtext"></div>
+                     <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
+                     <asp:Label  AssociatedControlId="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime" ></asp:Label>  
+
+                  </div> 
  
-                <div class="SeparatoreForm">Durata</div>
+                <div class="SeparatoreForm">Durata Progetto</div>
 
                 <!-- *** DATA INIZIO  ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label ID="Label4" CssClass="inputtext" runat="server" Text="Data inizio:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" 
-                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+               <div class="input nobottomborder">
+               <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Da"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" width="100px" 
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
+                                                
+               <asp:Label class="css-label" style="padding:0px 20px 0px 20px" runat="server">a</asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' 
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
                 </div>
-
-                 <!-- *** DATA FINE  ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label ID="Label5" CssClass="inputtext" runat="server"  Text="Data fine:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
-                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                </div>    
                      
                 </div> <!-- *** TAB 2 ***  -->
 
@@ -478,12 +482,12 @@
                         <asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
                         <asp:Label  AssociatedControlId="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo" style="padding-right:40px"></asp:Label> 
                                                                        
-                        <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%# bind("ActivityOn") %>' />
+                        <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%#Bind("ActivityOn") %>' />
                         <asp:Label  AssociatedControlId="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS" ></asp:Label>           
                      
                         <br />
 
-                        <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%# bind("BloccoCaricoSpese") %>' />
+                        <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                         <asp:Label  AssociatedControlId="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>                         
      
                 </div>
@@ -543,7 +547,7 @@
                   <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine" columns="5" class="ASPInputcontent" runat="server" Text='<%# Bind("MargineTarget") %>' 
+                    <asp:TextBox ID="TBMargine" columns="5" class="ASPInputcontent" runat="server" Text='<%# Bind("MargineProposta") %>' 
                                   data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent"   /> 
                     <label>%</label>
                   </div> 
@@ -560,7 +564,7 @@
                  <!-- *** DATA FINE  ***  -->
                 <div class="input nobottomborder">
                     <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data fine:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine","{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
+                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine", "{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
                                  data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                 </div>
                                    
@@ -757,14 +761,14 @@
                  <div class="input nobottomborder">
 
                         <span class="input2col">
-                            <asp:CheckBox ID="DisActivityOn" runat="server" Checked='<%# bind("ActivityOn") %>' />
+                            <asp:CheckBox ID="DisActivityOn" runat="server" Checked='<%#Bind("ActivityOn") %>' />
                             <asp:Label  AssociatedControlId="DisActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>                              
                         </span>
 
                         <asp:CheckBox ID="DisAlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
                         <asp:Label  AssociatedControlId="DisAlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>  
                      
-                        <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%# bind("BloccoCaricoSpese") %>' />
+                        <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                         <asp:Label  AssociatedControlId="DisBloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>   
                              
                 </div>
@@ -817,7 +821,7 @@
                 <!-- *** MARGINE TARGET ***  -->
 				  <div class="input nobottomborder">
 				    <div class="inputtext">Margine: </div>
-                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineTarget") %>' Enabled="False" 
+                    <asp:TextBox ID="TBMargine"  class="ASPInputcontent" columns="5" runat="server" Text='<%# Bind("MargineProposta") %>' Enabled="False" 
                                  data-parsley-errors-container="#valMsg"  data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1'   /> 
 				  </div> 
  
@@ -946,9 +950,9 @@
            <asp:SqlDataSource ID="projects" runat="server" 
             ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
             DeleteCommand="DELETE FROM [Projects] WHERE [Projects_Id] = @Projects_Id" 
-            InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, TipoContratto_id, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineTarget, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @TipoContratto_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineTarget/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore )" 
+            InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, TipoContratto_id, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @TipoContratto_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime )" 
             SelectCommand="SELECT * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)" 
-            UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineTarget=@MargineTarget/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore  WHERE (Projects_Id = @Projects_Id)" OnInserting="projects_Inserting">
+            UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime  WHERE (Projects_Id = @Projects_Id)" OnInserting="projects_Inserting">
             <SelectParameters>
                 <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode" 
                     Type="String" />
@@ -971,7 +975,7 @@
                 <asp:Parameter Name="BudgetABAP" Type="Decimal" />
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
                 <asp:Parameter Name="SpeseBudget" Type="Decimal" />
-                <asp:Parameter Name="MargineTarget" Type="Decimal" />
+                <asp:Parameter Name="MargineProposta" Type="Decimal" />
                 <asp:Parameter Name="DataFine" Type="DateTime" />
                 <asp:Parameter Name="DataInizio" Type="DateTime" />
                 <asp:Parameter Name="SpeseForfait" Type="Boolean" />
@@ -984,6 +988,7 @@
                 <asp:Parameter Name="CodiceCliente" Type="String" />
                 <asp:Parameter Name="Note" Type="String" />
                 <asp:Parameter Name="ActivityOn" />
+                <asp:Parameter Name="NoOvertime" />
                 <asp:Parameter Name="Projects_Id" Type="Int32" />
                 <asp:Parameter Name="TestoObbligatorio" Type="Boolean" />
                 <asp:Parameter Name="MessaggioDiErrore" Type="String" />
@@ -1004,7 +1009,7 @@
                 <asp:Parameter Name="BudgetGGABAP" Type="Decimal" />
                 <asp:Parameter Name="SpeseBudget" Type="Decimal" />
                 <asp:Parameter Name="SpeseForfait" Type="Boolean" />
-                <asp:Parameter Name="MargineTarget" Type="Decimal" />
+                <asp:Parameter Name="MargineProposta" Type="Decimal" />
                 <asp:Parameter Name="DataFine" Type="DateTime" />
                 <asp:Parameter Name="DataInizio" Type="DateTime" />
                 <asp:Parameter Name="RevenueFatturate" Type="Decimal" />
@@ -1016,6 +1021,7 @@
                 <asp:Parameter Name="CodiceCliente" Type="String" />
                 <asp:Parameter Name="Note" Type="String" />
                 <asp:Parameter Name="ActivityOn" />
+                <asp:Parameter Name="NoOvertime" />
                 <asp:Parameter Name="TestoObbligatorio" Type="Boolean" />
                 <asp:Parameter Name="MessaggioDiErrore" Type="String" />
             </InsertParameters>
@@ -1084,10 +1090,12 @@
     $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
 
 // formatta il campo percentuale
-    var percentDecimal =  $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
-    if (percentDecimal != "") {
-        var percentCent = parseFloat(percentDecimal) * 100;
-        $("#FVProgetto_TBMargine").val(percentCent);
+        var percentDecimal =  $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
+
+        if (percentDecimal != "") {
+            var percentCent = Math.round( parseFloat(percentDecimal) * 10000 ) / 100;
+            percentCent = percentCent.toString().replace(".", ",");
+            $("#FVProgetto_TBMargine").val(percentCent);
     } 
 
     Parsley.addMessages('it', {
@@ -1128,6 +1136,8 @@
     window.Parsley.addValidator("requiredIf", {
         validateString: function (value, requirement) {
 
+            value = value.toString().replace(',', '.');
+
             // se inserito deve essere un numero
             if (isNaN(value) && !!value) {
                 window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
@@ -1137,7 +1147,7 @@
             if (jQuery("#FVProgetto_DDLTipoContratto option:selected").text() == "FIXED") {
 
                 // se FIXED verifica obbligatorietà
-                if (!value)  {
+                if (!value && requirement!= "percent")  {
                     window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
                     return false;
                 }
@@ -1152,13 +1162,13 @@
                     }
 
                 // se percent
-                if (requirement == "percent")
-                    if ( !isNaN(value) && value > 0 && value <= 100 ) //  compilato e numerico
-                        return true;
-                    else {
-                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero tra 1 e 100");
-                        return false;
-                    }    
+                //if (requirement == "percent")
+                //    if ( !isNaN(value) && value >= 0 && value <= 100 ) //  compilato e numerico
+                //        return true;
+                //    else {
+                //        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero tra 1 e 100");
+                //        return false;
+                //    }    
             }
 
             return true;

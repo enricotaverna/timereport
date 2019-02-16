@@ -431,44 +431,44 @@ public class CommonFunction
             return (remainingDays - 2);
     }
 
-    public static void CreaFestiviAutomatici(Int16 Persons_id)
-    {
-        // Richiamata con o senza identificativo della persona
-        // Crea i festivi automatici a partire dalla data corrente leggendo la tabella Holiday
-        // Se Persons_id = 0 o null vengono creati per tutte le persone attive
-        string SQLString;
+    //public static void CreaFestiviAutomatici(Int16 Persons_id)
+    //{
+    //    // Richiamata con o senza identificativo della persona
+    //    // Crea i festivi automatici a partire dalla data corrente leggendo la tabella Holiday
+    //    // Se Persons_id = 0 o null vengono creati per tutte le persone attive
+    //    string SQLString;
 
-        if (Persons_id != 0)
-            SQLString = "SELECT Persons_id from Persons where Persons_id = " + Persons_id.ToString();
-        else
-            SQLString = "SELECT Persons_id from Persons where active = 1 ";
+    //    if (Persons_id != 0)
+    //        SQLString = "SELECT Persons_id from Persons where Persons_id = " + Persons_id.ToString();
+    //    else
+    //        SQLString = "SELECT Persons_id from Persons where active = 1 ";
 
-        // 1' step: cancella tutti i festivi automatici (solo quelli dal giorno attuale in avanti !!!)
-        DataTable dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
+    //    // 1' step: cancella tutti i festivi automatici (solo quelli dal giorno attuale in avanti !!!)
+    //    DataTable dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
 
-        foreach (DataRow rdr in dtPersons.Rows)
-        {
-            // cancella i record creati automaticamente con data >= data attuale
-            SQLString = "DELETE FROM hours WHERE FestivoAutomatico = 1 AND Persons_id = " + rdr["Persons_id"].ToString() + " AND Date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
-            Database.ExecuteSQL(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
-        }
+    //    foreach (DataRow rdr in dtPersons.Rows)
+    //    {
+    //        // cancella i record creati automaticamente con data >= data attuale
+    //        SQLString = "DELETE FROM hours WHERE FestivoAutomatico = 1 AND Persons_id = " + rdr["Persons_id"].ToString() + " AND Date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
+    //        Database.ExecuteSQL(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
+    //    }
 
-        // 2' step: crea i carichi automatici
+    //    // 2' step: crea i carichi automatici
 
-        // Join tra persone attive e date giorni festivi >= data odierna
-        if (Persons_id != 0)
-            SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.Persons_id = " + Persons_id.ToString() + " AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
-        else
-            SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.active = 1 AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"));
+    //    // Join tra persone attive e date giorni festivi >= data odierna
+    //    if (Persons_id != 0)
+    //        SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.Persons_id = " + Persons_id.ToString() + " AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
+    //    else
+    //        SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.active = 1 AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"));
 
-        dtPersons.Clear();
-        dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
+    //    dtPersons.Clear();
+    //    dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
 
-        foreach (DataRow rdr in dtPersons.Rows)
-            // cancella i record creati automaticamente con data >= data attuale
-            // cancella i record creati automaticamente con data >= data attuale
-            Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, FestivoAutomatico) VALUES(" + ASPcompatility.FormatDateDb(rdr["holiday_date"].ToString(), false) + " , " + ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]) + " , " + ASPcompatility.FormatStringDb(rdr["Persons_id"].ToString()) + " , " + ASPcompatility.FormatNumberDB(8) + " , " + ASPcompatility.FormatStringDb("1") + " , " + " '0'  , " + " null  , " + " null  , " + " null , " + " null  , " + ASPcompatility.FormatStringDb(HttpContext.Current.Session["UserId"].ToString()) + " , " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + "'1'" + " )", null/* TODO Change to default(_) if this is not a reference type */);
-    }
+    //    foreach (DataRow rdr in dtPersons.Rows)
+    //        // cancella i record creati automaticamente con data >= data attuale
+    //        // cancella i record creati automaticamente con data >= data attuale
+    //        Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, FestivoAutomatico) VALUES(" + ASPcompatility.FormatDateDb(rdr["holiday_date"].ToString(), false) + " , " + ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]) + " , " + ASPcompatility.FormatStringDb(rdr["Persons_id"].ToString()) + " , " + ASPcompatility.FormatNumberDB(8) + " , " + ASPcompatility.FormatStringDb("1") + " , " + " '0'  , " + " null  , " + " null  , " + " null , " + " null  , " + ASPcompatility.FormatStringDb(HttpContext.Current.Session["UserId"].ToString()) + " , " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + "'1'" + " )", null/* TODO Change to default(_) if this is not a reference type */);
+    //}
 
     public static CultureInfo GetCulture()
     {
@@ -830,7 +830,7 @@ public class ASPcompatility
         // elenco dei mesi con default il corrente
         for (i = 1; i <= 12; i++)
         {
-            lItem = new ListItem(mfi.MonthNames[i - 1], i.ToString());
+            lItem = new ListItem(mfi.MonthNames[i - 1], i.ToString("D2"));
             DDL.Items.Add(lItem);
 
             if (DateTime.Now.Month == i)

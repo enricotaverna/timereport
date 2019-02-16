@@ -30,13 +30,13 @@
  
 <div id="MainWindow"> 
 
-<div id="FormWrap" >
+<div id="FormWrap" class="StandardForm">
 
     <form id="form1" runat="server"  >
 
-    <asp:FormView ID="SchedaCostRate" runat="server" DataKeyNames="ForcedAccounts_Id" 
+    <asp:FormView ID="SchedaCostRate" runat="server" DataKeyNames="ProjectCostRate_id" 
         DataSourceID="DSForcedAccounts" EnableModelValidation="True" DefaultMode="Insert"
-        align="center" oniteminserted="SchedaCostRate_ItemInserted"  CssClass="StandardForm"
+        align="center" oniteminserted="SchedaCostRate_ItemInserted"   
         onitemupdated="SchedaCostRate_ItemUpdated" onmodechanging="SchedaCostRate_ModeChanging">
         
         <EditItemTemplate>
@@ -66,11 +66,11 @@
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" Display="none" runat="server" ErrorMessage="Inserisci il codice progetto" ControlToValidate="DDLProgetto"></asp:RequiredFieldValidator>
                 </div>   
 
-               <!-- *** Cost Rate ***  --> 
+               <!-- *** Bill Rate ***  --> 
                <div class="input nobottomborder"> 
-                     <div class="inputtext">Cost Rate (EUR): </div> 
-                     <asp:TextBox ID="TBCostRate" runat="server" Text='<%# Bind("CostRate") %>' CssClass="ASPInputcontent" />
-                     <asp:RequiredFieldValidator ID="RequiredFieldValidator3" Display="none" runat="server" ErrorMessage="Inserisci valore Cost Rate" ControlToValidate="TBCostRate"></asp:RequiredFieldValidator>
+                     <div class="inputtext">Bill Rate (EUR): </div> 
+                     <asp:TextBox ID="TBBillRate" runat="server" Text='<%# Bind("BillRate") %>' CssClass="ASPInputcontent" />
+                     <asp:RequiredFieldValidator ID="RequiredFieldValidator3" Display="none" runat="server" ErrorMessage="Inserisci valore Cost Rate" ControlToValidate="TBBillRate"></asp:RequiredFieldValidator>
                </div>  
                 			
 	           <!-- *** BOTTONI  ***  -->
@@ -104,10 +104,10 @@
                         </label>
                 </div>   
 
-               <!-- *** Cost Rate ***  --> 
+               <!-- *** Bill Rate ***  --> 
                <div class="input nobottomborder"> 
-                     <div class="inputtext">Cost Rate (EUR): </div> 
-                     <asp:TextBox ID="TBCostRate" runat="server" Text='<%# Bind("CostRate") %>' CssClass="ASPInputcontent" Enabled="False" />
+                     <div class="inputtext">Bill Rate (EUR): </div> 
+                     <asp:TextBox ID="TBBillRate" runat="server" Text='<%# Bind("BillRate") %>' CssClass="ASPInputcontent" Enabled="False" />
                </div>  
                 			
 	           <!-- *** BOTTONI  ***  -->
@@ -140,24 +140,22 @@
 
         <asp:SqlDataSource ID="DSForcedAccounts" runat="server" 
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
-        SelectCommand="SELECT * FROM [ForcedAccounts] WHERE ([ForcedAccounts_id] = @ForcedAccounts_id)" 
-        InsertCommand="INSERT INTO [ForcedAccounts] ([Persons_id],[Projects_id], [CostRate], [ListPrice] ) VALUES (@Persons_id, @Projects_id, @CostRate, @ListPrice)" 
-        UpdateCommand="UPDATE [ForcedAccounts] SET [Persons_id] = @Persons_id, [Projects_id] = @Projects_id, [CostRate] = @CostRate, [ListPrice] = @ListPrice WHERE [ForcedAccounts_id] = @ForcedAccounts_id" >        
+        SelectCommand="SELECT * FROM [ProjectCostRate] WHERE ([ProjectCostRate_id] = @ProjectCostRate_id)" 
+        InsertCommand="INSERT INTO [ProjectCostRate] ([Persons_id],[Projects_id], [BillRate] ) VALUES (@Persons_id, @Projects_id, @BillRate)" 
+        UpdateCommand="UPDATE [ProjectCostRate] SET [Persons_id] = @Persons_id, [Projects_id] = @Projects_id, [BillRate] = @BillRate WHERE [ProjectCostRate_id] = @ProjectCostRate_id" >        
 
         <SelectParameters>
-        <asp:QueryStringParameter Name="ForcedAccounts_id" QueryStringField="ForcedAccounts_id" Type="String" />
+        <asp:QueryStringParameter Name="ProjectCostRate_id" QueryStringField="ProjectCostRate_id" Type="String" />
         </SelectParameters>
         <InsertParameters>
             <asp:Parameter Name="Persons_id" Type="Int32" />
             <asp:Parameter Name="Projects_id" Type="Int32" />
-            <asp:Parameter Name="CostRate" Type="Decimal" />
-            <asp:Parameter Name="ListPrice" Type="Decimal" />
+            <asp:Parameter Name="BillRate" Type="Decimal" />
         </InsertParameters>
         <UpdateParameters>
             <asp:Parameter Name="Persons_id" Type="Int32" />
             <asp:Parameter Name="Projects_id" Type="Int32" />
-            <asp:Parameter Name="CostRate" Type="Decimal" />
-            <asp:Parameter Name="ListPrice" Type="Decimal" />
+            <asp:Parameter Name="BillRate" Type="Decimal" />
         </UpdateParameters>
     </asp:SqlDataSource>
 

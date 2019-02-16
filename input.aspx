@@ -18,33 +18,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title><asp:Literal runat="server" Text="<%$ Resources:Titolo%>" /></title>
 </head>
 
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
-<!--**** Stili per effetto dialog box ***-->
-<style>
-
-    #boxes .window {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 440px;
-        height: 200px;
-        display: none;
-        z-index: 9999;
-        padding: 20px;
-    }
-
-    #boxes #dialog {
-        width: 450px;
-        height: 150px;
-        padding: 0px;
-    }
-
-    }
 </style>
 
 <body>
@@ -226,7 +206,7 @@
     </div>
 
     <!-- **** Finestre richiesta spese / trasferte **** -->
-    <div id="boxes">
+    <div id="ModalWindow">
 
         <form name="loginform" action="input.aspx" method="post" class="StandardForm" runat="server">
 
@@ -286,7 +266,7 @@
 
         </form>
 
-    </div>    <%--BOXES--%>
+    </div>    <%--ModalWindow--%>
 
     <!-- Mask to cover the whole screen -->
     <div id="mask"></div>

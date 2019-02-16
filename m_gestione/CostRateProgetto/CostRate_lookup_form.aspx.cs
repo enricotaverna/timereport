@@ -26,9 +26,9 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
      // Imposta dinamicamente query selezione
     protected void ImpostaQuery()
     {
-      
+
         // Se Manager posso visualizzare solo i miei progetti
-        if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED"))
+        if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             DSProgetti.SelectCommand = "SELECT Projects_Id, ProjectCode + N'  ' + Name AS NomeProgetto, ClientManager_id, Active FROM Projects WHERE Projects.Active = 1 AND ClientManager_id = @clientmanager_id ORDER BY NomeProgetto";
         else
             DSProgetti.SelectCommand = "SELECT Projects_Id, ProjectCode + N'  ' + Name AS NomeProgetto, ClientManager_id, Active FROM Projects WHERE Projects.Active = 1 ORDER BY NomeProgetto";       
@@ -40,7 +40,7 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
     {
         // Se richiamato con parametro imposta la modalità Edit e cambia il CommandNae del tasto "Salva"
         // Usato per non duplicate i template nella FormView a fronte degli stessi controlli
-        if (!IsPostBack && Request.QueryString["ForcedAccounts_id"] != null && SchedaCostRate.CurrentMode == FormViewMode.Insert)
+        if (!IsPostBack && Request.QueryString["ProjectCostRate_id"] != null && SchedaCostRate.CurrentMode == FormViewMode.Insert)
         {
             SchedaCostRate.ChangeMode(FormViewMode.Edit);
             SchedaCostRate.DefaultMode = FormViewMode.Edit;

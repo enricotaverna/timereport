@@ -42,7 +42,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         // se manager limita i progetti visibili
         sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND Projects.ClientManager_id=" + Session["Persons_id"] : sWhere;
 
-        DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineTarget " +
+        DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta " +
                                          " FROM Projects " +
                                          " LEFT OUTER JOIN Persons ON Projects.ClientManager_id = Persons.Persons_id " +
                                          " LEFT OUTER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id LEFT OUTER JOIN Customers ON Projects.CodiceCliente = Customers.CodiceCliente" + sWhere + strQueryOrdering;             
