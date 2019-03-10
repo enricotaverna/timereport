@@ -13,6 +13,7 @@ const AUTH_EMPLOYEE = 2;
 const AUTH_TEAMLEADER = 3;
 const AUTH_MANAGER = 4;
 const AUTH_ADMIN = 5;
+const AUTH_TRAINER = 6;
 
 // Legge livello autorizzazioni da file chiamante
 var sUserLevel = AUTH_EXTERNAL;
@@ -138,16 +139,22 @@ effect,				// Filter - Text variable for setting transitional effects on menu ac
 , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=Utilita", , "", 1
 , (sLingua == 'it') ?  "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=Progetti", , "", 1
 , (sLingua == 'it') ? "Amministrazione&nbsp;&nbsp;" : "Administration&nbsp;&nbsp;", "show-menu=Amministrazione", , "", 1
+, (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=HR", , "", 1
 ,"Logout&nbsp;&nbsp;","/timereport/logout.aspx",,"",1
 ])
 
 	// cancella menu progetti (Manager)
 if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AUTH_TEAMLEADER)
-		menu.splice(42, 10);
+		menu.splice(42, 15);
 
 	// cancella menu Amministrazione
-	if (sUserLevel == AUTH_MANAGER )
+if (sUserLevel == AUTH_TRAINER)
 		menu.splice(47, 5);
+
+	// cancella menu Amministrazione e training
+if (sUserLevel == AUTH_MANAGER )
+    menu.splice(47, 10);
+
 
 	//addmenu(menu=["Spese",
 	//,,180,1,"",style1,,"",effect,,,,,,,,,,,,
@@ -197,8 +204,37 @@ if (sUserLevel == AUTH_EMPLOYEE | sUserLevel == AUTH_EXTERNAL | sUserLevel == AU
 	, "Gestione Economics", "show-menu=Amm_Economics", , , 1
 	, "Tabelle valori", "show-menu=Tabelle", , , 1
 	, "Report", "show-menu=Amm_Export", , , 1
-	])
-	
+])
+
+
+addmenu(menu = ["HR",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "Training", "show-menu=Training", , , 1
+])
+
+addmenu(menu = ["Training",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "Catalogo", "show-menu=Catalogo", , , 1
+    , "Training plan", "show-menu=Training plan", , , 1
+])
+
+addmenu(menu = ["Catalogo",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Corso", "/timereport/lookup_list.aspx?TableName=HR_CourseType&SortField=CourseTypeName&FieldNumber=1&init=true&CheckTable=HR_Course", , , 1
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Prodotti", "/timereport/lookup_list.aspx?TableName=HR_Product&SortField=ProductName&FieldNumber=1&init=true&CheckTable=HR_Course", , , 1
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Vendor Corso", "/timereport/lookup_list.aspx?TableName=HR_CourseVendor&SortField=VendorName&FieldNumber=1&init=true&CheckTable=HR_Course", , , 1
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Catalogo corsi", "/timereport/m_gestione/training/CourseCatalog.aspx", , , 1
+])
+
+addmenu(menu = ["Training plan",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Crea", "/timereport/m_gestione/training/trainingplan_create.aspx", , , 1
+    , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Schedula", "/timereport/m_gestione/training/trainingplan_schedule.aspx", , , 1
+])
+
+
+
+
 	addmenu(menu = ["Amm_CutOff",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
 	, "<img src=/timereport/images/icons/16x16/cutoff.gif border=0>&nbsp;CutOff", "/timereport/m_gestione/Cutoff/cutoff.aspx", , , 1

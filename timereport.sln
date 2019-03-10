@@ -1,27 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "timereport", "http://localhost/timereport", "{894F246B-FC26-453B-9718-209D6CA45CE2}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "timereport", "http://localhost/timereport", "{CBEBC014-DA2B-4084-B5D0-7ABE4BD51F8E}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "false"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/timereport"
-		Debug.AspNetCompiler.PhysicalPath = "G:\01 Cloud\OneDrive\02 Development\timereport\"
+		Debug.AspNetCompiler.PhysicalPath = "..\timereport\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\timereport\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/timereport"
-		Release.AspNetCompiler.PhysicalPath = "G:\01 Cloud\OneDrive\02 Development\timereport\"
+		Release.AspNetCompiler.PhysicalPath = "..\timereport\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\timereport\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "G:\01 Cloud\OneDrive\02 Development\timereport\"
+		SlnRelativePath = "..\timereport\"
 	EndProjectSection
 EndProject
 Global
@@ -29,13 +29,13 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{894F246B-FC26-453B-9718-209D6CA45CE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{894F246B-FC26-453B-9718-209D6CA45CE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBEBC014-DA2B-4084-B5D0-7ABE4BD51F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBEBC014-DA2B-4084-B5D0-7ABE4BD51F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C17E4F79-3981-4964-A03D-59E686915931}
+		SolutionGuid = {B7E19305-B2B1-4D3B-8C8E-9AAC552CEE0A}
 	EndGlobalSection
 EndGlobal

@@ -670,7 +670,7 @@ public class Database
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static void ExecuteSQL(string cmdText, Page mypage)
+    public static bool ExecuteSQL(string cmdText, Page mypage)
     {
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
 
@@ -687,10 +687,11 @@ public class Database
                 {
                     if (!(mypage == null))
                         mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteSQL: " + ex.Message + "');", true);
+                    return false; 
                 }
             }
         }
-        return;
+        return true;
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
@@ -887,6 +888,11 @@ public class ASPcompatility
         string sRet = "";
 
         DateTime DateToConvert;
+
+        if (sDateToConvert == "") {
+            sRet = "''";
+            return sRet;
+        } //  init
 
         if (timestamp)
             DateToConvert = DateTime.ParseExact(sDateToConvert, "d/M/yyyy HH.mm.ss", System.Globalization.CultureInfo.InvariantCulture);

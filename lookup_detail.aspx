@@ -8,15 +8,21 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+<!-- Stili -->
+<link href="/timereport/include/newstyle.css" rel="stylesheet" /> 
+<link href="/timereport/include/standard/uploader/uploader.css" rel="stylesheet"  />
 
-<!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
+<!-- Menù  -->
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
+<!-- Jquery per date picker  -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="include/jquery/jquery-1.9.0.min.js"></script> 
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
 <script runat="server">
 
@@ -24,6 +30,7 @@
     const int cLenght = 2;
     const int cIsIdentity = 17;
     const int cDataType = 24;
+    const int cIsNullable = 13;
 
     public string strMode;
     //public DataRow drRecord;
@@ -37,7 +44,10 @@
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        Auth.CheckPermission("CONFIG", "TABLE");
+        if ( Session["TableName"].ToString().Substring(0,2) == "HR" )
+                Auth.CheckPermission("TRAINING", "PLAN");  // Coordinatore Trainer
+        else
+                Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
 
         // recupera la struttura della tabella
         SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
@@ -87,11 +97,19 @@
 
             case "int":
             case "float":
-                sRet = ASPcompatility.FormatNumberDB(Convert.ToDouble(sValue));
+            case "smallmoney":
+                if ( sValue!= "")
+                    sRet = ASPcompatility.FormatNumberDB(Convert.ToDouble(sValue));
+                else
+                    sRet = "''";
                 break;
 
             case "smalldatetime":
-                sRet = ASPcompatility.FormatDateDb(sValue);
+            case "datetime":
+                if (sValue != "")
+                    sRet = ASPcompatility.FormatDateDb(sValue);
+                else
+                    sRet = "''";
                 break;
         }
 
@@ -106,7 +124,7 @@
         if (strMode == "update")
         {
 
-            if (strFieldType != "smalldatetime")
+            if (strFieldType != "smalldatetime" && strFieldType != "datetime")
                 sResult = dtRecord.Rows[0][iIndex].ToString().TrimEnd(' ');
             else
                 sResult = dtRecord.Rows[0][iIndex].ToString().Substring(0, 10);
@@ -226,13 +244,14 @@
 
         <div id="FormWrap" class="StandardForm">
 
-            <form name="form1" runat="server" method="post" action="lookup_detail.aspx" >
+            <form id="formTab" runat="server" method="post" action="lookup_detail.aspx" >
 
                 <!-- *** TITOLO FORM ***  -->
                 <div class="formtitle">Edit Form</div>
 
                 <% 
                     string sValue, flagnbh;
+                    string sMandatory;
                     iIndex = 0;
 
                     foreach (DataRow fld in dtSchema.Rows)
@@ -273,13 +292,23 @@
 
                                     case "int":
                                     case "float":
+                                    case "smallmoney":
+                                        if (fld[cIsNullable].ToString() == "True")
+                                            sMandatory = "";
+                                        else
+                                            sMandatory = " data-parsley-errors-container='#valMsg' data-parsley-required='true' ";
+
 
                                         if (fld[cName].ToString().IndexOf("_Id") > 0 || fld[cName].ToString().IndexOf("_id") > 0)
                                         {
-                                            Response.Write("<label class=dropdown style=width:200px><select name=" + fld[cName].ToString() + ">");
-                                            Response.Write("<option value=0> nessun valore </option>");
+                                            Response.Write("<label class=dropdown style=width:200px><select name=" + fld[cName].ToString() + sMandatory + " >");
+                                            Response.Write("<option value=''> nessun valore </option>");
 
                                             string strLookUpTable = fld[cName].ToString().Substring(0, fld[cName].ToString().Length - 3);
+
+                                            if (strLookUpTable == "Course" || strLookUpTable == "CourseType" || strLookUpTable == "Product" || strLookUpTable == "CourseVendor")
+                                                strLookUpTable = "HR_" + strLookUpTable;
+
 
                                             DataTable dtLookup = Database.GetData("SELECT * FROM " + strLookUpTable, this.Page);
 
@@ -296,16 +325,27 @@
                                             Response.Write("</select></label> </div>");
                                         }
                                         else
-                                            Response.Write("<div class=inputcontent><input size=70  type=text name=" + fld[cName] + " value=" + sValue + "></div> </div>");
+                                            Response.Write("<div class=inputcontent><input size=70  type=text name=" + fld[cName] + " value=" + sValue + sMandatory + "></div> </div>");
                                         break;
 
                                     case "smalldatetime":
-                                        Response.Write("<div class=inputcontent><input size=10 type=text name=" + fld[cName].ToString() + " value='" + sValue + "' maxlength=10></div> </div>");
+                                    case "datetime":
+                                        if (fld[cIsNullable].ToString() == "True")
+                                            sMandatory = "";
+                                        else
+                                            sMandatory = " data-parsley-errors-container='#valMsg' data-parsley-required='true' ";
+
+                                        Response.Write("<div class='inputcontent' ><input class = 'datepicker' style='width:120px' type=text name=" + fld[cName].ToString() + " value='" + sValue + "' maxlength=10 " + sMandatory + "></div> </div>");
                                         break;
 
                                     case "nvarchar":
                                     case "nchar":
-                                        Response.Write("<div class=inputcontent><input size=" + fld[cLenght].ToString() + " type=text name=" + fld[cName].ToString() + " value='" + sValue + "' maxlength=" + fld[cLenght].ToString() + "></div> </div>");
+                                        if (fld[cIsNullable].ToString() == "True")
+                                            sMandatory = "";
+                                        else
+                                            sMandatory = " data-parsley-errors-container='#valMsg' data-parsley-required='true' ";
+
+                                        Response.Write("<div class=inputcontent><input size=" + fld[cLenght].ToString() + " type=text name=" + fld[cName].ToString() + " value='" + sValue + "' maxlength=" + fld[cLenght].ToString() +  sMandatory + "></div> </div>");
                                         break;
                                 }
 
@@ -320,9 +360,9 @@
                         }
                     %>
 
-                    <div class="buttons">
+                    <div class="buttons" id="valMsg">
                         <asp:Button ID="btSave" runat='server' type='submit' name='save' Text='Salva' class='orangebutton' OnClick="btSave_Click" />
-                        <asp:Button ID="btCancel" runat="server" type="submit" name="cancel" Text="Annulla" class="greybutton" OnClick="btCancel_Click" />
+                        <asp:Button ID="btCancel" runat="server" type="submit" name="cancel" Text="Annulla" class="greybutton" OnClick="btCancel_Click" formnovalidate=""  />
                     </div>
             </form>
 
@@ -343,6 +383,21 @@
     </div>
 
 </body>
+
+<script>
+        
+	$(function () {
+
+		$(".datepicker").datepicker($.datepicker.regional['it']);
+
+        $('#formTab').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+        });
+
+
+	});
+
+</script>
 
 
 </html>

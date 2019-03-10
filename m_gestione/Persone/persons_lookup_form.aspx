@@ -518,7 +518,7 @@
 
 <asp:sqldatasource runat="server" ID="DSLivelloUtente"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
-        SelectCommand="SELECT * FROM [AuthUserLevel]"></asp:sqldatasource>
+        SelectCommand="SELECT * FROM [AuthUserLevel] ORDER BY UserLevel_ID"></asp:sqldatasource>
 
 <asp:sqldatasource runat="server" ID="DSCalendario"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 

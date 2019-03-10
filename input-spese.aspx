@@ -318,7 +318,7 @@
 
 						<!-- *** Bottoni ***  -->
 						<div class="buttons">
-                            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>                                
+                            <div id="valMsg" class="parsely-single-error" style="display:inline-block;width:130px"></div>                                
 							<asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
 							<asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" formnovalidate />
 						</div>

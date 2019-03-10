@@ -207,8 +207,7 @@
         <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>
     </div>
 
-    <!-- Mask to cover the whole screen -->
-    <div id="mask"></div>
+    <div id="mask"></div>  <!-- Mask to cover the whole screen -->
 
     <script type="text/javascript">
 

@@ -31,3 +31,12 @@
         });
     };
 
+    //custom formatter definition
+    var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
+        return "<i class='fa fa-trash'></i>";
+    };  
+
+    //custom formatter definition
+    var editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        return "<i class='fa fa-edit'></i>";
+    };

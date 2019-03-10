@@ -28,8 +28,10 @@
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        //	Authorization level 3 needed for this function
-        Auth.CheckPermission("CONFIG", "TABLE");
+        if ( Request["TableName"].ToString().Substring(0,2) == "HR" )
+                Auth.CheckPermission("TRAINING", "PLAN");  // Coordinatore Trainer
+        else
+                Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
 
         if (Request["cancel_from_list"] == "Cancel")
             Response.Redirect("/timereport/menu.aspx");

@@ -977,3 +977,19 @@ select.parsley-error {
 
 /*#endregion*/
 
+/*#Tabulator*/
+.tabulator {
+    font: 10px sans-serif;
+    border: none;
+    border-radius: 6px;
+}
+
+.tabulator-col {
+    background: #FFBD27 !important;
+    border: none !important;
+}
+
+.tabulator-header {
+    border: none !important;
+}
+

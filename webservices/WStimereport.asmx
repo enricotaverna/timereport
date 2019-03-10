@@ -3,16 +3,13 @@
 using System;
 using System.Web;
 using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
-using System.Web.Script.Services;
-using System.Web.Services;
+using System.Text;
 
 /// <summary>
 /// Summary description for WStimereport
