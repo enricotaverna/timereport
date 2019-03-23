@@ -9,6 +9,7 @@
     {
         // Code that runs on application startup
         Application["OnlineVisitors"] = 0;
+        WebControl.DisabledCssClass = "";
     }
 
     void Application_End(object sender, EventArgs e)

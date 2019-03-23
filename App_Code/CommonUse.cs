@@ -717,7 +717,7 @@ public class Database
                     connection.Open(); // Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
                     da.Fill(dtRecord);
 
-                    if (dtRecord.Rows.Count == 1)
+                    if (dtRecord.Rows.Count > 1)
                         result = true;
                     else
                         result = false;

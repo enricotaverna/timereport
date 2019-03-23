@@ -39,7 +39,7 @@ public partial class m_CostRateAnno_lookup_list : System.Web.UI.Page
 
         //// Si imposta valore della selezione se DDL impostata "OR" si verifica il valore di default della DDL
         sWhere = " WHERE ( PersonsCostRate.Persons_id = @Persons_id OR @Persons_id = '0' ) AND " +
-                       " ( Persons.Active = @DDLFlattivo OR @DDLFlattivo = '99' ) AND " +
+       //                " ( Persons.Active = @DDLFlattivo OR @DDLFlattivo = 99 ) AND " +
                        " anno = @anno ";
 
         DSElenco.SelectCommand = "SELECT DISTINCT PersonsCostRate_id, PersonsCostRate.Persons_id, Persons.name as NomePersona, Anno, PersonsCostRate.CostRate, Comment " +

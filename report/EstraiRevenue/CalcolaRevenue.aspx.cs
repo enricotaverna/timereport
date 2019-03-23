@@ -54,7 +54,7 @@ public partial class report_esportaAttivita : System.Web.UI.Page
                  case 0:     // calcolo Revenue Mese
                   CalcolaRevenueMese(DDLFromMonth.Text, DDLFromYear.Text) ;                 
                   Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMese + "')";
-                  Session["ReportPath"] = "RevenuePerMese.rdlc";
+                  Session["ReportPath"] = "REV_RevenueDettaglioPerMese.rdlc";
                   //ClientScript.RegisterStartupScript(this.GetType(), "Popup", "", true);
                   Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
                   break;

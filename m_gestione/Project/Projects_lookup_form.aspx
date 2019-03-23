@@ -278,11 +278,11 @@
                <div class="input nobottomborder">
                <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Da"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" width="100px" 
-                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"  />
                                                 
                <asp:Label class="css-label" style="padding:0px 20px 0px 20px" runat="server">a</asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' 
-                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"  />
                 </div>
                      
                 </div> <!-- *** TAB 2 ***  -->
@@ -552,20 +552,24 @@
                     <label>%</label>
                   </div> 
  
-                <div class="SeparatoreForm">Durata</div>
+				  <div class="input nobottomborder">
+				    <div class="inputtext"></div>
+                     <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
+                     <asp:Label  AssociatedControlId="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime" ></asp:Label>  
+
+                  </div> 
+ 
+                <div class="SeparatoreForm">Durata Progetto</div>
 
                 <!-- *** DATA INIZIO  ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label ID="Label4" CssClass="inputtext" runat="server" Text="Data inizio:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data inizio" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}")%>' MaxLength="10" Rows="12" Columns="10" 
-                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                </div>
-
-                 <!-- *** DATA FINE  ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data fine:"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ErrorMessage = "Inserire data fine" ID="TBAttivoA" runat="server" Text='<%# Bind("DataFine", "{0:d}") %>' MaxLength="10" Rows="12" Columns="10" 
-                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+               <div class="input nobottomborder">
+               <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Da"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" width="100px" 
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"  />
+                                                
+               <asp:Label class="css-label" style="padding:0px 20px 0px 20px" runat="server">a</asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' 
+                                     data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"  />
                 </div>
                                    
                 </div> <!-- *** TAB 2 ***  -->
@@ -1021,7 +1025,7 @@
                 <asp:Parameter Name="CodiceCliente" Type="String" />
                 <asp:Parameter Name="Note" Type="String" />
                 <asp:Parameter Name="ActivityOn" />
-                <asp:Parameter Name="NoOvertime" />
+                <asp:Parameter Name="NoOvertime" DefaultValue ="false" />
                 <asp:Parameter Name="TestoObbligatorio" Type="Boolean" />
                 <asp:Parameter Name="MessaggioDiErrore" Type="String" />
             </InsertParameters>

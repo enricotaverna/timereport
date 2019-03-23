@@ -29,6 +29,13 @@ public class Course
     public string ValidTo { get; set; }
 }
 
+// definisce la struttura  da ritornare con GetCoursePlanItem
+public class CoursePlanItem
+{
+    public int CoursePlan_id { get; set; }
+    public string Comment { get; set; }
+}
+
 /// <summary>
 /// Summary description for WStimereport
 /// </summary>
@@ -42,6 +49,29 @@ public class WSHR_Training : System.Web.Services.WebService {
 
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
+    }
+
+    [WebMethod(EnableSession = true)]
+    public bool UpdateTrainingPlanRecord(string sCoursePlan_id, string sFieldToUpdate, string sValue )
+    {
+        bool ret = false;
+
+        if (sFieldToUpdate == "CourseStatusName") {
+            sFieldToUpdate = "CourseStatus_id";
+            sValue = Database.ExecuteScalar("SELECT CourseStatus_id from HR_CourseStatus WHERE CourseStatusName ='" + sValue + "'", null ).ToString();
+        }
+
+        if (sFieldToUpdate == "CourseDate") // formatta data
+            sValue = ASPcompatility.FormatDateDb(sValue);
+        else
+            sValue = ASPcompatility.FormatStringDb(sValue);
+
+        // aggiorna record del trainig plan
+        if ( Convert.ToInt16(sCoursePlan_id) > 0)
+            ret = Database.ExecuteSQL("Update HR_CoursePlan SET " + sFieldToUpdate + " = " + sValue + " WHERE CoursePlan_id='" + sCoursePlan_id + "'", null );
+
+        return ret;
+
     }
 
     [WebMethod(EnableSession = true)]
@@ -140,7 +170,7 @@ public class WSHR_Training : System.Web.Services.WebService {
             sFilter = Persons_id == "0" ? sFilter : sFilter + " AND A.Persons_id =  '" + Persons_id + "' "; // se senza persona resituisce tutto il piano corsi
         }
 
-        String query = "SELECT A.CoursePlan_id,A.Course_id, A.Anno, E.CourseCode, E.CourseName, B.CourseTypeName, C.ProductName, E.Area, D.VendorName, F.CourseStatusName, A.Score, G.Name as PersonName FROM HR_CoursePlan AS A " +
+        String query = "SELECT A.CoursePlan_id,A.Course_id, A.Anno, A.Comment, CONVERT(VARCHAR(10),A.CourseDate, 103) as CourseDate, E.CourseCode, E.CourseName, B.CourseTypeName, C.ProductName, E.Area, D.VendorName, F.CourseStatus_id, F.CourseStatusName, A.Score, G.Name as PersonName FROM HR_CoursePlan AS A " +
                                 "JOIN HR_Course AS E ON E.Course_id = A.Course_id " +
                                 "LEFT JOIN HR_CourseType AS B ON B.CourseType_id = E.CourseType_id " +
                                 "LEFT JOIN HR_Product AS C ON C.Product_id= E.Product_id " +
@@ -178,7 +208,7 @@ public class WSHR_Training : System.Web.Services.WebService {
     }
 
     [WebMethod(EnableSession = true)]
-    public int CreateUpdateCourse( int Course_id, string CourseCode, string CourseName,
+    public int CreateUpdateCourse( int Course_id, string CourseName,
                            string Description, string CourseType_id,
                            string Product_id, string Area, string Active,
                            string CourseVendor_id, string  DurationDays,
@@ -197,6 +227,12 @@ public class WSHR_Training : System.Web.Services.WebService {
 
         if (Active == null)
             Active  = "false";
+
+        //      genera il codice corso
+        object obj = Database.ExecuteScalar("SELECT MAX(CourseCode) FROM HR_Course", null );
+        int counter = Convert.ToInt32( obj.ToString().Substring(2, 4) );
+        counter++;
+        string CourseCode = "TR" + counter.ToString("0000");
 
         if (Course_id > 0)
             sSQL = "UPDATE HR_Course SET " +
@@ -294,8 +330,50 @@ public class WSHR_Training : System.Web.Services.WebService {
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public CoursePlanItem GetCoursePlanItem(string sCoursePlan_id )
+    {
+
+        CoursePlanItem rc = new CoursePlanItem();
+
+        DataTable dt = Database.GetData("SELECT * FROM HR_CoursePlan where CoursePlan_Id = " + sCoursePlan_id, null);
+
+        // valorizza flag che dice se testo commento è obbligatorio
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            rc.CoursePlan_id = 0;
+        }
+        else
+        {
+            rc.CoursePlan_id = Convert.ToInt32(dt.Rows[0]["CoursePlan_id"].ToString());
+            rc.Comment = dt.Rows[0]["Comment"].ToString();
+        }
 
 
+        return rc;
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public int CreateUpdateCoursePlanItem( int CoursePlan_id, string Comment )
+    {
+        int newIdentity = 0;
+        string sSQL = "";
+
+        sSQL = "UPDATE HR_CoursePlan SET " +
+                  "Comment = " + ASPcompatility.FormatStringDb(Comment) +
+                  " WHERE CoursePlan_id = " + ASPcompatility.FormatNumberDB(CoursePlan_id) ;
+
+        bool bResult = Database.ExecuteSQL(sSQL, null);
+
+        if (bResult) {
+            // recupera record Id creato 
+            newIdentity = Database.GetLastIdInserted("SELECT MAX(Course_id) from HR_Course");
+        }
+
+        return newIdentity;
+
+    }
 
 
 }

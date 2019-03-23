@@ -24,10 +24,9 @@
 
 
 <head id="Head1" runat="server">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>Calcola Revenue</title>
-    
-
-    </head>
+</head>
 
 <body>    
 
@@ -47,7 +46,7 @@
         <label class="dropdown" >
             <asp:DropDownList style="width:150px" runat="server" id="DDLFromMonth"> </asp:DropDownList>
         </label>
-                  
+        &nbsp;          
         <label class="dropdown" >
             <asp:DropDownList style="width:100px" runat="server" id="DDLFromYear"></asp:DropDownList>          
         </label>

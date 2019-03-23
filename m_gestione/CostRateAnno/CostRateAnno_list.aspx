@@ -341,7 +341,7 @@
 
     <!--DATASOURCE Persona per DDL -->
     <asp:SqlDataSource ID="DSPersona" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Persons.Persons_id, Persons.Name as NomePersona FROM Persons WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        SelectCommand="SELECT Persons.Persons_id, Persons.Name as NomePersona FROM Persons  ORDER BY Persons.Name">
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>

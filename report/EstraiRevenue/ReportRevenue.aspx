@@ -23,10 +23,9 @@
 
 
 <head id="Head1" runat="server">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>Calcola Revenue</title>
-    
-
-    </head>
+</head>
 
 <body>    
 
@@ -40,42 +39,68 @@
       
     <div  class="formtitle">Report</div>              
 
+ 
+
     <!--  *** MANAGER *** -->            
-    <div class="input">
+    <div class="input nobottomborder">
           <div class="inputtext">Manager</div>   
           <label class="dropdown">
                <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
-                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Persone"> 
+                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Persone" style="width:265px" > 
                    <asp:ListItem Value="0">-- tutti i manager --</asp:ListItem>                        
                     </asp:DropDownList>
           </label>
     </div>   
 
+    <!--  *** PROGETTO *** -->            
     <div class="input nobottomborder">
-        <div class="inputtext">Dalla data</div>
-        <label class="dropdown" >
+          <div class="inputtext">Progetto</div>   
+          <label class="dropdown">
+               <asp:DropDownList ID="DDLProgetto" runat="server" DataTextField="NomeProgetto" DataValueField="Projects_id"
+                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Progetti" style="width:265px" > 
+                   <asp:ListItem Value="0">-- tutti i progetti --</asp:ListItem>                        
+                    </asp:DropDownList>
+          </label>
+    </div> 
+
+    <div class="input ">
+        <div class="inputtext">Mese</div>
+        <label class="dropdown"  >
             <asp:DropDownList style="width:150px" runat="server" id="DDLFromMonth"> </asp:DropDownList>
         </label>
-                  
+        &nbsp;          
         <label class="dropdown" >
             <asp:DropDownList style="width:100px" runat="server" id="DDLFromYear"></asp:DropDownList>          
         </label>
+
     </div>  
 
-    <div class="input nobottomborder">
+
+<%--    <div class="input nobottomborder">
         <div class="inputtext">Alla data</div>
-        <label ID="lbDDLToMonth" class="dropdown" ><asp:DropDownList style="width:150px" runat="server" ID="DDLToMonth"></asp:DropDownList></label>      
-        <label class="dropdown" ID="lbDDLToYear" >
-            <asp:DropDownList style="width:100px" runat="server" ID="DDLToYear"> </asp:DropDownList>         
+        <label class="dropdown" >
+            <asp:DropDownList style="width:150px" runat="server" id="DDLToMonth"> </asp:DropDownList>
         </label>
-    </div>  
+                  
+        <label class="dropdown" >
+            <asp:DropDownList style="width:100px" runat="server" id="DDLToYear"></asp:DropDownList>          
+        </label>
+    </div> --%> 
+
+
+    <div class="input ">
+         <div class="inputtext">Tipo Report</div>
+                    <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" >
+                        <asp:ListItem Selected="True" Value="1">Revenue per progetto/persona</asp:ListItem>
+                        <asp:ListItem Value="2">Revenue per progetto</asp:ListItem>
+                    </asp:RadioButtonList>
+    </div>
 
     <div class="input nobottomborder">
-         <div class="inputtext">Azione</div>
-                    <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" >
-                        <asp:ListItem Selected="True" Value="1">Report dettaglio mese</asp:ListItem>
-                        <asp:ListItem Value="2">Report KPI mese</asp:ListItem>
-                        <asp:ListItem Value="3">Report Revenue Totali</asp:ListItem>
+         <div class="inputtext">Tipo Estrazione</div>
+                    <asp:RadioButtonList ID="RBTipoEstrazione" runat="server" RepeatColumns="1" >
+                        <asp:ListItem Selected="True" Value="1">Mese</asp:ListItem>
+                        <asp:ListItem Value="2">Year to Date</asp:ListItem>
                     </asp:RadioButtonList>
     </div>
                             
@@ -106,6 +131,10 @@
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>
+    </asp:SqlDataSource>
+
+    <asp:SqlDataSource ID="DS_Progetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
+        SelectCommand="SELECT Projects_id, ProjectCode + ' ' + Name as 'NomeProgetto' FROM Projects WHERE Active = 1 ORDER BY ProjectCode" >        
     </asp:SqlDataSource>
 
     <script type="text/javascript">

@@ -984,6 +984,10 @@ select.parsley-error {
     border-radius: 6px;
 }
 
+.tabulator-edit-select-list {
+    font: 10px sans-serif;
+}
+
 .tabulator-col {
     background: #FFBD27 !important;
     border: none !important;

@@ -44,8 +44,9 @@
                       
                   <ul>
                     <li><a href="#tabs-1">Dati anagrafici</a></li>
-                    <li><a href="#tabs-2">Ruolo</a></li>
-                    <li><a href="#tabs-3">Tariffa</a></li>
+                    <li><a href="#tabs-2">Userid</a></li>
+                    <li><a href="#tabs-3">Ruolo</a></li>
+                    <li><a href="#tabs-4">Tariffa</a></li>
                   </ul>
 
                 <div id="tabs-1" style="height:380px;width:100%">  
@@ -67,6 +68,13 @@
                                      data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
                     </div>
                   
+                    <!-- *** Anni non Aeonvis ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Anni non Aeonvis:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAnniNonAeonvis" runat="server" Text='<%# Bind("AnniNonAeonvis") %>' 
+                                     data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$"  Columns="6" /> 
+                    </div>
+
                     <!-- *** FLAG  ***  -->
                     <div class="input ">    
                         <asp:CheckBox  ID="CBAttivo" runat="server"  Checked='<%# Bind("active") %>' />
@@ -77,21 +85,7 @@
                         <asp:CheckBox  ID="CBForzato" runat="server"  Checked='<%# Bind("ForcedAccount") %>' />
 					    <asp:Label  AssociatedControlId="CBForzato" class="css-label" ID="Label8" runat="server">Conti forzati</asp:Label>
                     </div>                                    
-                             
-                    <!-- *** USERID ***  -->
-                    <div class="input nobottomborder">
-                        <asp:Label ID="Label9" CssClass="inputtext" runat="server" Text="Userd Id:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBUserid" Enabled="false" runat="server" Text='<%# Bind("Userid") %>' 
-                                     data-parsley-errors-container="#valMsg" MinMaxLength="6" MaxLength="20" data-parsley-required="true"/>
-                    </div>
-
-                    <!-- *** PASSWORD ***  -->
-                    <div class="input ">
-                        <asp:Label ID="label24" CssClass="inputtext" runat="server" Text="Password:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" Text='<%# Bind("password") %>' 
-                                     data-parsley-errors-container="#valMsg"  MinLength="3" MaxLength="10" required/>
-                    </div>
-                    
+                                                 
                     <!-- *** SEDE ***  -->
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Sede:"></asp:Label>
@@ -117,21 +111,32 @@
                     
                     </div> <!-- *** TAB 1 ***  -->
 
-                <div id="tabs-2" style="height:380px;width:100%"> 
+                    <div id="tabs-2" style="height:380px;width:100%">  
 
-                    <!-- *** NICKNAME  ***  -->
+                    <!-- *** USERID ***  -->
                     <div class="input nobottomborder">
-                        <asp:Label ID="Label13" CssClass="inputtext" runat="server" Text="Nickname:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBNickname" runat="server" Text='<%# Bind("nickname") %>' Columns="6" 
-                                     MaxLength="5" />
+                        <asp:Label ID="Label9" CssClass="inputtext" runat="server" Text="Userd Id:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBUserid" Enabled="false" runat="server" Text='<%# Bind("Userid") %>' 
+                                     data-parsley-errors-container="#valMsg" MinMaxLength="6" MaxLength="20" data-parsley-required="true"/>
+                    </div>
+
+                    <!-- *** PASSWORD ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label ID="label24" CssClass="inputtext" runat="server" Text="Password:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" Text='<%# Bind("password") %>' 
+                                     data-parsley-errors-container="#valMsg"  MinLength="3" MaxLength="10" required/>
                     </div>
 
                     <!-- *** MAIL  ***  -->
-                    <div class="input">
+                    <div class="input nobottomborder">
                         <asp:Label ID="Label14" CssClass="inputtext" runat="server" Text="Mail:"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBMail" runat="server" Text='<%# Bind("mail") %>' Width="265px" Columns="50"  
                                      data-parsley-errors-container="#valMsg" required data-parsley-type='email' />
                     </div>
+
+                </div>
+
+                <div id="tabs-3" style="height:380px;width:100%"> 
 
                     <!-- *** RUOLO ***  -->
                     <div class="input nobottomborder">
@@ -144,6 +149,17 @@
                             </asp:DropDownList>
                         </label>      
 
+                    </div>
+
+                    <!-- *** TIPO CONSULENZA ***  -->
+                    <div class="input nobottomborder ">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Tipo consulenza:"></asp:Label>
+                        <label class="dropdown" style="width:190px">
+                            <asp:DropDownList ID="DDLTipoConsulenza" runat="server" DataSourceID="DSTipoConsulenza" 
+                                DataTextField="ConsultantTypeName" DataValueField="ConsultantType_id"  data-parsley-errors-container="#valMsg"  required="true"
+                                SelectedValue='<%# Bind("ConsultantType_id") %>'  >
+                            </asp:DropDownList>
+                        </label>      
                     </div>
 
                     <!-- *** USER LEVEL ***  -->
@@ -170,9 +186,21 @@
                         </label>      
                     </div>
 
-                </div> <!-- *** TAB 2 ***  -->
+                    <!-- *** MANAGER ***  -->
+                    <div class="input nobottomborder ">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
+                        <label class="dropdown" style="width:190px">
+                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" 
+                                DataTextField="Name" DataValueField="Persons_id" 
+                                SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
+                                <asp:ListItem  Value="" Text="Seleziona un valore"/>
+                            </asp:DropDownList>
+                        </label>      
+                    </div>
 
-                <div id="tabs-3" style="height:380px;width:100%"> 
+                </div> <!-- *** TAB 3 ***  -->
+
+                <div id="tabs-4" style="height:380px;width:100%"> 
 
                     <!-- *** ORE CONTRATTO ***  -->
                     <div class="input nobottomborder">
@@ -194,7 +222,7 @@
 	                    <asp:TextBox ID="TextBox22" runat="server" Columns="30" Rows="5" Text='<%# Bind("Note") %>' TextMode="MultiLine" CssClass="textarea"/> 
 	                </div> 
 
-                </div> <!-- *** TAB 3 ***  -->
+                </div> <!-- *** TAB 4 ***  -->
 
                 </div>  <!-- *** TABS ***  -->
                
@@ -213,8 +241,9 @@
                       
                   <ul>
                     <li><a href="#tabs-1">Dati anagrafici</a></li>
-                    <li><a href="#tabs-2">Ruolo</a></li>
-                    <li><a href="#tabs-3">Tariffa</a></li>
+                    <li><a href="#tabs-2">Userid</a></li>
+                    <li><a href="#tabs-3">Ruolo</a></li>
+                    <li><a href="#tabs-4">Tariffa</a></li>
                   </ul>
 
                 <div id="tabs-1" style="height:380px;width:100%">  
@@ -236,7 +265,14 @@
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoFino" runat="server" width="100px" Text='<%# Bind("attivo_fino","{0:d}") %>' 
                                      data-parsley-errors-container="#valMsg"  data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" required />
                     </div>
-                  
+
+                    <!-- *** Anni non Aeonvis ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Anni non Aeonvis:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAnniNonAeonvis" runat="server" Text='<%# Bind("AnniNonAeonvis") %>' 
+                                     data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$"  Columns="6" /> 
+                    </div>
+
                     <!-- *** FLAG  ***  -->
                     <div class="input ">    
                         <asp:CheckBox  ID="CBAttivo" runat="server"  Checked='<%# Bind("active") %>'  />
@@ -246,23 +282,10 @@
                         <asp:Label ID="Label7" CssClass="inputtext" runat="server" Text=""></asp:Label> <!--- posizionamento -->
                         <asp:CheckBox  ID="CBForzato" runat="server"  Checked='<%# Bind("ForcedAccount") %>' />
 					    <asp:Label  AssociatedControlId="CBForzato" class="css-label" ID="Label8" runat="server">Conti forzati</asp:Label>
-                    </div>                                    
-                             
-                    <!-- *** USERID ***  -->
-                    <div class="input nobottomborder">
-                        <asp:Label ID="Label9" CssClass="inputtext" runat="server" Text="Userd Id:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBUserid" runat="server" Text='<%# Bind("Userid") %>' 
-                                     data-parsley-errors-container="#valMsg"  MinMaxLength="6" MaxLength="20" required
-                                     data-parsley-userid="" data-parsley-trigger-after-failure="focusout"  />
-                    </div>
-
-                    <!-- *** PASSWORD ***  -->
-                    <div class="input ">
-                        <asp:Label ID="label24" CssClass="inputtext" runat="server" Text="Password:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" Text='<%# Bind("password") %>' 
-                                     data-parsley-errors-container="#valMsg"  MinLength="3" MaxLength="10" required/>
-                    </div>
-                
+                    </div>        
+                    
+                    <br />
+                                            
                     <!-- *** SEDE ***  -->
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Sede:"></asp:Label>
@@ -287,23 +310,37 @@
                         </label>      
                     </div>
                     
-                    </div> <!-- *** TAB 1 ***  -->
+                    </div> <!-- *** TAB 2 ***  -->
 
-                <div id="tabs-2" style="height:380px;width:100%">  
-
-                    <!-- *** NICKNAME  ***  -->
+                    <div id="tabs-2" style="height:380px;width:100%">  
+                
+                             
+                    <!-- *** USERID ***  -->
                     <div class="input nobottomborder">
-                        <asp:Label ID="Label13" CssClass="inputtext" runat="server" Text="Nickname:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBNickname" runat="server" Text='<%# Bind("nickname") %>' Columns="6" 
-                                     MaxLength="5" />
+                        <asp:Label ID="Label22" CssClass="inputtext" runat="server" Text="Userd Id:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TextBox5" runat="server" Text='<%# Bind("Userid") %>' 
+                                     data-parsley-errors-container="#valMsg"  MinMaxLength="6" MaxLength="20" required
+                                     data-parsley-userid="" data-parsley-trigger-after-failure="focusout"  />
                     </div>
 
+                    <!-- *** PASSWORD ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label ID="label23" CssClass="inputtext" runat="server" Text="Password:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TextBox6" runat="server" Text='<%# Bind("password") %>' 
+                                     data-parsley-errors-container="#valMsg"  MinLength="3" MaxLength="10" required/>
+                    </div>
+    
                     <!-- *** MAIL  ***  -->
-                    <div class="input">
+                    <div class="input nobottomborder">
                         <asp:Label ID="Label14" CssClass="inputtext" runat="server" Text="Mail:"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBMail" runat="server" Text='<%# Bind("mail") %>' Width="265px" Columns="50"  
                                      data-parsley-errors-container="#valMsg" required data-parsley-type='email' />
                     </div>
+
+                    
+                    </div> <!-- *** TAB 3 ***  -->
+
+                <div id="tabs-3" style="height:380px;width:100%">  
 
                     <!-- *** RUOLO ***  -->
                     <div class="input nobottomborder">
@@ -316,6 +353,17 @@
                             </asp:DropDownList>
                         </label>      
 
+                    </div>
+
+                    <!-- *** TIPO CONSULENZA ***  -->
+                    <div class="input nobottomborder ">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Tipo consulenza:"></asp:Label>
+                        <label class="dropdown" style="width:190px">
+                            <asp:DropDownList ID="DDLTipoConsulenza" runat="server" DataSourceID="DSTipoConsulenza" 
+                                DataTextField="ConsultantTypeName" DataValueField="ConsultantType_id" data-parsley-errors-container="#valMsg"  required="true"
+                                SelectedValue='<%# Bind("ConsultantType_id") %>'  >
+                            </asp:DropDownList>
+                        </label>      
                     </div>
 
                     <!-- *** USER LEVEL ***  -->
@@ -342,9 +390,21 @@
                         </label>      
                     </div>
 
-                </div> <!-- *** TAB 2 ***  -->
+                    <!-- *** MANAGER ***  -->
+                    <div class="input nobottomborder ">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
+                        <label class="dropdown" style="width:190px">
+                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" 
+                                DataTextField="Name" DataValueField="Persons_id" 
+                                SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
+                                <asp:ListItem  Value="" Text="Seleziona un valore"/>
+                            </asp:DropDownList>
+                        </label>      
+                    </div>
 
-                <div id="tabs-3" style="height:380px;width:100%">  
+                </div> <!-- *** TAB 4 ***  -->
+
+                <div id="tabs-4" style="height:380px;width:100%">  
 
                     <!-- *** ORE CONTRATTO ***  -->
                     <div class="input nobottomborder">
@@ -366,7 +426,7 @@
 	                    <asp:TextBox ID="TextBox22" runat="server" Columns="30" Rows="5" Text='<%# Bind("Note") %>' TextMode="MultiLine" CssClass="textarea"/> 
 	                </div> 
 
-                </div> <!-- *** TAB 3 ***  -->
+                </div> <!-- *** TAB 4 ***  -->
 
                 </div>  <!-- *** TABS ***  -->  
                
@@ -457,8 +517,8 @@
     <asp:SqlDataSource ID="DSPersone" runat="server" 
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
         SelectCommand="SELECT * FROM [Persons] WHERE ([Persons_id] = @Persons_id)" 
-        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id]) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id)" 
-        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id WHERE [Persons_id] = @Persons_id" >
+        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id]) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id)" 
+        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id WHERE [Persons_id] = @Persons_id" >
         <InsertParameters>
             <asp:Parameter Name="Name" Type="String" />
             <asp:Parameter Name="Roles_Id" Type="Int32" />
@@ -480,7 +540,10 @@
             <asp:Parameter Name="ContractHours" Type="Int32" />
             <asp:Parameter Name="Note" Type="String" />
             <asp:Parameter Name="BetaTester" Type="Boolean" DefaultValue="false" />
-            <asp:Parameter Name="Calendar_id" Type="Int32" />     
+            <asp:Parameter Name="Calendar_id" Type="Int32" /> 
+            <asp:Parameter Name="Manager_id" Type="Int32" /> 
+            <asp:Parameter Name="AnniNonAeonvis" Type="Decimal" /> 
+            <asp:Parameter Name="ConsultantType_id" Type="Int32" /> 
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="Persons_id" QueryStringField="persons_id" 
@@ -508,7 +571,10 @@
             <asp:Parameter Name="ContractHours" Type="Int32" />
             <asp:Parameter Name="Note" Type="String" />
             <asp:Parameter Name="BetaTester" Type="Boolean"   />
-            <asp:Parameter Name="Calendar_id" Type="Int32" />            
+            <asp:Parameter Name="Calendar_id" Type="Int32" />    
+            <asp:Parameter Name="Manager_id" Type="Int32" /> 
+            <asp:Parameter Name="AnniNonAeonvis" Type="Decimal" /> 
+            <asp:Parameter Name="ConsultantType_id" Type="Int32" /> 
         </UpdateParameters>
     </asp:SqlDataSource>
 
@@ -531,6 +597,16 @@
 <asp:sqldatasource runat="server" ID="DSSocieta"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
         SelectCommand="SELECT * FROM [Company]"></asp:sqldatasource>
+
+<asp:SqlDataSource ID="DSmanager" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
+            SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) ORDER BY Name">
+        </asp:SqlDataSource>
+
+<asp:SqlDataSource ID="DSTipoConsulenza" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
+            SelectCommand="SELECT ConsultantType_id, ConsultantTypeName FROM ConsultantType ORDER BY ConsultantTypeName">
+        </asp:SqlDataSource>
 
 </html>
 

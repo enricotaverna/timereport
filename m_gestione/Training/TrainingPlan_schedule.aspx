@@ -81,6 +81,34 @@
 
     </div> <!--End PanelWrap-->
     
+    <div id="ModalWindow"> <!--  Finestra Dialogo -->
+
+        <div id="dialog" class="window">
+
+            <div id="FormWrap" class="StandardForm">
+
+            <div class="formtitle">Commento</div>
+
+            <div class="input nobottomborder"> <!-- ** DESCRIZIONE ** -->
+                <div class="inputtext">Descrizione</div>
+                <asp:TextBox runat="server" id="TBComment" TextMode="MultiLine" Rows="6" CssClass="textarea" />
+            </div>
+ 
+            <asp:TextBox runat="server" id="TBCoursePlan_id" style="visibility:hidden"/>
+
+            <div class="buttons">
+                <asp:Button ID="btnSalvaModale" runat="server" CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>" CssClass="orangebutton" />
+                <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />
+           </div>
+
+           </div>
+
+       </div>  <%--DIALOG--%>
+
+    </div> <!--  Finestra Dialogo -->
+    
+    <div id="mask"></div>  <!-- Mask to cover the whole screen -->
+
     </form>
 
     </div> <!-- END MainWindow -->
@@ -106,8 +134,71 @@
 
     });   
 
+    $("#btnSalvaModale").click(function (e) {
+
+        $('#FVForm').parsley().validate();
+
+        if (!$('#FVForm').parsley().isValid())
+            return;
+
+        submitCreaAggiornaRecord();
+
+        $('#mask').hide();
+        $('.window').hide();
+
+    }); // bottone salva su form modale
+
+    $("#btnCancelModale").click(function (e) {
+        //Cancel the link behavior
+        e.preventDefault();
+        $('#FVForm').parsley().reset();
+
+        $('#mask').hide();
+        $('.window').hide();
+    }); // bottone chiude su form modale
+
     // ** TABULATOR **
+    var editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        var value = cell.getRow().getData().Comment;
+        if (value == null || value == "" ) 
+           return "<i class='fa fa-edit'></i>";
+        else 
+            return "<i class='fa fa-comment'></i>";    
+    };  // icona edit
+
     var TableTrainingPlan = new Tabulator("#TableTrainingPlan", {
+    cellEdited:function(cell){
+        //cell - cell component
+        var CoursePlan_id = cell.getRow().getCells()[0].getValue(); // indice record da aggiornare
+             
+        // chiamata di aggiornamento
+        var values = "{'sCoursePlan_id': '" + CoursePlan_id + "' , " +
+                        " 'sFieldToUpdate': '" + cell.getField() + "' , " +
+                        " 'sValue': '" + cell.getValue() + "' " +
+                        "  } ";
+        $.ajax({
+
+                    type: "POST",
+                    url: "/timereport/webservices/WSHR_Training.asmx/UpdateTrainingPlanRecord",
+                    data: values,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+
+                    success: function (msg) {
+                        // se call OK inserisce una riga sotto l'elemento 
+                        if (msg.d != true) {
+                            alert("Error in updating Training Plan, please exit and retry");
+                        }
+                    },
+
+                    error: function (xhr, textStatus, errorThrown) {
+                        return false;
+                    }
+
+        }); // ajax        
+
+
+        },
     paginationSize: 14, // this option can take any positive integer value (default = 10)
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
@@ -130,15 +221,50 @@
         { title: "Corso", field:"CourseName", sorter:"string", headerFilter:"input" },
         { title: "Tipo", field: "CourseTypeName", sorter:"string", headerFilter:true },
         { title: "Prodotto", field: "ProductName", sorter: "string", headerFilter:true },
-        { title: "Area", field: "Area", sorter: "string", headerFilter:true },
-        { title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter:true },
-        { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true },
-        { title: "Score", field: "Score", sorter: "date", formatter: "star" },
-        {formatter:trashIcon, width:40, align:"center", cellClick:function(e, cell){cancellaRecord(cell.getRow().getData(), cell.getRow())}},
-        ],
+        { title: "Area", field: "Area", sorter: "string", headerFilter: true },
+        { title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: true, editor: "select", editorParams: { values: { "PROPOSED":"PROPOSED", "PLANNED":"PLANNED", "SCHEDULED":"SCHEDULED" } } },
+        { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true, editor: "input", validator:"regex:^[0-9]{2}\/[0-9]{2}\/[0-9]{4}" },
+        { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
+        { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
+    ],
     });
 
-    function cancellaRecord(dati, riga) {
+    // ** FUNZIONI **
+
+    function T_leggiRecord(dati, riga) {
+
+        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+        var values = "{'sCoursePlan_id': '" + dati.CoursePlan_id + "'   } ";
+
+        $.ajax({
+
+            type: "POST",
+            url: "/timereport/webservices/WSHR_Training.asmx/GetCoursePlanItem",
+            data: values,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+
+            success: function (msg) {
+
+                var objCourse = msg.d;
+
+                if (objCourse.CoursePlan_id > 0)
+                    $('#TBCoursePlan_id').val(objCourse.CoursePlan_id);
+                $('#TBComment').val(objCourse.Comment);
+
+                openDialogForm("UPDATE");
+
+            },
+
+            error: function (xhr, textStatus, errorThrown) {
+                return false;
+            }
+
+        }); // ajax
+
+    }  // leggi dati da record, chiamata da Tabulator
+
+    function T_cancellaRecord(dati, riga) {
 
         if (dati.CourseStatusName == "PROPOSED") {
 
@@ -169,7 +295,35 @@
         }
 
 
-    }
+        }
+
+    function submitCreaAggiornaRecord() {
+
+        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+        var values = "{ 'CoursePlan_id': '" + $('#TBCoursePlan_id').val() + "', " +
+            "'Comment': '" + $('#TBComment').val() + "'   } ";
+
+        $.ajax({
+
+            type: "POST",
+            url: "/timereport/webservices/WSHR_Training.asmx/CreateUpdateCoursePlanItem",
+            data: values,
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+
+            success: function (msg) {
+                // chiude dialogo
+                CourseCatalogTable.replaceData() // ricarica tabella dopo insert
+
+            },
+
+            error: function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText);
+            }
+
+        }); // ajax
+    } // crea o aggiorna record selezionato, chiamata da btnSalvaModale
 
 </script>
 

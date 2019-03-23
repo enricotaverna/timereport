@@ -65,7 +65,7 @@
             <!-- ** INPUT ELEMENT ** -->
             <div class="input nobottomborder"> <!-- ** CODICE CORSO ** -->
                 <div class="inputtext">Codice Corso</div>
-                <asp:TextBox class="ASPInputcontent" runat="server" id="TBCourseCode" data-parsley-errors-container="#valMsg"  data-parsley-required="true" data-parsley-codiceunico="true" />
+                <asp:TextBox class="ASPInputcontent" runat="server" id="TBCourseCode"  Enabled="False" />
 
                 <asp:CheckBox  ID="CBActive" runat="server"  Checked="True" /> <!-- ** ATTIVO ** -->
 				<asp:Label  AssociatedControlId="CBActive" class="css-label" ID="Label3" runat="server">Attivo</asp:Label>
@@ -161,8 +161,6 @@
 
     <div id="mask"></div>  <!-- Mask to cover the whole screen -->
         
-    <div id="dialog" style="display: none"></div> <!-- Per output messaggio  -->
-
 </body>
 
 <script>
@@ -394,7 +392,6 @@
         
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{ 'Course_id': '" + $('#TBCourse_id').val() + "', " +
-            "'CourseCode': '" + $('#TBCourseCode').val() + "', " +
             "'CourseName': '" + $('#TBCourseName').val() + "' , " +
             "'Description': '" + $('#TBDescription').val() + "' , " +
             "'CourseType_id': '" + $('#DDLCourseType').val() + "' , " +
@@ -457,12 +454,14 @@
         // reset validations
         $('#FVForm').parsley().reset();
 
-        if (mode == "UPDATE")
-            $("#TBCourseCode").attr('disabled', true);
-        else {
-            $("#TBCourseCode").attr('disabled', false);
-            $('#TBCourseCode').focus();
-        }
+        //$("#TBCourseCode").attr('disabled', true);
+
+        //if (mode == "UPDATE")
+        //    $("#TBCourseCode").attr('disabled', true);
+        //else {
+        //    $("#TBCourseCode").attr('disabled', false);
+        //    $('#TBCourseCode').focus();
+        //}
 
     }     // Apre Form Modale
 

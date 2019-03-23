@@ -1930,7 +1930,6 @@
                             <BackgroundColor>Linen</BackgroundColor>
                           </Style>
                         </GaugePanel>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -3342,6 +3341,11 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSetReport</DataSetName>
+            <SortExpressions>
+              <SortExpression>
+                <Value>=Fields!CodiceProgetto.Value</Value>
+              </SortExpression>
+            </SortExpressions>
             <Top>8.51641cm</Top>
             <Left>0.89641cm</Left>
             <Height>3.26134cm</Height>

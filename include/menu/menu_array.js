@@ -216,6 +216,7 @@ addmenu(menu = ["Training",
     , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
     , "Catalogo", "show-menu=Catalogo", , , 1
     , "Training plan", "show-menu=Training plan", , , 1
+    , "Report&Download", "show-menu=Training report", , , 1
 ])
 
 addmenu(menu = ["Catalogo",
@@ -232,8 +233,11 @@ addmenu(menu = ["Training plan",
     , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Schedula", "/timereport/m_gestione/training/trainingplan_schedule.aspx", , , 1
 ])
 
-
-
+addmenu(menu = ["Training report",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Catalogo Corsi", "/timereport/report/Rdlc/ReportExecute.aspx?ReportName=HR_CourseCatalog", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Training Plan", "/timereport/m_gestione/training/TrainingPlan_report.aspx", , , 1
+])
 
 	addmenu(menu = ["Amm_CutOff",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
@@ -247,10 +251,9 @@ addmenu(menu = ["Training plan",
 	, , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
 	, "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;FLC per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
     , "<img src=/timereport/images/icons/16x16/S_calendar.gif border=0>&nbsp;Bill Rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
-    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report FLC", "/timereport/report/rdlc/CostRateReport.aspx", , , 1
     , "<img src=/timereport/images/icons/16x16/S_B_ACTY.gif border=0>&nbsp;Calcolo Revenue", "/timereport/report/EstraiRevenue/CalcolaRevenue.aspx", , , 1
     , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/ReportRevenue.aspx", , , 1
-
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Report FLC", "/timereport/report/rdlc/CostRateReport.aspx", , , 1
     ])
 
 	addmenu(menu = ["Amm_MassChange",
@@ -306,7 +309,8 @@ addmenu(menu = ["Training plan",
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Canali", "/timereport/lookup_list.aspx?TableName=Channels&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true", , , 1
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Messaggi", "/timereport/m_gestione/messaggi/messaggi_lookup_list.aspx", , , 1
 	, "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Bonus", "/timereport/lookup_list.aspx?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true", , , 1
-])
+        , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Consulenza", "/timereport/lookup_list.aspx?TableName=ConsultantType&SortField=ConsultantTypeName&FieldNumber=1&CheckTable=Persons&init=true", , , 1
+    ])
 
 
 
