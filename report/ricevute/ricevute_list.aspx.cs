@@ -59,6 +59,8 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
         else         // se mode != admin forza con la variabile di sessione
             SQLDSricevute.SelectParameters["persons_id"].DefaultValue = Session["persons_id"].ToString(); // persona da variabile di sessione
 
+        SQLDSricevute.SelectParameters["invoiceflag"].DefaultValue = Request.QueryString["invoiceflag"].ToString(); // flag fattura
+
         // carico array con i nomi dei file caricati sul mese in analisi
         Carica_Lista(mese, anno, Request.QueryString["mode"]);
 
@@ -161,6 +163,14 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
 
             var start = filePaths[i].IndexOf("fid-") + 4;
             var stExpenses_id = filePaths[i].Substring(start, filePaths[i].LastIndexOf("-") - start);
+
+            // se specificato il flag fattura seleziona solo ricevute corrispondenti
+            if (Request.QueryString["invoiceflag"].ToString() != "" )
+            {
+                if (!Database.RecordEsiste("Select expenses_id from expenses where expenses_id=" + ASPcompatility.FormatStringDb(stExpenses_id) +
+                                             " AND invoiceflag=" + ASPcompatility.FormatStringDb(Request.QueryString["invoiceflag"].ToString()), null))
+                    continue; // salta al prossimo record
+            }
 
             // aggiunti elemento con contatore, nome file e id spesa da usare nella stampa dei riferimenti alle ricevute
             IndexFile.Add(new IndexFileObj() { index = (i+1).ToString(), 

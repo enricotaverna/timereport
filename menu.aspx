@@ -15,9 +15,13 @@
 <script src="/timereport/include/javascript/timereport.js"></script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- Menù  -->
+<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session("NoExpenses")%>  lingua='<%= Session("lingua")%>' userlevel='<%= Session("userLevel")%>' type="text/javascript"></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
 <head runat="server">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
 	<title>Time Report</title>
  
 		<style type="text/css">
@@ -32,9 +36,6 @@
 			</style>
 
 </head>
-
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session("lingua")%>  UserLevel=<%= Session("userLevel")%> type =text/javascript></SCRIPT>
-<SCRIPT language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></SCRIPT>
 
 <body>
 
@@ -153,7 +154,7 @@
 	<!-- **** FOOTER **** -->  
 	<div id="WindowFooter">       
 		<div ></div>        
-		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %>
+		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(Now())  %>
             <% If Session("persons_id") = 1 Then
                     Dim sConn = ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString.ToString()
                     Response.Write("&nbsp; " + sConn.Substring(12, 13) + "&nbsp; " + sConn.Substring(36, 20))

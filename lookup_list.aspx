@@ -29,7 +29,7 @@
     {
 
         if ( Request["TableName"].ToString().Substring(0,2) == "HR" )
-                Auth.CheckPermission("TRAINING", "PLAN");  // Coordinatore Trainer
+                Auth.CheckPermission("TRAINING", "CREATE");  // Coordinatore Trainer
         else
                 Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
 

@@ -2,14 +2,12 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-
     <link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
     <link href="include/newstyle.css" rel="stylesheet" type="text/css">
     <link href="include/jquery/chosen/chosen.css" rel="stylesheet" />
 
     <!-- Menù  -->
-    <script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
+    <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session["NoExpenses"]%> Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
     <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
     <!-- Jquery   -->
@@ -20,6 +18,8 @@
 
     <%--Chosen - Dropdown list multiple--%>
     <script src="include/jquery/chosen/chosen.jquery.min.js"></script>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
     
 <head id="Head1" runat="server">
 

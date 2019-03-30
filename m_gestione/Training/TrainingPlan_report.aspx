@@ -42,7 +42,6 @@
         <br />
         <div class="input nobottomborder">
             <asp:Label CssClass="inputtext" runat="server" Text="Anno" ></asp:Label>
-
             <label id="lbDDLAttivita" class="dropdown">
                 <!-- per stile CSS -->
                 <asp:DropDownList ID="DDLAnno" runat="server" AppendDataBoundItems="True" >
@@ -50,6 +49,27 @@
                 </asp:DropDownList>
             </label>
         </div>
+
+        <div class="input nobottomborder">
+        <asp:Label CssClass="inputtext" runat="server" Text="Manager" ></asp:Label>
+            <label id="lbDDLManager" class="dropdown">
+                <!-- per stile CSS -->
+                <asp:DropDownList ID="DDLManager" runat="server" AppendDataBoundItems="True" DataSourceID="DSManager" DataTextField="Name" DataValueField="Persons_id"  >
+                    <asp:ListItem value="0">--tutti i manager --</asp:ListItem>
+                </asp:DropDownList>
+            </label>
+        </div>
+
+        <div class="input nobottomborder">
+        <asp:Label CssClass="inputtext" runat="server" Text="Consulente" ></asp:Label>
+            <label id="lbDDLPersons" class="dropdown">
+                <!-- per stile CSS -->
+                <asp:DropDownList ID="DDLPersons" runat="server" AppendDataBoundItems="True" DataSourceID="DSPersons"  DataTextField="Name" DataValueField="Persons_id" >
+                    <asp:ListItem value="0">--tutte le persone --</asp:ListItem>
+                </asp:DropDownList>
+            </label>
+        </div>
+
         <br />
 
     <div class="buttons">    
@@ -74,6 +94,16 @@
      </div> 
 
 </body>
+
+<asp:SqlDataSource ID="DSmanager" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
+            SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) and ( Roles_id = '1' OR Roles_id = '2' OR Roles_id = '3') and Company_id = '1'   ORDER BY Name">
+</asp:SqlDataSource>
+
+<asp:SqlDataSource ID="DSPersons" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
+            SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) and Company_id = '1' ORDER BY Name">
+        </asp:SqlDataSource>
 
 </html>
 

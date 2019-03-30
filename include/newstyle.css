@@ -370,13 +370,17 @@ a, a:visited, a:hover, a:active {
     overflow: hidden;
 }
 
-    .inputtextbox .inputcontent {
+.inputtextbox .inputcontent {
         height: 114px;
     }
 
 .nobottomborder {
     border-bottom: 0;
     margin: 10px 30px 10px 10px;
+}
+
+.tight {
+    line-height: 30px !important;
 }
 
 #ModalWindow .window {
@@ -803,7 +807,7 @@ a, a:visited, a:hover, a:active {
 /*#region controlli form custom*/
 label.dropdown select {
     padding: 7px 42px 7px 10px;
-    font: 14px sans-serif;
+    font: 12px sans-serif;
     color: #777;
     border: 1px solid #C7C7C7;
     border-radius: 6px;
@@ -855,13 +859,13 @@ label.dropdown:after {
         -ms-transform: rotate(90deg);
         transform: rotate(90deg);
         right: 2px;
-        top: -5px;
+        top: -4px;
         border-bottom: 1px solid #C7C7C7;
         position: absolute;
         pointer-events: none;
-        width: 32px;
+        width: 30px;
         padding: 0 0 5px 0;
-        text-indent: 14px;
+        text-indent: 12px;
         margin-top: auto;
         margin-bottom: auto;
     }
@@ -979,17 +983,23 @@ select.parsley-error {
 
 /*#Tabulator*/
 .tabulator {
-    font: 10px sans-serif;
+    font-size: 12px;
+    font-family: Arial;
     border: none;
     border-radius: 6px;
 }
 
 .tabulator-edit-select-list {
-    font: 10px sans-serif;
+    font-size: 12px;
+    font-family: Arial;
 }
 
 .tabulator-col {
     background: #FFBD27 !important;
+    border: none !important;
+}
+
+.tabulator-cell {
     border: none !important;
 }
 

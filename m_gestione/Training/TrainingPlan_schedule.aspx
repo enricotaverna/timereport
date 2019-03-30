@@ -215,14 +215,20 @@
     },
     columns: [
         { title: "CoursePlan_id", field: "CoursePlan_id", sorter: "number", visible: false },
-        { title: "Anno", field: "Anno", sorter: "number", headerFilter: "input" },
-        { title: "Consulente", field: "PersonName", sorter:"string", headerFilter:"input"},
+        { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: "input" },
+        { title: "Manager", field: "ManagerName", sorter:"string", headerFilter:"input"},
         { title: "Codice Corso", field: "CourseCode", sorter:"string", headerFilter:"input"},
         { title: "Corso", field:"CourseName", sorter:"string", headerFilter:"input" },
         { title: "Tipo", field: "CourseTypeName", sorter:"string", headerFilter:true },
         { title: "Prodotto", field: "ProductName", sorter: "string", headerFilter:true },
-        { title: "Area", field: "Area", sorter: "string", headerFilter: true },
-        { title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: true, editor: "select", editorParams: { values: { "PROPOSED":"PROPOSED", "PLANNED":"PLANNED", "SCHEDULED":"SCHEDULED" } } },
+        {
+            title: "Priorità", field: "Priority", sorter: "integer", headerFilter: true, align:"center",
+            headerFilter: "select", headerFilterParams: { values:  { "1": "1", "2": "2", "3": "3", "4": "4", "5": "5","" : "all" } }
+        },
+        {
+            title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: "select",
+            headerFilterParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED" , "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED", "": "All Status" } }, editor: "select", editorParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED", "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED" } }
+        },
         { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true, editor: "input", validator:"regex:^[0-9]{2}\/[0-9]{2}\/[0-9]{4}" },
         { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
         { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
@@ -252,7 +258,7 @@
                     $('#TBCoursePlan_id').val(objCourse.CoursePlan_id);
                 $('#TBComment').val(objCourse.Comment);
 
-                openDialogForm("UPDATE");
+                openDialogForm("#dialog");
 
             },
 
@@ -301,12 +307,13 @@
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{ 'CoursePlan_id': '" + $('#TBCoursePlan_id').val() + "', " +
-            "'Comment': '" + $('#TBComment').val() + "'   } ";
+            "'Comment': '" + $('#TBComment').val() + "', " +
+            "'Feedback': 'no_upd'   } ";
 
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WSHR_Training.asmx/CreateUpdateCoursePlanItem",
+            url: "/timereport/webservices/WSHR_Training.asmx/UpdateCoursePlanItem",
             data: values,
             async: false,
             contentType: "application/json; charset=utf-8",

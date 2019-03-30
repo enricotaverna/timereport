@@ -34,6 +34,7 @@ public class CoursePlanItem
 {
     public int CoursePlan_id { get; set; }
     public string Comment { get; set; }
+    public string Feedback { get; set; }
 }
 
 /// <summary>
@@ -65,6 +66,9 @@ public class WSHR_Training : System.Web.Services.WebService {
             sValue = ASPcompatility.FormatDateDb(sValue);
         else
             sValue = ASPcompatility.FormatStringDb(sValue);
+
+        if (sValue == "")
+            sValue = null;
 
         // aggiorna record del trainig plan
         if ( Convert.ToInt16(sCoursePlan_id) > 0)
@@ -161,22 +165,28 @@ public class WSHR_Training : System.Web.Services.WebService {
         // SCHEDULE: Anno seleziona, Persona può sia essere selezionata che no (torna tutto)
         string sFilter = "";
 
-        if (Mode == "CREATE")
+        if (Mode == "CREATE" )
         {
             sFilter = " WHERE A.Persons_id =  '" + Persons_id + "' ";
         }
-        else if (Mode == "SCHEDULE") {
+        else if (Mode == "SCHEDULE")
+        {
             sFilter = " WHERE Anno = " + Anno;
             sFilter = Persons_id == "0" ? sFilter : sFilter + " AND A.Persons_id =  '" + Persons_id + "' "; // se senza persona resituisce tutto il piano corsi
         }
+        else if (Mode == "RATE") // solo corsi personali da SCHEDULED in avanti
+        {
+            sFilter = " WHERE A.Persons_id =  '" + Persons_id + "' AND A.CourseStatus_id > '2' ";
+        }
 
-        String query = "SELECT A.CoursePlan_id,A.Course_id, A.Anno, A.Comment, CONVERT(VARCHAR(10),A.CourseDate, 103) as CourseDate, E.CourseCode, E.CourseName, B.CourseTypeName, C.ProductName, E.Area, D.VendorName, F.CourseStatus_id, F.CourseStatusName, A.Score, G.Name as PersonName FROM HR_CoursePlan AS A " +
+        String query = "SELECT A.CoursePlan_id,A.Course_id, A.Anno, A.Comment,  A.Feedback,CONVERT(VARCHAR(10),A.CourseDate, 103) as CourseDate, A.Priority, E.CourseCode, E.CourseName, B.CourseTypeName, C.ProductName, E.Area, D.VendorName, F.CourseStatus_id, F.CourseStatusName, A.Score, G.Name as PersonName, H.name as ManagerName FROM HR_CoursePlan AS A " +
                                 "JOIN HR_Course AS E ON E.Course_id = A.Course_id " +
                                 "LEFT JOIN HR_CourseType AS B ON B.CourseType_id = E.CourseType_id " +
                                 "LEFT JOIN HR_Product AS C ON C.Product_id= E.Product_id " +
                                 "LEFT JOIN HR_CourseVendor AS D ON D.CourseVendor_id = E.CourseVendor_id " +
                                 "JOIN HR_CourseStatus AS F ON F.CourseStatus_id = A.CourseStatus_id " +
                                 "JOIN Persons AS G ON G.Persons_id = A.Persons_id " +
+                                "LEFT JOIN Persons AS H ON H.Persons_id = G.Manager_id" +
                                 sFilter +
                                 "ORDER BY A.Anno DESC, G.Persons_id, E.CourseCode ASC ";
 
@@ -236,7 +246,6 @@ public class WSHR_Training : System.Web.Services.WebService {
 
         if (Course_id > 0)
             sSQL = "UPDATE HR_Course SET " +
-                  "CourseCode = " + ASPcompatility.FormatStringDb(CourseCode) + " , " +
                   "CourseName = " + ASPcompatility.FormatStringDb(CourseName) + " , " +
                   "Description = " + ASPcompatility.FormatStringDb(Description) + " , " +
                   "CourseType_id = " + ASPcompatility.FormatStringDb(CourseType_id) + " , " +
@@ -347,6 +356,7 @@ public class WSHR_Training : System.Web.Services.WebService {
         {
             rc.CoursePlan_id = Convert.ToInt32(dt.Rows[0]["CoursePlan_id"].ToString());
             rc.Comment = dt.Rows[0]["Comment"].ToString();
+            rc.Feedback = dt.Rows[0]["Feedback"].ToString();
         }
 
 
@@ -355,14 +365,20 @@ public class WSHR_Training : System.Web.Services.WebService {
     }
 
     [WebMethod(EnableSession = true)]
-    public int CreateUpdateCoursePlanItem( int CoursePlan_id, string Comment )
+    public int UpdateCoursePlanItem( int CoursePlan_id, string Comment, string Feedback )
     {
         int newIdentity = 0;
         string sSQL = "";
 
-        sSQL = "UPDATE HR_CoursePlan SET " +
-                  "Comment = " + ASPcompatility.FormatStringDb(Comment) +
-                  " WHERE CoursePlan_id = " + ASPcompatility.FormatNumberDB(CoursePlan_id) ;
+        // seleziona cosa aggiornate in base al valore del campo con no_upd 
+        if ( Feedback == "no_upd" )
+            sSQL = "UPDATE HR_CoursePlan SET " +
+                      "Comment = " + ASPcompatility.FormatStringDb(Comment) +
+                      " WHERE CoursePlan_id = " + ASPcompatility.FormatNumberDB(CoursePlan_id) ;
+        else if ( Comment == "no_upd"  )
+            sSQL = "UPDATE HR_CoursePlan SET " +
+                      "Feedback = " + ASPcompatility.FormatStringDb(Feedback) +
+                      " WHERE CoursePlan_id = " + ASPcompatility.FormatNumberDB(CoursePlan_id) ;
 
         bool bResult = Database.ExecuteSQL(sSQL, null);
 

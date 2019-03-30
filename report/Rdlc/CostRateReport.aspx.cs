@@ -9,8 +9,8 @@ public partial class report_Rdl_Default : System.Web.UI.Page
 
         if (!IsPostBack)
         {
-            string sSQL1 = "Select * from v_PersonCostRate order by Anno desc, PersonName";
-            string sSQL2 = "Select * from v_ProjectCostRate by PersonName, ProjectCode";
+            string sSQL1 = "Select * from v_PersonCostRate order by DataDa desc, PersonName";
+            string sSQL2 = "Select * from v_ProjectCostRate order by PersonName, ProjectCode";
 
             DataTable dtData1 = Database.GetData(sSQL1, null);
             DataTable dtData2 = Database.GetData(sSQL2, null);

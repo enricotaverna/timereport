@@ -13,9 +13,8 @@
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
-<script src="../../include/jquery/sumoselect/jquery.sumoselect.js"></script> 
+<script src="/timereport/include/javascript/timereport.js"></script>
 
 <!-- Menù  -->
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
@@ -53,7 +52,7 @@
     </div>   
 
     <!--  *** PROGETTO *** -->            
-    <div class="input nobottomborder">
+    <div class="input ">
           <div class="inputtext">Progetto</div>   
           <label class="dropdown">
                <asp:DropDownList ID="DDLProgetto" runat="server" DataTextField="NomeProgetto" DataValueField="Projects_id"
@@ -63,7 +62,18 @@
           </label>
     </div> 
 
-    <div class="input ">
+    <!--  *** VERSIONE *** -->            
+    <div class="input nobottomborder">
+          <div class="inputtext">Versione</div>   
+          <label class="dropdown">
+               <asp:DropDownList ID="DDLRevenueVersion" runat="server" DataTextField="RevenueVersionDescription" DataValueField="RevenueVersionCode"
+                        DataSourceID="DS_RevenueVersion" style="width:150px" >                   
+                    </asp:DropDownList>
+          </label>
+    </div>
+
+    <!--  *** MESE *** -->  
+    <div class="input">
         <div class="inputtext">Mese</div>
         <label class="dropdown"  >
             <asp:DropDownList style="width:150px" runat="server" id="DDLFromMonth"> </asp:DropDownList>
@@ -75,38 +85,27 @@
 
     </div>  
 
-
-<%--    <div class="input nobottomborder">
-        <div class="inputtext">Alla data</div>
-        <label class="dropdown" >
-            <asp:DropDownList style="width:150px" runat="server" id="DDLToMonth"> </asp:DropDownList>
-        </label>
-                  
-        <label class="dropdown" >
-            <asp:DropDownList style="width:100px" runat="server" id="DDLToYear"></asp:DropDownList>          
-        </label>
-    </div> --%> 
-
-
-    <div class="input ">
-         <div class="inputtext">Tipo Report</div>
+    <!--  ***  DETTAGLIO *** -->  
+    <div class="input tight">
+         <div class="inputtext">Report</div>
                     <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" >
-                        <asp:ListItem Selected="True" Value="1">Revenue per progetto/persona</asp:ListItem>
-                        <asp:ListItem Value="2">Revenue per progetto</asp:ListItem>
+                        <asp:ListItem Selected="True" Value="1">Singoli record</asp:ListItem>
+                        <asp:ListItem Value="2">KPI Progetto</asp:ListItem>
                     </asp:RadioButtonList>
     </div>
 
-    <div class="input nobottomborder">
-         <div class="inputtext">Tipo Estrazione</div>
+    <!--  *** TIPO ESTRAZIONE *** -->  
+    <div class="input nobottomborder tight">
+         <div class="inputtext">Estrazione</div>
                     <asp:RadioButtonList ID="RBTipoEstrazione" runat="server" RepeatColumns="1" >
-                        <asp:ListItem Selected="True" Value="1">Mese</asp:ListItem>
-                        <asp:ListItem Value="2">Year to Date</asp:ListItem>
+                        <asp:ListItem Selected="True" Value="1">Mese selezionato</asp:ListItem>
+                        <asp:ListItem Value="2">Year to date</asp:ListItem>
                     </asp:RadioButtonList>
     </div>
                             
     <div class="buttons">        
             <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: EXEC_TXT %>" CssClass="orangebutton"  CommandName="Exec" OnClick="sottometti_Click" />    
-            <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
+            <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.location.href='/timereport/menu.aspx';return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
  
     </div>
 
@@ -139,12 +138,12 @@
 
     <script type="text/javascript">
 
-        $(function () {
+        window.onunload = function(){}; // forza refresh quando si torna sulla pagina con back (problema firefox)
 
+        $(function () {
+            UnMaskScreen();
             // reset cursore e finestra modale
             document.body.style.cursor = 'default';
- 
- 
         });
 
         $("#RBTipoReport").click(function () {
@@ -185,6 +184,9 @@
 
 </script>
 
+<asp:SqlDataSource ID="DS_RevenueVersion" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
+       SelectCommand="SELECT RevenueVersionCode, RevenueVersionCode + ' ' + RevenueVersionDescription as RevenueVersionDescription FROM RevenueVersion ORDER BY RevenueVersionCode" >        
+</asp:SqlDataSource>
 
 </body>
 </html>

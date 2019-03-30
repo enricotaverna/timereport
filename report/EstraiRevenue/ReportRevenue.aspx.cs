@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.IO;
+using Microsoft.Reporting.WebForms;
 
 public partial class report_esportaAttivita : System.Web.UI.Page
 {
@@ -49,73 +50,83 @@ public partial class report_esportaAttivita : System.Web.UI.Page
 
     protected void sottometti_Click(object sender , System.EventArgs e ) {
 
-        string sAnnoMeseDa = DDLFromYear.Text + "-" + DDLFromMonth.Text;
+        string sAnnoMeseA = DDLFromYear.Text + "-" + DDLFromMonth.Text;
+        string sAnnoMeseDa = DDLFromYear.Text + "-01";
 
         Session["SelectedMonth"] = DDLFromMonth.SelectedIndex;
         Session["SelectedYear"] = DDLFromYear.SelectedIndex;
         Session["SelectedProject"] = DDLProgetto.SelectedIndex;
         Session["SelectedManager"] = DDLManager.SelectedIndex;
+        Session["RevenueVersion"] = DDLRevenueVersion.SelectedItem.Text;
 
-        //Button bt = (Button) sender;
+        // *** TIPO REPORT  ****
         switch (RBTipoReport.SelectedIndex)
                 {
-                case 0:     // report Revenue Persona/Progetto
-
-                    
-                    if ( RBTipoEstrazione.SelectedIndex == 0 ) // Puntuale
-                        Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseDa + "')";          
-                    else // Cumulato
-                        Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese <= '" + sAnnoMeseDa + "')";
-
-                    if (DDLManager.SelectedIndex != 0)
-                            Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-
-                    if (DDLProgetto.SelectedIndex != 0)
-                            Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-
-                        Session["ReportPath"] = "REV_RevenueDettaglioPerMese.rdlc";
-                            Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
-                        break;
-
-                case 1:     // report KPI Mese
+                case 0:     // **** DETTAGLIO PERSONA/PROGETTO
 
                 if (RBTipoEstrazione.SelectedIndex == 0)
-                { // Puntuale 
-                    Session["SQL"] = "SELECT CodiceProgetto, NomeProgetto, NomeCliente, TipoProgetto, NomeSocieta, SUM(GiorniCosti) as GiorniCosti , " +
-                                 "SUM(GiorniRevenue) as GiorniRevenue, SUM(RevenueProposta) as RevenueProposta,  SUM(Costo) as Costo, SUM(CostoSpese) as CostoSpese " +
-                                 "FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseDa + "') ";
-
-                    if (DDLManager.SelectedIndex != 0)
-                        Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-
-                    if (DDLProgetto.SelectedIndex != 0)
-                        Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-
-                    Session["SQL"] = Session["SQL"] + " GROUP BY CodiceProgetto, NomeProgetto, NomeCliente, TipoProgetto, NomeSocieta";
-
-                    Session["ReportPath"] = "REV_KPIPerMese.rdlc";
-                    Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
+                {
+                    Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                    Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
                 }
                 else
-                { // YTD
-                    Session["SQL"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMeseCalcolo = '" + sAnnoMeseDa + "')";
-
-                    if (DDLManager.SelectedIndex != 0)
-                        Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "' ";
-
-
-                    if (DDLProgetto.SelectedIndex != 0)
-                        Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-
-                    Session["ReportPath"] = "REV_RevenueProgettoYTD.rdlc";
-                    Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
+                {
+                    Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                    Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
                 }
 
+                // *** parametri addizionali: manager
+                if (DDLManager.SelectedIndex != 0) { 
+                            Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+                            Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+
+                }
+
+                // *** parametri addizionali: progetto
+                if (DDLProgetto.SelectedIndex != 0) { 
+                            Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+                            Session["SQL2"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+                }
+
+                // ** ordinamento                    
+                Session["SQL"] = Session["SQL"]+ " ORDER BY AnnoMese, NomePersona, CodiceProgetto";
+                Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
+
+                Session["ReportPath"] = "REV_RawData.rdlc";
+                Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
+                        break;
+
+                case 1:     // **** DETTAGLIO PROGETTO
+
+                if (RBTipoEstrazione.SelectedIndex == 0)
+                { // mese selezionato
+                    Session["SQL"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                    Session["SQL2"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                }
+                else
+                {// YTD
+                    Session["SQL"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                    Session["SQL2"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+                }
+
+                if (DDLManager.SelectedIndex != 0) { 
+                        Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+                        Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+                }
+
+                if (DDLProgetto.SelectedIndex != 0) { 
+                        Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+                        Session["SQL2"] = Session["SQL2"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+                }
+
+                Session["SQL"] = Session["SQL"] + " ORDER BY AnnoMese, CodiceProgetto";
+                Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
+
+                Session["ReportPath"] = "REV_RevenueProgettoYTD.rdlc";
+                Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
 
                 break;
-
        }
-
     }
 
     protected void CalcolaRevenueMese(string sMese, string sAnno) {

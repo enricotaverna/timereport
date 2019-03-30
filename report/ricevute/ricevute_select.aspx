@@ -55,13 +55,26 @@
           </label>
     </div>  
 
-    <!--  *** PERSONA *** -->            
+    <!--  *** TIPO SPESA *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Tipo Spesa</div>   
           <label class="dropdown">
                <asp:DropDownList ID="DDLTipoSpesa" runat="server" 
                         AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="SQLDSTipoSpesa" DataTextField="NomeSpesa" DataValueField="ExpenseType_Id" >        
                         <asp:ListItem Value="" Text="--- Tutte le spese ---" />     
+               </asp:DropDownList>
+          </label>
+    </div>  
+
+    <!--  *** FLAG FATTURA *** -->            
+    <div class="input nobottomborder">
+          <div class="inputtext">Flag fattura</div>   
+          <label class="dropdown">
+               <asp:DropDownList ID="DDLInvoiceFlag" runat="server" 
+                        AppendDataBoundItems="True"   >        
+                        <asp:ListItem Value="" Text="--- Tutti ---" />     
+                        <asp:ListItem Value="true" Text="Si"/>     
+                        <asp:ListItem Value="false" Text="No" />     
                </asp:DropDownList>
           </label>
     </div>  

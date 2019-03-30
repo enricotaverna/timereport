@@ -45,7 +45,7 @@
     {
 
         if ( Session["TableName"].ToString().Substring(0,2) == "HR" )
-                Auth.CheckPermission("TRAINING", "PLAN");  // Coordinatore Trainer
+                Auth.CheckPermission("TRAINING", "CREATE");  // Coordinatore Trainer
         else
                 Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
 
@@ -302,7 +302,7 @@
                                         if (fld[cName].ToString().IndexOf("_Id") > 0 || fld[cName].ToString().IndexOf("_id") > 0)
                                         {
                                             Response.Write("<label class=dropdown style=width:200px><select name=" + fld[cName].ToString() + sMandatory + " >");
-                                            Response.Write("<option value=''> nessun valore </option>");
+                                            Response.Write("<option value='0'> nessun valore </option>");
 
                                             string strLookUpTable = fld[cName].ToString().Substring(0, fld[cName].ToString().Length - 3);
 

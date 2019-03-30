@@ -71,6 +71,12 @@
                      <div class="inputtext">Bill Rate (EUR): </div> 
                      <asp:TextBox ID="TBBillRate" runat="server" Text='<%# Bind("BillRate") %>' CssClass="ASPInputcontent" />
                      <asp:RequiredFieldValidator ID="RequiredFieldValidator3" Display="none" runat="server" ErrorMessage="Inserisci valore Cost Rate" ControlToValidate="TBBillRate"></asp:RequiredFieldValidator>
+               </div>
+            
+               <!-- *** Cost Rate ***  --> 
+               <div class="input nobottomborder"> 
+                     <div class="inputtext">Cost Rate (EUR): </div> 
+                     <asp:TextBox ID="TBCostRate" runat="server" Text='<%# Bind("CostRate") %>' CssClass="ASPInputcontent" />
                </div>  
                 			
 	           <!-- *** BOTTONI  ***  -->
@@ -108,7 +114,13 @@
                <div class="input nobottomborder"> 
                      <div class="inputtext">Bill Rate (EUR): </div> 
                      <asp:TextBox ID="TBBillRate" runat="server" Text='<%# Bind("BillRate") %>' CssClass="ASPInputcontent" Enabled="False" />
-               </div>  
+               </div>
+            
+               <!-- *** Cost Rate ***  --> 
+               <div class="input nobottomborder"> 
+                     <div class="inputtext">Cost Rate (EUR): </div> 
+                     <asp:TextBox ID="TBCostRate" runat="server" Text='<%# Bind("CostRate") %>' CssClass="ASPInputcontent" Enabled="False" />
+               </div> 
                 			
 	           <!-- *** BOTTONI  ***  -->
                <div class="buttons">
@@ -141,8 +153,8 @@
         <asp:SqlDataSource ID="DSForcedAccounts" runat="server" 
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
         SelectCommand="SELECT * FROM [ProjectCostRate] WHERE ([ProjectCostRate_id] = @ProjectCostRate_id)" 
-        InsertCommand="INSERT INTO [ProjectCostRate] ([Persons_id],[Projects_id], [BillRate] ) VALUES (@Persons_id, @Projects_id, @BillRate)" 
-        UpdateCommand="UPDATE [ProjectCostRate] SET [Persons_id] = @Persons_id, [Projects_id] = @Projects_id, [BillRate] = @BillRate WHERE [ProjectCostRate_id] = @ProjectCostRate_id" >        
+        InsertCommand="INSERT INTO [ProjectCostRate] ([Persons_id],[Projects_id], [BillRate], [CostRate] ) VALUES (@Persons_id, @Projects_id, @BillRate, @CostRate)" 
+        UpdateCommand="UPDATE [ProjectCostRate] SET [Persons_id] = @Persons_id, [Projects_id] = @Projects_id, [BillRate] = @BillRate, [CostRate] = @CostRate WHERE [ProjectCostRate_id] = @ProjectCostRate_id" >        
 
         <SelectParameters>
         <asp:QueryStringParameter Name="ProjectCostRate_id" QueryStringField="ProjectCostRate_id" Type="String" />
@@ -151,11 +163,13 @@
             <asp:Parameter Name="Persons_id" Type="Int32" />
             <asp:Parameter Name="Projects_id" Type="Int32" />
             <asp:Parameter Name="BillRate" Type="Decimal" />
+            <asp:Parameter Name="CostRate" Type="Decimal" />
         </InsertParameters>
         <UpdateParameters>
             <asp:Parameter Name="Persons_id" Type="Int32" />
             <asp:Parameter Name="Projects_id" Type="Int32" />
             <asp:Parameter Name="BillRate" Type="Decimal" />
+            <asp:Parameter Name="CostRate" Type="Decimal" />
         </UpdateParameters>
     </asp:SqlDataSource>
 

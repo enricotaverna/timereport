@@ -336,7 +336,7 @@
         }
     </style>
 </head>
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session("lingua")%>  UserLevel=<%= Session("userLevel")%> type =text/javascript></SCRIPT>
+<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session("NoExpenses")%>  lingua='<%= Session("lingua")%>' userlevel='<%= Session("userLevel")%>' type="text/javascript"></script>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript">    function UploadFile_onclick() {
 
     }

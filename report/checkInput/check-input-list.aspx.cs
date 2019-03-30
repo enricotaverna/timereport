@@ -72,7 +72,7 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
 
         sSelect = "SELECT  Persons.Persons_Id,  Persons.Name,  Persons.mail, Company.Name as CName, Persons.ContractHours, " +
                   " ( SELECT  SUM(Hours)  FROM hours where Persons_id =  Persons.Persons_id and hours.date >= " + sDataInizio + " and hours.date <= " + sDataFine + " ) as oreMesePrecedente, " +
-                  " ( SELECT stato from logTR Where LogTR.Mese=" + sMese + " AND LogTR.Anno=" + sAnno + " AND persons_id=Persons.Persons_id ) as stato " + 
+                  " ( SELECT MAX(stato) from logTR Where LogTR.Mese=" + sMese + " AND LogTR.Anno=" + sAnno + " AND persons_id=Persons.Persons_id ) as stato " +
                   " FROM ( Persons INNER JOIN Company ON Persons.Company_id = Company.Company_id ) " +  
                   sWhere;
 
@@ -119,7 +119,7 @@ public partial class report_checkInput_check_input_list : System.Web.UI.Page
             }
 
             // sort
-        dt.DefaultView.Sort = "GGMancanti";
+        dt.DefaultView.Sort = "Nome";
         dt.DefaultView.ToTable();
 
         // Caricamento DataGrid

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-using System.IO;
 
 public partial class report_esportaAttivita : System.Web.UI.Page
 {
@@ -26,14 +20,13 @@ public partial class report_esportaAttivita : System.Web.UI.Page
             ASPcompatility.SelectMonths(ref DDLFromMonth);
         }
 
-        if (!IsPostBack || RBTipoReport.SelectedValue != "2")
+        if (RBTipoReport.SelectedValue != "2")
         {
             // cancella lo script per il messaggio popup di conferma cancellazione
-           // ClientScript.RegisterStartupScript(this.GetType(), "Popup", "", true);
+            //ClientScript.RegisterStartupScript(this.GetType(), "Popup", "", true);
 
         }
     }
-
 
     protected string addclause(string strInput , string toAdd)  
     {
@@ -52,18 +45,21 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         switch (RBTipoReport.SelectedIndex)
                 {
                  case 0:     // calcolo Revenue Mese
-                  CalcolaRevenueMese(DDLFromMonth.Text, DDLFromYear.Text) ;                 
-                  Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMese + "')";
-                  Session["ReportPath"] = "REV_RevenueDettaglioPerMese.rdlc";
-                  //ClientScript.RegisterStartupScript(this.GetType(), "Popup", "", true);
+                  CalcolaRevenueMese(DDLFromMonth.Text, DDLFromYear.Text, DDLRevenueVersion.SelectedValue) ;                 
+                  Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMese + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " ORDER BY CodiceProgetto, NomePersona";
+                  Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMese + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " ORDER BY CodiceProgetto";
+                  Session["ReportPath"] = "REV_RawData.rdlc";
+                  Session["RevenueVersion"] = DDLRevenueVersion.SelectedItem.Text;
+
                   Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
                   break;
 
-                case 1:     // Cancella
-                Database.ExecuteSQL("DELETE TABLE RevenueMese WHERE  AnnoMese = '" + sAnnoMese + "',)", null);
-                // emette messaggio di conferma salvataggio
-                string message = "Cancellazione effettuata";
-                //ClientScript.RegisterStartupScript(this.GetType(), "Popup", "ShowPopup('" + message + "');", true);
+                  case 1:     // Cancella
+                  Database.ExecuteSQL("DELETE FROM RevenueMese WHERE RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " AND TipoRecord='A' AND AnnoMese = '" + sAnnoMese + "'", null);
+                  Database.ExecuteSQL("DELETE FROM RevenueProgetto WHERE RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " AND AnnoMese = '" + sAnnoMese + "'", null);
+                  // emette messaggio di conferma salvataggio
+                  string message = "Cancellazione effettuata";
+                  // ClientScript.RegisterStartupScript(this.GetType(), "Popup", "ShowPopup('" + message + "');", true); ** cancellata per problema POPUP
 
                 break;
 
@@ -73,18 +69,19 @@ public partial class report_esportaAttivita : System.Web.UI.Page
 
     }
 
-    protected void CalcolaRevenueMese(string sMese, string sAnno) {
+    protected void CalcolaRevenueMese(string sMese, string sAnno, string sRevenueVersionCode) {
 
         var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
 
         using (SqlConnection con = new SqlConnection(connectionString))
         {
-            using (SqlCommand cmd = new SqlCommand("SPcalcolaRevenueMese", con))
+            using (SqlCommand cmd = new SqlCommand("REV_CalcolaRevenueMese", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.Add("@Mese", SqlDbType.NVarChar).Value = sMese;
                 cmd.Parameters.Add("@Anno", SqlDbType.NVarChar).Value = sAnno;
+                cmd.Parameters.Add("@RevenueVersionCode", SqlDbType.NVarChar).Value = sRevenueVersionCode;
 
                 con.Open();
                 cmd.ExecuteNonQuery();

@@ -11,7 +11,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
     {
 
         //	Autorizzazione di display o creazione
-        Auth.CheckPermission("TRAINING", "PLAN");
+        Auth.CheckPermission("TRAINING", "CREATE");
 
  
     }

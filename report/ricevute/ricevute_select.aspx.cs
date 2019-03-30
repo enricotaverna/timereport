@@ -40,7 +40,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
                 // salva valori controlli 
                 SalvaControlli();
 
-                Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue + "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue + "&tipospesa=" + DDLTipoSpesa.SelectedValue +
+                Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue + "&invoiceflag=" + DDLInvoiceFlag.SelectedValue + "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue + "&tipospesa=" + DDLTipoSpesa.SelectedValue +
                                   "&persona=" + DDLPersone.SelectedValue + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
             }
         }

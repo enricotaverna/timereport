@@ -39,7 +39,7 @@
 
     <div id="FormWrap" style="width:70%;margin-top:25px;" >
 
-    <form id="NOME_FORM" runat="server" Class="StandardForm" >
+    <form id="FVForm" runat="server" Class="StandardForm" >
 
         <div class="formtitle" style="width:98%"> <asp:Literal runat="server" Text="<%$ Resources:titolo%>" /></div>
 
@@ -86,7 +86,7 @@
 
         <!-- *** BOTTONI ***  -->
         <div class="buttons">            
-            <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Chiudi TR" OnClick="InsertButton_Click" meta:resourcekey="InsertButtonResource1"      /> 
+            <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton"  Text="Chiudi TR" meta:resourcekey="InsertButtonResource1" OnClick="InsertButton_Click"    OnClientClick="return CheckIsRepeat();"  /> 
             <asp:Button ID="btStampaRicevute" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Stampa giustificativi" meta:resourcekey="btStampaRicevuteResource1" /> 
             <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="CancelButtonResource1"    />                    
         </div>
@@ -104,6 +104,18 @@
         <div  id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>              
         <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>      
     </div> 
+
+<script type="text/javascript">
+
+    var submit = 0; 
+    function CheckIsRepeat() {
+        if (++submit > 1) {
+            return false;
+        }
+    }
+
+    </script>
+
 
 </body>
 </html>

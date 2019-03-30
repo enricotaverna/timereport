@@ -533,7 +533,8 @@ public class CheckChiusura
                                              " INNER JOIN Projects AS b ON b.projects_id = a.projects_id " +
                                              " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"]  + "  AND " +
                                              " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
-        dtFerie.PrimaryKey = new DataColumn[] { dtFerie.Columns["date"] };
+
+        //dtFerie.PrimaryKey = new DataColumn[] { dtFerie.Columns["hours_id"] };
 
         // cicla sui giorni del mese
         for (f = 1; f <= DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)); f++)
@@ -546,7 +547,7 @@ public class CheckChiusura
             {
 
                 // controlla che non sia festivo
-                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (   dtFerie.Rows.Count == 0 ||  !dtFerie.Rows.Contains(sDate) ) )
+                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (   dtFerie.Rows.Count == 0 ||  dtFerie.Select("date = '" + sDate + "'").Length == 0  ) ) // dtFerie.Rows.Contains(sDate) ) )
                 {
 
                     // controlla che sia caricato un ticket
@@ -717,7 +718,7 @@ public class Database
                     connection.Open(); // Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
                     da.Fill(dtRecord);
 
-                    if (dtRecord.Rows.Count > 1)
+                    if (dtRecord.Rows.Count >= 1)
                         result = true;
                     else
                         result = false;
@@ -819,6 +820,43 @@ public class ASPcompatility
     {         
         string sRet = "'" + InputString.Replace("'", "''") + "'";
         return sRet;
+    }
+
+    // Costruisce la DDL AnnoMese
+    // MenoMesi = numero di mesi da sottrarre alla data corrente
+    // PiuMesi = ....
+    public static void SelectAnnoMese(ref DropDownList DDL, int MenoMesi, int PiuMesi)
+    {
+        ListItem lItem;
+
+        // al massimo indietro di 12 mesi    
+        if (MenoMesi > 12)
+            MenoMesi = 12;
+
+        int MeseCorrente = DateTime.Now.Month;
+        int AnnoCorrente = DateTime.Now.Year;
+
+        // MeseCorrente = 3 (Marzo) MenoMesi = 5 => Meseda = 11 / Annoda = AnnoCorrente - 1
+        int MeseDa = MeseCorrente - MenoMesi < 0 ? 13 - (MenoMesi - MeseCorrente) : MeseCorrente - MenoMesi;
+        int Annoda = MeseCorrente - MenoMesi < 0 ? (AnnoCorrente - 1) : AnnoCorrente;
+        int MeseA = MeseCorrente + PiuMesi < 13 ? MeseCorrente + PiuMesi : (MeseCorrente + PiuMesi) - 12;
+
+        int MenoAnno = 0;
+        for (int i = MeseDa; i < MeseDa + (MenoMesi + PiuMesi); i++) {
+
+            // costruisce anno-mese    
+            
+            lItem = new ListItem(Annoda.ToString() + "-" + (i-MenoAnno).ToString("D2"), Annoda.ToString() + "-" + (i - MenoAnno).ToString("D2"));
+            if (i == MeseDa + (MenoMesi + PiuMesi) - 1)
+                lItem.Selected = true; // l'ultimo è selezionato per default
+    
+            DDL.Items.Add(lItem);
+
+            if (i == 12) {
+                MenoAnno = 12;
+                Annoda = Annoda + 1;
+            }
+        }
     }
 
     public static void SelectMonths(ref DropDownList DDL, string sLingua = "it")

@@ -38,7 +38,7 @@
 
     <div id="MainWindow" >
   
-    <form id="FVForm" runat="server">
+    <form id="FVForm" runat="server" >
     
     <div id="PanelWrap"  > 
 
@@ -65,7 +65,7 @@
             <!-- ** INPUT ELEMENT ** -->
             <div class="input nobottomborder"> <!-- ** CODICE CORSO ** -->
                 <div class="inputtext">Codice Corso</div>
-                <asp:TextBox class="ASPInputcontent" runat="server" id="TBCourseCode"  Enabled="False" />
+                <asp:TextBox class="ASPInputcontent" runat="server" id="TBCourseCode"  Enabled="False"  />
 
                 <asp:CheckBox  ID="CBActive" runat="server"  Checked="True" /> <!-- ** ATTIVO ** -->
 				<asp:Label  AssociatedControlId="CBActive" class="css-label" ID="Label3" runat="server">Attivo</asp:Label>
@@ -73,7 +73,7 @@
  
             <div class="input nobottomborder"> <!-- ** NOME CORSO ** -->
                 <div class="inputtext">Nome Corso</div>
-                <asp:TextBox class="ASPInputcontent" style="width:270px" runat="server" id="TBCourseName" data-parsley-errors-container="#valMsg" data-parsley-required="true" MaxLength="100" />
+                <asp:TextBox class="ASPInputcontent" style="width:270px" data-parsley-codiceunico runat="server" id="TBCourseName" data-parsley-errors-container="#valMsg" data-parsley-required="true" MaxLength="100" />
             </div>
 
             <div class="input nobottomborder"> <!-- ** DESCRIZIONE ** -->
@@ -127,9 +127,11 @@
 
             <div class="input nobottomborder"> <!-- ** VALIDO DA ** -->
                 <div class="inputtext">Validato da</div>
-                <asp:TextBox class="ASPInputcontent" runat="server" id="TBValidFrom"  Columns="10" />
+                <asp:TextBox class="ASPInputcontent" runat="server" id="TBValidFrom"  Columns="10" 
+                             data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"/>
                 &nbsp;a&nbsp;
-                <asp:TextBox class="ASPInputcontent" runat="server" id="TBValidTo" Columns="10" />
+                <asp:TextBox class="ASPInputcontent" runat="server" id="TBValidTo" Columns="10" 
+                             data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/"/>
             </div>
 
             <asp:TextBox runat="server" id="TBCourse_id" style="visibility:hidden"/>
@@ -223,7 +225,7 @@
 
         initValue();  // inizializza campi
 
-        openDialogForm("CREATE");
+        openDialogForm("#dialog");
 
     });  // tasto crea record
     
@@ -233,6 +235,9 @@
     }); // chiude form modale
 
     $("#btnSalvaModale").click(function (e) {
+
+        //Cancel the link behavior
+        e.preventDefault();
 
         $('#FVForm').parsley().validate();
 
@@ -346,7 +351,7 @@
                         $('#TBValidFrom').val(objCourse.ValidFrom);;
                         $('#TBValidTo').val(objCourse.ValidTo);;
 
-                        openDialogForm("UPDATE");
+                        openDialogForm("#dialog");
 
                 },
 
@@ -425,45 +430,6 @@
 
         }); // ajax
     } // crea o aggiorna record selezionato, chiamata da btnSalvaModale
-
-    function openDialogForm(mode) {
-
-        //Get the screen height and width
-        var maskHeight = $(document).height();
-        var maskWidth = $(window).width();
-
-        //Set heigth and width to mask to fill up the whole screen
-        $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
-
-        //transition effect		
-        $('#mask').fadeIn(1);
-        $('#mask').fadeTo("fast", 0.6);
-
-        //Get the window height and width
-        var winH = $(window).height();
-        var winW = $(window).width();
-
-        //Set the popup window to center
-        //Set the popup window to center
-        $('#dialog').css('top', 40);
-        $('#dialog').css('left', winW / 2 - $('#dialog').width() / 2);
-
-        //transition effect
-        $('#dialog').fadeIn(1);
-
-        // reset validations
-        $('#FVForm').parsley().reset();
-
-        //$("#TBCourseCode").attr('disabled', true);
-
-        //if (mode == "UPDATE")
-        //    $("#TBCourseCode").attr('disabled', true);
-        //else {
-        //    $("#TBCourseCode").attr('disabled', false);
-        //    $('#TBCourseCode').focus();
-        //}
-
-    }     // Apre Form Modale
 
 </script>
 

@@ -36,11 +36,22 @@
 
     <div id="FormWrap" class="StandardForm" >
  
-    <form id="form1" runat="server"  >     
+    <form id="FVForm" runat="server"  >     
       
-    <div  class="formtitle">Report</div>              
+    <div  class="formtitle">Calcolo Revenue</div>              
 
+    <!--  *** VERSIONE *** -->            
+    <div class="input nobottomborder">
+          <div class="inputtext">Versione</div>   
+          <label class="dropdown">
+               <asp:DropDownList ID="DDLRevenueVersion" runat="server" DataTextField="RevenueVersionDescription" DataValueField="RevenueVersionCode"
+                                 data-parsley-errors-container="#valMsg" data-parsley-checkversion="true" 
+                                 DataSourceID ="DS_RevenueVersion" style="width:150px"  >                   
+                    </asp:DropDownList> 
+          </label>
+    </div> 
   
+    <!--  *** ALLA DATA *** --> 
     <div class="input nobottomborder">
         <div class="inputtext">Dalla data</div>
         <label class="dropdown" >
@@ -60,7 +71,8 @@
                     </asp:RadioButtonList>
     </div>
                             
-    <div class="buttons">        
+    <div class="buttons">  
+            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
             <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: EXEC_TXT %>" CssClass="orangebutton"  CommandName="Exec" OnClick="sottometti_Click" />    
             <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>"    />                    
  
@@ -91,33 +103,65 @@
         $(function () {
 
             // reset cursore e finestra modale
-            document.body.style.cursor = 'default';
- 
- 
+            UnMaskScreen();
         });
       
+        // *** attiva validazione campi form
+        $('#FVForm').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+        });
+
+        // *** Custom Validator Parsley *** 
+        window.Parsley.addValidator('checkversion', function (value, requirement) {
+
+            // controllo che non esista una versione 00 nel mese di calcolo
+            var response;
+            var dataAjax = "{ RevenueVersionCode: '" + $("#DDLRevenueVersion").val() + "', " +
+                " Anno: '" + $("#DDLFromYear").val() + "', " +
+                " Mese: '" + $("#DDLFromMonth").val() + "' }";
+
+            if ($("#RBTipoReport_1").prop("checked")) // se cancella va sempre bene
+                return true;
+
+            $.ajax({
+                url: "/timereport/report/EstraiRevenue/WS_EstraiRevenue.asmx/CheckVersion", // nome del Web Service
+                data: dataAjax,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                type: 'post',
+                async: false, // validazione sincrona
+                success: function (data) {
+                    response = data.d; // false esiste già versione
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+            return response;
+        }, 32)
+        .addMessage('it', 'checkversion', 'Esiste già un versione 00 sul mese');
 
         // al click del bottone disabilita lo schermo e cambia il cursore in wait
-        $('#BtExec').click(function() {
+        $('#BtExec').click(function(e) {
 
-            //Get the screen height and width
-            var maskHeight = $(document).height();
-            var maskWidth = $(window).width();
+            //Cancel the link behavior
+            //e.preventDefault();
 
-            //Set heigth and width to mask to fill up the whole screen
-            $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+            if (!$('#FVForm').parsley().validate())
+                return;
 
-            //transition effect		
-            //$('#mask').fadeIn(200);
-            $('#mask').fadeTo("fast", 0.5);
-
-
-            document.body.style.cursor = 'wait';
+            // maschera lo schermo
+            // NB: deve essere definito un elemento <div id="mask"></div> nel corpo del HTML
+            MaskScreen(true);
  
         });
 
 </script>
 
+<asp:SqlDataSource ID="DS_RevenueVersion" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
+       SelectCommand="SELECT RevenueVersionCode, RevenueVersionCode + ' ' + RevenueVersionDescription as RevenueVersionDescription FROM RevenueVersion ORDER BY RevenueVersionCode" >        
+</asp:SqlDataSource>
 
 </body>
 </html>

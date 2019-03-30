@@ -131,7 +131,7 @@
                     <div class="input nobottomborder">
                         <asp:Label ID="Label14" CssClass="inputtext" runat="server" Text="Mail:"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBMail" runat="server" Text='<%# Bind("mail") %>' Width="265px" Columns="50"  
-                                     data-parsley-errors-container="#valMsg" required data-parsley-type='email' />
+                                     data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
                     </div>
 
                 </div>
@@ -191,7 +191,7 @@
                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                         <label class="dropdown" style="width:190px">
                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" 
-                                DataTextField="Name" DataValueField="Persons_id" 
+                                DataTextField="Name" DataValueField="Persons_id"  data-parsley-errors-container="#valMsg" required="true"
                                 SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
                                 <asp:ListItem  Value="" Text="Seleziona un valore"/>
                             </asp:DropDownList>
@@ -395,7 +395,7 @@
                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                         <label class="dropdown" style="width:190px">
                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" 
-                                DataTextField="Name" DataValueField="Persons_id" 
+                                DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" required="true" 
                                 SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
                                 <asp:ListItem  Value="" Text="Seleziona un valore"/>
                             </asp:DropDownList>

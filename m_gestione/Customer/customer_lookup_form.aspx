@@ -436,7 +436,7 @@ $(function () {
    
     $("#tabs").tabs(); // abilitate tab view
 
-        // *** controllo che non esista lo stesso codice utente *** //
+    // *** controllo che non esista lo stesso codice utente *** //
     window.Parsley.addValidator('codiceunico', function (value, requirement) {
         var response = false;
         var dataAjax = "{ sKey: 'CodiceCliente', " +

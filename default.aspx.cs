@@ -122,7 +122,7 @@ public partial class defaultAspx : System.Web.UI.Page
 
                 // se non ha trovato spese forzate sulla persona, a questo punto carica tutto
                     if (dtSpeseForzate.Rows.Count == 0) {   
-                        dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore,TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
+                     //   dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore,TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
                     }
                 }
 			else  {
@@ -134,6 +134,7 @@ public partial class defaultAspx : System.Web.UI.Page
 
 		Session["dtProgettiForzati"] = dtProgettiForzati;
         Session["dtSpeseForzate"] = dtSpeseForzate;
+        Session["NoExpenses"] = dtSpeseForzate.Rows.Count == 0 ? "true" : "false";
 
         // Carica in buffer tipo spesa
         dtTipoSpesa = Database.GetData("Select ExpenseType_id, TipoBonus_id from ExpenseType", this.Page);
@@ -153,10 +154,12 @@ public partial class defaultAspx : System.Web.UI.Page
 		//*** Carica datatable con giorni di ferie (FINE)   
 
         // lancia il menu principale
-		LblErrorMessage.Text = "";  
-		Response.Redirect("/timereport/menu.aspx");
+		LblErrorMessage.Text = "";
 
-		} // Ispostbak
+            Response.Redirect("/timereport/menu.aspx");
+            //Response.Redirect("/timereport/report/EstraiRevenue/ReportRevenue.aspx");
+
+        } // Ispostbak
 
 	} // page_load
 
@@ -184,8 +187,8 @@ public partial class defaultAspx : System.Web.UI.Page
 			Session["ForcedAccount"] = 0;
 		Session["ExpensesProfile_id"] = rdr["ExpensesProfile_id"];
 
-		// salva in cookie la preferenza di lingua
-		HttpCookie myCookie = new HttpCookie("lingua");
+        // salva in cookie la preferenza di lingua
+        HttpCookie myCookie = new HttpCookie("lingua");
 		myCookie.Value = rdr["Lingua"].ToString();
 		myCookie.Expires = DateTime.Now.AddYears(100);
 		Response.Cookies.Add(myCookie);

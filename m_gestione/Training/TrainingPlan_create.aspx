@@ -267,7 +267,37 @@
         ],
     });
 
-    var TableTrainingPlan = new Tabulator("#TableTrainingPlan", {
+    var TableTrainingPlan = new Tabulator("#TableTrainingPlan", { 
+    cellEdited:function(cell){
+        //cell - cell component
+        var CoursePlan_id = cell.getRow().getCells()[0].getValue(); // indice record da aggiornare
+             
+        // chiamata di aggiornamento
+        var values = "{'sCoursePlan_id': '" + CoursePlan_id + "' , " +
+                        " 'sFieldToUpdate': '" + cell.getField() + "' , " +
+                        " 'sValue': '" + cell.getValue() + "' " +
+                        "  } ";
+        $.ajax({
+
+                    type: "POST",
+                    url: "/timereport/webservices/WSHR_Training.asmx/UpdateTrainingPlanRecord",
+                    data: values,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+
+                    success: function (msg) {
+                        // se call OK inserisce una riga sotto l'elemento 
+                        if (msg.d != true) {
+                            alert("Error in updating Training Plan, please exit and retry");
+                        }
+                    },
+
+                    error: function (xhr, textStatus, errorThrown) {
+                        return false;
+                    }
+
+        }); // ajax        
+    },
     movableRowsReceiver: RiceviRiga,
     paginationSize: 4, // this option can take any positive integer value (default = 10)
     pagination:"local", //enable local pagination.
@@ -292,7 +322,10 @@
         { title: "Prodotto", field: "ProductName", sorter: "string", headerFilter:true },
         { title: "Area", field: "Area", sorter: "string", headerFilter:true },
         { title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter:true },
-        { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true },
+        { title: "Priorità", field: "Priority", sorter: "integer", headerFilter: true, align:"center",
+            headerFilter: "select", headerFilterParams: { values:  { "1": "1", "2": "2", "3": "3", "4": "4", "5": "5","" : "all" } },
+            editor: "select", editorParams: { values: { "": "", "1": "1", "2": "2", "3": "3", "4": "4", "5": "5" } }
+        },
         { title: "Score", field: "Score", sorter: "date", formatter: "star" },
         { title: "Comment", field: "Comment", sorter: "number", visible: false },
         { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
@@ -323,7 +356,7 @@
                     $('#TBCoursePlan_id').val(objCourse.CoursePlan_id);
                 $('#TBComment').val(objCourse.Comment);
 
-                openDialogForm("UPDATE");
+                openDialogForm("#dialog");
 
             },
 
@@ -371,12 +404,13 @@
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{ 'CoursePlan_id': '" + $('#TBCoursePlan_id').val() + "', " +
-            "'Comment': '" + $('#TBComment').val() + "'   } ";
+            "'Comment': '" + $('#TBComment').val() + "'," +
+            "'Feedback': 'no_upd'   } ";
 
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WSHR_Training.asmx/CreateUpdateCoursePlanItem",
+            url: "/timereport/webservices/WSHR_Training.asmx/UpdateCoursePlanItem",
             data: values,
             async: false,
             contentType: "application/json; charset=utf-8",

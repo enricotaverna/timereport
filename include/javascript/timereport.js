@@ -18,6 +18,11 @@
     // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
     function ShowPopup(message) {
         $(function () {
+
+            // se non c'è la div mask la aggiunge
+            if (document.getElementById("dialog") == null)
+                $("body").append("<div id='dialog'></div>");
+
             $("#dialog").html(message);
             $("#dialog").dialog({
                 title: "Messaggio",
@@ -42,32 +47,61 @@
     };
 
     // Apre Form Modale
-    function openDialogForm(mode) { 
+    function openDialogForm(ModalForm) { 
+
+        MaskScreen(false);
+
+        //Get the window height and width
+        var winW = 960;
+
+        //Set the popup window to center
+        $(ModalForm).css('top', 60);
+        $(ModalForm).css('left', winW / 2 - $(ModalForm).width() / 2);
+
+        //transition effect
+        $(ModalForm).fadeIn(1);
+
+        // reset validations
+        $('#FVForm').parsley().reset();
+
+} 
+
+// Maschera lo schermo con una effetto Fade
+function MaskScreen(wait) {
+
+    // se non c'è la div mask la aggiunge
+    if (document.getElementById("mask") == null) 
+         $("body").append("<div id='mask'></div>");
 
     //Get the screen height and width
     var maskHeight = $(document).height();
     var maskWidth = $(window).width();
 
     //Set heigth and width to mask to fill up the whole screen
-    $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+    $("#mask").css({ 'width': maskWidth, 'height': maskHeight });
 
     //transition effect		
-    $('#mask').fadeIn(1);
-    $('#mask').fadeTo("fast", 0.6);
+    //$('#mask').fadeIn(200);
+    $("#mask").fadeTo("fast", 0.5);
 
-    //Get the window height and width
-    var winH = $(window).height();
-    var winW = $(window).width();
+    if (wait)
+        document.body.style.cursor = 'wait';
 
-    //Set the popup window to center
-    //Set the popup window to center
-    $('#dialog').css('top', 40);
-    $('#dialog').css('left', winW / 2 - $('#dialog').width() / 2);
+}
 
-    //transition effect
-    $('#dialog').fadeIn(1);
+// Riporta lo schermo alla normalità//
+function UnMaskScreen() {
 
-    // reset validations
-    $('#FVForm').parsley().reset();
+    //Get the screen height and width
+    var maskHeight = $(document).height();
+    var maskWidth = $(window).width();
 
-    }     
+    //Set heigth and width to mask to fill up the whole screen
+    $("#mask").css({ 'width': 0, 'height': 0 });
+
+    //transition effect		
+    $("#mask").fadeTo("fast", 0);
+
+    document.body.style.cursor = 'default';
+
+}

@@ -15,7 +15,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        Auth.CheckPermission("TRAINING", "PLAN");
+        Auth.CheckPermission("TRAINING", "REPORT");
 
         if (!IsPostBack) {
             /* Popola dropdown con i valori        */
@@ -29,11 +29,19 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 
         // salva data report utilizzata nella gridview per il drill sulle revenue
         Session["Path"] = "";
+        string sCondition = "";
 
-        if ( DDLAnno.SelectedValue == "0" )
-            Session["SQL"] = "SELECT * FROM V_TRAININGPLAN";
-        else
-            Session["SQL"] = "SELECT * FROM V_TRAININGPLAN WHERE Anno='" + DDLAnno.SelectedValue + "'";
+        if ( DDLAnno.SelectedValue != "0" )
+            sCondition = " WHERE Anno = '" + DDLAnno.SelectedValue + "' ";
+
+        if (DDLManager.SelectedValue != "0")
+            sCondition = sCondition == "" ? " WHERE Manager_id = '" + DDLManager.SelectedValue + "' " : sCondition + " AND Manager_id = '" + DDLManager.SelectedValue + "' ";
+
+        if (DDLPersons.SelectedValue != "0")
+            sCondition = sCondition == "" ? " WHERE Persons_id = '" + DDLPersons.SelectedValue + "' " : sCondition + " AND Persons_id = '" + DDLPersons.SelectedValue + "' ";
+
+
+        Session["SQL"] = "SELECT * FROM V_TRAININGPLAN " + sCondition;
 
         Session["ReportPath"] = "/timereport/report/Rdlc/HR_TrainingPlan.rdlc"; 
 

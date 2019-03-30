@@ -1,6 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input.aspx.cs" Inherits="input"  %>
 
 <%@ Import Namespace="System.Globalization" %>
+<%@ Import Namespace="System.Data" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -18,11 +19,10 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title><asp:Literal runat="server" Text="<%$ Resources:Titolo%>" /></title>
 </head>
 
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session["NoExpenses"]%> Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 </style>
@@ -93,33 +93,38 @@
         <!-- END PanelWrap -->
 
         <%
-           // *****
-           // ***** TAB TIPO CALENDARIO *****
-           // *****
-           string ch = "", ce = "", cs = "";
-           
-           switch ((string)Session["type"])
-           {
-               case "hours":
-                   ch = "Tab-active";
-                   ce = cs = "Tab-noactive";
-                   break;
-               case "expenses":
-                   ce = "Tab-active";
-                   ch = cs = "Tab-noactive";
-                   break;
-               case "bonus":
-                   cs = "Tab-active";
-                   ch = ce = "Tab-noactive";
-                   break;
-           }
-                                  
-           Response.Write("<a class=" + ch + " style='margin-left:48px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
-           Response.Write("<a class=" + ce + " href=input.aspx?type=expenses>"+ GetLocalResourceObject("SPESE") +"</a>");
-           // solo se dipendente
-           if ( Auth.ReturnPermission("DATI","BUONI") )
-              Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>"+ GetLocalResourceObject("BUONI") + "</a>");
-				
+            // *****
+            // ***** TAB TIPO CALENDARIO *****
+            // *****
+            string ch = "", ce = "", cs = "";
+
+            switch ((string)Session["type"])
+            {
+                case "hours":
+                    ch = "Tab-active";
+                    ce = cs = "Tab-noactive";
+                    break;
+                case "expenses":
+                    ce = "Tab-active";
+                    ch = cs = "Tab-noactive";
+                    break;
+                case "bonus":
+                    cs = "Tab-active";
+                    ch = ce = "Tab-noactive";
+                    break;
+            }
+
+            Response.Write("<a class=" + ch + " style='margin-left:48px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
+
+            // solo se ha spese
+            DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
+            if (dtSpeseForzate.Rows.Count > 0)
+                Response.Write("<a class=" + ce + " href=input.aspx?type=expenses>" + GetLocalResourceObject("SPESE") + "</a>");
+
+            // solo se dipendente
+            if ( Auth.ReturnPermission("DATI","BUONI") )
+                Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>"+ GetLocalResourceObject("BUONI") + "</a>");
+
         %>
         <table width="90%" align="center" style="border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
             <!--        lascia righa vuota-->
@@ -208,7 +213,7 @@
     <!-- **** Finestre richiesta spese / trasferte **** -->
     <div id="ModalWindow">
 
-        <form name="loginform" action="input.aspx" method="post" class="StandardForm" runat="server">
+        <form id="FVForm" action="input.aspx" method="post" class="StandardForm" runat="server">
 
         <div id="dialog" class="window">
 
