@@ -1,0 +1,139 @@
+﻿<%@ WebService Language="C#" Class="WebService" %>
+
+using System;
+using System.Web;
+using System.Web.Services;
+using System.Web.Services.Protocols;
+
+[WebService(Namespace = "http://tempuri.org/")]
+[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+// Per consentire la chiamata di questo servizio Web dallo script utilizzando ASP.NET AJAX, rimuovere il commento dalla riga seguente. 
+[System.Web.Script.Services.ScriptService]
+public class WebService  : System.Web.Services.WebService {
+
+    [WebMethod]
+    public string gvision(string image64) {
+        return "Hello World";
+    }
+    
+    [WebMethod]
+    public string parseReceipt(string BillText) {
+    bool foundAmount = false;
+
+    string arrBillData = BillText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+    string dateStr;
+
+    // modelCurrencyData.setData(currency);
+
+    // Check for Date and Total Amount
+    //yyyy-mm-dd
+    var date1 = /^([12]\d{3}[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12]\d|3[01])) (2[0-3]|[01][0-9]):[0-5][0-9]$/;
+
+    //dd-mm-yyyy
+    var date2 = /^((0[1-9]|[12]\d|3[01])[-/.](0[1-9]|1[0-2])[-/.][12]\d{3}) (2[0-3]|[01][0-9]):[0-5][0-9]$/;
+
+
+    //dd-mm-yy
+    var date3 = /^((0[1-9]|[12]\d|3[01])[-/.](0[1-9]|1[0-2])[-/.][12]\d{1}) (2[0-3]|[01][0-9]):[0-5][0-9]$/;
+
+    // Loop through all Text
+    for (i = 0; i < arrBillData.length; i++) {
+        let value = arrBillData[i];
+        // Date
+        if (date1.test(value) || date2.test(value) || date3.test(value)) {
+            console.log(value);
+
+            if (date1.test(value)) {
+                //yyyy-mm-dd
+                dateStr = value.substr(0,4) + value.substr(5,2) + value.substr(8,2);
+            } else if (date2.test(value)){
+                //dd-mm-yyyy
+                dateStr = value.substr(6,4) + value.substr(3,2) + value.substr(0,2);
+
+            } else if(date3.test(value)) {
+                //dd-mm-yy
+                dateStr = dateStr = '20' + value.substr(6,2) + value.substr(3,2) + value.substr(0,2);
+            }
+            inReceiptDate.setValue(dateStr);
+
+        } else {
+
+        }
+
+        // Amount
+
+        // find Currency Pattern
+        for (j = 0; j < currency.length; j++) {
+            let ccode = currency[j].code;
+            let csymbol = currency[j].symbol;
+
+            if (value.includes(ccode)) {
+                var cstr1 = "[A-Z]" + ccode + "[A-Z]$";
+                var cstr2 = ccode + "[A-Z]$";
+                var cstr3 = "[A-Z]" + ccode + "$";
+
+                let crex1 = new RegExp(cstr1);
+                let crex2 = new RegExp(cstr2);
+                let crex3 = new RegExp(cstr3);
+
+                inReceiptCurrency.setSelectedKey(ccode); // almeno imposta la valuta
+
+                if (!(crex1.test(value) || crex2.test(value) || crex3.test(value))) {
+                    if (value.length > 3) {
+                        inReceiptAmount.setValue(value.substr(3));
+                        inReceiptCurrency.setSelectedKey(ccode);
+                        foundAmount = true;
+                    } else {
+                        inReceiptAmount.setValue(arrBillData[i + 1]);
+                        inReceiptCurrency.setSelectedKey(ccode);
+                        foundAmount = true;
+                    }
+                }
+
+
+                break;
+            }
+            // else if (value.includes(csymbol)) {
+            //     // with symbol
+
+            //     var sstr1 = "[A-Z]" + csymbol + "[A-Z]$";
+            //     var sstr2 = csymbol + "[A-Z]$";
+            //     var sstr3 = "[A-Z]" + csymbol + "$";
+
+            //     let srex1 = new RegExp(sstr1);
+            //     // let crex2 = /NOK[A-Z]$/;
+            //     let srex2 = new RegExp(sstr2);
+            //     let srex3 = new RegExp(sstr3);
+
+            //     if (!(srex2.test(value))) {
+            //         if (value.length > 1) {
+            //             ipAmount.setValue(value.substr(1, value.length));
+            //             foundAmount = true;
+            //         } else {
+            //             ipAmount.setValue(arrBillData[i + 1]);
+            //             foundAmount = true;
+            //         }
+            //     } else if (!(srex3.test(value))) {
+            //         if (value.length > 1) {
+            //             ipAmount.setValue(value.substr(1, value.length));
+            //             foundAmount = true;
+            //         } else {
+            //             ipAmount.setValue(arrBillData[i + 1]);
+            //             foundAmount = true;
+            //         }
+            //     }
+            // }
+        }
+
+        if (foundAmount) {
+            break;
+        }
+
+
+    }
+
+    // Get Shop Name
+    inReceiptInfo.setValue(arrBillData[0] + '-' + arrBillData[1]);
+    }
+
+}

@@ -45,9 +45,17 @@
     <br />
          
     <div class="input nobottomborder">
-          <div class="inputtext">File</div>   
+          <div class="inputtext">File (.xls)</div>   
           <asp:FileUpload  ID="FileUpload" runat="server" class="jfilestyle"  data-text="seleziona" data-inputSize="160px" accept=".xls" 
                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-obbligofile="true" /> 
+    </div>
+
+    <div class="input nobottomborder">
+
+          <!-- *** Checkboc Storno ***  -->
+          <div class="inputtext"></div>   
+          <asp:CheckBox ID="CBSkipFirstRow" runat="server" Checked="True" />
+          <asp:Label AssociatedControlID="CBSkipFirstRow" runat="server" Text="intestazioni su prima riga"></asp:Label> 
     </div>
     
     <!--  *** PERIODO / VERSIONE *** -->            
@@ -106,6 +114,8 @@
 
         $(document).ready(function () {
             UnMaskScreen(); // reset cursore e finestra modale
+
+            $(":checkbox").addClass("css-checkbox"); // post rendering dei checkbox in ASP.NET
         })
 
         // BOTTONE CANCELLA

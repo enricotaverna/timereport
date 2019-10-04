@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="TrainingPlan_evaluate.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
+﻿    <%@ Page Language="C#" AutoEventWireup="true" ValidateRequest ="false" CodeFile="TrainingPlan_evaluate.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
 
 <!DOCTYPE html>
 
@@ -60,15 +60,15 @@
     
     <div id="ModalWindow"> <!--  Finestra Dialogo -->
 
-        <div id="dialog" class="window">
+        <div id="dialog" class="window" >
 
-            <div id="FormWrap" class="StandardForm">
+            <div id="FormWrap" class="StandardForm" style="width: 520px;">
 
-            <div class="formtitle">Commento</div>
+            <div class="formtitle" style="width: 520px;">Valutazione corso</div>
 
             <div class="input nobottomborder"> <!-- ** DESCRIZIONE ** -->
-                <div class="inputtext">Valutazione</div>
-                <asp:TextBox runat="server" id="TBFeedback" TextMode="MultiLine" Rows="6" CssClass="textarea" />
+                <div class="inputtext">Descrizione</div>
+                <asp:TextBox runat="server" id="TBFeedback" TextMode="MultiLine" Rows="12" CssClass="textarea" style="width: 350px;" />
             </div>
  
             <asp:TextBox runat="server" id="TBCoursePlan_id" style="visibility:hidden"/>
@@ -137,11 +137,29 @@
     // ** TABULATOR **
     var editIcon = function (cell, formatterParams, onRendered) { //plain text value
         var value = cell.getRow().getData().Feedback;
-        if (value == null || value == "" ) 
+
+        if (!EditScoreCheck(cell))
+            return "";
+
+        if (value == null || value == "") 
            return "<i class='fa fa-edit'></i>";
         else 
             return "<i class='fa fa-comment'></i>";    
     };  // icona edit
+
+    var EditScoreCheck = function(cell){
+        // Verifica che la data del corso più recente di 90 giorni da oggi
+        //cell - the cell component for the editable cell
+
+        var dtDateToCheck = new Date();
+        dtDateToCheck.setDate(dtDateToCheck.getDate()-90); // sottrae i giorni del parametro
+
+        //get row data
+        var strDt = cell.getRow().getData().CourseDate;
+        var dtDataCorso = new Date(strDt.substring(6,10),strDt.substring(3,5)-1, strDt.substring(0,2));
+
+        return dtDataCorso > dtDateToCheck; // only allow the name cell to be edited if the age is over 18
+    }
 
     var TableTrainingPlan = new Tabulator("#TableTrainingPlan", {
     cellEdited:function(cell){
@@ -205,10 +223,10 @@
         //},
         {
             title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: "select",
-            headerFilterParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED" , "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED", "": "All Status" } }, editor: "select", editorParams: { values: { "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED" } }
+            headerFilterParams: { values: { "ATTENDED": "ATTENDED" , "": "All Status" }  }
         },
         { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true, validator: "regex:^[0-9]{2}\/[0-9]{2}\/[0-9]{4}" },
-        { title: "Valutazione", field: "Score",  formatter:"star", editor:true  },
+        { title: "Valutazione", field: "Score", formatter: "star", editor: true, editable:EditScoreCheck  },
         //{ formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
         { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
     ],
@@ -235,7 +253,19 @@
 
                 if (objCourse.CoursePlan_id > 0)
                     $('#TBCoursePlan_id').val(objCourse.CoursePlan_id);
-                $('#TBFeedback').val(objCourse.Feedback);
+
+                // se new input default template valutazione
+                if (objCourse.Feedback == "") {
+
+                    str = "1. Il corso ha un'applicazione concreta nel lavoro? \n (risposta libera) \n \n" +
+                        "2. Suggeriresti il corso ad un collega \n (si/no) \n \n" +
+                        "3. Valutazione complessiva del corso \n (risposta libera) \n \n" +
+                        "4. Note \n";
+
+                    $('#TBFeedback').val(str);
+                }
+                else
+                    $('#TBFeedback').val(objCourse.Feedback);
 
                 openDialogForm("#dialog");
 
@@ -252,9 +282,14 @@
     
     function submitCreaAggiornaRecord() {
 
+
+        str = $('#TBFeedback').val();
+
+        str = str.replace(/'/g,"\\'");
+
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{ 'CoursePlan_id': '" + $('#TBCoursePlan_id').val() + "', " +
-            "'Feedback': '" + $('#TBFeedback').val() + "', " +
+            "'Feedback': '" + str + "', " +
             "'Comment': 'no_upd'   } ";
 
         $.ajax({

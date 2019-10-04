@@ -17,6 +17,8 @@ public class MyConstants
     public static int AUTH_EXTERNAL = 1; // vede solo sè stesso
     public static int AUTH_EMPLOYEE = 2; // vede solo sè stesso
 
+    public static int TRAINIG_ATTENDED = 4; // corso eseguito
+
     public static string[] aDaysName = new[] { "Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato" };
 
     public static System.Data.DataTable DTHoliday = new System.Data.DataTable();

@@ -96,6 +96,7 @@
 
             //Cancel the link behavior
             e.preventDefault();
+            MaskScreen(true); // cursore e finestra modale
 
             var selectedData = SFImportTable.getData(); // array con le rige selezionate
             var dataToPost = [];
@@ -120,6 +121,9 @@
 
                     success: function (msg) {
                         // se call OK inserisce una riga sotto l'elemento 
+                                    
+                        UnMaskScreen(); // reset cursore e finestra modale
+
                         if (msg.d == true) 
                             ShowPopup("Aggiornato completato");
                         else

@@ -69,7 +69,7 @@
 								 </tr>
 								 <tr>
 									 <td>
-										 <asp:ImageButton ID="BtnMobile" runat="server" ImageUrl="~/apple-touch-icon.png" Width="50px" /> 
+										 <asp:ImageButton ID="BtnMobile" runat="server" ImageUrl="~/apple-touch-icon.png" Width="50px" OnClientClick="window.open('https://www.aeonvis.it/timereport/mobile/login.aspx')" CausesValidation="False" /> 
 										 </td>
 									 <td><asp:Literal runat="server" Text="<%$ Resources:Msg_mobile%>" /><br />
 									 </td>
@@ -166,6 +166,40 @@
 		<div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
 		<div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session("UserName")  %></div>        
 	 </div> 
+
+ <script type="text/javascript">
+
+        $( document ).ready(function() {
+
+            // Verifica se esistono corsi non valutati ed in caso genera un dialogo di reminder (la prima volta...)
+            var bSecondCall = <%=Session("TrainingCheckSecondCall")%>;
+            if (bSecondCall  == false) { 
+
+                var dataAjax = " { Persons_id : <%=Session("persons_id")%> , PastDue : 90 }";
+                $.ajax({
+                    url: "/timereport/webservices/WSHR_Training.asmx/CheckTrainingToEvalutate",
+                    data: dataAjax,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    type: 'post',
+                    async: false,
+                    success: function(data) {
+                        if (data.d == false)
+                            response = false;
+                        else
+                            ShowPopup("Hai un corso completato da meno di 90 giorni senza valutazione, ricordati di compilare la valutazione online.");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.status);
+                        alert(thrownError);
+                    }
+                 });
+            }
+
+        });
+
+</script>
+
 
 </body>
 

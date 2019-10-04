@@ -24,20 +24,36 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         if (!IsPostBack) {
             DDLManager.SelectedIndex = 0;
 
-            /* Popola dropdown con i valori        */  
-            ASPcompatility.SelectYears(ref DDLFromYear);
-            ASPcompatility.SelectMonths(ref DDLFromMonth);
+            /* Popola dropdown con i valori        */
+            popolaPeriodo(ref DDLPeriodo);
 
             /* default */
-            if (Session["SelectedMonth"] != null) { 
-                DDLFromMonth.SelectedIndex = Convert.ToInt16(Session["SelectedMonth"].ToString());
-                DDLFromYear.SelectedIndex = Convert.ToInt16(Session["SelectedYear"].ToString());
+            if (Session["SelectedPeriod"] != null) { 
+                DDLPeriodo.SelectedIndex = Convert.ToInt16(Session["SelectedPeriod"].ToString());
                 DDLProgetto.SelectedIndex = Convert.ToInt16(Session["SelectedProject"].ToString());
                 DDLManager.SelectedIndex = Convert.ToInt16(Session["SelectedManager"].ToString());
+                DDLCliente.SelectedIndex = Convert.ToInt16(Session["SelectedCliente"].ToString());
             }
         }
     }
 
+    protected void popolaPeriodo(ref DropDownList DDL)
+    {
+
+        DataTable dt;
+        ListItem lItem;
+
+        // seleziona tutti i periodi dell'anno corrente e del precedente
+        dt = Database.GetData("SELECT DISTINCT AnnoMese FROM RevenueMese WHERE AnnoMese >= CAST(YEAR(GETDATE()) - 1 AS varchar) ORDER by AnnoMese", null);
+
+        foreach (DataRow dr in dt.Rows) {
+            lItem = new ListItem(dr[0].ToString(), dr[0].ToString());
+            DDL.Items.Add(lItem);
+        }
+
+        DDL.SelectedIndex = DDL.Items.Count-1;
+
+    }
 
     protected string addclause(string strInput , string toAdd)  
     {
@@ -50,53 +66,60 @@ public partial class report_esportaAttivita : System.Web.UI.Page
 
     protected void sottometti_Click(object sender , System.EventArgs e ) {
 
-        string sAnnoMeseA = DDLFromYear.Text + "-" + DDLFromMonth.Text;
-        string sAnnoMeseDa = DDLFromYear.Text + "-01";
+        string sAnnoMeseA = DDLPeriodo.SelectedValue;
+        string sAnnoMeseDa = DDLPeriodo.SelectedValue.Substring(0,4) + "-01";
 
-        Session["SelectedMonth"] = DDLFromMonth.SelectedIndex;
-        Session["SelectedYear"] = DDLFromYear.SelectedIndex;
+        Session["SelectedPeriod"] = DDLPeriodo.SelectedIndex;
         Session["SelectedProject"] = DDLProgetto.SelectedIndex;
         Session["SelectedManager"] = DDLManager.SelectedIndex;
+        Session["SelectedCliente"] = DDLCliente.SelectedIndex;
         Session["RevenueVersion"] = DDLRevenueVersion.SelectedItem.Text;
 
         // *** TIPO REPORT  ****
-        switch (RBTipoReport.SelectedIndex)
-                {
-                case 0:     // **** DETTAGLIO PERSONA/PROGETTO
+        //switch (RBTipoReport.SelectedIndex)
+        //        {
+        //        case 0:     // **** DETTAGLIO PERSONA/PROGETTO
 
-                if (RBTipoEstrazione.SelectedIndex == 0)
-                {
-                    Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-                    Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-                }
-                else
-                {
-                    Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-                    Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-                }
+        //        if (RBTipoEstrazione.SelectedIndex == 0)
+        //        {
+        //            Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+        //            Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+        //        }
+        //        else
+        //        {
+        //            Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+        //            Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
+        //        }
 
-                // *** parametri addizionali: manager
-                if (DDLManager.SelectedIndex != 0) { 
-                            Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-                            Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+        //        // *** parametri addizionali: manager
+        //        if (DDLManager.SelectedIndex != 0) { 
+        //                    Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
+        //                    Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
 
-                }
+        //        }
 
-                // *** parametri addizionali: progetto
-                if (DDLProgetto.SelectedIndex != 0) { 
-                            Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-                            Session["SQL2"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-                }
+        //        // *** parametri addizionali: progetto
+        //        if (DDLProgetto.SelectedIndex != 0) { 
+        //                    Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+        //                    Session["SQL2"] = Session["SQL2"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
+        //        }
 
-                // ** ordinamento                    
-                Session["SQL"] = Session["SQL"]+ " ORDER BY AnnoMese, NomePersona, CodiceProgetto";
-                Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
+        //        // *** parametri addizionali: cliente
+        //        if (DDLCliente.SelectedIndex != 0)
+        //        {
+        //            Session["SQL"] = Session["SQL"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
+        //            Session["SQL2"] = Session["SQL2"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
+        //        }
 
-                Session["ReportPath"] = "REV_RawData.rdlc";
-                Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
-                        break;
+        //        // ** ordinamento                    
+        //        Session["SQL"] = Session["SQL"]+ " ORDER BY AnnoMese, NomePersona, CodiceProgetto";
+        //        Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
 
-                case 1:     // **** DETTAGLIO PROGETTO
+        //        Session["ReportPath"] = "REV_RawData.rdlc";
+        //        Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
+        //                break;
+
+        //        case 1:     // **** DETTAGLIO PROGETTO
 
                 if (RBTipoEstrazione.SelectedIndex == 0)
                 { // mese selezionato
@@ -119,14 +142,19 @@ public partial class report_esportaAttivita : System.Web.UI.Page
                         Session["SQL2"] = Session["SQL2"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
                 }
 
+                if (DDLCliente.SelectedIndex != 0) {
+                    Session["SQL"] = Session["SQL"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
+                    Session["SQL2"] = Session["SQL2"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
+                }
+
                 Session["SQL"] = Session["SQL"] + " ORDER BY AnnoMese, CodiceProgetto";
                 Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
 
                 Session["ReportPath"] = "REV_RevenueProgettoYTD.rdlc";
                 Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
 
-                break;
-       }
+                //break;
+//       }
     }
 
     protected void CalcolaRevenueMese(string sMese, string sAnno) {
@@ -148,6 +176,14 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         }
     }
 
-  
-
+    protected void DDLManager_DataBound(object sender, EventArgs e)
+    {
+        // se manager forza ai soli progetti intestati
+        if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
+        {
+            DDLManager.ClearSelection();
+            DDLManager.Items.FindByValue(Session["Persons_id"].ToString()).Selected = true;
+            DDLManager.Enabled = false;
+        }
+    }
 }

@@ -73,13 +73,18 @@ public partial class SFimport_select : System.Web.UI.Page
 
         DataRow drCheck;
         DataRow drTR;
+        int iStartRow = 1;
 
         double price;
         bool isDouble;
         Regex rgx = new Regex(@"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$");
 
-        // loop dalla 2 riga in avanti
-        for (int i = 1; i < dt.Rows.Count; i++)
+        if (CBSkipFirstRow.Checked)
+            iStartRow = 1;
+        else
+            iStartRow = 0;
+
+        for (int i = iStartRow; i < dt.Rows.Count; i++)
         {
 
             string sProjectCode = (string)dt.Rows[i][0];  // indice 0 c'è il codice progetto

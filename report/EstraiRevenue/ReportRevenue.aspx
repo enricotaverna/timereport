@@ -38,15 +38,24 @@
       
     <div  class="formtitle">Report</div>              
 
- 
-
     <!--  *** MANAGER *** -->            
     <div class="input nobottomborder">
           <div class="inputtext">Manager</div>   
           <label class="dropdown">
                <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
-                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Persone" style="width:265px" > 
+                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Persone" style="width:265px" OnDataBound="DDLManager_DataBound" > 
                    <asp:ListItem Value="0">-- tutti i manager --</asp:ListItem>                        
+                    </asp:DropDownList>
+          </label>
+    </div>   
+
+    <!--  *** CLIENTE *** -->            
+    <div class="input nobottomborder">
+          <div class="inputtext">Cliente</div>   
+          <label class="dropdown">
+               <asp:DropDownList ID="DDLCliente" runat="server" DataTextField="NomeEsteso" DataValueField="Nome1"
+                        AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_CLienti" style="width:265px" > 
+                   <asp:ListItem Value="0">-- tutti i clienti --</asp:ListItem>                        
                     </asp:DropDownList>
           </label>
     </div>   
@@ -72,34 +81,29 @@
           </label>
     </div>
 
-    <!--  *** MESE *** -->  
+    <!--  *** PERIODO *** -->  
     <div class="input">
-        <div class="inputtext">Mese</div>
+        <div class="inputtext">Periodo</div>
         <label class="dropdown"  >
-            <asp:DropDownList style="width:150px" runat="server" id="DDLFromMonth"> </asp:DropDownList>
+            <asp:DropDownList style="width:150px" runat="server" id="DDLPeriodo"> </asp:DropDownList>
         </label>
-        &nbsp;          
-        <label class="dropdown" >
-            <asp:DropDownList style="width:100px" runat="server" id="DDLFromYear"></asp:DropDownList>          
-        </label>
-
     </div>  
 
     <!--  ***  DETTAGLIO *** -->  
-    <div class="input tight">
+<%--    <div class="input tight">
          <div class="inputtext">Report</div>
                     <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" >
-                        <asp:ListItem Selected="True" Value="1">Singoli record</asp:ListItem>
-                        <asp:ListItem Value="2">KPI Progetto</asp:ListItem>
+                        <asp:ListItem Value="1">Singoli record</asp:ListItem>
+                        <asp:ListItem Selected="True" Value="2">KPI Progetto</asp:ListItem>
                     </asp:RadioButtonList>
-    </div>
+    </div>--%>
 
     <!--  *** TIPO ESTRAZIONE *** -->  
     <div class="input nobottomborder tight">
          <div class="inputtext">Estrazione</div>
                     <asp:RadioButtonList ID="RBTipoEstrazione" runat="server" RepeatColumns="1" >
-                        <asp:ListItem Selected="True" Value="1">Mese selezionato</asp:ListItem>
-                        <asp:ListItem Value="2">Year to date</asp:ListItem>
+                        <asp:ListItem  Value="1">Mese selezionato</asp:ListItem>
+                        <asp:ListItem Selected="True" Value="2">Year to date</asp:ListItem>
                     </asp:RadioButtonList>
     </div>
                             
@@ -134,6 +138,10 @@
 
     <asp:SqlDataSource ID="DS_Progetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
         SelectCommand="SELECT Projects_id, ProjectCode + ' ' + Name as 'NomeProgetto' FROM Projects WHERE Active = 1 ORDER BY ProjectCode" >        
+    </asp:SqlDataSource>
+
+    <asp:SqlDataSource ID="DS_CLienti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"        
+        SelectCommand="SELECT CodiceCliente, CodiceCliente + ' - ' + Nome1 as NomeEsteso, Nome1 FROM Customers ORDER BY CodiceCliente" >        
     </asp:SqlDataSource>
 
     <script type="text/javascript">

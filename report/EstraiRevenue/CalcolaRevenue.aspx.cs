@@ -56,7 +56,7 @@ public partial class report_esportaAttivita : System.Web.UI.Page
 
                   case 1:     // Cancella
                   Database.ExecuteSQL("DELETE FROM RevenueMese WHERE RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " AND TipoRecord='A' AND AnnoMese = '" + sAnnoMese + "'", null);
-                  Database.ExecuteSQL("DELETE FROM RevenueProgetto WHERE RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " AND AnnoMese = '" + sAnnoMese + "'", null);
+                  Database.ExecuteSQL("DELETE FROM RevenueProgetto WHERE RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue) + " AND TipoRecord='A' AND AnnoMese = '" + sAnnoMese + "'", null);
                   // emette messaggio di conferma salvataggio
                   string message = "Cancellazione effettuata";
                   // ClientScript.RegisterStartupScript(this.GetType(), "Popup", "ShowPopup('" + message + "');", true); ** cancellata per problema POPUP

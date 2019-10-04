@@ -190,12 +190,19 @@ public partial class Esporta : System.Web.UI.Page
         if ( Auth.ReturnPermission("REPORT","PROJECT_ALL") )
             DSProgetti.SelectCommand = "SELECT Projects_id, ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " + (CBProgettiDisattivi.Checked == false ? " WHERE Active = 1 " : "") + " ORDER BY ProjectCode";
 
+        // i progetti assegnati + quelli di cui è manager
         if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL") )
             DSProgetti.SelectCommand = "SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a" +
                                        " INNER JOIN ForcedAccounts as b ON a.Projects_id = b.Projects_id " +
                                        " WHERE b.persons_id = " + Session["persons_id"] +
-                                       (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") + " ORDER BY ProjectCode";
+                                       (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") +
+                                        " UNION " +
+                                        " SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a " +
+                                        " WHERE a.clientmanager_id = " + Session["persons_id"] +
+                                       (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") +
+                                        " ORDER BY ProjectCode";
     }
+
 
     protected override void InitializeCulture()
     {

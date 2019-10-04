@@ -802,6 +802,12 @@ a, a:visited, a:hover, a:active {
     padding: 2px;
 }
 
+.dialogMessage {
+    position: absolute !important;
+    top: 270px !important;
+    left: 400px !important;
+}
+
 /*#endregion*/
 
 /*#region controlli form custom*/
@@ -981,7 +987,7 @@ select.parsley-error {
 
 /*#endregion*/
 
-/*#Tabulator*/
+/*#region Tabulator*/
 .tabulator {
     font-size: 12px;
     font-family: Arial;
@@ -1006,4 +1012,4 @@ select.parsley-error {
 .tabulator-header {
     border: none !important;
 }
-
+/*#endregion*/

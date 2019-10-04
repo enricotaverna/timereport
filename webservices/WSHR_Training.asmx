@@ -174,9 +174,13 @@ public class WSHR_Training : System.Web.Services.WebService {
             sFilter = " WHERE Anno = " + Anno;
             sFilter = Persons_id == "0" ? sFilter : sFilter + " AND A.Persons_id =  '" + Persons_id + "' "; // se senza persona resituisce tutto il piano corsi
         }
-        else if (Mode == "RATE") // solo corsi personali da SCHEDULED in avanti
+        else if (Mode == "RATE") // solo corsi personali ATTENDED 
         {
-            sFilter = " WHERE A.Persons_id =  '" + Persons_id + "' AND A.CourseStatus_id > '2' ";
+            sFilter = " WHERE A.Persons_id =  '" + Persons_id + "' AND A.CourseStatus_id = '4' ";
+        }
+        else if (Mode == "VIEW") // solo corsi personali da PLANNED in poi
+        {
+            sFilter = " WHERE A.Persons_id =  '" + Persons_id + "' AND A.CourseStatus_id > '1' ";
         }
 
         String query = "SELECT A.CoursePlan_id,A.Course_id, A.Anno, A.Comment,  A.Feedback,CONVERT(VARCHAR(10),A.CourseDate, 103) as CourseDate, A.Priority, E.CourseCode, E.CourseName, B.CourseTypeName, C.ProductName, E.Area, D.VendorName, F.CourseStatus_id, F.CourseStatusName, A.Score, G.Name as PersonName, H.name as ManagerName FROM HR_CoursePlan AS A " +
@@ -391,6 +395,22 @@ public class WSHR_Training : System.Web.Services.WebService {
 
     }
 
+    // torna true se ci sono corsi non valutati più recenti di oggi - PastDue
+    [WebMethod(EnableSession = true)]
+    public bool CheckTrainingToEvalutate( string Persons_id, int PastDue)
+    {
+        bool bFound = false;
+        DateTime DateToCheck = (DateTime)DateTime.Today.AddDays(PastDue*-1); // sottrae i giorni del parametro
+
+            if (Database.RecordEsiste("SELECT * FROM HR_CoursePlan WHERE Persons_id = " + ASPcompatility.FormatStringDb(Persons_id) +
+                                       " AND CourseDate > " + ASPcompatility.FormatDateDb(DateToCheck.ToString("dd/MM/yyyy")) +
+                                       " AND Score = 0 " + 
+                                       " AND CourseStatus_id = " + ASPcompatility.FormatNumberDB(MyConstants.TRAINIG_ATTENDED), null))
+                bFound = true;
+
+        return bFound;
+
+    }
 
 }
     

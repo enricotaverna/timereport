@@ -1128,7 +1128,7 @@
                             <TextRun>
                               <Value>=Fields!Importo.Value</Value>
                               <Style>
-                                <Format>#,0.00;-#,0.00;'-'</Format>
+                                <Format>n2</Format>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -1385,6 +1385,7 @@
       </rd:DataSetInfo>
     </DataSet>
   </DataSets>
+  <Language>it-IT</Language>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>ce28766d-180d-464c-b884-a0d258f94ebc</rd:ReportID>
 </Report>

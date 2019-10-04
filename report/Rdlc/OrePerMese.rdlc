@@ -208,7 +208,7 @@
                                 <TextRun>
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -243,7 +243,7 @@
                                 <TextRun>
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -283,7 +283,7 @@
                                 <TextRun>
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                     <Color>Gray</Color>
                                   </Style>
                                 </TextRun>
@@ -319,14 +319,14 @@
                                 <TextRun>
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                     <Color>Gray</Color>
                                   </Style>
                                 </TextRun>
                                 <TextRun>
                                   <Value xml:space="preserve"> </Value>
                                   <Style>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                     <Color>Gray</Color>
                                   </Style>
                                 </TextRun>
@@ -369,7 +369,7 @@
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -405,7 +405,7 @@
                                   <Value>=Sum(Fields!Giorni.Value)</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>0;(0)</Format>
+                                    <Format>0.00;(0.00)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1416,6 +1416,44 @@
               </Border>
             </Style>
           </Rectangle>
+          <Textbox Name="Textbox6">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>Report: OrePerMese.rdlc - Data: </Value>
+                    <Style>
+                      <FontSize>8pt</FontSize>
+                    </Style>
+                  </TextRun>
+                  <TextRun>
+                    <Value>=Globals!ExecutionTime</Value>
+                    <Style>
+                      <FontSize>8pt</FontSize>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox6</rd:DefaultName>
+            <Top>12.2047cm</Top>
+            <Left>0.44662cm</Left>
+            <Height>0.6cm</Height>
+            <Width>6.96617cm</Width>
+            <ZIndex>2</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
         </ReportItems>
         <Height>5.37306in</Height>
         <Style>
@@ -1441,6 +1479,7 @@
       <NumberOfRows>2</NumberOfRows>
     </GridLayoutDefinition>
   </ReportParametersLayout>
+  <Language>it-IT</Language>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>ac77f686-64dc-4eb8-92ed-d45a8fe07b3f</rd:ReportID>
 </Report>

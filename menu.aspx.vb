@@ -25,6 +25,12 @@ Partial Class menu
             CalcolaProgressivoOreTR("")
         End If
 
+        If Session("TrainingCheckSecondCall") = Nothing Then
+            Session("TrainingCheckSecondCall") = "false"
+        Else
+            Session("TrainingCheckSecondCall") = "true"
+        End If
+
     End Sub
 
     Sub CalcolaProgressivoOreTR(ByVal sBottone As String)

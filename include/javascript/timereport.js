@@ -26,6 +26,9 @@
             $("#dialog").html(message);
             $("#dialog").dialog({
                 title: "Messaggio",
+                classes: {
+                    "ui-dialog": "dialogMessage"
+                },
                 buttons: {
                     Close: function () {
                         $(this).dialog('close');

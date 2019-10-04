@@ -127,10 +127,10 @@
     <value>Messaggi</value>
   </data>
   <data name="Msg_istruzioni" xml:space="preserve">
-    <value>Clicca per scaricare il manuale delle nuove funzionalità TR 2015</value>
+    <value>Clicca per scaricare il manuale delle funzionalità TR </value>
   </data>
   <data name="Msg_mobile" xml:space="preserve">
-    <value>Clicca per inviare via mail il Link per installazione Web App iOS</value>
+    <value>Con l'app Mobile puoi caricare le spese con una fotografia, clicca per vedere il link.</value>
   </data>
   <data name="ore_caricate" xml:space="preserve">
     <value>Ore caricate: </value>
