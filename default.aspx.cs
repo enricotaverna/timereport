@@ -110,10 +110,11 @@ public partial class defaultAspx : System.Web.UI.Page
 			DataTable dtProgettiForzati = null;
             DataTable dtSpeseForzate = null;
             DataTable dtTipoSpesa = null;
-				
-			if (Convert.ToInt32(Session["ForcedAccount"]) != 0)  {
+            DataTable dtApprovalManagerList = null;
+
+            if (Convert.ToInt32(Session["ForcedAccount"]) != 0)  {
 				//** A.1 Carica progetti possibili
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn  FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode", this.Page);
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects.Projects_Id, Projects.ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType  FROM ForcedAccounts RIGHT JOIN Projects ON ForcedAccounts.Projects_id = Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR Projects.Always_available = 1 ) AND Projects.active = 1 )  ORDER BY Projects.ProjectCode", this.Page);
 
 				//** A.2 Carica spese possibili				
 				//** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
@@ -127,14 +128,18 @@ public partial class defaultAspx : System.Web.UI.Page
                 }
 			else  {
 				//** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn  FROM Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType  FROM Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
 				//** B.2 tutte le spese attive 							
                 dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
             }
 
-		Session["dtProgettiForzati"] = dtProgettiForzati;
+        Session["dtProgettiForzati"] = dtProgettiForzati;
         Session["dtSpeseForzate"] = dtSpeseForzate;
         Session["NoExpenses"] = dtSpeseForzate.Rows.Count == 0 ? "true" : "false";
+
+        // Carica Manager per approvazione ore
+        dtApprovalManagerList = Database.GetData("SELECT persons_id, name, mail FROM Persons WHERE active=1 AND (roles_id = 1 OR roles_id=2) ORDER BY Name" , this.Page); 
+        Session["dtApprovalManagerList"] = dtApprovalManagerList;
 
         // Carica in buffer tipo spesa
         dtTipoSpesa = Database.GetData("Select ExpenseType_id, TipoBonus_id from ExpenseType", this.Page);
@@ -165,17 +170,24 @@ public partial class defaultAspx : System.Web.UI.Page
 
 //** Variabili di sessioni
 	protected void ValorizzaSessionVar(DataRow rdr) {
-		
-		//rdr.Read();
 
-		// valorizza variabili di sessione
-		Session["UserLevel"] = rdr["UserLevel_ID"];
+        // valorizza dati manager legati alla persona
+        DataRow drRecord = Database.GetRow("SELECT Name, Mail from Persons WHERE persons_id= " + ASPcompatility.FormatStringDb(rdr["Manager_id"].ToString()), this.Page);
+        if (drRecord != null) {
+            Session["ApprovalManager_id"] = Convert.ToInt16(rdr["Manager_id"].ToString()); // usato in Jquery per post
+            Session["ApprovalManagerName"] = drRecord["Name"].ToString(); ; // usato in Jquery per post
+            Session["ApprovalManagerMail"] = drRecord["Mail"].ToString(); ; // usato in Jquery per post
+        }
+
+        // valorizza variabili di sessione
+        Session["UserLevel"] = rdr["UserLevel_ID"];
 		Session["UserId"] = rdr["UserId"].ToString();
 		Session["UserName"] = rdr["Name"];
 		Session["persons_id"] = rdr["persons_id"];
         Session["calendar_id"] = rdr["calendar_id"];
         Session["nickname"] = rdr["nickname"];
 		Session["ColorScheme"] = rdr["ColorScheme"];
+        Session["ContractHours"] = rdr["ContractHours"];
 		Session["lingua"] = rdr["Lingua"];
 		Session["BetaTester"] = string.IsNullOrEmpty(rdr["BetaTester"].ToString()) ? false :rdr["BetaTester"] ; // abilita nuove funzionalità
 		Session["CartaCreditoAziendale"] = rdr["CartaCreditoAziendale"]; 

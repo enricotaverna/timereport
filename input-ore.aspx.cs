@@ -84,6 +84,15 @@ public partial class input_ore : System.Web.UI.Page
     {
 
         DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+
+        // cancella le righe soggette a Workflow
+        //var rows = dtProgettiForzati.Select("WorkflowType != null");
+        foreach (DataRow row in dtProgettiForzati.Rows) { 
+            if ( row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
+                row.Delete();
+        }
+        dtProgettiForzati.AcceptChanges();
+
         ddlProject = (DropDownList)FVore.FindControl("DDLprogetto");
 
         ddlProject.Items.Clear();

@@ -391,8 +391,11 @@
 
             var ActivityOn = $("#FVore_DDLprogetto").find("option:selected").attr("data-ActivityOn");
 
-            if (ActivityOn != "True")  // progetto non richiede le attività
+            if (ActivityOn != "True") {  // progetto non richiede le attività 
+                $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
+                $("#FVore_DDLAttivita").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
                 $('#lbDDLAttivita').hide();
+                }
             else {
 
                 $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
