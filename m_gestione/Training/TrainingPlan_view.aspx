@@ -84,7 +84,7 @@
     paginationSize: 14, // this option can take any positive integer value (default = 10)
     pagination: "local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
-    ajaxURL:"/timereport/webservices/WSHR_Training.asmx/GetTrainingPlan", //ajax URL
+    ajaxURL:"/timereport/webservices/HR_Training.asmx/GetTrainingPlan", //ajax URL
     ajaxParams: { Persons_id: <%= Session["persons_id"]  %> , Anno: "0", Mode: "VIEW" }, //ajax parameters
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string

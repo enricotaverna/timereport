@@ -270,10 +270,12 @@
     };  // icona edit
 
     var CourseCatalogTable = new Tabulator("#CourseCatalogTable", {
+    initialHeaderFilter: [{ field: "Active", value: "true" } //valore iniziare dello stato per filtrare
+    ],
     paginationSize: 18, // this option can take any positive integer value (default = 10)
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
-    ajaxURL:"/timereport/webservices/WSHR_Training.asmx/GetCourseCatalog", //ajax URL
+    ajaxURL:"/timereport/webservices/HR_Training.asmx/GetCourseCatalog", //ajax URL
     ajaxParams: { bActive: false, sAnno: "" }, //ajax parameters
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string
@@ -328,7 +330,7 @@
             $.ajax({
 
                 type: "POST",
-                url: "/timereport/webservices/WSHR_Training.asmx/GetCourse",
+                url: "/timereport/webservices/HR_Training.asmx/GetCourse",
                 data: values,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -344,6 +346,7 @@
                         $('#TBDescription').val(objCourse.Description);
                         $('#DDLCourseType').val(objCourse.CourseType_id);
                         $('#DDLProduct').val(objCourse.Product_id);
+                        $('#CBActive').val(objCourse.bActive);
                         $('#TBArea').val(objCourse.Area);
                         $('#DDLCourseVendor').val(objCourse.CourseVendor_id);
                         $('#TBDurationDays').val(objCourse.DurationDays);;
@@ -371,7 +374,7 @@
                 $.ajax({
 
                     type: "POST",
-                    url: "/timereport/webservices/WSHR_Training.asmx/DeleteCourse",
+                    url: "/timereport/webservices/HR_Training.asmx/DeleteCourse",
                     data: values,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -412,7 +415,7 @@
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WSHR_Training.asmx/CreateUpdateCourse",
+            url: "/timereport/webservices/HR_Training.asmx/CreateUpdateCourse",
             data: values,
             async: false,
             contentType: "application/json; charset=utf-8",

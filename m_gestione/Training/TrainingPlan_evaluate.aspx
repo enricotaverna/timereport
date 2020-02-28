@@ -152,7 +152,7 @@
         //cell - the cell component for the editable cell
 
         var dtDateToCheck = new Date();
-        dtDateToCheck.setDate(dtDateToCheck.getDate()-90); // sottrae i giorni del parametro
+        dtDateToCheck.setDate(dtDateToCheck.getDate()-360); // sottrae i giorni del parametro
 
         //get row data
         var strDt = cell.getRow().getData().CourseDate;
@@ -174,7 +174,7 @@
         $.ajax({
 
                     type: "POST",
-                    url: "/timereport/webservices/WSHR_Training.asmx/UpdateTrainingPlanRecord",
+                    url: "/timereport/webservices/HR_Training.asmx/UpdateTrainingPlanRecord",
                     data: values,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -197,7 +197,7 @@
     paginationSize: 14, // this option can take any positive integer value (default = 10)
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
-    ajaxURL:"/timereport/webservices/WSHR_Training.asmx/GetTrainingPlan", //ajax URL
+    ajaxURL:"/timereport/webservices/HR_Training.asmx/GetTrainingPlan", //ajax URL
     ajaxParams: { Persons_id: <%= Session["persons_id"]  %> , Anno: "0", Mode: "RATE" }, //ajax parameters
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string
@@ -242,7 +242,7 @@
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WSHR_Training.asmx/GetCoursePlanItem",
+            url: "/timereport/webservices/HR_Training.asmx/GetCoursePlanItem",
             data: values,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -295,7 +295,7 @@
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WSHR_Training.asmx/UpdateCoursePlanItem",
+            url: "/timereport/webservices/HR_Training.asmx/UpdateCoursePlanItem",
             data: values,
             async: false,
             contentType: "application/json; charset=utf-8",
