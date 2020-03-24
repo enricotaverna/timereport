@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
 using System.Threading;
+using System.Web.UI.WebControls;
 
 public partial class Esporta : System.Web.UI.Page
 {
@@ -10,11 +9,17 @@ public partial class Esporta : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-            //           Popola dropdown con i valori          
+            // Popola dropdown con i valori          
             ASPcompatility.SelectYears(ref DDLFromYear);
             ASPcompatility.SelectYears(ref DDLToYear);
             ASPcompatility.SelectMonths(ref DDLFromMonth, Session["lingua"].ToString());
             ASPcompatility.SelectMonths(ref DDLToMonth, Session["lingua"].ToString());
+
+            // aggiunge Export not chargable
+            //if (Session["BetaTester"].ToString() != "False") {
+            //    RBTipoExport.Items.Add(new ListItem("Ore non chargable","3"));
+            //}
+ 
         }
     }
 
@@ -43,9 +48,9 @@ public partial class Esporta : System.Web.UI.Page
         // *** ADMIN
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
-            if (bProgettiSelezionati) // sono stati selezionati dei progetti
+            if (bProgettiSelezionati && RBTipoExport.SelectedValue != "3") // sono stati selezionati dei progetti e non è il tipo export Not Chargable
                 sWhereClause = Addclause(sWhereClause, "Projects_id IN (" + sListaProgettiSel + " )" );
-
+            
             if (bPersoneSelezionate)
                 sWhereClause = Addclause(sWhereClause, "Persons_id IN (" + sListaPersoneSel + " )");
         } // *** ADMIN
@@ -71,29 +76,20 @@ public partial class Esporta : System.Web.UI.Page
             // altrimenti tutti vedono spese e ore di progetti BD e INFRASTRUTTURALI a cui sono assegnati
 
             if (bPersoneSelezionate)
-                sWhereClause = 
-                    " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
-                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
-                    "   AND Persons_id IN (" + sListaPersoneSel + ")" +
-                    " ) OR " +
-                    " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + 
-                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
-                    "   AND Persons_id = " + Session["persons_id"] +
-                    " ) ) ";
-            else
-                sWhereClause = 
+                sWhereClause =
+                    "   Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    "   AND Persons_id IN (" + sListaPersoneSel + ")";
+            else // persone non selezionate estrare solo le ore non chargable delle persone associate al manager
+                sWhereClause =
                     " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
                     "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     " ) OR " +
                     " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
-                    "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
-                    "   AND Persons_id = " + Session["persons_id"] +
+                    " AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+                    " AND ( Persons_id = " + Session["persons_id"] + " OR Manager_id = " + Session["persons_id"] + ")" +
                     " ) ) ";
 
         } // *** MANAGER / TEAM LEADER
-
-        //if (CBmieore.Checked)
-        //    sWhereClause = Addclause(sWhereClause, "Persons_id = " + Session["persons_id"]);
 
         if (DDLClienti.SelectedValue != "")
             sWhereClause = Addclause(sWhereClause, "CodiceCliente = " + ASPcompatility.FormatStringDb(DDLClienti.SelectedValue));
@@ -112,6 +108,19 @@ public partial class Esporta : System.Web.UI.Page
 
         sWhereClause = sWhereClause + " date >= " + fd + " AND date <= " + ld ;
 
+        // se tipo export 3 cambia i filtri
+        // solo ore NON chargable
+        // filtro data
+        // su persone o se stesso o persone associate al manager
+        //if ( RBTipoExport.SelectedValue == "3")
+        //{
+        //    sWhereClause = "";
+        //    sWhereClause = " Date >= " + fd + " AND Date <= " + ld + " AND " +
+        //                   " ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + " AND " +
+        //                   " Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " ) AND " +
+
+        //}
+
         return sWhereClause;
 
     }
@@ -127,16 +136,19 @@ public partial class Esporta : System.Web.UI.Page
         {
 
             case "1":
-                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
+                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote from v_ore where " + sWhereClause);
                 break;
             case "2":
                 Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '' from v_spese where " + sWhereClause);
                 break;
+            //case "3":
+            //    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
+            //    break;
         }
 
         switch (RBTipoReport.SelectedValue)
         {
-            case "3":
+                case "3":
                     Session["SQL"] = "SELECT nomepersona, nomeprogetto, giorni, annomese FROM v_ore WHERE " + sWhereClause;
                     Session["ReportPath"] = "OrePerMese.rdlc";
                     Response.Redirect("report/rdlc/ReportExecute.aspx");
@@ -198,7 +210,7 @@ public partial class Esporta : System.Web.UI.Page
                                        (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") +
                                         " UNION " +
                                         " SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a " +
-                                        " WHERE a.clientmanager_id = " + Session["persons_id"] +
+                                        " WHERE ( a.clientmanager_id = " + Session["persons_id"] + " OR a.Accountmanager_id = " + Session["persons_id"] + ")" +
                                        (CBProgettiDisattivi.Checked == false ? " AND a.Active = 1 " : "") +
                                         " ORDER BY ProjectCode";
     }

@@ -114,7 +114,7 @@
                 </div>
 
                 <div class="input nobottomborder" id="DivManager" runat="server">
-                    <div class="inputtext">Manager</div>
+                    <div class="inputtext">Mngr o Account</div>
 
                     <label class="dropdown">
                         <!-- per stile CSS -->
@@ -182,19 +182,14 @@
 
                 </div>
 
-                <!-- *** flag solo mie ore ***  -->
-    <%--            <div class="input nobottomborder">
-                <div class="inputtext"></div>
-                <asp:CheckBox ID="CBmieore"  runat="server" />
-                <asp:Label AssociatedControlID="CBmieore" runat="server" Text="Solo i miei consuntivi" meta:resourcekey="CBmieore"></asp:Label>
+<%--                <!-- CheckBox Ore non chargable -->
+                <div class="input nobottomborder">
+                    <div class="inputtext">
+                        <asp:Literal runat="server" Text="" /></div>
+                       <asp:CheckBox ToolTip ="Include ore non chargable" name="CBNonChargable" ID="CBNonChargable"  Text="Estrai anche ore non chargable" runat="server" Font-Bold="False" />              
                 </div>--%>
 
-                <!-- *** separatore ***  -->
-
-<%--                <div class="input"></div>--%>
-
-               
-                <div class="input nobottomborder">
+               <div class="input nobottomborder">
                     <div class="inputtext">
                         <asp:Literal runat="server" /></div>
                     
@@ -299,7 +294,7 @@
 
             $("#BTexec").click(function () {
 
-                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2)
+                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2 )
                     return;
 
                 //Get the screen height and width

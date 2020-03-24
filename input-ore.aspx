@@ -95,6 +95,10 @@
                                     data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
                             </span>
 
+                            <!-- *** Checkboc Remote ***  -->
+                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+
                             <!-- *** Checkboc Storno ***  -->
                             <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
                             <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
@@ -124,7 +128,7 @@
 
                     </EditItemTemplate>
 
-                    <%--INSERT--%>
+                    <%-- INSERT --%>
                     <InsertItemTemplate>
 
                         <div class="formtitle">
@@ -173,8 +177,13 @@
                                     data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
                             </span>
 
+                            <!-- *** Checkboc Remote ***  -->
+                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+
+                            <!-- *** Checkboc Storno ***  -->
                             <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />
-                            <asp:Label AssociatedControlID="CancelFlagCheckBox"  runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
+                            <asp:Label AssociatedControlID="CancelFlagCheckBox"  runat="server" Text="Storno" meta:resourcekey="Label5Resource1" ></asp:Label>
 
                         </div>
 
@@ -201,7 +210,7 @@
 
                     </InsertItemTemplate>
 
-                    <%--        DISPLAY--%>
+                    <%-- DISPLAY --%>
                     <ItemTemplate>
                         <div class="formtitle">
                             <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
@@ -247,6 +256,10 @@
                                 <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
                             </span>
 
+                            <!-- *** Checkboc Remote ***  -->
+                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+
                             <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="disCancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
                                 <asp:Label runat="server" AssociatedControlID="disCancelFlagCheckBox" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
@@ -285,9 +298,9 @@
                     SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
                 <asp:SqlDataSource ID="DSore" runat="server"
                     ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-                    InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate)"
-                    UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate WHERE (Hours_Id = @Hours_id)"
+                    SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate, WorkedInRemote FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+                    InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote)"
+                    UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote WHERE (Hours_Id = @Hours_id)"
                     OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
                     <InsertParameters>
@@ -303,6 +316,7 @@
                         <asp:Parameter Name="CreatedBy" />
                         <asp:Parameter Name="CreationDate" />
                         <asp:Parameter Name="AccountingDate" Type="DateTime" />
+                        <asp:Parameter Name="WorkedInRemote"/>
                     </InsertParameters>
                     <SelectParameters>
                         <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
@@ -321,6 +335,7 @@
                         <asp:Parameter Name="LastModifiedBy" />
                         <asp:Parameter Name="LastModificationDate" />
                         <asp:Parameter Name="AccountingDate" Type="DateTime" />
+                        <asp:Parameter Name="WorkedInRemote"/>
                     </UpdateParameters>
                 </asp:SqlDataSource>
 

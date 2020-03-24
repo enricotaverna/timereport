@@ -117,281 +117,95 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CancelFlagCheckBoxResource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CancelFlagCheckBoxResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CancelFlagCheckBoxResource2.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CancelFlagCheckBoxResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="CommentTextBoxResource1.Text" xml:space="preserve">
     <value>Nota</value>
-  </data>
-  <data name="CommentTextBoxResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="CustomValidator1Resource1.ErrorMessage" xml:space="preserve">
     <value>Specificare un codice attività</value>
   </data>
-  <data name="CustomValidator1Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CustomValidator1Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="CustomValidator2Resource1.ErrorMessage" xml:space="preserve">
     <value>Specificare un codice attività</value>
-  </data>
-  <data name="CustomValidator2Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CustomValidator2Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="CV_TBCommentResource1.ErrorMessage" xml:space="preserve">
     <value>Inserire una nota di commento</value>
   </data>
-  <data name="CV_TBCommentResource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CV_TBCommentResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="CV_TBCommentResource2.ErrorMessage" xml:space="preserve">
     <value>Inserire una nota di commento</value>
-  </data>
-  <data name="CV_TBCommentResource2.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="CV_TBCommentResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLAttivitaResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLAttivitaResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLAttivitaResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLprogettoResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLprogettoResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLprogettoResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="disCancelFlagCheckBoxResource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="disCancelFlagCheckBoxResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FVoreResource1.Caption" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FVoreResource1.EmptyDataText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FVoreResource1.FooterText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FVoreResource1.HeaderText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FVoreResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="HoursTextBoxResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="HoursTextBoxResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="HoursTextBoxResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Image1Resource1.AlternateText" xml:space="preserve">
-    <value />
   </data>
   <data name="Image1Resource1.ToolTip" xml:space="preserve">
     <value>Vedi log modifiche</value>
   </data>
-  <data name="ImageResource1.AlternateText" xml:space="preserve">
-    <value />
-  </data>
   <data name="ImageResource1.ToolTip" xml:space="preserve">
     <value>Vedi log modifiche</value>
-  </data>
-  <data name="InsertButtonResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label11Resource1.Text" xml:space="preserve">
     <value>Data</value>
   </data>
-  <data name="Label11Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label11Resource2.Text" xml:space="preserve">
     <value>Data</value>
-  </data>
-  <data name="Label11Resource2.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label11Resource3.Text" xml:space="preserve">
     <value>Data</value>
   </data>
-  <data name="Label11Resource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Label13Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label1Resource1.Text" xml:space="preserve">
     <value>Nota</value>
-  </data>
-  <data name="Label1Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label1Resource2.Text" xml:space="preserve">
     <value>Nota</value>
   </data>
-  <data name="Label1Resource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label4Resource1.Text" xml:space="preserve">
     <value>Ore</value>
-  </data>
-  <data name="Label4Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label4Resource2.Text" xml:space="preserve">
     <value>Ore</value>
   </data>
-  <data name="Label4Resource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label4Resource3.Text" xml:space="preserve">
     <value>Ore</value>
-  </data>
-  <data name="Label4Resource3.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label5Resource1.Text" xml:space="preserve">
     <value>Storno</value>
   </data>
-  <data name="Label5Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label5Resource2.Text" xml:space="preserve">
     <value>Storno</value>
-  </data>
-  <data name="Label5Resource2.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label6Resource1.Text" xml:space="preserve">
     <value>Attività</value>
   </data>
-  <data name="Label6Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label6Resource2.Text" xml:space="preserve">
     <value>Attività</value>
-  </data>
-  <data name="Label6Resource2.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label7Resource1.Text" xml:space="preserve">
     <value>Progetto</value>
   </data>
-  <data name="Label7Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label7Resource2.Text" xml:space="preserve">
     <value>Progetto</value>
-  </data>
-  <data name="Label7Resource2.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label7Resource3.Text" xml:space="preserve">
     <value>Progetto</value>
   </data>
-  <data name="Label7Resource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label8Resource1.Text" xml:space="preserve">
     <value>Attività</value>
-  </data>
-  <data name="Label8Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label9Resource1.Text" xml:space="preserve">
     <value>Storno</value>
   </data>
-  <data name="Label9Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBAccountingDateDisplayResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="LBAccountingDateResource1.Text" xml:space="preserve">
     <value>Competenza</value>
-  </data>
-  <data name="LBAccountingDateResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="LBAccountingDateResource2.Text" xml:space="preserve">
     <value>Competenza</value>
   </data>
-  <data name="LBAccountingDateResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="LBAccountingDateResource3.Text" xml:space="preserve">
     <value>Competenza</value>
-  </data>
-  <data name="LBAccountingDateResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBdateResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBdateResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBdateResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBpersonResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="LBpersonResource2.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="ListItemResource1.Text" xml:space="preserve">
     <value>--seleziona attività--</value>
   </data>
-  <data name="ListItemResource1.Value" xml:space="preserve">
-    <value />
-  </data>
   <data name="ListItemResource2.Text" xml:space="preserve">
     <value>--seleziona attività--</value>
   </data>
-  <data name="ListItemResource2.Value" xml:space="preserve">
-    <value />
-  </data>
   <data name="ListItemResource3.Text" xml:space="preserve">
     <value>-- seleziona un valore --</value>
-  </data>
-  <data name="ListItemResource3.Value" xml:space="preserve">
-    <value />
   </data>
   <data name="PageResource1.Title" xml:space="preserve">
     <value>Inserimento Ore</value>
@@ -399,107 +213,26 @@
   <data name="RangeValidator2Resource1.ErrorMessage" xml:space="preserve">
     <value>Inserire una data competenza valida</value>
   </data>
-  <data name="RangeValidator2Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RangeValidator2Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="RangeValidator4Resource1.ErrorMessage" xml:space="preserve">
     <value>Inserire una data competenza valida</value>
-  </data>
-  <data name="RangeValidator4Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RangeValidator4Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="RegularExpressionValidator1Resource1.ErrorMessage" xml:space="preserve">
     <value>Numero ore deve essere un valore numerico positivo</value>
   </data>
-  <data name="RegularExpressionValidator1Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RegularExpressionValidator1Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="RegularExpressionValidatorm1Resource1.ErrorMessage" xml:space="preserve">
     <value>Numero ore deve essere un valore numerico positivo</value>
-  </data>
-  <data name="RegularExpressionValidatorm1Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RegularExpressionValidatorm1Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="RequiredFieldValidator1Resource1.ErrorMessage" xml:space="preserve">
     <value>Specificare un codice progetto</value>
   </data>
-  <data name="RequiredFieldValidator1Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RequiredFieldValidator1Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="RequiredFieldValidator2Resource1.ErrorMessage" xml:space="preserve">
     <value>Specificare un codice progetto</value>
-  </data>
-  <data name="RequiredFieldValidator2Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RequiredFieldValidator2Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="RequiredFieldValidator3Resource1.ErrorMessage" xml:space="preserve">
     <value>Inserire numero ore</value>
   </data>
-  <data name="RequiredFieldValidator3Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RequiredFieldValidator3Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="RequiredFieldValidator4Resource1.ErrorMessage" xml:space="preserve">
     <value>Inserire numero ore</value>
-  </data>
-  <data name="RequiredFieldValidator4Resource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="RequiredFieldValidator4Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="TBAccountingDateResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="TBAccountingDateResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="TBCommentResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="TBCommentResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="TextBox2Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="UpdateButtonResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="UpdateCancelButtonResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="UpdateCancelButtonResource2.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="UpdateCancelButtonResource3.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ValidationSummary2Resource1.HeaderText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ValidationSummary2Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="DDLAttivita.testo" xml:space="preserve">
     <value>-- seleziona una attività --</value>
@@ -509,5 +242,11 @@
   </data>
   <data name="Titolo" xml:space="preserve">
     <value>Inserimento ore</value>
+  </data>
+  <data name="DDLNotifica.testo" xml:space="preserve">
+    <value>-- Notifica anche --</value>
+  </data>
+  <data name="CBWorkedInRemote.Text" xml:space="preserve">
+    <value>Remoto</value>
   </data>
 </root>
