@@ -3,16 +3,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
  <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">        
 <!-- Menù  -->
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
 <script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>    
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 <script src="/timereport/include/javascript/timereport.js"></script>
 
@@ -52,6 +53,7 @@
 
         <!-- *** TEXTBOX MULTILINE ***  -->
         <div class="input nobottomborder">
+            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
             <asp:Label CssClass="inputtext" ID="CommentTextBox" runat="server" Text="NOME_NOTA"></asp:Label>
             <asp:TextBox ID="TBNOME_CONTROLLO1" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("XXXXX") %>' TextMode="MultiLine" Columns="30" Enabled="False" />
         </div>
@@ -79,5 +81,22 @@
         <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>      
     </div> 
 
+<script type="text/javascript">
+
+    $(function () {
+
+    // datepicker
+    $("#TBFromDate").datepicker($.datepicker.regional['it']);
+    $("#TBToDate").datepicker($.datepicker.regional['it']);
+ 
+    // *** attiva validazione campi form
+    $('#formLeaveRequest').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+    });
+
+    });
+</script>
+
 </body>
+
 </html>

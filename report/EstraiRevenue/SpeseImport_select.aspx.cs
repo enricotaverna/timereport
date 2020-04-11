@@ -26,7 +26,7 @@ public partial class SFimport_select : System.Web.UI.Page
             Auth.CheckPermission("REPORT", "PROJECT_FORCED");
 
         if (!IsPostBack)
-            ASPcompatility.SelectAnnoMese(ref DDLAnnoMese, 2, 1);             /* Popola dropdown con i valori        */
+            ASPcompatility.SelectAnnoMese(ref DDLAnnoMese, 5, 1);             /* Popola dropdown con i valori        */
 
     }
 

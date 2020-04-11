@@ -20,7 +20,7 @@ public partial class report_Rdl_Default : System.Web.UI.Page
             switch (SReportType)
             {
                 case "HR_CourseCatalog":
-                    sSQL = "SELECT * FROM V_COURSE";
+                    sSQL = "SELECT * FROM V_COURSE Where active = 'true'";
                     sPath = "/timereport/report/Rdlc/HR_CourseCatalog.rdlc";
                     break;
 

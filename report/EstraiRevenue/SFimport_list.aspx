@@ -122,13 +122,14 @@
             e.preventDefault();
 
             var selectedData = SFImportTable.getSelectedData(); // array con le rige selezionate
-            var dataToPost = [];
+            var dataToPost = []; // array vuoto
 
             if (selectedData.length == 0) {
                 ShowPopup("Selezionare almeno una riga");
                 return;
             }
 
+            // aggiunge gli elementi
             for (i = 0; i < selectedData.length; i++) {
                 dataToPost.push("{ trprojectsid:'" + selectedData[i].trprojectsid + "', sfengagementtype:'" + selectedData[i].sfengagementtype +
                                 "', sfamount:'" + selectedData[i].sfamount + "',  sfexpectedmargin:'" +  selectedData[i].sfexpectedmargin + "', sfexpectedfulfillmentdate:'" +  selectedData[i].sfexpectedfulfillmentdate + "'}");

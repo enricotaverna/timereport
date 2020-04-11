@@ -40,7 +40,7 @@
 
     <!--  *** MANAGER *** -->            
     <div class="input nobottomborder">
-          <div class="inputtext">Manager</div>   
+          <div class="inputtext">Mngr o Accnt</div>   
           <label class="dropdown">
                <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
                         AppendDataBoundItems="True" AutoPostBack="True" DataSourceID="DS_Persone" style="width:265px" OnDataBound="DDLManager_DataBound" > 

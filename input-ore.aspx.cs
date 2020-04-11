@@ -52,6 +52,10 @@ public partial class input_ore : System.Web.UI.Page
             
                 Label LBperson =   (Label)FVore.FindControl("LBperson");
                 LBperson.Text = (string)Session["UserName"];
+
+                CheckBox CBWorkedInRemote = (CheckBox)FVore.FindControl("CBWorkedInRemote");
+                CBWorkedInRemote.Checked = true ;
+
         }
 
     }

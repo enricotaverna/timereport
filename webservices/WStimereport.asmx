@@ -254,7 +254,7 @@ public class WStimereport : System.Web.Services.WebService {
         switch (Session["type"].ToString()) {
 
             case "hours":
-                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote " +
                                                "FROM hours AS a " +
                                                "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                "WHERE hours_id=" + sId, null);
@@ -267,7 +267,7 @@ public class WStimereport : System.Web.Services.WebService {
                 strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                 // scrive il record copia!
-                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate) VALUES(" +
+                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, WorkedInRemote, createdBy, creationDate) VALUES(" +
                                      ASPcompatility.FormatDateDb(sInsDate, false) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -278,6 +278,7 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["Activity_id"].ToString()) + " , " +
                                      strAccountingDate + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["WorkedInRemote"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) +
                                      " )"

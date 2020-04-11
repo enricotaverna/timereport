@@ -141,7 +141,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>Anni Aeonvis</Value>
+                              <Value>Assunto da</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
                               </Style>
@@ -328,7 +328,6 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -798,9 +797,9 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=DateDiff("m",Fields!Attivo_da.Value,Globals!ExecutionTime)/12</Value>
+                              <Value>=Fields!Attivo_da.Value</Value>
                               <Style>
-                                <Format>0.0;(0.0)</Format>
+                                <Format>d</Format>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -820,6 +819,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>

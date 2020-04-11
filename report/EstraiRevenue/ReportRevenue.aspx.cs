@@ -75,50 +75,6 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         Session["SelectedCliente"] = DDLCliente.SelectedIndex;
         Session["RevenueVersion"] = DDLRevenueVersion.SelectedItem.Text;
 
-        // *** TIPO REPORT  ****
-        //switch (RBTipoReport.SelectedIndex)
-        //        {
-        //        case 0:     // **** DETTAGLIO PERSONA/PROGETTO
-
-        //        if (RBTipoEstrazione.SelectedIndex == 0)
-        //        {
-        //            Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-        //            Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese = '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-        //        }
-        //        else
-        //        {
-        //            Session["SQL"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-        //            Session["SQL2"] = "SELECT * FROM RevenueProgetto WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
-        //        }
-
-        //        // *** parametri addizionali: manager
-        //        if (DDLManager.SelectedIndex != 0) { 
-        //                    Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-        //                    Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-
-        //        }
-
-        //        // *** parametri addizionali: progetto
-        //        if (DDLProgetto.SelectedIndex != 0) { 
-        //                    Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-        //                    Session["SQL2"] = Session["SQL2"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
-        //        }
-
-        //        // *** parametri addizionali: cliente
-        //        if (DDLCliente.SelectedIndex != 0)
-        //        {
-        //            Session["SQL"] = Session["SQL"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
-        //            Session["SQL2"] = Session["SQL2"] + " AND NomeCliente = '" + DDLCliente.SelectedValue + "' ";
-        //        }
-
-        //        // ** ordinamento                    
-        //        Session["SQL"] = Session["SQL"]+ " ORDER BY AnnoMese, NomePersona, CodiceProgetto";
-        //        Session["SQL2"] = Session["SQL2"] + " ORDER BY AnnoMese, CodiceProgetto";
-
-        //        Session["ReportPath"] = "REV_RawData.rdlc";
-        //        Response.Redirect("/timereport/report/rdlc/ReportExecute.aspx");
-        //                break;
-
         //        case 1:     // **** DETTAGLIO PROGETTO
 
                 if (RBTipoEstrazione.SelectedIndex == 0)
@@ -132,10 +88,10 @@ public partial class report_esportaAttivita : System.Web.UI.Page
                     Session["SQL2"] = "SELECT * FROM RevenueMese WHERE ( AnnoMese >= '" + sAnnoMeseDa + "' AND AnnoMese <= '" + sAnnoMeseA + "') AND RevenueVersionCode = " + ASPcompatility.FormatStringDb(DDLRevenueVersion.SelectedValue);
                 }
 
-                if (DDLManager.SelectedIndex != 0) { 
-                        Session["SQL"] = Session["SQL"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-                        Session["SQL2"] = Session["SQL2"] + " AND ClientManager_id = '" + DDLManager.SelectedValue + "'";
-                }
+                if (DDLManager.SelectedIndex != 0) {
+                    Session["SQL"] = Session["SQL"] +   " AND ( ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + " OR AccountManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + ")";
+                    Session["SQL2"] = Session["SQL2"] + " AND ( ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + " OR AccountManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + ")";
+        }
 
                 if (DDLProgetto.SelectedIndex != 0) { 
                         Session["SQL"] = Session["SQL"] + " AND Projects_id = '" + DDLProgetto.SelectedValue + "' ";
