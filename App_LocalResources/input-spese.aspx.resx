@@ -496,7 +496,7 @@
     <value />
   </data>
   <data name="RicevuteButtonResource1.Text" xml:space="preserve">
-    <value>Giustificativi</value>
+    <value>ricevute</value>
   </data>
   <data name="RicevuteButtonResource1.ToolTip" xml:space="preserve">
     <value />
@@ -562,7 +562,7 @@
     <value>Carica file</value>
   </data>
   <data name="giustificativi" xml:space="preserve">
-    <value>Giustificativi</value>
+    <value>ricevute</value>
   </data>
   <data name="inserimento_spese" xml:space="preserve">
     <value>Inserimento spese</value>

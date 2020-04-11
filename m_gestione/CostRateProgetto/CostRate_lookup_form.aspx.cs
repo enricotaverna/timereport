@@ -50,6 +50,17 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
                 btn.CommandName = "Update";
         }
 
+        // se in creazione imposta default persona e progetto
+        if (!IsPostBack && Request.QueryString["ProjectCostRate_id"] == null && SchedaCostRate.CurrentMode == FormViewMode.Insert)
+        {
+            DropDownList ddl1 = (DropDownList)SchedaCostRate.FindControl("DDLPersona");
+
+            if (Session["DDLPersons"] != null) 
+                ddl1.SelectedValue = Session["DDLPersons"].ToString();
+
+        }
+
+
         // Se manager cancella bottone crea
         if (!Auth.ReturnPermission("MASTERDATA", "COSTRATE"))
         {
@@ -80,5 +91,22 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
         if (e.CancelingEdit)
             Response.Redirect("CostRate_list.aspx");        
     }
+
+    public void CheckRecordExist(object source, ServerValidateEventArgs args)
+    {
+        DropDownList ddl1 = (DropDownList)SchedaCostRate.FindControl("DDLPersona");
+        DropDownList ddl2 = (DropDownList)SchedaCostRate.FindControl("DDLProgetto");
+
+        if (SchedaCostRate.DefaultMode != FormViewMode.Insert) { 
+            args.IsValid = true;
+            return;
+        }
+
+        if (Database.RecordEsiste("Select * from ProjectCostRate where persons_id=" + ASPcompatility.FormatStringDb(ddl1.SelectedValue.ToString()) + " AND projects_id=" + ASPcompatility.FormatStringDb(ddl2.SelectedValue.ToString())))
+            args.IsValid = false;
+        else
+            args.IsValid = true;
+    }
+
 
 }

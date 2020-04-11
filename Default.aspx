@@ -1,4 +1,17 @@
 ﻿<%@ Language="C#" AutoEventWireup="true" CodeFile="default.aspx.cs" Inherits="defaultAspx" %>
+
+
+<!--
+
+** DOCUMENTAZIONE ***
+
+per disattivare richiesta assenza
+    1) parametro LEAVE_ON su web.config
+    2) commento su menu_array.js delle voci di menu
+    3) reset workflowtype a 0 per tutti i projects
+
+
+-->
  
 <!DOCTYPE html>
 

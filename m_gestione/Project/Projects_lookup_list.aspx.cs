@@ -34,13 +34,13 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         string strQueryOrdering = " ORDER BY Projects.ProjectCode ";
 
         //// Si imposta valore della selezione se DDL impostata "OR" si verifica il valore di default della DDL
-        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0' ) AND " +
+        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0' OR Projects.AccountManager_id = @Persons_id ) AND " +
                        " ( Projects.ProjectCode LIKE '%' + (@TB_Codice) + '%' ) AND " +
                        " ( Projects.Active = @DDLFlattivo OR @DDLFlattivo = '99' ) AND " +
                        " ( Projects.CodiceCliente = @CodiceCliente or @CodiceCliente = '0' )";
 
         // se manager limita i progetti visibili
-        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND Projects.ClientManager_id=" + Session["Persons_id"] : sWhere;
+        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND ( Projects.ClientManager_id=" + Session["Persons_id"] + " OR Projects.AccountManager_id=" + Session["Persons_id"] + ")" : sWhere;
 
         DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta " +
                                          " FROM Projects " +

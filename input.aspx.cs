@@ -9,11 +9,12 @@ using System.Globalization;
 using System.Threading;
 
 public partial class input : System.Web.UI.Page
-{
+{   
     public int intMonth;
     public bool bTRChiuso;
     public DataTable dtHours;
     public DataTable dtenses;
+    public DataTable dtAssenze;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -35,7 +36,6 @@ public partial class input : System.Web.UI.Page
 
         if ((string)Session["type"] == "bonus")
             BindDDLProjects();
-
     }
 
     //   ********************************************************************************************
@@ -124,6 +124,10 @@ public partial class input : System.Web.UI.Page
 
         } // Session["type"] == "hours")
 
+        if ((string)Session["type"] == "leave")
+        {
+            // **** drag & drop non abilitato su richieste assenza **
+        }
     }
   
     //   ****************************************
@@ -142,7 +146,6 @@ public partial class input : System.Web.UI.Page
         // se in creazione imposta il default di progetto 
         if (Session["ProjectCodeDefault"] != null)
             DDLProgetto.SelectedValue = Session["ProjectCodeDefault"].ToString();
-
     }
 
     //   ****************************************
@@ -208,6 +211,7 @@ public partial class input : System.Web.UI.Page
         // carica in memoria le ore del mese per l'utente
         CaricaBufferOre();
         CaricaBufferSpese();
+        CaricaBufferAssenze();
 
         intMonth = Convert.ToUInt16(Session["month"].ToString());
 
@@ -267,13 +271,30 @@ public partial class input : System.Web.UI.Page
         string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
 
         // seleziona tutte le ore da primo a ultimo del mese
-        string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, CreatedBy, CreationDate " +
+        string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, CreatedBy, CreationDate, ApprovalStatus, ApprovalRequest_Id " +
                         " FROM Hours INNER JOIN projects ON hours.projects_id=projects.projects_id LEFT OUTER JOIN Activity ON Activity.Activity_id = Hours.Activity_id " +
                         " WHERE hours.Persons_id=" + Session["Persons_id"] +
                         " AND hours.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                         " AND hours.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
         dtHours = Database.GetData(sQuery, this.Page);
+
+    }
+
+    // Carica buffer assenze
+    protected void CaricaBufferAssenze()
+    {
+
+        string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
+
+        // seleziona tutte le ore da primo a ultimo del mese
+        string sQuery = "SELECT *, b.Name as ProjectName" +
+                        " FROM WF_ApprovalRequest AS a INNER JOIN projects as b ON a.projects_id=b.projects_id " +
+                        " WHERE a.Persons_id=" + Session["Persons_id"] +
+                        " AND a.FromDate >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
+                        " AND a.FromDate <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
+
+        dtAssenze = Database.GetData(sQuery, this.Page);
 
     }
 
@@ -331,6 +352,7 @@ public partial class input : System.Web.UI.Page
         string strTooltip = "";
         string sDate, sISODate;
         float iOre = 0;
+        string WFIcon = "";
 
         if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
         {
@@ -338,7 +360,9 @@ public partial class input : System.Web.UI.Page
             sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
             sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
 
-            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
+                Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
+            //else
+            //    Response.Write("<td id='TDitm" + sISODate + "'>");
 
             DataRow[] drRow = dtHours.Select("[date] = '" + sDate + "'");
 
@@ -348,18 +372,32 @@ public partial class input : System.Web.UI.Page
 
                 iOre = Convert.ToSingle(rdr["hours"]);
                 strTooltip = "Data:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                             "<br>Progetto:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["name"] +
+                             "<br>Progetto:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
                              "<br>Attività:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
                              "<br>Ore:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
                              "<br>Creato da:&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
                               "<br>Creato il:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]) +
                              "<br><br>" + rdr["comment"];
 
-                // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
-                Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
+                // imposta icona di workflow
+                WFIcon = "";
 
-                        Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G")  + " " + GetLocalResourceObject("oreUOM") + "</a>");
-                        if (Convert.ToBoolean(Session["InputScreenChangeMode"])) 
+                if (rdr["ApprovalStatus"].ToString() == MyConstants.WF_REQUEST)
+                    WFIcon = "<img align = left src ='/timereport/images/icons/16x16/warning.png' width = 14 height = 14 border = 0 >";
+
+                // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
+
+                if (rdr["ApprovalStatus"].ToString().Length == 0) { 
+                    Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
+                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G")  + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
+                }
+                else { 
+                    Response.Write("<div id=TRitm" + rdr["Hours_id"] + ">");
+                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
+                }
+
+                // cancellazione solo in change e se la riga non è una richiesta assenza
+                if (Convert.ToBoolean(Session["InputScreenChangeMode"]) & (rdr["ApprovalStatus"].ToString().Length == 0)) 
                             Response.Write("<a href=# onclick='CancellaId(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
 
                     Response.Write("</div>"); // TRore
@@ -404,12 +442,12 @@ public partial class input : System.Web.UI.Page
                 sFlag = Convert.ToBoolean(rdr["InvoiceFlag"]) ? sFlag + " FAT " : sFlag;
 
                 strTooltip = "Data:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                             "<br>Progetto:&nbsp;&nbsp;" + rdr["Name"] +
+                             "<br>Progetto:&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
                              "<br>Spesa:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
                              "<br>Importo:&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
                              "<br>Flag:&nbsp;&nbsp;&nbsp;" +
                              sFlag +
-                             "<br><br>" + rdr["comment"];
+                             "<br><br>" + HttpUtility.HtmlEncode(rdr["comment"].ToString());
 
                 // se la spesa ha una ricevuta stampa un icona, altrimenti lascia blank
                 if (iRicevuteBuffer.Contains(Convert.ToInt32(rdr["expenses_id"])))
@@ -430,6 +468,69 @@ public partial class input : System.Web.UI.Page
 
             if (drRow.Count() > 0)
                 Response.Write("</td>");
+            else
+                Response.Write("&nbsp;</td>");
+
+        }
+    }
+
+    protected void FindAssenze(int intDayNumber)
+    {
+
+        string strTooltip = "";
+        string sDate, sISODate;
+        float iOre = 0;
+        string WFIcon = "";
+
+        if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
+        {
+
+            sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
+            sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
+
+            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
+
+            DataRow[] drRow = dtAssenze.Select("[FromDate] = '" + sDate + "'");
+
+            // cerca sulla versione bufferizzate dtHours
+            foreach (DataRow rdr in drRow)
+            {
+
+                iOre = Convert.ToSingle(rdr["hours"]);
+                strTooltip = "Da data:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["FromDate"]) +
+                             "<br>A data:&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["ToDate"]) +
+                             "<br>Progetto:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["ProjectName"]) +
+                             "<br>Ore:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
+                             "<br>Stato:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["ApprovalStatus"]) +
+                             "<br>Creato il:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]) +
+                             "<br><br>" + rdr["Comment"];
+
+                // imposta icona di workflow
+                WFIcon = "";
+
+                if (rdr["ApprovalStatus"].ToString() == MyConstants.WF_REQUEST)
+                    WFIcon = "<img align = left src ='/timereport/images/icons/16x16/warning.png' width = 14 height = 14 border = 0 >";
+
+                if (rdr["ApprovalStatus"].ToString() == MyConstants.WF_APPROVED | rdr["ApprovalStatus"].ToString() == MyConstants.WF_NOTIFIED)
+                    WFIcon = "<img align = left src ='/timereport/images/icons/16x16/WF_OK.png' width = 14 height = 14 border = 0 >";
+
+                if (rdr["ApprovalStatus"].ToString() == MyConstants.WF_REJECTED)
+                    WFIcon = "<img align = left src ='/timereport/images/icons/16x16/WF_Delete.png' width = 12 height = 12 border = 0 >";
+
+
+                // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
+                Response.Write("<div id=TRitm" + rdr["ApprovalRequest_id"] + ">");
+
+                Response.Write(WFIcon + "<a id=" + rdr["ApprovalRequest_id"] + " title=' " + strTooltip + "' class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + rdr["ProjectName"] + "</a>" );
+
+                if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
+                    Response.Write("<a href=# onclick='CancellaAssenza(" + rdr["ApprovalRequest_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+
+                Response.Write("</div>"); // TRore
+            }
+
+            if (drRow.Count() > 0)
+                Response.Write("</td>");   // class=hours
             else
                 Response.Write("&nbsp;</td>");
 
@@ -503,6 +604,10 @@ public partial class input : System.Web.UI.Page
                         Response.Write("<a  align=right href=input-ore.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
                         break;
 
+                    case "leave":  // CALENDARIO DATE
+                        Response.Write("<a  align=right href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
+                        break;
+
                     case "expenses": // CALENDARIO SPESE
                         Response.Write("<a  align=right href=input-spese.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
                         break;
@@ -550,7 +655,7 @@ public partial class input : System.Web.UI.Page
                 "'" + Session["persons_id"] + "' ," +
                 "'" + Request.Form["DDLBonus"] + "' ," +     // da dropdown
                 "'1' ," +
-                "'" + Request.Form["SedeViaggio"] + "' , " +
+                ASPcompatility.FormatStringDb(Request.Form["SedeViaggio"]) + ", " +
                 "'false' ," +
                 "'false' ," +
                 "'false' ," +

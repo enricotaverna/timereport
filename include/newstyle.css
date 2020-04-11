@@ -4,6 +4,7 @@ BODY {
     padding: 0;
     background: #F4F4F4;
     font: 14px sans-serif;
+    line-height: 1 !important;
 }
 
 #WindowFooter {
@@ -43,7 +44,7 @@ BODY {
     min-height: 580px;
     /*background-color: #D0D0D0; */
     background: url("/timereport/images/light-grey.jpg");
-    padding: 0px 0 20px;
+    padding: 10px 0 10px 0;
     float: left;
 }
 
@@ -424,31 +425,33 @@ a, a:visited, a:hover, a:active {
 }
 
 .greybutton {
-    background: #E1E1E1;
+    /*background: #E1E1E1;
     /*Old browsers*/
-    background: -moz-linear-gradient(top, #e1e1e1 0%, #bababa 100%);
+    /*background: -moz-linear-gradient(top, #e1e1e1 0%, #bababa 100%);*/
     /*FF3.6+*/
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e1e1e1), color-stop(100%,#bababa));
+    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e1e1e1), color-stop(100%,#bababa));*/
     /*Chrome,Safari4+*/
-    background: -webkit-linear-gradient(top, #e1e1e1 0%,#bababa 100%);
+    /*background: -webkit-linear-gradient(top, #e1e1e1 0%,#bababa 100%);*/
     /*Chrome10+,Safari5.1+*/
-    background: -o-linear-gradient(top, #e1e1e1 0%,#bababa 100%);
+    /*background: -o-linear-gradient(top, #e1e1e1 0%,#bababa 100%);*/
     /*Opera11.10+*/
-    background: -ms-linear-gradient(top, #e1e1e1 0%,#bababa 100%);
+    /*background: -ms-linear-gradient(top, #e1e1e1 0%,#bababa 100%);*/
     /*IE10+*/
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e1e1e1', endColorstr='#bababa',GradientType=0 );
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e1e1e1', endColorstr='#bababa',GradientType=0 );*/
     /*IE6-9*/
-    background: linear-gradient(top, #e1e1e1 0%,#bababa 100%);
+    /*background: linear-gradient(top, #e1e1e1 0%,#bababa 100%);*/
     /*W3C*/
-    border: 1px solid #BABABA;
+    width: 85px;
+    background-color: #e1e1e1;
+    border: 1px solid #e1e1e1;
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
     font-size: 16px;
-    padding: 6px 12px;
-    color: #FFF;
-    text-shadow: -1px -1px #BABABA;
+    padding: 6px 6px;
+    color: dimgrey;
+    /*text-shadow: -1px -1px #BABABA;*/
     float: right;
     margin-left: 10px;
     cursor: pointer;
@@ -475,23 +478,42 @@ a, a:visited, a:hover, a:active {
     }
 
 .orangebutton {
+    width: 85px;
     background: #FFC339;
     /*Old browsers*/
-    background: -moz-linear-gradient(top, #ffc339 0%, #ff9b19 100%);
+    /*background: -moz-linear-gradient(top, #ffc339 0%, #ff9b19 100%);*/
     /*FF3.6+*/
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffc339), color-stop(100%,#ff9b19));
+    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffc339), color-stop(100%,#ff9b19));*/
     /*Chrome,Safari4+*/
-    background: -webkit-linear-gradient(top, #ffc339 0%,#ff9b19 100%);
+    /*background: -webkit-linear-gradient(top, #ffc339 0%,#ff9b19 100%);*/
     /*Chrome10+,Safari5.1+*/
-    background: -o-linear-gradient(top, #ffc339 0%,#ff9b19 100%);
+    /*background: -o-linear-gradient(top, #ffc339 0%,#ff9b19 100%);*/
     /*Opera11.10+*/
-    background: -ms-linear-gradient(top, #ffc339 0%,#ff9b19 100%);
+    /*background: -ms-linear-gradient(top, #ffc339 0%,#ff9b19 100%);*/
     /*IE10+*/
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc339', endColorstr='#ff9b19',GradientType=0 );
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc339', endColorstr='#ff9b19',GradientType=0 );*/
     /*IE6-9*/
-    background: linear-gradient(top, #ffc339 0%,#ff9b19 100%);
+    /*background: linear-gradient(top, #ffc339 0%,#ff9b19 100%);*/
     /*W3C*/
-    border: 1px solid #FF9B19;
+    border: 1px solid #FFC339;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    line-height: 20px;
+    font-size: 16px;
+    padding: 6px 6px;
+    color: #FFF;
+    /*text-shadow: -1px -1px #FF9B19;*/
+    float: right;
+    margin-left: 10px;
+    cursor: pointer;
+    outline: none;
+}
+
+.greenbutton {
+    width: 85px;
+    background-color: forestgreen;
+    border: 1px solid forestgreen;
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
@@ -499,7 +521,23 @@ a, a:visited, a:hover, a:active {
     font-size: 16px;
     padding: 6px 12px;
     color: #FFF;
-    text-shadow: -1px -1px #FF9B19;
+    float: right;
+    margin-left: 10px;
+    cursor: pointer;
+    outline: none;
+}
+
+.redbutton {
+    width: 85px;
+    background-color: red;
+    border: 1px solid red;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    line-height: 20px;
+    font-size: 16px;
+    padding: 6px 12px;
+    color: #FFF;
     float: right;
     margin-left: 10px;
     cursor: pointer;

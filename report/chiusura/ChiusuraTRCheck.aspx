@@ -75,6 +75,14 @@
             <asp:Label ID="CheckSpese" runat="server" Text="Check Spese" meta:resourcekey="CheckSpeseResource1"></asp:Label> </td>
                 <td>&nbsp;</td>
             </tr>
+            <tr>
+                <td>
+            <asp:Image ID="CheckAssenzeImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1"  Width="25px"  />
+                </td>
+                <td>
+            <asp:Label ID="CheckAssenze" runat="server" Text="" meta:resourcekey="CheckAssenze"></asp:Label> </td>
+                <td>&nbsp;</td>
+            </tr>
         </table>
 
         <br />

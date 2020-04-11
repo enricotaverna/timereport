@@ -2,26 +2,23 @@
 
 <!DOCTYPE html>
 
+<%--Stylesheet--%>
+<link href="../../include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">  
+
 <!-- Jquery   -->
 <link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
 <script src="/timereport/include/javascript/timereport.js"></script>
-<script>
-    $(function () {
-
-        // nasconde la colonna con la chiave usata nella cancellazione del record
-        $('.hiddencol').css({ display: 'none' });
-
-    });
-</script>
+<script src="../../include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
     <title>Cost rate per progetto</title>
-    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">  
+
 </head>
 
 <SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
@@ -39,43 +36,51 @@
     <div id="PanelWrap" style="width:750px"> 
 
     <!--**** Primo Box ***-->    
-    <div class="RoundedBox" >
+    <div class="RoundedBox" style="width:740px;height:90px">
 
-    <table width="760" border="0" class="GridTab">
-        <tr>
-        <td>
-            Persona:
-        
+    <table    border="0" class="GridTab"  style="position:absolute">
+        <tr > 
+        <td >
+            Persona:        
         </td>
-         <td>
-                <asp:DropDownList ID="DDLPersons" runat="server" AutoPostBack="True" OnSelectedIndexChanged="DDLPersons_SelectedIndexChanged" AppendDataBoundItems="True"
-                    Width="150px"  CssClass="TabellaLista" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id">
-                    <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
-                </asp:DropDownList>                
+         <td  style="width:300px">  <!-- per dimensionare cella sformattata dalla position:absolute -->
+
+            <span> <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+                <asp:ListBox ID="DDLPersons" runat="server" DataTextField="Name"   AppendDataBoundItems="True" DataSourceID="DSPersons"
+                DataValueField="Persons_id" class="select2-auth" OnSelectedIndexChanged="DDLPersons_SelectedIndexChanged" AutoPostBack="True" Width="180px"  >
+                <asp:ListItem Value=''>-- seleziona un valore ---</asp:ListItem>       
+
+                </asp:ListBox>
+            </span>
+            
         </td>
-        <td>
+        <td >
             Progetto:
         </td>
-        <td>
-            <asp:DropDownList ID="DDLProgetto" runat="server" DataSourceID="DSProgetti" DataTextField="NomeProgetto" 
-                DataValueField="Projects_id" AutoPostBack="True" AppendDataBoundItems="True"
-                OnSelectedIndexChanged="DDLProgetto_SelectedIndexChanged"
-                Width="150px" CssClass="TabellaLista">
-                <asp:ListItem Text="Tutti i valori" Value="0" />
-            </asp:DropDownList>
-        </td>
+        <td style="width:300px;height:40px">
 
+            <span > <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+                <asp:ListBox ID="DDLProgetto" runat="server" DataTextField="NomeProgetto"   AppendDataBoundItems="True" DataSourceID="DSProgetti"
+                DataValueField="Projects_id" class="select2-auth" OnSelectedIndexChanged="DDLProgetto_SelectedIndexChanged" AutoPostBack="True" Width="180px"  >
+                <asp:ListItem Value=''>-- seleziona un valore ---</asp:ListItem>    
+                </asp:ListBox>
+            </span>
+        </td>
         </tr>
 
         <tr>
         <td>&nbsp;        </td>
         <td>&nbsp;        </td>
         <td>Manager:      </td>
-        <td>
-                <asp:DropDownList ID="DDLManager" runat="server" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
-                    Width="150px"  CssClass="TabellaLista" DataSourceID="DSManager" DataTextField="ManagerName" DataValueField="Manager_id" OnDataBound="DDLManager_DataBound" >
-                    <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
-                </asp:DropDownList>  
+        <td style="width:300px;height:40px">
+
+            <span > <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+                <asp:ListBox ID="DDLManager" runat="server" DataTextField="ManagerName"   AppendDataBoundItems="True" DataSourceID="DSManager"
+                DataValueField="Manager_id" class="select2-auth" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AutoPostBack="True" Width="180px"  OnDataBound="DDLManager_DataBound">
+                <asp:ListItem Value=''>-- seleziona un valore ---</asp:ListItem>
+                </asp:ListBox>
+            </span>
+
         </td>
 
         </tr>
@@ -147,9 +152,9 @@
         SelectCommand= "** costruita in page load **" 
         DeleteCommand="DELETE FROM ProjectCostRate WHERE (ProjectCostRate_id = @ProjectCostRate_id)">
         <SelectParameters>
-            <asp:ControlParameter ControlID="DDLProgetto" name="Projects_id" PropertyName="SelectedValue" Type="Int16" />
-            <asp:ControlParameter ControlID="DDLPersons" name="Persons_id" PropertyName="SelectedValue"  Type="Int16"/>
-            <asp:ControlParameter ControlID="DDLManager" name="Manager_id" PropertyName="SelectedValue"  Type="Int16"/>
+            <asp:ControlParameter ControlID="DDLProgetto" name="Projects_id" PropertyName="SelectedValue" Type="Int16" DefaultValue="0" />
+            <asp:ControlParameter ControlID="DDLPersons" name="Persons_id" PropertyName="SelectedValue"  Type="Int16" DefaultValue="0"/>
+            <asp:ControlParameter ControlID="DDLManager" name="Manager_id" PropertyName="SelectedValue"  Type="Int16" DefaultValue="0"/>
         </SelectParameters>
          <DeleteParameters>
             <asp:Parameter Name="ProjectCostRate_id" />
@@ -182,6 +187,30 @@
         <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
         <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>        
      </div>    
+
+<script>
+
+    $(function () {
+
+        // attiva sumo select
+        $(document).ready(function () {
+
+                 // imposta css della listbox
+            $('.select2-auth').SumoSelect({
+                search: true,
+
+            }
+
+            );
+
+        });
+             
+        // nasconde la colonna con la chiave usata nella cancellazione del record
+        $('.hiddencol').css({ display: 'none' });
+
+    });
+
+</script>
 
 </body>
 </html>

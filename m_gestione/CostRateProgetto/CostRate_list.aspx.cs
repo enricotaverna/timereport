@@ -78,14 +78,14 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
     // al cambio di DDL salva il valore 
     protected void DDLPersons_SelectedIndexChanged(object sender, System.EventArgs e)
     {
-        DropDownList ddl = (DropDownList)sender;
+        ListBox ddl = (ListBox)sender;
         Session["DDLPersons"] = ddl.SelectedValue;
     }
 
     // al cambio di DDL salva il valore 
     protected void DDLProgetto_SelectedIndexChanged(object sender, System.EventArgs e)
     {
-        DropDownList ddl = (DropDownList)sender;
+        ListBox ddl = (ListBox)sender;
         Session["DDLProgetto"] = ddl.SelectedValue;
     }
     
@@ -139,7 +139,7 @@ public partial class m_gestione_CostRate_lookup_list : System.Web.UI.Page
     // al cambio di DDL salva il valore 
     protected void DDLManager_SelectedIndexChanged(object sender, System.EventArgs e)
     {
-        DropDownList ddl = (DropDownList)sender;
+        ListBox ddl = (ListBox)sender;
         Session["DDLManager"] = ddl.SelectedValue;
     }
     

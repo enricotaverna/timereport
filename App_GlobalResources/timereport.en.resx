@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="APPROVE_TXT" xml:space="preserve">
+    <value>Approve</value>
+  </data>
   <data name="CANCEL_TXT" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -128,6 +131,9 @@
   </data>
   <data name="Inserisci" xml:space="preserve">
     <value>Input</value>
+  </data>
+  <data name="REJECT_TXT" xml:space="preserve">
+    <value>Reject</value>
   </data>
   <data name="REPORT_TXT" xml:space="preserve">
     <value>generate report</value>

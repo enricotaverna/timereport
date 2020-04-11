@@ -7,6 +7,11 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Reflection;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -333,7 +338,6 @@ public class Utilities
 
 public class CommonFunction
 {
-
     // Classe per definire paramentri di output della procedura CalcolaPercOre
     public class CalcolaPercOutput
     {
@@ -431,45 +435,6 @@ public class CommonFunction
             return (remainingDays - 2);
     }
 
-    //public static void CreaFestiviAutomatici(Int16 Persons_id)
-    //{
-    //    // Richiamata con o senza identificativo della persona
-    //    // Crea i festivi automatici a partire dalla data corrente leggendo la tabella Holiday
-    //    // Se Persons_id = 0 o null vengono creati per tutte le persone attive
-    //    string SQLString;
-
-    //    if (Persons_id != 0)
-    //        SQLString = "SELECT Persons_id from Persons where Persons_id = " + Persons_id.ToString();
-    //    else
-    //        SQLString = "SELECT Persons_id from Persons where active = 1 ";
-
-    //    // 1' step: cancella tutti i festivi automatici (solo quelli dal giorno attuale in avanti !!!)
-    //    DataTable dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
-
-    //    foreach (DataRow rdr in dtPersons.Rows)
-    //    {
-    //        // cancella i record creati automaticamente con data >= data attuale
-    //        SQLString = "DELETE FROM hours WHERE FestivoAutomatico = 1 AND Persons_id = " + rdr["Persons_id"].ToString() + " AND Date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
-    //        Database.ExecuteSQL(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
-    //    }
-
-    //    // 2' step: crea i carichi automatici
-
-    //    // Join tra persone attive e date giorni festivi >= data odierna
-    //    if (Persons_id != 0)
-    //        SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.Persons_id = " + Persons_id.ToString() + " AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
-    //    else
-    //        SQLString = "SELECT Persons_id, holiday_date from Persons, Holiday where persons.active = 1 AND Holiday.holiday_date >= " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"));
-
-    //    dtPersons.Clear();
-    //    dtPersons = Database.GetData(SQLString, null/* TODO Change to default(_) if this is not a reference type */);
-
-    //    foreach (DataRow rdr in dtPersons.Rows)
-    //        // cancella i record creati automaticamente con data >= data attuale
-    //        // cancella i record creati automaticamente con data >= data attuale
-    //        Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, FestivoAutomatico) VALUES(" + ASPcompatility.FormatDateDb(rdr["holiday_date"].ToString(), false) + " , " + ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]) + " , " + ASPcompatility.FormatStringDb(rdr["Persons_id"].ToString()) + " , " + ASPcompatility.FormatNumberDB(8) + " , " + ASPcompatility.FormatStringDb("1") + " , " + " '0'  , " + " null  , " + " null  , " + " null , " + " null  , " + ASPcompatility.FormatStringDb(HttpContext.Current.Session["UserId"].ToString()) + " , " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + "'1'" + " )", null/* TODO Change to default(_) if this is not a reference type */);
-    //}
-
     public static CultureInfo GetCulture()
     {
         // PROVATA IN SOSTITUZIONE DI GLOBAL.ASAX    
@@ -489,6 +454,87 @@ public class CommonFunction
 
         return sRet;
     }
+
+    /// <summary>
+    /// Invia Mail a destinatario ed elenco CC</summary>
+    /// 
+    /// <param SendtoString> Destinatario</param>
+    /// <param approvalStatus> Stato approvazione: REQU, NOTF etc.</param>    
+    /// <param WorkflowType> Tipo Workflow 01 Approvazione 02 Notifica </param>  
+    /// <param ListaParametri> Lista parametri da sostituire nel corpo della mail </param>
+    /// 
+    public static Boolean WF_SendMail(string SendtoString, string CCString, string approvalStatus, string WorkflowType, List<TipoParametri> ListaParametri)
+    {
+        // Sendto indirizzi mail di spedizione separati da virgole es. "nome.cognome1@aeonvis.com, nome.cognome2@aeonvis.com"
+
+        // ** recupera la mail di default associata al WF
+        DataRow dr = Database.GetRow("Select DefaultMail FROM WF_WorkflowType WHERE WorkflowType = " + ASPcompatility.FormatStringDb(WorkflowType), null);
+
+        if (dr["DefaultMail"].ToString().Trim().Length > 0)
+            CCString = CCString + ", " + dr["DefaultMail"];
+
+        try
+        {
+           // Get the HTML from an embedded resource.
+            string bodyTo = File.ReadAllText(HttpContext.Current.Server.MapPath(MyConstants.MAIL_TEMPLATE_PATH + MyConstants.SMTP_TEMPLATE));
+
+            string bodyCC = bodyTo; // toglie il link per l'approvazione
+            bodyCC = bodyCC.Replace("%link%", "");
+            bodyTo = bodyTo.Replace("%link%", "<a href='https://www.aeonvis.it/timereport/m_gestione/approval/Approval_request.aspx?approval_id=%approvalRequest_id%'>clicca per vedere la richiesta</a>");
+
+            // sostituisce i parametri variabili
+            foreach (TipoParametri p in ListaParametri) {
+                bodyTo = bodyTo.Replace("%" + p.pKey + "%" , p.pValue);
+                bodyCC = bodyCC.Replace("%" + p.pKey + "%", p.pValue);
+            }
+
+            // Send the email
+            SmtpClient smtp = new SmtpClient();
+            smtp.Port = MyConstants.SMTP_PORT;
+            smtp.EnableSsl = MyConstants.SMTP_SSL;
+            smtp.Host = MyConstants.SMTP_HOST; //Or Your SMTP Server Address
+            smtp.Credentials = new System.Net.NetworkCredential(MyConstants.SMTP_USER, MyConstants.SMTP_PWD, "aeonvis.com");
+
+            // ** Manda la mail all'approvatore
+            // Create an alternate view and add it to the email.
+            // Create the message.
+            var msgTo = new MailMessage();
+            msgTo.From = new MailAddress(MyConstants.MAIL_FROM);
+
+            msgTo.SubjectEncoding = Encoding.UTF8;
+
+            TipoParametri subj = ListaParametri.Find(x => x.pKey == "subject");
+            msgTo.Subject = subj.pValue; // soggetto della mail
+
+            var altView = AlternateView.CreateAlternateViewFromString(bodyTo, null, MediaTypeNames.Text.Html);
+            msgTo.AlternateViews.Add(altView);
+            msgTo.To.Add(SendtoString);
+
+            smtp.Send(msgTo); // ****** INVIO MAIL **********+
+
+            // ** Manda la mail di notifica
+            if (CCString.Length > 0)
+            {
+                var msgCC = new MailMessage();
+                msgCC.From = new MailAddress(MyConstants.MAIL_FROM);
+
+                msgCC.SubjectEncoding = Encoding.UTF8;
+                msgCC.Subject = subj.pValue; // soggetto della mail
+
+                altView = AlternateView.CreateAlternateViewFromString(bodyCC, null, MediaTypeNames.Text.Html);
+                msgCC.AlternateViews.Add(altView);
+                msgCC.To.Add(CCString);
+
+                smtp.Send(msgCC); // ****** INVIO MAIL **********+
+            }
+        }
+        finally
+        {
+        }
+
+        return true;
+    }
+
 }
 
 public class CheckChiusura
@@ -502,6 +548,7 @@ public class CheckChiusura
         public string Descrizione;
         public string ExpenseCode;
         public string ProjectCode;
+        public string ProjectName;
         public double Amount;
         public string UnitOfMeasure;
     }
@@ -635,6 +682,38 @@ public class CheckChiusura
         else
             iRet = 0;
 
+        return iRet;
+    }
+
+    public static int CheckAssenze(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
+    {
+        // Funzione ritorna
+        // 0 = nessun problema
+        // 1 = warning
+        // 2 = errore
+        // La lista di oggetti contiene le anomalie secondo la struttura della class CheckAnomalia        
+        int iRet;
+
+        ListaAnomalie.Clear();
+
+        string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
+        string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
+
+        // selezione se ce ne sono le ore di richiesta assenza in stato da approvare
+        DataTable dtAssenze = Database.GetData("Select FORMAT(a.date,'dd/MM/yyyy') as date, a.Projects_id, b.ProjectCode, b.Name as ProjectName from Hours as a JOIN Projects as b ON b.Projects_id = a.Projects_id WHERE ApprovalStatus='" + MyConstants.WF_REQUEST + "' AND Persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null/* TODO Change to default(_) if this is not a reference type */);
+
+        iRet = dtAssenze.Rows.Count; // numero anomalie
+
+        // cicla sulle assenze non approvate
+        foreach (DataRow rs in dtAssenze.Rows)
+            {
+              CheckAnomalia a = new CheckAnomalia();
+              a.Data = Convert.ToDateTime(rs["date"].ToString());
+              a.Descrizione = "Richiesta assenza da approvare";
+              a.ProjectName = rs["ProjectName"].ToString();
+
+              ListaAnomalie.Add(a);
+             }
         return iRet;
     }
 }
@@ -928,7 +1007,7 @@ public class ASPcompatility
         DateTime DateToConvert;
 
         if (sDateToConvert == "") {
-            sRet = "''";
+            sRet = "NULL";
             return sRet;
         } //  init
 

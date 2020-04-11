@@ -383,7 +383,7 @@ function dmenu(mnu){
 		{
 			bgc="bgColor="+hlp[13]
 		}
-		mt="<layer z-index=19 visibility=hidden "+bgc+" id="+mnu+" top="+menu[1]+" left="+menu[2]+" width="+thw+">"
+        mt ="<layer z-index=19 box-sizing=content-box visibility=hidden "+bgc+" id="+mnu+" top="+menu[1]+" left="+menu[2]+" width="+thw+">"
 		
 		if (hlp[11])
 		{
@@ -398,7 +398,7 @@ function dmenu(mnu){
 		iedf=" filter:";flt=menu[9].split("\;");for(fx=0;fx<flt.length;fx++){iedf+=" progid:DXImageTransform.Microsoft."+flt[fx]}}
 		if(!hlp[4]&&(mac||opera))hlp[4]="transparent"
 		if (hlp[11]){brd = "border:solid "+menu[4]+"px; border-left-color:"+hlp[12]+";border-top-color:"+hlp[12]+";border-bottom-color:"+hlp[13]+";border-right-color:"+hlp[13]+";"}else{brd = "border:solid "+menu[4]+"px; border-left-color:"+hlp[4]+";border-top-color:"+hlp[4]+";border-bottom-color:"+hlp[4]+";border-right-color:"+hlp[4]+";"}
-		mt="<div id="+mnu+" style=\""+iedf+";z-index:19;visibility:hidden;"+brd+"position:absolute;background-Color:"+hlp[4]+";width:"+(menu[3]+ns6w)+"px;left:"+menu[2]+"px;top:"+menu[1]+"px;\">"
+        mt = "<div id=" + mnu + " style=\"" + iedf +";z-index:19;box-sizing:content-box;visibility:hidden;"+brd+"position:absolute;background-Color:"+hlp[4]+";width:"+(menu[3]+ns6w)+"px;left:"+menu[2]+"px;top:"+menu[1]+"px;\">"
 	}
 	
 	_d.write(mt)
@@ -428,7 +428,7 @@ function dmenu(mnu){
 					//sbgc=parseLink(menu[b-3],"separatorcolor");
 					if(sbgc)bgc="bgcolor="+sbgc;
 					if(!hlp[11])x++
-					txt="<layer top="+(x-2)+" left="+menu[4]+" height="+menu[b]+" "+bgc+" width="+mt.clip.width+" onmouseover=\"clearTimeout(Mtimer)\" ></layer>"
+                    txt = "<layer top=" + (x - 2) + " left=" + menu[4] +" box-sizing=content-box height="+menu[b]+" "+bgc+" width="+mt.clip.width+" onmouseover=\"clearTimeout(Mtimer)\" ></layer>"
 					if(hlp[11]){txt+="<layer top="+(x-1)+" left="+menu[4]+" height=1 bgcolor="+hlp[12]+" width="+mt.clip.width+"></layer>"
 					}
 				}

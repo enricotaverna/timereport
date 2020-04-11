@@ -204,4 +204,7 @@
   <data name="Titolo" xml:space="preserve">
     <value>Check chiusura Time Report</value>
   </data>
+  <data name="CheckAssenze" xml:space="preserve">
+    <value />
+  </data>
 </root>

@@ -58,7 +58,7 @@
         var winW = 960;
 
         //Set the popup window to center
-        $(ModalForm).css('top', 60);
+        $(ModalForm).css('top', 40);
         $(ModalForm).css('left', winW / 2 - $(ModalForm).width() / 2);
 
         //transition effect

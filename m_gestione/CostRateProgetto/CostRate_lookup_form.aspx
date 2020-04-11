@@ -64,6 +64,7 @@
                             </asp:DropDownList>
                         </label>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" Display="none" runat="server" ErrorMessage="Inserisci il codice progetto" ControlToValidate="DDLProgetto"></asp:RequiredFieldValidator>
+                        <asp:CustomValidator ID="CustomValidator1" runat="server" Display="Static"  onservervalidate="CheckRecordExist" ErrorMessage="Record già esistente!" ControlToValidate="DDLProgetto"  Font-Bold="True" ForeColor="#FF3300"></asp:CustomValidator>
                 </div>   
 
                <!-- *** Bill Rate ***  --> 
@@ -130,7 +131,7 @@
 
     </asp:FormView>
      
-    <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false"  />
+    <asp:ValidationSummary ID="VSValidator" runat="server" ShowMessageBox="True" ShowSummary="false" HeaderText="Messaggi di Errore"  />
 
     </form>
 

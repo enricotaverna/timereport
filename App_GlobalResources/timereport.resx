@@ -117,26 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="APPROVE_TXT" xml:space="preserve">
+    <value>approva</value>
+  </data>
   <data name="CANCEL_TXT" xml:space="preserve">
-    <value>Annulla</value>
+    <value>annulla</value>
   </data>
   <data name="EXEC_TXT" xml:space="preserve">
-    <value>Esegui</value>
+    <value>esegui</value>
   </data>
   <data name="EXPORT_TXT" xml:space="preserve">
-    <value>esporta su file</value>
+    <value>esporta</value>
   </data>
   <data name="Inserisci" xml:space="preserve">
     <value>Inserisci</value>
   </data>
+  <data name="REJECT_TXT" xml:space="preserve">
+    <value>rifiuta</value>
+  </data>
   <data name="REPORT_TXT" xml:space="preserve">
-    <value>genera report</value>
+    <value>report</value>
   </data>
   <data name="SAVE_TXT" xml:space="preserve">
-    <value>Salva</value>
+    <value>salva</value>
   </data>
   <data name="TICKETS" xml:space="preserve">
-    <value>Giustificativi</value>
+    <value>ricevute</value>
   </data>
   <data name="Utente" xml:space="preserve">
     <value>Utente:</value>

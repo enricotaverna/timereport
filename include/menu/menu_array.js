@@ -119,9 +119,9 @@ if (sUserLevel == AUTH_ADMIN) {
         "mainmenu",
         10, 12, , 0, , XPMainStyle, 1, "left", effect, , 1, , , , , , , , , ,
         , "Home", "/timereport/menu.aspx", , "Back to the home page", 1 // "Description Text", "URL", "Alternate URL", "Status", "Separator Bar"
-        , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=FULL_Inserisci", , "", 1
+        , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=MGR_Inserisci", , "", 1
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
-        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=COMMON_Utilita", , "", 1
+        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
         , (sLingua == 'it') ? "Amministrazione&nbsp;&nbsp;" : "Administration&nbsp;&nbsp;", "show-menu=ADMIN_MainMenu", , "", 1
         , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=COMMON_HR", , "", 1
@@ -224,9 +224,9 @@ if (sUserLevel == AUTH_MANAGER) {
         "mainmenu",
         10, 12, , 0, , XPMainStyle, 1, "left", effect, , 1, , , , , , , , , ,
         , "Home", "/timereport/menu.aspx", , "Back to the home page", 1 // "Description Text", "URL", "Alternate URL", "Status", "Separator Bar"
-        , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=FULL_Inserisci", , "", 1
+        , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=MGR_Inserisci", , "", 1
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
-        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=COMMON_Utilita", , "", 1
+        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
         , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=COMMON_HR", , "", 1
         , "Logout&nbsp;&nbsp;", "/timereport/logout.aspx", , "", 1
@@ -263,7 +263,7 @@ if (sUserLevel == AUTH_TRAINER) {
 }
 
 // **** MENU EMPLOYEE e TEAMLEADER e TRAINER  **** //
-if (sUserLevel == AUTH_EMPLOYEE || sUserLevel == AUTH_TEAMLEADER  ) {
+if (sUserLevel == AUTH_EMPLOYEE || sUserLevel == AUTH_TEAMLEADER ) {
 
     addmenu(menu = [
         "mainmenu",
@@ -359,7 +359,6 @@ addmenu(menu =["MNGR_Economics",
         , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Cost Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=CR", , , 1
         , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Bill Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=BR", , , 1
         , "<img src=/timereport/images/icons/16x16/report.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/ReportRevenue.aspx", , , 1
-
 ]);
 
 addmenu(menu = ["MNGR_TrainingReport",
@@ -368,6 +367,12 @@ addmenu(menu = ["MNGR_TrainingReport",
     , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Training Plan", "/timereport/m_gestione/training/TrainingPlan_report.aspx", , , 1
 ]);
 
+addmenu(menu = ["MGR_Utilita",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Cambia password" : "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Change password", "/timereport/m_utilita/change-password.aspx", , , 1
+    // , "<img src=/timereport/images/icons/16x16/S_F_OKAY.gif border=0>&nbsp;Approva Richieste", "/timereport/m_gestione/Approval/Approval_list.aspx", , , 1 *** LEAVE_OFF  ***
+
+]);
 
 // **** COMUNI *****
 addmenu(menu = ["COMMON_Utilita",
@@ -386,15 +391,23 @@ addmenu(menu = ["FULL_Inserisci",
     , "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore", "/timereport/input.aspx?type=hours", , , 1
     , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese", "/timereport/input.aspx?type=expenses", , , 1
     , "<img src=/timereport/images/icons/16x16/restaurant.png border=0>&nbsp;Ticket", "/timereport/input.aspx?type=bonus", , , 1
+    // , "<img src=/timereport/images/icons/16x16/cutoff.gif border=0>&nbsp;Assenze", "/timereport/input.aspx?type=leave", , , 1   *** LEAVE_OFF  ***
+    , "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Upload spese", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
+]);
+
+addmenu(menu = ["MGR_Inserisci",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "<img src=/timereport/images/icons/16x16/hours.gif border=0>&nbsp;Ore", "/timereport/input.aspx?type=hours", , , 1
+    , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Spese", "/timereport/input.aspx?type=expenses", , , 1
+    , "<img src=/timereport/images/icons/16x16/restaurant.png border=0>&nbsp;Ticket", "/timereport/input.aspx?type=bonus", , , 1
+    // , "<img src=/timereport/images/icons/16x16/cutoff.gif border=0>&nbsp;Assenze", "/timereport/input.aspx?type=leave", , , 1   *** LEAVE_OFF  ***
     , "<img src=/timereport/images/icons/16x16/export.gif border=0>&nbsp;Upload spese", "/timereport/m_utilita/upload-expenses-xls.aspx", , , 1
 ]);
 
 addmenu(menu = ["COMMON_HR",
     , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
     , "Training", "show-menu=MULTI_Training", , , 1
+    , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Download CV", "/timereport/m_gestione/curricula/CV_list.aspx", , , 1
 ]);
-
-
-
 
 dumpmenus()

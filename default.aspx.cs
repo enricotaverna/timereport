@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
+using Microsoft.Win32;
 
 public partial class defaultAspx : System.Web.UI.Page
 {

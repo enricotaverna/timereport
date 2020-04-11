@@ -10,6 +10,8 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 {
 
     const string RQS_TICKET = "01";
+    const string RQS_SPESA = "02";
+    const string RQS_ASSENZA = "03";
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -44,7 +46,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
             }
         }
     
-        if (Request.QueryString["type"] == "02") // check spese 
+        if (Request.QueryString["type"] == RQS_SPESA) // check spese 
         {
             CheckChiusura.CheckSpese(Session["Month"].ToString(),
                                                        Session["Year"].ToString(),
@@ -74,6 +76,31 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 
             }
 
+        }
+
+        if (Request.QueryString["type"] == RQS_ASSENZA) // check assenze
+        {
+            CheckChiusura.CheckAssenze(Session["Month"].ToString(),
+                                                       Session["Year"].ToString(),
+                                                       Session["persons_id"].ToString(),
+                                                               ref ListaAnomalie);
+
+            //  popola grid di visualizzazione
+            dt.Reset();
+            // costruisce la struttura della tabella di output
+            dt.Columns.Add("Data");
+            dt.Columns.Add("Causale");
+            dt.Columns.Add("Nota");
+
+            foreach (CheckChiusura.CheckAnomalia curr in ListaAnomalie)
+            {
+                // popola la tabella
+                DataRow dr = dt.NewRow();
+                dr["Data"] = curr.Data.ToShortDateString();
+                dr["Causale"] = curr.ProjectName;
+                dr["Nota"] = curr.Descrizione;
+                dt.Rows.Add(dr);
+            }
         }
 
         GV_anomalie.DataSource = dt;

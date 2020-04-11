@@ -13,6 +13,7 @@
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script> 
      
 <!-- ToolTip jquey add-in  -->
 <script type="text/javascript" src="/timereport/include/jquery/tooltip/jquery.smallipop.min.js"></script>
@@ -96,21 +97,25 @@
             // *****
             // ***** TAB TIPO CALENDARIO *****
             // *****
-            string ch = "", ce = "", cs = "";
+            string ch = "", ce = "", cs = "", ca = "";
 
             switch ((string)Session["type"])
             {
                 case "hours":
                     ch = "Tab-active";
-                    ce = cs = "Tab-noactive";
+                    ce = cs = ca = "Tab-noactive";
                     break;
                 case "expenses":
                     ce = "Tab-active";
-                    ch = cs = "Tab-noactive";
+                    ch = cs = ca = "Tab-noactive";
                     break;
                 case "bonus":
                     cs = "Tab-active";
-                    ch = ce = "Tab-noactive";
+                    ch = ce = ca = "Tab-noactive";
+                    break;
+                case "leave":
+                    ca = "Tab-active";
+                    ch = ce = cs = "Tab-noactive";
                     break;
             }
 
@@ -124,6 +129,10 @@
             // solo se dipendente
             if ( Auth.ReturnPermission("DATI","BUONI") )
                 Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>"+ GetLocalResourceObject("BUONI") + "</a>");
+            
+            // solo se dipendente
+            if ( Auth.ReturnPermission("DATI","ASSENZE") && ConfigurationManager.AppSettings["LEAVE_ON"] == "true")
+                Response.Write("<a class=" + ca + " href=input.aspx?type=leave>"+ GetLocalResourceObject("ASSENZE") + "</a>");
 
         %>
         <table width="90%" align="center" style="border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
@@ -154,20 +163,26 @@
 			// First columns --------------------------------------				
 			if ((string)Session["type"]=="hours")
 				FindHours(cnt);
-			else
+			else if ((string)Session["type"]=="expenses" | (string)Session["type"]=="bonus" )
 				FindExpenses(cnt);
+            else
+				FindAssenze(cnt);
 			
                 // Second columns --------------------------------------
             if ((string)Session["type"] == "hours")
 				FindHours(cnt+10);
-			else
-				FindExpenses(cnt+10);							
+			else if ((string)Session["type"]=="expenses" | (string)Session["type"]=="bonus" )
+				FindExpenses(cnt+10);
+            else
+				FindAssenze(cnt+10);						
 
 			// Third columns --------------------------------------
             if ((string)Session["type"] == "hours")
 				FindHours(cnt+20);
-			else
-				FindExpenses(cnt+20);									
+			else if ((string)Session["type"]=="expenses" | (string)Session["type"]=="bonus"  )
+				FindExpenses(cnt+20);
+            else
+				FindAssenze(cnt+20);								
                 %>
             </tr>
 
@@ -190,8 +205,10 @@
 		Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
         if ((string)Session["type"] == "hours")
 			FindHours(31);
-		else
-			FindExpenses(31);
+        else if ((string)Session["type"]=="expenses" | (string)Session["type"]=="bonus" )
+				FindExpenses(31);
+            else
+				FindAssenze(31);
         Response.Write("</tr>");
 
 	}
@@ -299,7 +316,7 @@
                     // d[1] "" se ore, aaaammgg se spese
                     if (msg.d[0] == "true") {
 
-                        var elemtohide = document.getElementById("TRitm" + Id);
+                        var elemtohide = document.getElementById("TRitm"+Id);
                         elemtohide.remove();
 
                         if (msg.d[1] != "") {
@@ -313,6 +330,46 @@
 
                 // in caso di errore
                 error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+
+            }); // ajax
+        } //CANCELLA_ID 
+
+    //CancellaAssenza : premendo il tasto trash cancella il record richiesta assenza
+    function CancellaAssenza(Id) {
+
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+            var values = "{'ApprovalRequest_id': '" + Id + "','UpdateMode': 'DELE', 'ApprovalText1' : '' }";
+
+            MaskScreen(true); // mette in wait a schermo scuro
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateApprovalRecord",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                // se tutto va bene
+                success: function (msg) {
+
+                    UnMaskScreen();
+
+                    if (msg.d == true) {
+
+                        var elemtohide = document.getElementById("TRitm"+Id);
+                        elemtohide.remove();
+
+                    }
+                    else
+                        ShowPopup("Errore in aggiornamento");
+                },
+
+                // in caso di errore
+                error: function (xhr, textStatus, errorThrown) {
+                    UnMaskScreen();
                     alert(xhr.responseText);
                 }
 
@@ -361,7 +418,7 @@
                         refThis.removeClass("HdrDisabled"); // riattiva il bottone dopo il submit
 
                         // richiama la funzione per abilitare il drag&drop sul nuovo item
-                        $(".hours").draggable({
+                        $(".TRitem").draggable({
                                 cursor: "move",
                                 appendTo: "body",
                                 helper: "clone",
@@ -400,7 +457,7 @@
 
         // drag & drop
         // draggable attaccato alla classe Hours è l'elemento che si muove
-        $(".hours").draggable({
+        $(".TRitem").draggable({
             cursor: "move",
             appendTo: "body",
             helper: "clone",
@@ -416,7 +473,7 @@
             drop: function (event, ui) {
 
                 var strTooltip = "";
-                var values = "{'sId': '" + ui.draggable.attr("id") + "' , " +
+                var values = "{'sId': '" + ui.draggable.attr("id").substr(5) + "' , " +
                              " 'sInsDate': '" + $(this).attr("title") + "'   } ";
                 var refThis = $(this);
                 var sSessione = "<%= Session["type"]  %>";
@@ -444,9 +501,9 @@
                             var htmlString = $(idItem).html() + "<div class=TRitem id=TRitm" + msg.d[1] + ">";
 
                             if (sSessione == "hours")
-                                htmlString = htmlString + "<a id=" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-ore.aspx?action=fetch&hours_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+                                htmlString = htmlString + "<a id=TRitm" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-ore.aspx?action=fetch&hours_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
                             else            
-                                htmlString = htmlString + "<a id=" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-spese.aspx?action=fetch&expenses_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+                                htmlString = htmlString + "<a id=TRitm" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-spese.aspx?action=fetch&expenses_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
 
                         htmlString = htmlString + "<a href=# onclick='CancellaId(" + msg.d[1] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
                         htmlString = htmlString + "</div>";
@@ -458,7 +515,7 @@
                         $(idIcon).hide();
 
                         // richiama la funzione per abilitare il drag&drop sul nuovo item
-                        $(".hours").draggable({
+                        $(".TRitem").draggable({
                                 cursor: "move",
                                 appendTo: "body",
                                 helper: "clone",

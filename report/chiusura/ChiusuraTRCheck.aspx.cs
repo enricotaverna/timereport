@@ -64,6 +64,17 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
         // imposta indirizzo stampa ricevute
         btStampaRicevute.OnClientClick = "window.open('/timereport/report/ricevute/ricevute_list.aspx?mese=" + Session["Month"] + "&anno=" + Session["Year"] + "')";
 
+        // ********* Check Assenze ************* 
+        int iCheckAssenze = CheckChiusura.CheckAssenze(Session["Month"].ToString(),
+                                                     Session["Year"].ToString(),
+                                                     Session["persons_id"].ToString(),
+                                                     ref ListaAnomalie);
+        if ( iCheckAssenze > 0)
+        {
+            CheckAssenze.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=03'>" + ListaAnomalie.Count + " richieste</a> in attesa di conferma";
+            CheckAssenzeImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
+        }
+
     } // Page_Load()      
 
     protected void InsertButton_Click(object sender, EventArgs e)

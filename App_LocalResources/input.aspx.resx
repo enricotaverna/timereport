@@ -183,4 +183,7 @@
   <data name="oreUOM" xml:space="preserve">
     <value>ore</value>
   </data>
+  <data name="ASSENZE" xml:space="preserve">
+    <value>Assenze</value>
+  </data>
 </root>

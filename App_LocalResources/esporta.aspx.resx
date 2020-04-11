@@ -177,4 +177,7 @@
   <data name="exportspese" xml:space="preserve">
     <value>Spese</value>
   </data>
+  <data name="exportoreNonChargable" xml:space="preserve">
+    <value>Ore (incl. non chargable)</value>
+  </data>
 </root>

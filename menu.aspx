@@ -177,7 +177,7 @@
 
                 var dataAjax = " { Persons_id : <%=Session("persons_id")%> , PastDue : 90 }";
                 $.ajax({
-                    url: "/timereport/webservices/WSHR_Training.asmx/CheckTrainingToEvalutate",
+                    url: "/timereport/webservices/HR_Training.asmx/CheckTrainingToEvalutate",
                     data: dataAjax,
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
