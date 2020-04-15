@@ -124,7 +124,7 @@ if (sUserLevel == AUTH_ADMIN) {
         , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
         , (sLingua == 'it') ? "Amministrazione&nbsp;&nbsp;" : "Administration&nbsp;&nbsp;", "show-menu=ADMIN_MainMenu", , "", 1
-        , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=COMMON_HR", , "", 1
+        , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=ADM_HR", , "", 1
         , "Logout&nbsp;&nbsp;", "/timereport/logout.aspx", , "", 1
     ]);
 
@@ -193,6 +193,8 @@ if (sUserLevel == AUTH_ADMIN) {
     addmenu(menu = ["ADMIN_Tabelle",
         , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
         , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Autorizzazioni", "/timereport/m_gestione/AuthPermission/AuthPermission.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Client Location", "/timereport/m_gestione/Location/ClientLocation.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Project Location", "/timereport/m_gestione/Location/ProjectLocation.aspx", , , 1
         , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Tipo Contratto", "/timereport/lookup_list.aspx?TableName=TipoContratto&CheckTable=Projects&SortField=Descrizione&FieldNumber=1&init=true", , , 1
         , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Metodo di Pagamento", "/timereport/lookup_list.aspx?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=2&init=true", , , 1
         , "<img src=/timereport/images/icons/16x16/modifica.gif border=0>&nbsp;Termini di Pagamento", "/timereport/lookup_list.aspx?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=2&init=true", , , 1
@@ -405,6 +407,12 @@ addmenu(menu = ["MGR_Inserisci",
 ]);
 
 addmenu(menu = ["COMMON_HR",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , "Training", "show-menu=MULTI_Training", , , 1
+    //, "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Download CV", "/timereport/m_gestione/curricula/CV_list.aspx", , , 1
+]);
+
+addmenu(menu = ["ADM_HR",
     , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
     , "Training", "show-menu=MULTI_Training", , , 1
     , "<img src=/timereport/images/icons/16x16/S_PROTOK.gif border=0>&nbsp;Download CV", "/timereport/m_gestione/curricula/CV_list.aspx", , , 1

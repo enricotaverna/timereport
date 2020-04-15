@@ -60,7 +60,7 @@ public class HR_curriculum : System.Web.Services.WebService
         {
             rc.Filename = "CV-" + WordCV.Surname + "-" + Language + "-" + WordCV.LastUpdated.Replace("/", "") + ".docx";
             WordCV.SaveTemplateAs("TemplateCurriculum", rc.Filename);
-            WordCV.DownloadFile();
+            //WordCV.DownloadFile();
             rc.Result = true;
         }
         else

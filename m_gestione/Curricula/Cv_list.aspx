@@ -136,7 +136,7 @@
     paginationSize: 18, // this option can take any positive integer value (default = 10)
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
-    ajaxURL:"/timereport/webservices/HR_curriculum.asmx/GetCVList", //ajax URL
+    ajaxURL:"/timereport/webservices/HR_Curriculum.asmx/GetCVList", //ajax URL
     // ajaxParams: { persons_id: xxxx },  
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string
@@ -182,7 +182,7 @@
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/HR_curriculum.asmx/CreateCV",
+            url: "/timereport/webservices/HR_Curriculum.asmx/CreateCV",
             data: "{ 'RagicId': '" + dati._ragicId + "', 'Language': '" + dati.Language + "'  }",
             async: false,
             contentType: "application/json; charset=utf-8",
