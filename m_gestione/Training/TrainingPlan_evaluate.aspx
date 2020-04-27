@@ -156,6 +156,8 @@
 
         //get row data
         var strDt = cell.getRow().getData().CourseDate;
+    
+        if (strDt == null) return false;
         var dtDataCorso = new Date(strDt.substring(6,10),strDt.substring(3,5)-1, strDt.substring(0,2));
 
         return dtDataCorso > dtDateToCheck; // only allow the name cell to be edited if the age is over 18
@@ -210,8 +212,8 @@
     },
     columns: [
         { title: "CoursePlan_id", field: "CoursePlan_id", sorter: "number", visible: false },
-//        { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: "input" },
-//        { title: "Manager", field: "ManagerName", sorter:"string", headerFilter:"input"},
+//      { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: "input" },
+//      { title: "Manager", field: "ManagerName", sorter:"string", headerFilter:"input"},
         { title: "Anno", field: "Anno", sorter:"string", headerFilter:"input"},
         { title: "Codice Corso", field: "CourseCode", sorter:"string", headerFilter:"input"},
         { title: "Corso", field:"CourseName", sorter:"string", headerFilter:"input" },
@@ -225,19 +227,22 @@
             title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: "select",
             headerFilterParams: { values: { "ATTENDED": "ATTENDED" , "": "All Status" }  }
         },
-        { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true, validator: "regex:^[0-9]{2}\/[0-9]{2}\/[0-9]{4}" },
+        { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true },
         { title: "Valutazione", field: "Score", formatter: "star", editor: true, editable:EditScoreCheck  },
         //{ formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
-        { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
+        { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow(), cell) } },
     ],
     });
 
     // ** FUNZIONI **
 
-    function T_leggiRecord(dati, riga) {
+    function T_leggiRecord(dati, riga, cell) {
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{'sCoursePlan_id': '" + dati.CoursePlan_id + "'   } ";
+
+       if (!EditScoreCheck(cell))
+            return;
 
         $.ajax({
 

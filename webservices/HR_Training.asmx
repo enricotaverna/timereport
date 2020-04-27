@@ -331,16 +331,15 @@ public class WSHR_Training : System.Web.Services.WebService {
             rc.CourseVendor_id = Convert.ToInt32(dt.Rows[0]["CourseVendor_id"].ToString());
             rc.DurationDays = Convert.ToInt32(dt.Rows[0]["DurationDays"].ToString());
             rc.Cost = (float)Convert.ToDouble(dt.Rows[0]["Cost"].ToString());
-            rc.ValidFrom = dt.Rows[0]["ValidFrom"].ToString().Substring(0, 10);
-            rc.ValidFrom = rc.ValidFrom == "01/01/1900"? "" : rc.ValidFrom;
-            rc.ValidTo = dt.Rows[0]["ValidTo"].ToString().Substring(0, 10);
-            rc.ValidTo = rc.ValidTo == "01/01/1900" ? "" : rc.ValidTo;
+            rc.ValidFrom = dt.Rows[0]["ValidFrom"].ToString() == "" ? "" : dt.Rows[0]["ValidFrom"].ToString().Substring(0, 10);
+            rc.ValidTo = dt.Rows[0]["ValidTo"] .ToString() == "" ? "" : dt.Rows[0]["ValidTo"].ToString().Substring(0, 10);            
 
+            //rc.ValidFrom = dt.Rows[0]["ValidFrom"].ToString().Substring(0, 10);
+            //rc.ValidFrom = rc.ValidFrom == "01/01/1900" ? "" : rc.ValidFrom;
+            //rc.ValidTo = dt.Rows[0]["ValidTo"].ToString().Substring(0, 10);
+            //rc.ValidTo = rc.ValidTo == "01/01/1900" ? "" : rc.ValidTo;
         }
-
-
         return rc;
-
     }
 
     [WebMethod(EnableSession = true)]
@@ -402,11 +401,11 @@ public class WSHR_Training : System.Web.Services.WebService {
         bool bFound = false;
         DateTime DateToCheck = (DateTime)DateTime.Today.AddDays(PastDue*-1); // sottrae i giorni del parametro
 
-            if (Database.RecordEsiste("SELECT * FROM HR_CoursePlan WHERE Persons_id = " + ASPcompatility.FormatStringDb(Persons_id) +
-                                       " AND CourseDate > " + ASPcompatility.FormatDateDb(DateToCheck.ToString("dd/MM/yyyy")) +
-                                       " AND Score = 0 " + 
-                                       " AND CourseStatus_id = " + ASPcompatility.FormatNumberDB(MyConstants.TRAINIG_ATTENDED), null))
-                bFound = true;
+        if (Database.RecordEsiste("SELECT * FROM HR_CoursePlan WHERE Persons_id = " + ASPcompatility.FormatStringDb(Persons_id) +
+                                   " AND CourseDate > " + ASPcompatility.FormatDateDb(DateToCheck.ToString("dd/MM/yyyy")) +
+                                   " AND Score = 0 " +
+                                   " AND CourseStatus_id = " + ASPcompatility.FormatNumberDB(MyConstants.TRAINIG_ATTENDED), null))
+            bFound = true;
 
         return bFound;
 

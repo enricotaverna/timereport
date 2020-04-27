@@ -346,7 +346,8 @@
                         $('#TBDescription').val(objCourse.Description);
                         $('#DDLCourseType').val(objCourse.CourseType_id);
                         $('#DDLProduct').val(objCourse.Product_id);
-                        $('#CBActive').val(objCourse.bActive);
+                        $('#CBActive').prop('checked', objCourse.Active ); // imposta il valore del check box
+                        //$('#CBActive').val(objCourse.Active);
                         $('#TBArea').val(objCourse.Area);
                         $('#DDLCourseVendor').val(objCourse.CourseVendor_id);
                         $('#TBDurationDays').val(objCourse.DurationDays);;
