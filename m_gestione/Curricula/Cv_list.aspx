@@ -40,7 +40,7 @@
   
     <form id="FVForm" runat="server"  >
     
-    <div id="PanelWrap" style="width:720px" > 
+    <div id="PanelWrap" style="width:800px" > 
 
     <div class="StandardForm">        
         <div id="CVListTable"></div>
@@ -157,9 +157,12 @@
         { title: "RagicId", field: "RagicId", sorter: "number", visible: false },
         { title: "Consulente", field: "Name", sorter: "string", width: 130, headerFilter: true },
         { title: "Livello", field: "Level", sorter: "string", width: 130, headerFilter: true },
-        { title: "Stato", field: "CVStatus", sorter: "string", headerFilter: "select", headerFilterParams: { values: { "01": "01 - Active", "02": "02 - Under review", "03": "03 - Obsolete" , "": "All Status" } }  },
+        { title: "Manager", field: "ManagerName", sorter: "string", width: 130,  headerFilter: true },
+        {
+            title: "Stato", field: "CVStatus", sorter: "string", headerFilter: "select",
+            headerFilterParams: { values: { "01": "01 - Active", "02": "02 - Adm review", "03": "03 - Manager review", "99": "99 - Obsolete", "": "All Status" } }
+        },
         { title: "Lang", field: "Language", sorter: "string", width: 60, headerFilter: true },
-        { title: "Versione", field: "Version", sorter: "string", width: 80, headerFilter: true },
         { title: "Agg.", field: "LastUpdated", sorter: "string", headerFilter: true, formatter: "datetime", formatterParams: { inputFormat: "YYYY-MM-DD", outputFormat: "DD/MM/YYYY", } },
         { title: "Autore", field: "AuthorLastUpdate", sorter: "string", headerFilter: true},
         { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { OpenRagic(cell.getRow().getData()) } },
@@ -194,6 +197,7 @@
                 if (msg.d.Result) {
                     // crea link
                     var html = "<a id='clicklink' href='<%=ConfigurationManager.AppSettings["FolderPath"]%>" + msg.d.Filename + "'></a >"; // link vuoto che viene cliccato subito dopo
+                    $('#Wordlink').empty();
                     $('#Wordlink').append(html);
                     $('#clicklink')[0].click();
                     //alert("CV generato con successo");

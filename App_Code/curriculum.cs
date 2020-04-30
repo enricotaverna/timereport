@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,9 +29,8 @@ public class LanguageSet
 
 public class SkillSet
 {
-    public string Technology { get; set; }
     public string Area { get; set; }
-    public string SkillLevel { get; set; }
+    public string SkillDescription { get; set; }
     public string Comment { get; set; }
 }
 
@@ -60,6 +60,7 @@ public class Curriculum
     public string Name { get; set; }
     public string Surname { get; set; }
     public string Level { get; set; }
+    public string HireDate { get; set; }
     public string Summary { get; set; }
     public string LastUpdated { get; set; }
     public List<EducationSet> EducationList = new List<EducationSet>();
@@ -96,6 +97,8 @@ public class Curriculum
             Name = rec.Name;
             Surname = rec.Surname;
             Level = rec.Level;
+            // formatta HireData
+            HireDate = rec.HireDate != null ? HireDate = rec.HireDate.Substring(8, 2) + "/" + rec.HireDate.Substring(5, 2) + "/" + rec.HireDate.Substring(0, 4) : "";
             Summary = rec.Summary;
             LastUpdated = rec.LastUpdated;
 
@@ -136,9 +139,8 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000042> SkillRecord in rec.Subtable1000042)
                 SkillList.Add(new SkillSet()
                 {
-                    Technology = FormatField(SkillRecord.Value.Technology),
                     Area = FormatField(SkillRecord.Value.Area),
-                    SkillLevel = FormatField(SkillRecord.Value.SkillLevel),
+                    SkillDescription = FormatField(SkillRecord.Value.SkillDescription),
                     Comment = FormatField(SkillRecord.Value.Comment)
                 });
 
@@ -219,6 +221,7 @@ public class Curriculum
             document.ReplaceText("<Name>", Name);
             document.ReplaceText("<Surname>", Surname);
             document.ReplaceText("<Level>", Level);
+            document.ReplaceText("<HireDate>", HireDate);
             document.ReplaceText("<Summary>", Summary);
 
             // *** Education ***
@@ -289,9 +292,8 @@ public class Curriculum
             foreach (SkillSet skill in SkillList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
-                SkillTable.Rows[loopIndex].ReplaceText("<Technology>", skill.Technology);
                 SkillTable.Rows[loopIndex].ReplaceText("<Area>", skill.Area);
-                SkillTable.Rows[loopIndex].ReplaceText("<SkillLevel>", skill.SkillLevel);
+                SkillTable.Rows[loopIndex].ReplaceText("<SkillDescription>", skill.SkillDescription);
                 SkillTable.Rows[loopIndex].ReplaceText("<Comment>", skill.Comment);
                 loopIndex++;
             }
@@ -351,7 +353,27 @@ public class Curriculum
 // ** Classe List Curriculum ***
 public class CurriculumList {
 
+    // contiene la lista dei record che vengono visualizzati in tabella
     public List<Dictionary<string, string>> Data = new List<Dictionary<string, string>>();
+
+    private void AddManager(Dictionary<string, string> row)
+    {
+        string userid = "";
+        if (row.TryGetValue("TimereportUserId", out userid) && userid != "") // recupera il nome del manager associato alla persona
+        {
+            DataRow dr = Database.GetRow("Select * from v_Persons where userid = " + ASPcompatility.FormatStringDb(userid), null);
+            if (dr != null)
+            {
+                row.Add("Manager_Id", dr["Manager_id"].ToString()); // arricchisce la tabella con il nome manager
+                row.Add("ManagerName", dr["ManagerName"].ToString()); // arricchisce la tabella con il nome manager
+            }
+        }
+        else
+        {
+            row.Add("Manager_Id", ""); // non trovato
+            row.Add("ManagerName", ""); // 
+        }
+    }
 
     public void BuildListFromRagicAPI()
     {
@@ -375,11 +397,10 @@ public class CurriculumList {
         Dictionary<string, Dictionary<string, string>> model = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(response.Content);
         foreach(var item in model) {
             row = item.Value;
+            AddManager(row);
             Data.Add(row);
         }
     }
-
-
 }
 
 //      RAGIC API Data Model
@@ -412,11 +433,11 @@ public partial class The0
     [JsonProperty("BornDate")]
     public string BornDate { get; set; }
 
-    [JsonProperty("_index_calDates_")]
-    public string IndexCalDates { get; set; }
-
     [JsonProperty("HireDate")]
     public string HireDate { get; set; }
+
+    [JsonProperty("_index_calDates_")]
+    public string IndexCalDates { get; set; }
 
     [JsonProperty("EmployeeNumber")]
     public string EmployeeNumber { get; set; }
@@ -550,14 +571,11 @@ public partial class Subtable1000042
     [JsonProperty("SkillId")]
     public string SkillId { get; set; }
 
-    [JsonProperty("Technology")]
-    public string Technology { get; set; }
-
     [JsonProperty("Area")]
     public string Area { get; set; }
 
-    [JsonProperty("SkillLevel")]
-    public string SkillLevel { get; set; }
+    [JsonProperty("SkillDescription")]
+    public string SkillDescription { get; set; }
 
     [JsonProperty("Comment")]
     public string Comment { get; set; }
@@ -640,8 +658,11 @@ public partial class RagicModelList
     [JsonProperty("Language")]
     public string Language { get; set; }
 
-    [JsonProperty("Version")]
-    public string Version { get; set; }
+    [JsonProperty("Company")]
+    public string Company { get; set; }
+
+    [JsonProperty("TimereportUsedId")]
+    public string TimereportUsedId { get; set; }
 
     [JsonProperty("LastUpdated")]
     public string LastUpdated { get; set; }

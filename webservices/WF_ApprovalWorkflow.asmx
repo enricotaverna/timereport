@@ -60,6 +60,9 @@ public class Card
     public string KPI1;
     public string KPI2;
     public string KPI3;
+    public string CSSClass1; // text-warning text-primary text-success
+    public string CSSClass2; // text-warning text-primary text-success
+    public string CSSClass3; // text-warning text-primary text-success
     public int persons_id;
     private string WF_ApprovalRequest;
 
@@ -69,6 +72,7 @@ public class Card
         cardName = name;
         updateRateSec = rate != 0 ? rate : 30; // default 30 secs
         lastUpdateTime = new DateTime(2001,01,01);
+        CSSClass1 = CSSClass2 = CSSClass3 = ""; // default
     }
 
     // UpdateCardKPI()
@@ -110,15 +114,14 @@ public class Card
 
             case "GiorniTraining":
 
-
                 result = Database.ExecuteScalar("SELECT COUNT(*) FROM Hours as a" +
-                                                " INNER JOIN Projects as b ON b.projects_id = a.projects_id " +
-                                                " INNER JOIN persons as c ON c.persons_id = a.persons_id" +
-                                                " WHERE a.date >=" + ASPcompatility.FormatDateDb(DateFrom.ToString("dd/MM/yyyy")) +
-                                                " AND a.date <= " + ASPcompatility.FormatDateDb(DateTo.ToString("dd/MM/yyyy")) +
-                                                " AND b.ProjectType_Id = '" + ConfigurationManager.AppSettings["CODICI_TRAINING"] + "'" +
-                                                " AND c.manager_id = " + ASPcompatility.FormatNumberDB(persons_id),
-                                                null);
+                                            " INNER JOIN Projects as b ON b.projects_id = a.projects_id " +
+                                            " INNER JOIN persons as c ON c.persons_id = a.persons_id" +
+                                            " WHERE a.date >=" + ASPcompatility.FormatDateDb(DateFrom.ToString("dd/MM/yyyy")) +
+                                            " AND a.date <= " + ASPcompatility.FormatDateDb(DateTo.ToString("dd/MM/yyyy")) +
+                                            " AND b.ProjectType_Id = '" + ConfigurationManager.AppSettings["CODICI_TRAINING"] + "'" +
+                                            " AND c.manager_id = " + ASPcompatility.FormatNumberDB(persons_id),
+                                            null);
 
                 KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
                 KPI2 = KPI3 = "";
@@ -153,6 +156,31 @@ public class Card
                 KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
                 KPI2 = KPI3 = "";
                 KPInumber = 1;
+                CSSClass1 = KPI1 == "0" ? "text-primary" : "text-warning";
+                break;
+
+            case "CVdaConfermare":
+
+                CurriculumList list = new CurriculumList();
+                list.BuildListFromRagicAPI();
+
+                int count = 0; // numero CV da rivedere a cura del manager
+                foreach ( Dictionary<string,string> row in list.Data)
+                {
+                    string CVStatus = "";
+                    string manager_id = "";
+
+                    if ( row.TryGetValue("CVStatus", out CVStatus) && row.TryGetValue("Manager_Id", out manager_id) )
+                    {
+                        if (CVStatus.Substring(0,2) == "03" && manager_id == persons_id.ToString()) // manager review
+                            count++;
+                    }
+                }
+
+                KPI1 = count.ToString();
+                KPI2 = KPI3 = "";
+                KPInumber = 1;
+                CSSClass1 = KPI1 == "0" ? "text-success" : "text-warning";
                 break;
 
             case "OreNelMese":
@@ -160,10 +188,11 @@ public class Card
                 CommonFunction.CalcolaPercOutput calc;
                 calc = CommonFunction.CalcolaPercOre(persons_id, DateTime.Now.Month, DateTime.Now.Year);
 
-                KPI1 = calc.sPerc + "%";
+                KPI1 = calc.oreMancanti + "";
                 KPI2 = calc.dOreCaricate.ToString() + " su " + calc.dOreLavorative.ToString();
-                KPI3 = "";
-                KPInumber = 2;
+                KPI3 = calc.sPerc + "%";
+                KPInumber = 3;
+                CSSClass1 = KPI1 == "0" ? "text-primary" : "text-warning";
                 break;
 
             case "SpeseNelMese":
@@ -224,6 +253,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
     Card TrainingDaValutare;
     Card OreNelMese;
     Card SpeseNelMese;
+    Card CVdaConfermare;
 
     List<Card> listaCard = new List<Card>(); // lista oggetti
 
@@ -238,6 +268,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         OreNelMese = Session["OreNelMese"] == null ? new Card("OreNelMese", 10) : (Card)Session["OreNelMese"];
         GiorniAssenza = Session["GiorniAssenza"] == null ? new Card("GiorniAssenza", 10) : (Card)Session["GiorniAssenza"];
         SpeseNelMese = Session["SpeseNelMese"] == null ? new Card("SpeseNelMese", 10) : (Card)Session["SpeseNelMese"];
+        CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
 
         // carica lista oggetti
         listaCard.Add(RichiesteAperte);
@@ -246,7 +277,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(OreNelMese);
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);
-
+        listaCard.Add(CVdaConfermare);
     }
 
     // UpdateCardKPI()
