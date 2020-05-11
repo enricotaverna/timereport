@@ -50,20 +50,22 @@ public class ApprovalRequest
     public string workflowType { get; set; }
 }
 
+public class KPISet
+{
+    public string KPIDescription { get; set; }
+    public string KPIValue { get; set; }
+    public string CSSClass { get; set; }
+}
+
 // Classe Card per Dashboard
 public class Card
 {
     public string cardName;
     public DateTime lastUpdateTime;
     public int updateRateSec;
-    public int KPInumber;
-    public string KPI1;
-    public string KPI2;
-    public string KPI3;
-    public string CSSClass1; // text-warning text-primary text-success
-    public string CSSClass2; // text-warning text-primary text-success
-    public string CSSClass3; // text-warning text-primary text-success
+    public List<KPISet> KPIList;
     public int persons_id;
+    public string cutoffDate;
     private string WF_ApprovalRequest;
 
     // Constructor
@@ -71,8 +73,8 @@ public class Card
     {
         cardName = name;
         updateRateSec = rate != 0 ? rate : 30; // default 30 secs
-        lastUpdateTime = new DateTime(2001,01,01);
-        CSSClass1 = CSSClass2 = CSSClass3 = ""; // default
+        lastUpdateTime = new DateTime(2001, 01, 01);
+        KPIList = new List<KPISet>(); // lista KPI di ritorno
     }
 
     // UpdateCardKPI()
@@ -85,12 +87,13 @@ public class Card
         string SQLfilterApprovalRequest = "";
         DateTime DateFrom = (DateTime)DateTime.Today; // sottrae i giorni del parametro
         DateTime DateTo = (DateTime)DateTime.Today.AddDays(30); // sottrae i giorni del parametro
-
+        KPISet kpi;
 
         if (DateTime.Now < lastUpdateTime.AddSeconds(updateRateSec)) // non necessario lettura DB
             return;
 
         lastUpdateTime = DateTime.Now;
+        KPIList.Clear();
 
         switch (cardName)
         {
@@ -107,9 +110,11 @@ public class Card
 
                 result = Database.ExecuteScalar("SELECT COUNT(*) FROM WF_ApprovalRequest WHERE ApprovalStatus=" + ASPcompatility.FormatStringDb(MyConstants.WF_REQUEST) + SQLfilterApprovalRequest, null);
 
-                KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
-                KPI2 = KPI3 = "";
-                KPInumber = 1;
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0" : result.ToString();
+                KPIList.Add(kpi);
+
                 break;
 
             case "GiorniTraining":
@@ -123,9 +128,12 @@ public class Card
                                             " AND c.manager_id = " + ASPcompatility.FormatNumberDB(persons_id),
                                             null);
 
-                KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
-                KPI2 = KPI3 = "";
-                KPInumber = 1;
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0" : result.ToString();
+                kpi.CSSClass = "text-success";
+                KPIList.Add(kpi);
+
                 break;
 
             case "GiorniAssenza":
@@ -139,9 +147,12 @@ public class Card
                                                 " AND c.manager_id = " + ASPcompatility.FormatNumberDB(persons_id),
                                                 null);
 
-                KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
-                KPI2 = KPI3 = "";
-                KPInumber = 1;
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0" : result.ToString();
+                kpi.CSSClass = "text-success";
+                KPIList.Add(kpi);
+
                 break;
 
             case "TrainingDaValutare":
@@ -152,11 +163,12 @@ public class Card
                                            " AND CourseDate > " + ASPcompatility.FormatDateDb(DateToCheck.ToString("dd/MM/yyyy")) +
                                            " AND Score = 0 " +
                                            " AND CourseStatus_id = " + ASPcompatility.FormatNumberDB(MyConstants.TRAINIG_ATTENDED), null);
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0" : result.ToString();
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-primary" : "text-warning"; ;
+                KPIList.Add(kpi);
 
-                KPI1 = ( result == DBNull.Value ) ? "0" : result.ToString();
-                KPI2 = KPI3 = "";
-                KPInumber = 1;
-                CSSClass1 = KPI1 == "0" ? "text-primary" : "text-warning";
                 break;
 
             case "CVdaConfermare":
@@ -165,22 +177,41 @@ public class Card
                 list.BuildListFromRagicAPI();
 
                 int count = 0; // numero CV da rivedere a cura del manager
-                foreach ( Dictionary<string,string> row in list.Data)
+                foreach (Dictionary<string, string> row in list.Data)
                 {
                     string CVStatus = "";
                     string manager_id = "";
 
-                    if ( row.TryGetValue("CVStatus", out CVStatus) && row.TryGetValue("Manager_Id", out manager_id) )
+                    if (row.TryGetValue("CVStatus", out CVStatus) && row.TryGetValue("Manager_Id", out manager_id))
                     {
-                        if (CVStatus.Substring(0,2) == "03" && manager_id == persons_id.ToString()) // manager review
+                        if (CVStatus.Substring(0, 2) == "03" && manager_id == persons_id.ToString()) // manager review
                             count++;
                     }
                 }
 
-                KPI1 = count.ToString();
-                KPI2 = KPI3 = "";
-                KPInumber = 1;
-                CSSClass1 = KPI1 == "0" ? "text-success" : "text-warning";
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = count.ToString();;
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning";
+                KPIList.Add(kpi);
+                break;
+
+            case "ListaLocation":
+                DataTable data = Database.GetData("SELECT TOP(3) LocationDescription, CAST( SUM(Hours) AS INT) as TotalHours FROM Hours " +
+                                             " WHERE Date > " + ASPcompatility.FormatDateDb(cutoffDate) +
+                                             " AND Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) +
+                                             " AND ( LocationDescription <> '' AND LocationDescription IS NOT NULL )  " +
+                                             " GROUP BY LocationDescription " +
+                                             " ORDER BY TotalHours DESC", null);
+                // popola la lista di ritorno
+                foreach (DataRow dr in data.Rows) {
+                    kpi = new KPISet();
+                    kpi.KPIDescription = dr["LocationDescription"].ToString();
+                    kpi.KPIValue = dr["TotalHours"].ToString();
+                    KPIList.Add(kpi);
+                }
+                //KPIList.Add(new KPISet { KPIDescription = dr["LocationDescription"].ToString(), KPIValue = dr["TotalHours"].ToString() });
+
                 break;
 
             case "OreNelMese":
@@ -188,11 +219,19 @@ public class Card
                 CommonFunction.CalcolaPercOutput calc;
                 calc = CommonFunction.CalcolaPercOre(persons_id, DateTime.Now.Month, DateTime.Now.Year);
 
-                KPI1 = calc.oreMancanti + "";
-                KPI2 = calc.dOreCaricate.ToString() + " su " + calc.dOreLavorative.ToString();
-                KPI3 = calc.sPerc + "%";
-                KPInumber = 3;
-                CSSClass1 = KPI1 == "0" ? "text-primary" : "text-warning";
+                kpi = new KPISet();
+                kpi.KPIValue = calc.oreMancanti + "";
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-primary" : "text-warning"; 
+                KPIList.Add(kpi);
+
+                kpi = new KPISet();
+                kpi.KPIValue = calc.dOreCaricate.ToString() + " su " + calc.dOreLavorative.ToString();
+                KPIList.Add(kpi);
+
+                kpi = new KPISet();
+                kpi.KPIValue = calc.sPerc + "%";
+                KPIList.Add(kpi);
+
                 break;
 
             case "SpeseNelMese":
@@ -207,7 +246,11 @@ public class Card
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
 
                 result = Database.ExecuteScalar(sql, null);
-                KPI1 = ( result == DBNull.Value ) ? "0€" : result.ToString() + "€";
+
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0€" : result.ToString() + "€";
+                KPIList.Add(kpi);
 
                 // chilometri     
                 sql = "SELECT Round(Sum(Expenses.Amount),2) AS TotalAmount " +
@@ -218,7 +261,11 @@ public class Card
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
 
                 result = Database.ExecuteScalar(sql, null);
-                KPI2 = ( result == DBNull.Value ) ? "0km" : Convert.ToUInt16(result).ToString() + "km";
+
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0km" : Convert.ToUInt16(result).ToString() + "km";
+                KPIList.Add(kpi);
 
                 // spese da rimborsare
                 sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
@@ -228,9 +275,12 @@ public class Card
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND Expenses.CreditCardPayed = 0 AND Expenses.CompanyPayed = 0 ";
 
                 result = Database.ExecuteScalar(sql, null);
-                KPI3 = ( result == DBNull.Value ) ? "0€" : "rimborso spese: " + result.ToString() + "€";
 
-                KPInumber = 3;
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == DBNull.Value) ? "0€" : "rimborso: " + result.ToString() + "€";
+                KPIList.Add(kpi);
+
                 break;
 
         }
@@ -254,6 +304,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
     Card OreNelMese;
     Card SpeseNelMese;
     Card CVdaConfermare;
+    Card ListaLocation;
 
     List<Card> listaCard = new List<Card>(); // lista oggetti
 
@@ -269,6 +320,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         GiorniAssenza = Session["GiorniAssenza"] == null ? new Card("GiorniAssenza", 10) : (Card)Session["GiorniAssenza"];
         SpeseNelMese = Session["SpeseNelMese"] == null ? new Card("SpeseNelMese", 10) : (Card)Session["SpeseNelMese"];
         CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
+        ListaLocation = Session["ListaLocation"] == null ? new Card("ListaLocation", 10) : (Card)Session["ListaLocation"];
 
         // carica lista oggetti
         listaCard.Add(RichiesteAperte);
@@ -278,6 +330,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);
         listaCard.Add(CVdaConfermare);
+        listaCard.Add(ListaLocation);
     }
 
     // UpdateCardKPI()
@@ -285,13 +338,15 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
     // Le card sonon create nel costruttore
     //
     [WebMethod(EnableSession = true)]
-    public string UpdateCardKPI(int iPersons_id)
+    public string UpdateCardKPI(int iPersons_id, string cutoffDate)
     {
         string retJson = "";
         JavaScriptSerializer serializer = new JavaScriptSerializer();
 
-        foreach (Card i in listaCard) {
+        foreach (Card i in listaCard)
+        {
             i.persons_id = iPersons_id;
+            i.cutoffDate = cutoffDate;
             i.UpdateCardKPI();
             Session[i.cardName] = i; // memorizza in cache lo stato aggiornato dell'oggetto
         }
@@ -365,7 +420,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
                                                 " INNER JOIN persons as d ON d.persons_id = c.manager_id" +
                                                 " WHERE a.date >=" + ASPcompatility.FormatDateDb(DateFrom.ToString("dd/MM/yyyy")) +
                                                 " AND a.date <= " + ASPcompatility.FormatDateDb(DateTo.ToString("dd/MM/yyyy")) +
-                                                " AND b.ProjectType_Id = " + ASPcompatility.FormatStringDb(tipoOre)  +
+                                                " AND b.ProjectType_Id = " + ASPcompatility.FormatStringDb(tipoOre) +
                                                 " AND c.manager_id = " + ASPcompatility.FormatStringDb(persons_id);
 
 

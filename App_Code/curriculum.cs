@@ -98,7 +98,7 @@ public class Curriculum
             Surname = rec.Surname;
             Level = rec.Level;
             // formatta HireData
-            HireDate = rec.HireDate != null ? HireDate = rec.HireDate.Substring(8, 2) + "/" + rec.HireDate.Substring(5, 2) + "/" + rec.HireDate.Substring(0, 4) : "";
+            HireDate = (rec.HireDate != null && rec.HireDate != "" ) ? HireDate = rec.HireDate.Substring(8, 2) + "/" + rec.HireDate.Substring(5, 2) + "/" + rec.HireDate.Substring(0, 4) : "";
             Summary = rec.Summary;
             LastUpdated = rec.LastUpdated;
 

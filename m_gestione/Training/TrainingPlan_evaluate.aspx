@@ -152,7 +152,7 @@
         //cell - the cell component for the editable cell
 
         var dtDateToCheck = new Date();
-        dtDateToCheck.setDate(dtDateToCheck.getDate()-360); // sottrae i giorni del parametro
+        dtDateToCheck.setDate(dtDateToCheck.getDate()-120); // sottrae i giorni del parametro
 
         //get row data
         var strDt = cell.getRow().getData().CourseDate;

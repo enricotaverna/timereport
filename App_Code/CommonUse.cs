@@ -343,6 +343,7 @@ public class CommonFunction
     {
         public double dOreLavorative;
         public double dOreCaricate;
+        public double oreMancanti; // ore da caricare nel mese
         public string sPerc;
     }
 
@@ -378,6 +379,9 @@ public class CommonFunction
         string sFromDate = ASPcompatility.FormatDateDb("1/" + iMese.ToString() + "/" + iAnno.ToString());
         string sToDate = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(iAnno, iMese) + "/" + iMese.ToString() + "/" + iAnno.ToString());
 
+
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
         object obj = Database.ExecuteScalar("SELECT SUM(hours) as somma FROM Hours WHERE Persons_id = " + Persons_id + " AND Date >= " + sFromDate + " AND Date <= " + sToDate, null );
         if (obj != DBNull.Value)
             iContaOre = Convert.ToInt32(obj);
@@ -400,6 +404,19 @@ public class CommonFunction
             ret.sPerc = (((float)iContaOre / (float)iOreLavorative) * 100).ToString("N0");
         else
             ret.sPerc = "0";
+
+        // calcola Ore lavorative mancanti da inizio mese al oggi - 1
+        DateTime yesterday = DateTime.Today.AddDays(-1);
+        DateTime firstDayOfMonth = new DateTime(iAnno, iMese, 1);
+
+        int workingHours = 0;
+        if (yesterday >= firstDayOfMonth)
+        {
+            workingHours = NumeroGiorniLavorativi(firstDayOfMonth, yesterday) * CurrentSession.ContractHours;
+            var res = Database.ExecuteScalar("SELECT SUM(hours) as somma FROM Hours WHERE Persons_id = " + Persons_id + " AND Date >= " + sFromDate + " AND Date <= " + ASPcompatility.FormatDateDb(yesterday.ToString("dd/MM/yyyy")), null);
+            int oreCaricate = res != DBNull.Value ? Convert.ToInt32(res) : 0;
+            ret.oreMancanti = workingHours - oreCaricate;
+        }
 
         return ret;
     }
@@ -883,6 +900,29 @@ public class Database
 
         return iNewId;
 
+    }
+
+    // 04.2020 : converte datatable a Json
+    public static string FromDatatableToJson(DataTable dt) {
+
+        string sret;
+
+        System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+        Dictionary<string, object> row;
+        foreach (DataRow dr in dt.Rows)
+        {
+            row = new Dictionary<string, object>();
+            foreach (DataColumn col in dt.Columns)
+            {
+                row.Add(col.ColumnName, dr[col]);
+            }
+            rows.Add(row);
+        }
+        sret = serializer.Serialize(rows);
+
+        return sret;
+   
     }
 
 }

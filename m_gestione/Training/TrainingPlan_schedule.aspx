@@ -166,11 +166,25 @@
             return "<i class='fa fa-comment'></i>";    
     };  // icona edit
 
+    //validator to prevent values divisible by the provided devisor
+    var CourseStatusCheck = function(cell, value, parameters){
+	    //cell - the cell component for the edited cell
+	    //value - the new input value of the cell
+	    //parameters - the parameters passed in with the validator
+
+        if (value == "ATTENDED" && cell.getRow().getData().CourseDate == null) { // stato ATTENDED e data non valorizzata
+            alert("Specificare data di esecuzione del corso");
+            return false;
+        }
+
+        return true;
+    }
+
     var TableTrainingPlan = new Tabulator("#TableTrainingPlan", {
     cellEdited:function(cell){
         //cell - cell component
         var CoursePlan_id = cell.getRow().getCells()[0].getValue(); // indice record da aggiornare
-             
+
         // chiamata di aggiornamento
         var values = "{'sCoursePlan_id': '" + CoursePlan_id + "' , " +
                         " 'sFieldToUpdate': '" + cell.getField() + "' , " +
@@ -227,7 +241,10 @@
         },
         {
             title: "Stato", field: "CourseStatusName", sorter: "string", headerFilter: "select",
-            headerFilterParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED" , "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED", "": "All Status" } }, editor: "select", editorParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED", "ATTENDED": "ATTENDED" , "CANCELED": "CANCELED" } }
+            headerFilterParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED", "ATTENDED": "ATTENDED", "CANCELED": "CANCELED", "": "All Status" } },
+            editor: "select",
+            editorParams: { values: { "PROPOSED": "PROPOSED", "PLANNED": "PLANNED", "SCHEDULED": "SCHEDULED", "ATTENDED": "ATTENDED", "CANCELED": "CANCELED" } },
+            validator:[	{ type:CourseStatusCheck, parameters:{ } } ] // nessun parametro
         },
         { title: "Data Corso", field: "CourseDate", sorter: "date", headerFilter: true, editor: "input", validator:"regex:^[0-9]{2}\/[0-9]{2}\/[0-9]{4}" },
         { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },

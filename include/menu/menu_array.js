@@ -230,7 +230,7 @@ if (sUserLevel == AUTH_MANAGER) {
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
         , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
-        , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=COMMON_HR", , "", 1
+        , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=ADM_HR", , "", 1
         , "Logout&nbsp;&nbsp;", "/timereport/logout.aspx", , "", 1
     ]);
 

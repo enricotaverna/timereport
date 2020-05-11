@@ -40,7 +40,7 @@ public class MyConstants
     public static System.Data.DataTable DTHoliday = new System.Data.DataTable();
 
     // 
-    public static int DAYS_TO_EVALUATE = 60; // da quanti giorni max è scaduto il training da valutare
+    public static int DAYS_TO_EVALUATE = 120; // da quanti giorni max è scaduto il training da valutare
 }
 
 // usata per passare i parametri variabili come lista tra procedure
