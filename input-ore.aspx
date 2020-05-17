@@ -38,7 +38,7 @@
                     DataSourceID="DSore" align="center" DefaultMode="Edit"
                     OnItemInserted="FVore_ItemInserted" OnItemUpdated="FVore_ItemUpdated"
                     OnDataBound="FVore_DataBound" 
-                    OnModeChanging="FVore_modechanging" meta:resourcekey="FVoreResource1" CellPadding="0">
+                    OnModeChanging="FVore_modechanging" CellPadding="0">
 
                     <%-- EDIT --%>
                     <EditItemTemplate>
@@ -71,7 +71,7 @@
                         </div>
 
                         <!-- *** DDL Attività ***  -->
-                        <div class="input">
+                        <div class="input nobottomborder">
                             <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource1"></asp:Label>
                             
                             <label id="lbDDLAttivita" class="dropdown">  <!-- per stile CSS -->
@@ -81,11 +81,28 @@
                                     <asp:ListItem meta:resourcekey="ListItemResource1">--seleziona attività--</asp:ListItem>
                                 </asp:DropDownList>
                             </label>
-                        
+                        </div>
+
+                        <!-- *** DDL Location ***  -->
+                        <div class="input">
+                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                            
+                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
+                                    data-parsley-required="true" data-parsley-errors-container="#valMsg" >
+                                    <asp:ListItem>-- seleziona valore --</asp:ListItem>
+                                </asp:DropDownList>
+                            </label>
+
+                            <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server"  width="270px"   Text='<%# Bind("LocationDescription") %>'  
+                            data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+
                         </div>
 
                         <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
                         <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+
 
                         <!-- *** TB Ore ***  -->
                         <div class="input nobottomborder">
@@ -96,8 +113,8 @@
                             </span>
 
                             <!-- *** Checkboc Remote ***  -->
-                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
                             <!-- *** Checkboc Storno ***  -->
                             <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
@@ -154,7 +171,7 @@
                         </div>
 
                         <!-- *** DDL Attività ***  -->
-                        <div class="input">
+                        <div class="input nobottomborder">
                             <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource2"></asp:Label>
                             
                             <label id="lbDDLAttivita" class="dropdown"> <!-- per stile CSS -->
@@ -166,8 +183,24 @@
 
                         </div>
 
+                        <!-- *** DDL Location ***  -->
+                        <div class="input">
+                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                            
+                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" 
+                                    data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                            </label>
+
+                            <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server"  width="270px"   
+                            data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+   
+                        </div>
+
                         <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
                         <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
                         <!-- *** TB Ore ***  -->
                         <div class="input nobottomborder">
@@ -178,8 +211,8 @@
                             </span>
 
                             <!-- *** Checkboc Remote ***  -->
-                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
                             <!-- *** Checkboc Storno ***  -->
                             <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />
@@ -237,7 +270,7 @@
                         </div>
 
                         <!-- *** DDL Attività ***  -->
-                        <div class="input">
+                        <div class="input nobottomborder">
                             <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="Attività" meta:resourcekey="Label8Resource1"></asp:Label>
                             <label id="lbDDLAttivita" class="dropdown">
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
@@ -246,8 +279,22 @@
                             </label>
                         </div>
 
+                        <!-- *** DDL Location ***  -->
+                        <div class="input">
+                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                            
+                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" Enabled="False" >
+                                </asp:DropDownList>
+                            </label>
+
+                            <asp:TextBox CssClass="ASPInputcontent" Enabled="False" ID="TBLocation" runat="server"  width="270px" Text='<%# Bind("LocationDescription") %>' />
+
+                        </div>
+
                          <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
                         <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
                         <!-- *** TB Ore ***  -->
                         <div class="input nobottomborder">
@@ -257,8 +304,8 @@
                             </span>
 
                             <!-- *** Checkboc Remote ***  -->
-                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>
+<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
                             <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="disCancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
@@ -298,9 +345,9 @@
                     SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
                 <asp:SqlDataSource ID="DSore" runat="server"
                     ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate, WorkedInRemote FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-                    InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote)"
-                    UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote WHERE (Hours_Id = @Hours_id)"
+                    SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+                    InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType)"
+                    UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType WHERE (Hours_Id = @Hours_id)"
                     OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
                     <InsertParameters>
@@ -311,6 +358,9 @@
                         <asp:Parameter Name="Hours" />
                         <asp:Parameter Name="CancelFlag" />
                         <asp:Parameter Name="Comment" />
+                        <asp:Parameter Name="LocationKey" />
+                        <asp:Parameter Name="LocationType" />
+                        <asp:Parameter Name="LocationDescription" />
                         <asp:Parameter Name="TransferFlag" />
                         <asp:Parameter Name="Activity_id" />
                         <asp:Parameter Name="CreatedBy" />
@@ -329,6 +379,9 @@
                         <asp:Parameter Name="TransferFlag" />
                         <asp:Parameter Name="Activity_id" />
                         <asp:Parameter Name="Projects_Id" />
+                        <asp:Parameter Name="LocationKey" />
+                        <asp:Parameter Name="LocationType" />
+                        <asp:Parameter Name="LocationDescription" />
                         <asp:Parameter Name="Hours_id" />
                         <asp:Parameter Name="CreatedBy" />
                         <asp:Parameter Name="CreationDate" />
@@ -365,9 +418,14 @@
 
             // nasconde la select con i valori delle attività per bind sul client
             $("#FVore_DDLhidden").hide();
+            $("#FVore_DDLHiddenLocation").hide();
             $('#lbDDLAttivita').hide();
+            $('#lbDDLLocation').hide();
+
+            $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
 
             BindActivity();
+            BindLocation();
 
         });
 
@@ -398,6 +456,7 @@
         $("#FVore_DDLprogetto").on("change", function () {
 
             BindActivity();
+            BindLocation();
 
         });
 
@@ -405,16 +464,12 @@
         function BindActivity() {
 
             var ActivityOn = $("#FVore_DDLprogetto").find("option:selected").attr("data-ActivityOn");
-
+            $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
             if (ActivityOn != "True") {  // progetto non richiede le attività 
-                $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
                 $("#FVore_DDLAttivita").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
                 $('#lbDDLAttivita').hide();
                 }
             else {
-
-                $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
-
                 // aggiunge selezione vuota
                 $("#FVore_DDLAttivita").append($('<option>', { value: '', text: '--- seleziona un elemento ---' }));
 
@@ -427,12 +482,65 @@
                             selected: $(this)[0].selected
                         }));
                 });
-
                 $('#lbDDLAttivita').show(); // visualizza DropDown
+            }
+        }
 
+        // *** popola controllo delle Location *** 
+        function BindLocation() {
+
+            // se DDL valorizzato a 99999 attiva il testo libero
+            if ($("#FVore_DDLLocation").val() == 'T:99999') {
+                $('#FVore_TBLocation').show(); 
+                return;
             }
 
+            var LocationOn = $("#FVore_DDLprogetto").find("option:selected").attr("data-filterlocation");
+            $("#FVore_DDLLocation").children().remove(); // pulisce tutti gli item della  DropDown 
+            if (typeof LocationOn == 'undefined') {  // non esiste l'attributo 
+                $("#FVore_DDLLocation").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
+                $('#lbDDLLocation').hide();
+            }
+            else {
+                // aggiunge selezione vuota
+                $("#FVore_DDLLocation").append($('<option>', { value: '', text: '-- selezionare un valore --' }));
+
+                // loop su tutti gli item della select nascosta e li linka per il progetto selezionato
+                $("#FVore_DDLHiddenLocation > option").each(function () {
+                    if ($(this).attr("data-filterlocation") === $("#FVore_DDLprogetto").find("option:selected").attr("data-filterlocation"))
+                        $("#FVore_DDLLocation").append($('<option>', {
+                            value: $(this).val(),
+                            text: $(this).text(),
+                            selected: $(this)[0].selected
+                        }));
+                });
+
+                $("#FVore_DDLLocation").append($('<option>', { value: 'T:99999', text: '-- Testo Libero --' }));
+
+                $('#lbDDLLocation').show(); // visualizza DropDown
+
+                $('#FVore_TBLocation').val(""); // reset e spegnimento campo
+                $('#FVore_TBLocation').hide(); 
+            }
         }
+
+        // Mostra box testo in caso della corrispondente selezione della DDL Location
+        $("#FVore_DDLLocation").change(function() {
+            if ($("#FVore_DDLLocation").val() == 'T:99999') // mostra Box Testo
+            {
+                $('#lbDDLLocation').hide();
+                $('#FVore_TBLocation').show();  
+            }
+        });
+
+        // Se campo vien sblancato riattiva il DDL
+        $("#FVore_TBLocation").change(function() {
+            if ($("#FVore_TBLocation").val() == '') // mostra Box Testo
+            {
+                $('#FVore_DDLLocation').val('');
+                BindLocation(); // ricarica la DDL
+            }
+        });
 
     </script>
 

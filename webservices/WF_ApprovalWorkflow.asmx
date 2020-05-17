@@ -166,7 +166,7 @@ public class Card
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
                 kpi.KPIValue = (result == DBNull.Value) ? "0" : result.ToString();
-                kpi.CSSClass = kpi.KPIValue == "0" ? "text-primary" : "text-warning"; ;
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning"; ;
                 KPIList.Add(kpi);
 
                 break;
@@ -278,7 +278,7 @@ public class Card
 
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
-                kpi.KPIValue = (result == DBNull.Value) ? "0€" : "rimborso: " + result.ToString() + "€";
+                kpi.KPIValue = (result == DBNull.Value) ? "-" : "rimborso: " + result.ToString() + "€";
                 KPIList.Add(kpi);
 
                 break;

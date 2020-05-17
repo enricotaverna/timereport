@@ -158,8 +158,8 @@ if (sUserLevel == AUTH_ADMIN) {
 
     addmenu(menu = ["ADMIN_economics_masterdata",
         , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-        , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;FLC per anno", "/timereport/m_gestione/CostRateAnno/CostRateAnno_list.aspx", , , 1
-        , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Bill Rate per progetto", "/timereport/m_gestione/CostRateProgetto/CostRate_list.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Cost Rate Persona", "/timereport/m_gestione/CostRateAnno/CostRatePersona_list.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/expenses.gif border=0>&nbsp;Cost-Bill Rate Progetto", "/timereport/m_gestione/CostRateAnno/CostRateProgetto_list.aspx", , , 1
         , "<img src=/timereport/images/icons/16x16/progetto.gif border=0>&nbsp;Dati progetto", "/timereport/report/EstraiRevenue/ProjectRevenueData.aspx", , , 1
         , "<img src=/timereport/images/icons/16x16/report.gif  border=0>&nbsp;Scarica FLC", "/timereport/report/rdlc/CostRateReport.aspx", , , 1
     ]);

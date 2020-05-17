@@ -22,6 +22,7 @@
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script> <!-- Download excel da Tabulator -->
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" >
 
 
@@ -52,7 +53,7 @@
     <div id="TableTrainingPlan"></div>
 
     <div class="buttons">               
-<%--        <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>"  CssClass="orangebutton" PostBackUrl="/timereport/m_gestione/Project/Projects_lookup_form.aspx" />--%>
+        <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>"  CssClass="orangebutton" />
         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>"  CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
     </div> <!--End buttons-->
 
@@ -133,6 +134,12 @@
         $('#mask').hide();
         $('.window').hide();
     }); // bottone chiude su form modale
+
+    //trigger download of data.xlsx file
+    $("#btn_download").click(function(){
+        TableTrainingPlan.download("xlsx", "ExportData.xlsx", {sheetName:"Dati"});
+    });    
+
 
     // ** TABULATOR **
     var editIcon = function (cell, formatterParams, onRendered) { //plain text value

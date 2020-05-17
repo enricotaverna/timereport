@@ -28,13 +28,17 @@ public partial class menu : System.Web.UI.Page
             GiorniAssenza.Visible = false;
         }
 
+        // spegne box controllo CV in assenza di autorizzazioni
+        if (!Auth.ReturnPermission("REPORT", "CURRICULA"))
+            CVdaConfermare.Visible = false;
+
         // spegne box Feedback training in assenza di autorizzazioni
         if (!Auth.ReturnPermission("TRAINING", "RATE"))
-            row2.Visible = false;
+            TrainingDaValutare.Visible = false;
 
         // spegne box Assenze da approvare in assenza di autorizzazioni
-        if (!Auth.ReturnPermission("DATI", "ASSENZE"))
-            row1.Visible = false;
+        //if (!Auth.ReturnPermission("DATI", "ASSENZE"))
+        //row1.Visible = false;
 
     }
 }

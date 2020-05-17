@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CostRateAnno_list.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CostRateProgetto_list.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
 
 <!DOCTYPE html>
 
@@ -23,6 +23,7 @@
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script> <!-- Download excel da Tabulator -->
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -42,13 +43,13 @@
             <div id="PanelWrap" style="width: 720px">
 
                 <div class="StandardForm">
-                    <div id="PersonsCostRateTable"></div>
+                    <div id="ProjectCostRateTable"></div>
                 </div>
-
 
                 <div class="buttons">
                     <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" />
-                    <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>"  CssClass="orangebutton" />
+                     <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                 </div>
                 <!--End buttons-->
 
@@ -62,7 +63,7 @@
 
                     <div id="FormWrap" class="StandardForm">
 
-                        <div class="formtitle">Costo Persona</div>
+                        <div class="formtitle">Costo Persona/Progetto</div>
 
                         <div class="input nobottomborder">
                             <!-- ** PERSONA ** -->
@@ -77,29 +78,47 @@
                         </div>
 
                         <div class="input nobottomborder">
+                            <!-- ** PROGETTO ** -->
+                            <div class="inputtext">
+                                <asp:Literal runat="server" Text="Progetto" /></div>
+                            <label class="dropdown">
+                                <asp:DropDownList ID="DDLProjects" runat="server" DataSourceID="DSProjects" DataTextField="ProjectName" DataValueField="Projects_id"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" AppendDataBoundItems="True">
+                                    <asp:ListItem Text="-- selezionare un valore --" Value=""></asp:ListItem>
+                                </asp:DropDownList>
+                            </label>
+                        </div>
+
+                        <div class="input nobottomborder">
                             <!-- ** VALIDO DA ** -->
                             <div class="inputtext">Valido da</div>
                             <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataDa" Columns="10"
                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-no-focus="true" data-parsley-errors-messages-disabled=""
                                 data-parsley-dateinsequenza="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                            &nbsp;a&nbsp;
+                            &nbsp;&nbsp;a&nbsp;&nbsp;
                 <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataA" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-no-focus="true"
                     data-parsley-required="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                         </div>
 
                         <div class="input nobottomborder">
-                            <!-- ** COSTO ** -->
-                            <div class="inputtext">Costo(€)</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
+                            <!-- ** COST RATE ** -->
+                            <div class="inputtext">Cost Rate(€)</div>
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
+                        </div>
+
+                        <div class="input nobottomborder">
+                            <!-- ** BILL RATE ** -->
+                            <div class="inputtext">Bill Rate(€)</div>
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBBillRate" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
                         </div>
 
                         <div class="input nobottomborder">
                             <!-- ** COMMENT ** -->
                             <div class="inputtext">Nota</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" />
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" Width="260px" />
                         </div>
 
-                        <asp:TextBox runat="server" ID="TBPersonsCostRate_id" Style="visibility: hidden" />
+                        <asp:TextBox runat="server" ID="TBProjectCostRate_id" Style="visibility: hidden" />
 
                         <div class="buttons">
                             <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
@@ -196,6 +215,11 @@
 
     // ** EVENTI TRIGGER **
 
+    //trigger download of data.xlsx file
+    $("#btn_download").click(function(){
+        ProjectCostRateTable.download("xlsx", "ExportData.xlsx", {sheetName:"Dati"});
+    });
+
     $("#btn_crea").click(function (e) {
 
         //Cancel the link behavior
@@ -248,11 +272,11 @@
         return "<i class='fa fa-edit'></i>";
     };  // icona edit
 
-    var PersonsCostRateTable = new Tabulator("#PersonsCostRateTable", {
+    var ProjectCostRateTable = new Tabulator("#ProjectCostRateTable", {
         paginationSize: 18, // this option can take any positive integer value (default = 10)
         pagination: "local", //enable local pagination.
         headerFilterPlaceholder: "filtra i record...", //set column header placeholder text
-        ajaxURL: "/timereport/webservices/WS_PersonsCostRate.asmx/GetPersonsCostRateTable", //ajax URL
+        ajaxURL: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRateTable", //ajax URL
         ajaxParams: { sAnno: "" }, //ajax parameters
         ajaxConfig: "POST", //ajax HTTP request type
         ajaxContentType: "json", // send parameters to the server as a JSON encoded string
@@ -264,13 +288,17 @@
             return JSON.parse(response.d); //return the d property of a response json object
         },
         columns: [
-            { title: "PersonsCostRate_id", field: "PersonsCostRate_Id", sorter: "number", visible: false },
+            { title: "ProjectCostRate_id", field: "ProjectCostRate_Id", sorter: "number", visible: false },
             { title: "Persons_id", field: "Persons_id", sorter: "number", visible: false },
-            { title: "Da", field: "DataDa", sorter: "string", width: 100, headerFilter: true },
-            { title: "A", field: "DataA", sorter: "string", width: 100, headerFilter: true },
+            { title: "Project_id", field: "Project_id", sorter: "number", visible: false },
+            { title: "Da", field: "DataDa", sorter: "string", width: 80, headerFilter: true },
+            { title: "A", field: "DataA", sorter: "string", width: 80, headerFilter: true },
             { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
+            { title: "Prj Code", field: "ProjectCode", sorter: "string", headerFilter: true },
+            { title: "Prj Name", field: "ProjectName", sorter: "string", headerFilter: true },
             { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
-            { title: "CostRate", field: "CostRate", sorter: "number", width: 80, headerFilter: true },
+            { title: "Cost Rate", field: "CostRate", sorter: "number", width: 60, headerFilter: true },
+            { title: "Bill Rate", field: "BillRate", sorter: "number", width: 60, headerFilter: true },
             { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
             { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
         ],
@@ -280,9 +308,11 @@
 
     function initValue() {
 
-        $('#TBPersonsCostRate_id').val('0'); // attenzione!
+        $('#TBProjectCostRate_id').val('0'); // attenzione!
+        $('#DDLProjects').val('');
         $('#TBComment').val('');
         $('#TBCostRate').val('');
+        $('#TBBillRate').val('');
         $('#TBDataDa').val('');
         $('#TBDataA').val('');
 
@@ -291,27 +321,29 @@
     function T_leggiRecord(dati, riga) { 
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{'sPersonsCostRate_id': '" + dati.PersonsCostRate_id + "'   } ";
+        var values = "{'sProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
 
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/GetPersonsCostRate",
+            url: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRate",
             data: values,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
 
             success: function (msg) {
 
-                var objPersonsCostRate = msg.d;
+                var objProjectCostRate = msg.d;
 
-                if (objPersonsCostRate.PersonsCostRate_id > 0)
-                    $('#TBPersonsCostRate_id').val(objPersonsCostRate.PersonsCostRate_id);
-                $('#DDLPersons').val(objPersonsCostRate.Persons_id);
-                $('#TBCostRate').val(objPersonsCostRate.CostRate);
-                $('#TBDataDa').val(objPersonsCostRate.DataDa);
-                $('#TBDataA').val(objPersonsCostRate.DataA);
-                $('#TBComment').val(objPersonsCostRate.Comment);
+                if (objProjectCostRate.ProjectCostRate_id > 0)
+                $('#TBProjectCostRate_id').val(objProjectCostRate.ProjectCostRate_id);
+                $('#DDLPersons').val(objProjectCostRate.Persons_id);
+                $('#DDLProjects').val(objProjectCostRate.Projects_id);
+                $('#TBCostRate').val(objProjectCostRate.CostRate);
+                $('#TBBillRate').val(objProjectCostRate.BillRate);
+                $('#TBDataDa').val(objProjectCostRate.DataDa);
+                $('#TBDataA').val(objProjectCostRate.DataA);
+                $('#TBComment').val(objProjectCostRate.Comment);
 
                 openDialogForm("#dialog");
             },
@@ -327,12 +359,12 @@
     function T_cancellaRecord(dati, riga) {
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{'PersonsCostRate_id': '" + dati.PersonsCostRate_id + "'   } ";
+        var values = "{'ProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
 
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/DeletePersonsCostRate",
+            url: "/timereport/webservices/WS_PersonsCostRate.asmx/DeleteProjectCostRate",
             data: values,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -359,10 +391,15 @@
         if ($('#TBCostRate').val() == '')
             $('#TBCostRate').val(0);
 
+        if ($('#TBBillRate').val() == '')
+            $('#TBBillRate').val(0);
+
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{ 'PersonsCostRate_id': '" + $('#TBPersonsCostRate_id').val() + "', " +
+        var values = "{ 'ProjectCostRate_id': '" + $('#TBProjectCostRate_id').val() + "', " +
             "'Persons_id': '" + $('#DDLPersons').val() + "' , " +
+            "'Projects_id': '" + $('#DDLProjects').val() + "' , " +
             "'CostRate': '" + $('#TBCostRate').val() + "' , " +
+            "'BillRate': '" + $('#TBBillRate').val() + "' , " +
             "'Comment': '" + $('#TBComment').val() + "' , " +
             "'DataDa': '" + $('#TBDataDa').val() + "' , " +
             "'DataA': '" + $('#TBDataA').val() + "'   } ";
@@ -370,7 +407,7 @@
         $.ajax({
 
             type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/CreateUpdatePersonsCostRate",
+            url: "/timereport/webservices/WS_PersonsCostRate.asmx/CreateUpdateProjectCostRate",
             data: values,
             async: false,
             contentType: "application/json; charset=utf-8",
@@ -378,7 +415,7 @@
 
             success: function (msg) {
                 // chiude dialogo
-                PersonsCostRateTable.replaceData() // ricarica tabella dopo insert
+                ProjectCostRateTable.replaceData() // ricarica tabella dopo insert
 
             },
 
@@ -394,6 +431,10 @@
 <asp:sqldatasource runat="server" id="DSPersons"
     connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
     selectcommand="SELECT * FROM [Persons] WHERE Active = 'true' ORDER BY Name"></asp:sqldatasource>
+
+<asp:sqldatasource runat="server" id="DSProjects"
+    connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+    selectcommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY Name"></asp:sqldatasource>
 
 
 </html>

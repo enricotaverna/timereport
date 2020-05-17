@@ -1,204 +1,401 @@
-﻿<%@ Page Language="VB" AutoEventWireup="true" CodeFile="menu.aspx.vb" Inherits="menu" %>
-<%@ Register TagPrefix="asp101" TagName="ProgressBar" Src="/timereport/include/progress.ascx" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="menu.aspx.cs" Inherits="menu" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+<!-- Menù  -->
+<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" noexpenses='<%= Session["NoExpenses"]%>' lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<%--<script src="/timereport/include/jquery/jquery-ui.min.js"></script>--%>
+
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+<link href="/timereport/include/dashboard.css" rel="stylesheet" type="text/css" />
 
 <!-- INCLUDE JS TIMEREPORT   -->
 <script src="/timereport/include/javascript/timereport.js"></script>
 
+<!-- INCLUDE CHARTJS   -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session("NoExpenses")%>  lingua='<%= Session("lingua")%>' userlevel='<%= Session("userLevel")%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
 <head runat="server">
-
-	<title>Time Report</title>
- 
-		<style type="text/css">
-		.style2
-		{
-			width: 200px;
-		}
-		.style4
-		{
-			text-align: center;
-		}
-			</style>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Time Report</title>
 </head>
+
 
 <body>
 
-	<div id="TopStripe"></div> 
+    <style>
+        .hoverOn:hover {
+            cursor: pointer;
+        }
 
-	<div id="MainWindow">
+        /*.card {
+            width: 12rem;
+        }*/
+    </style>
+    <div id="TopStripe"></div>
+    <div id="MainWindow">
 
-	<!--**** Riquadro navigazione ***-->  
+        <!--**** Riquadro navigazione ***-->
+        <form id="form1" runat="server">
 
-	<form id="form1" runat="server">
+            <div class="container">
+                <!-- *** container *** -->
 
-	 <table  width="100%" style="font-size: 8pt;" > <!--**** Tabella principale ***-->  
-										
-					<tr> <!--**** finestra principale ***-->  
-					
-						<td valign="top" class="style2"> <!--**** colonna dx ***-->  
+                <!-- *** 1 Row *** -->
+                <div class="row" id="row1" runat="server">
 
-							<%--  *** Messaggi *** --%>
-							<table  class="BoxTable">
-								<tr>
-									<th><asp:Literal runat="server" Text="<%$ Resources:messaggi%>" /></th>
-								</tr>
-								<tr>
-									<td class="BoxBody">
-							 <table  >
-								 <tr>
-									 <td>
-										 <asp:HyperLink ID="HyperLink1" runat="server" Target="_blank" NavigateUrl="../public/Aeonvis  - nuove funzionalità TR - Tutti gli utilizzatori.pdf"><img alt="PPT file" src="images/icons/other/pdf.png" width="50px" /></asp:HyperLink>
-										 </td>
-									 <td><asp:Literal runat="server" Text="<%$ Resources:Msg_istruzioni%>" /></td>
-								 </tr>
-								 <tr>
-									 <td>
-										 <asp:ImageButton ID="BtnMobile" runat="server" ImageUrl="~/apple-touch-icon.png" Width="50px" OnClientClick="window.open('https://www.aeonvis.it/timereport/mobile/login.aspx')" CausesValidation="False" /> 
-										 </td>
-									 <td><asp:Literal runat="server" Text="<%$ Resources:Msg_mobile%>" /><br />
-									 </td>
-								 </tr>
-							</table>
-										<br />
-									</td>
-								</tr>
-							</table>
-							<br />
-							<%--  *** Report  *** --%>
-							<table class="BoxTable">
-								<tr>
-									<th >Report
-									</th>
-								</tr>
-							<tr>
-							<td class="BoxBody">
-								<asp:Literal runat="server" Text="<%$ Resources:mese%>" />
-								 <%--<a href="menu.aspx?cursor=bk">&lt;prec</a>  --%>
-									<asp:LinkButton ID="bk_button" runat="server" text ="<< " onclick="button_Click"></asp:LinkButton>
-								<asp:Label ID="lMese" runat="server" Text=""></asp:Label>    
-							   <%-- <a href="menu.aspx?cursor=fw">succ&gt;</a> --%>
-									<asp:LinkButton ID="fw_button" runat="server" text =">> " onclick="button_Click"></asp:LinkButton><br />
-								<br />
-								<asp:Literal runat="server" Text="<%$ Resources:ore_lavorative%>" /><asp:Label ID="lOreLavorative" runat="server" Text=""></asp:Label><br />
-								<asp:Literal runat="server" Text="<%$ Resources:ore_caricate%>" /><asp:Label ID="lContaOre" runat="server" Text=""></asp:Label>&nbsp;&nbsp;
-								 <asp:Label ID="lPerc" runat="server" Text=""></asp:Label>% <br />
-								<asp101:ProgressBar id="pbarIEesque" runat="server"
-								Style = "IEesque"
-								Width = 100 />
-								<br />                                                         
-								<br /><asp:Literal runat="server" Text="<%$ Resources:spese_carta_credito%>" /><asp:Label ID="lContaSpeseConCC" runat="server" Text=""></asp:Label>
-								<br />
-								<asp:Literal runat="server" Text="<%$ Resources:spese_da_rimborsare%>" /><asp:Label ID="lContaSpeseSenzaCC" runat="server" Text=""></asp:Label>
-								<br />
-								 <asp:Literal runat="server" Text="<%$ Resources:chilometri%>"></asp:Literal><asp:Label ID="lContaKm" runat="server" Text=""></asp:Label>
-								<br />
-								 <br />
-							</td>                            
-							</tr>                                                        
-							</table>
-							<br /> 
-							<%--  *** Currency *** --%>
-							<!-- Currency Converter script - fx-rate.net --> 
-							<div style="width:200px; background-color:#FFFFFF;border:2px solid #888;text-align:center;margin:0px;padding:0px"> 
-								<!-- EXCHANGERATES.ORG.UK EXCHANGE RATE CONVERTER START -->
-								<script type="text/javascript">
-									var dcf = 'EUR';
-									var dct = 'USD';
-									var mc = 'FFFFF';
-									var mbg = 'FFFFFF';
-									var f = 'arial';
-									var fs = '12';
-									var fc = '000000';
-									var tf = 'arial';
-									var ts = '14';
-									var tc = '080203';
-									var tz = 'userset';
-								</script>
-								<script type="text/javascript" src="https://www.currency.me.uk/remote/ER-ERC-1.php"></script>
-								<small>Source: <a href="https://www.exchangerates.org.uk" target="_new">ExchangeRates.org.uk</a></small>
-								<!-- EXCHANGERATES.ORG.UK  EXCHANGE RATE CONVERTER END -->
-							</div> <!-- End of Currency Converter script -->
-						
-						</td> <!--**** colonna dx ***-->  
-						
-						<td valign="top" > <!--**** colonna sx ***-->  
-						</td> <!--**** colonna sx ***-->  
-					
-					</tr> <!--**** finestra principale ***-->  
-				
-				</table>
+                    <!--  *** Box TRAINING DA VALUTARE ***    -->
+                    <div class="col-md-4" id="TrainingDaValutare" runat="server">
+                        <div class="card my-2 widget-content hoverOn" >
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Training da valutare</div>
+                                    <div class="widget-subheading">concluso entro 120gg</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers"><span id="TrainingDaValutare-KPIValue0">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-	</form>
-		
-	</div> <!-- END MainWindow -->
+                    <!--  *** Box CV ***    -->
+                    <div class="col-md-4" id="CVdaConfermare" runat="server">
+                        <div class="card  my-2 widget-content hoverOn">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Curriculum da confermare</div>
+                                    <div class="widget-subheading">da parte manager</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-	<!-- Per output messaggio conferma salvataggio -->
-	<div id="dialog" style="display: none"></div>
-	
-	<!-- **** FOOTER **** -->  
-	<div id="WindowFooter">       
-		<div ></div>        
-		<div  id="WindowFooter-L"> Aeonvis Spa <%= Year(Now())  %>
-            <% If Session("persons_id") = 1 Then
-                    Dim sConn = ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString.ToString()
-                    Response.Write("&nbsp; " + sConn.Substring(12, 13) + "&nbsp; " + sConn.Substring(36, 20))
-                End If
+                    <!--  *** Box GG TRAINING ***    -->
+                    <div class="col-md-4" id="GiorniTraining" runat="server">
+                        <div class="card  my-2 widget-content hoverOn">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Giornate training team</div>
+                                    <div class="widget-subheading">prossimi 30 gg</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            %>
+                </div>
+                <!-- *** 1 Row *** -->
 
-		</div> 
-		<div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>              
-		<div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session("UserName")  %></div>        
-	 </div> 
+                <!-- *** 2 Row *** -->
+                <div class="row" id="row2" runat="server">
 
- <script type="text/javascript">
+                    <!--  *** Box ORE CARICATE ***    -->
+                    <div class="col-md-4">
+                        <div class="card my-2 widget-content hoverOn" id="OreNelMese">
+                            <div class="widget-content-outer">
+                                <div class="widget-content-wrapper">
+                                    <div class="widget-content-left">
+                                        <div class="widget-heading">Ore da caricare</div>
+                                        <div class="widget-subheading">lavorative</div>
+                                    </div>
+                                    <div class="widget-content-right">
+                                        <div class="widget-numbers" id="OreNelMese-KPIValue0">-</div>
+                                    </div>
+                                </div>
+                                <div class="widget-progress-wrapper">
+                                    <div class="progress-bar-lg progress-bar-animated progress">
+                                        <div id="OreNelMeseProgressBar" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                                    </div>
+                                    <div class="progress-sub-label">
+                                        <div class="sub-label-left">ore caricate su totale mese</div>
+                                        <div class="sub-label-right" id="OreNelMese-KPIValue1">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        $( document ).ready(function() {
+                    <!--  *** Box vuoto ***    -->
+                    <div class="col-md-4" id="Div2" runat="server">
+                    </div>
 
-            // Verifica se esistono corsi non valutati ed in caso genera un dialogo di reminder (la prima volta...)
-            var bSecondCall = <%=Session("TrainingCheckSecondCall")%>;
-            if (bSecondCall  == false) { 
+                    <!--  *** Box ASSENZE ***    -->
+                    <div class="col-md-4" id="GiorniAssenza" runat="server">
 
-                var dataAjax = " { Persons_id : <%=Session("persons_id")%> , PastDue : 90 }";
-                $.ajax({
-                    url: "/timereport/webservices/HR_Training.asmx/CheckTrainingToEvalutate",
-                    data: dataAjax,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    type: 'post',
-                    async: false,
-                    success: function(data) {
-                        if (data.d == false)
-                            response = false;
-                        else
-                            ShowPopup("Hai un corso completato da meno di 90 giorni senza valutazione, ricordati di compilare la valutazione online.");
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                 });
+                        <div class="card  my-2 widget-content hoverOn">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Giornate assenza team</div>
+                                    <div class="widget-subheading">prossimi 30 gg</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-success"><span id="GiorniAssenza-KPIValue0">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- *** 2 Row *** -->
+
+                <!-- *** 3 Row *** -->
+                <div class="row" id="row3" runat="server">
+
+                    <!--  *** Box SPESE NEL MESE ***    -->
+                    <div class="col-md-4 my-2 hoverOn" id="SpeseNelMese">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left">
+                                                <div class="widget-heading">Spese Mese</div>
+                                                <div class="widget-subheading" id="SpeseNelMese-KPIValue2">-</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue0">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left">
+                                                <div class="widget-heading">Chilometri</div>
+                                                <div class="widget-subheading">mese corrente</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue1">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!--  *** Box GRAFICO ***    -->
+                    <%--        <div class="main- card mx-3 col-md-4 card">
+                        <div class="card-body">
+                            <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+                                <div class="chartjs-size-monitor-expand" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+                                    <div style="position: absolute; width: 1000000px; height: 1000000px; left: 0; top: 0"></div>
+                                </div>
+                                <div class="chartjs-size-monitor-shrink" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+                                    <div style="position: absolute; width: 200%; height: 200%; left: 0; top: 0"></div>
+                                </div>
+                            </div>
+                            <h5 class="card-title">Vertical Bars</h5>
+                            <canvas id="verticalBar" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
+                        </div>
+                    </div>--%>
+                </div>
+                <!-- *** 3 Row *** -->
+
+                <!-- *** 4 Row *** -->
+                <div class="row" id="row4" runat="server">
+
+                    <!--  *** ListaLocation ***    -->
+                    <div id="ListaLocation" class="col-md-4 my-2">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <table class="mb-0 table">
+                                    <thead>
+                                        <tr>
+                                            <th>Luogo</th>
+                                            <th>Ore</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td id="ListaLocation-KPIDescription0"></td>
+                                            <td id="ListaLocation-KPIValue0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="ListaLocation-KPIDescription1"></td>
+                                            <td id="ListaLocation-KPIValue1"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="ListaLocation-KPIDescription2"></td>
+                                            <td id="ListaLocation-KPIValue2"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--  *** Box RICHIESTE ***    -->
+                    <div class="col-md-4" id="RichiesteAperte" runat="server">
+                        <div class="card my-2 widget-content hoverOn">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Richieste assenza</div>
+                                    <div class="widget-subheading">da approvare</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-warning"><span id="RichiesteAperte-KPIValue0">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- *** 4 Row *** -->
+
+            </div>
+            <!-- *** container *** -->
+
+        </form>
+
+    </div>
+    <!-- END MainWindow -->
+
+
+
+    <!-- **** FOOTER **** -->
+    <div id="WindowFooter">
+        <div></div>
+        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+        <% if (Session["persons_id"].ToString() == "1")
+            {
+                string sConn = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString.ToString();
+                Response.Write("&nbsp; " + sConn.Substring(12, 13) + "&nbsp; " + sConn.Substring(36, 20));
             }
+        %>
+        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
+        <div id="WindowFooter-R">
+            <asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" />
+            <%= Session["UserName"]  %>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#RichiesteAperte").click(function () {
+                location.href = "/timereport/m_gestione/Approval/Approval_list.aspx";
+            });
+
+            $("#TrainingDaValutare").click(function () {
+                location.href = "/timereport/m_gestione/training/TrainingPlan_evaluate.aspx";
+            });
+
+            $("#OreNelMese").click(function () {
+                location.href = "/timereport/input.aspx?type=hours";
+            });
+
+            $("#SpeseNelMese").click(function () {
+                location.href = "/timereport/input.aspx?type=expenses";
+            });
+
+            $("#GiorniTraining").click(function () {
+                location.href = "/timereport/m_gestione/Approval/HoursList.aspx?tipoOre=<%=ConfigurationManager.AppSettings["CODICI_TRAINING"]%>";
+            });
+
+            $("#GiorniAssenza").click(function () {
+                location.href = "/timereport/m_gestione/Approval/HoursList.aspx?tipoOre=<%=ConfigurationManager.AppSettings["CODICI_ASSENZE"]%>";
+            });
+
+            $("#CVdaConfermare").click(function () {
+                location.href = "/timereport/m_gestione/curricula/CV_list.aspx";
+            });
+
+            // Richiama Web Service per aggiornamento KPI
+            var values = "{ iPersons_id : '<%= Session["persons_id"]  %>', cutoffDate :  '<%= Session["cutoffDate"]  %>'  }";
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateCardKPI",
+                data: values,
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // chiude dialogo
+                    var objList = JSON.parse(msg.d)
+
+                    for (var i = 0; i < objList.length; i++) {
+
+                        if (objList[i].cardName == "OreNelMese")
+                            $("#OreNelMeseProgressBar").width(objList[i].KPIList[2].KPIValue); // progress bar ore
+
+                        if (objList[i].KPIList != null) {
+                            for (var n = 0; n < objList[i].KPIList.length; n++) {
+                                var idDescription = "#" + objList[i].cardName + "-KPIDescription" + n;
+                                var idValue = "#" + objList[i].cardName + "-KPIValue" + n;
+                                $(idValue).parent().addClass(objList[i].KPIList[n].CSSClass);
+                                $(idDescription).text(objList[i].KPIList[n].KPIDescription);
+                                $(idValue).text(objList[i].KPIList[n].KPIValue);
+                            }
+                        }
+
+                    }
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+            }); // ajax
+
+
 
         });
 
-</script>
+
+        //var ctx = document.getElementById('verticalBar').getContext('2d');
+        //var chart = new Chart(ctx, {
+        //    // The type of chart we want to create
+        //    type: 'bar',
+
+        //    // The data for our dataset
+        //    data: {
+        //        labels: ['Rimborso', 'Km', 'CartaC'],
+        //        datasets: [{
+        //            label: 'Mese corrente',
+        //            backgroundColor: 'rgb(255, 0, 0)',
+        //            borderColor: 'rgb(255, 0, 0)',
+        //            data: [0, 10, 5]
+        //        }, {
+        //            label: 'Mese -1',
+        //            backgroundColor: 'rgb(0, 255, 0)',
+        //            borderColor: 'rgb(0, 255, 0)',
+        //            data: [0, 10, 5]
+        //        }, {
+        //            label: 'Media 6 mesi',
+        //            backgroundColor: 'rgb(0, 0, 255)',
+        //            borderColor: 'rgb(0, 0, 255)',
+        //            data: [5, 10, 15]
+        //        }]
+        //    },
+
+        //    // Configuration options go here
+        //    options: {}
+        //});
+
+    </script>
 
 
 </body>
