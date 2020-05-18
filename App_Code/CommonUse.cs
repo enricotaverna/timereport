@@ -395,7 +395,7 @@ public class CommonFunction
                 iOreLavorative = iOreLavorative + 1;
         }
 
-        iOreLavorative = iOreLavorative * 8;
+        iOreLavorative = iOreLavorative * CurrentSession.ContractHours;
 
         ret.dOreLavorative = iOreLavorative;
         ret.dOreCaricate = iContaOre;
