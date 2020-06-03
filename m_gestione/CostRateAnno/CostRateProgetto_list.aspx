@@ -434,7 +434,7 @@
 
 <asp:sqldatasource runat="server" id="DSProjects"
     connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-    selectcommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY Name"></asp:sqldatasource>
+    selectcommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY ProjectName"></asp:sqldatasource>
 
 
 </html>
