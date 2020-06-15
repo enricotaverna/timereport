@@ -14,6 +14,7 @@ using Xceed.Words.NET;
 // ** Basic Class ***
 public class EducationSet
 {
+    public string EducationId { get; set; }
     public string Title { get; set; }
     public string Year { get; set; }
     public string School { get; set; }
@@ -36,6 +37,7 @@ public class SkillSet
 
 public class CertificateSet
 {
+    public string CertificateId { get; set; }
     public string Certificate { get; set; }
     public string Institute { get; set; }
     public string Year { get; set; }
@@ -44,6 +46,7 @@ public class CertificateSet
 
 public class ProjectSet
 {
+    public string ProjectId { get; set; }
     public string Client { get; set; }
     public string Industry { get; set; }
     public string Year { get; set; }
@@ -107,6 +110,7 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000040> EduRecord in rec.Subtable1000040)
                 EducationList.Add(new EducationSet()
                 {
+                    EducationId = FormatField(EduRecord.Value.EducationId),
                     Title = EduRecord.Value.Title ?? "",
                     Year = EduRecord.Value.Year ?? "",
                     School = EduRecord.Value.School ?? "",
@@ -118,6 +122,7 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000041> CertRecord in rec.Subtable1000041)
                 CertificateList.Add(new CertificateSet()
                 {
+                    CertificateId = FormatField(CertRecord.Value.CertificateId),
                     Certificate = FormatField(CertRecord.Value.Certificate),
                     Institute = FormatField(CertRecord.Value.Institute),
                     Year = FormatField(CertRecord.Value.Year),
@@ -149,6 +154,7 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000061> PrjRecord in rec.Subtable1000061)
                     ProjectList.Add(new ProjectSet()
                     {
+                        ProjectId = FormatField(PrjRecord.Value.ProjectId).ToString().PadLeft(6,'0'),
                         Client = FormatField(PrjRecord.Value.Client),
                         Industry = FormatField(PrjRecord.Value.Industry),
                         Year = FormatField(PrjRecord.Value.Year),
@@ -233,6 +239,7 @@ public class Curriculum
                 EducationTable.InsertRow(EducationTable.Rows[0], i, true);
 
             loopIndex = 0;
+            EducationList.Sort((x, y) => y.EducationId.CompareTo(x.EducationId));
             foreach (EducationSet edu in EducationList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
@@ -270,6 +277,7 @@ public class Curriculum
                 CertificateTable.InsertRow(CertificateTable.Rows[0], i, true);
 
             loopIndex = 0;
+            CertificateList.Sort((x, y) => y.CertificateId.CompareTo(x.CertificateId));
             foreach (CertificateSet cert in CertificateList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
@@ -307,6 +315,9 @@ public class Curriculum
                 ProjectTable.InsertRow(ProjectTable.Rows[0], i, true);
 
             loopIndex = 0;
+            ProjectList.Sort((x, y) => y.ProjectId.CompareTo(x.ProjectId));
+            //ProjectList = ProjectList.OrderBy(c => int.Parse(c.ProjectId)).ToList();
+
             foreach (ProjectSet prj in ProjectList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
@@ -490,8 +501,8 @@ public partial class Subtable1000027
     [JsonProperty("_header_Y")]
     public long[] HeaderY { get; set; }
 
-    [JsonProperty("LanguageId")]
-    public string LanguageId { get; set; }
+    //[JsonProperty("LanguageId")]
+    //public string LanguageId { get; set; } // tolto
 
     [JsonProperty("LanguageName")]
     public string LanguageName { get; set; }
@@ -568,8 +579,8 @@ public partial class Subtable1000042
     [JsonProperty("_header_Y")]
     public long[] HeaderY { get; set; }
 
-    [JsonProperty("SkillId")]
-    public string SkillId { get; set; }
+    //[JsonProperty("SkillId")]
+    //public string SkillId { get; set; } // tolto
 
     [JsonProperty("Area")]
     public string Area { get; set; }
