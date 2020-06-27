@@ -14,39 +14,42 @@ using Xceed.Words.NET;
 // ** Basic Class ***
 public class EducationSet
 {
-    public string EducationId { get; set; }
+    //public string EducationId { get; set; }
+    public string SortString { get; set; }
     public string Title { get; set; }
     public string Year { get; set; }
     public string School { get; set; }
-    public string Comment { get; set; }
+    //public string Comment { get; set; }
 }
 
 public class LanguageSet
 {
     public string LanguageName { get; set; }
     public string LanguageLevel { get; set; }
-    public string Comment { get; set; }
+    //public string Comment { get; set; }
 }
 
 public class SkillSet
 {
     public string Area { get; set; }
     public string SkillDescription { get; set; }
-    public string Comment { get; set; }
+    //public string Comment { get; set; }
 }
 
 public class CertificateSet
 {
-    public string CertificateId { get; set; }
+    //public string CertificateId { get; set; }
+    public string SortString { get; set; }
     public string Certificate { get; set; }
     public string Institute { get; set; }
     public string Year { get; set; }
-    public string Comment { get; set; }
+    //public string Comment { get; set; }
 }
 
 public class ProjectSet
 {
-    public string ProjectId { get; set; }
+    //    public string ProjectId { get; set; }
+    public string SortString { get; set; }
     public string Client { get; set; }
     public string Industry { get; set; }
     public string Year { get; set; }
@@ -110,11 +113,12 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000040> EduRecord in rec.Subtable1000040)
                 EducationList.Add(new EducationSet()
                 {
-                    EducationId = FormatField(EduRecord.Value.EducationId),
+                    //EducationId = FormatField(EduRecord.Value.EducationId),
+                    SortString = FormatField(EduRecord.Value.Year).ToString(),
                     Title = EduRecord.Value.Title ?? "",
                     Year = EduRecord.Value.Year ?? "",
-                    School = EduRecord.Value.School ?? "",
-                    Comment = EduRecord.Value.Comment ?? ""
+                    School = EduRecord.Value.School ?? ""
+                    //Comment = EduRecord.Value.Comment ?? ""
                 });
 
             // Certificate
@@ -122,11 +126,12 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000041> CertRecord in rec.Subtable1000041)
                 CertificateList.Add(new CertificateSet()
                 {
-                    CertificateId = FormatField(CertRecord.Value.CertificateId),
+                    //CertificateId = FormatField(CertRecord.Value.CertificateId),
+                    SortString = FormatField(CertRecord.Value.Year).ToString(),
                     Certificate = FormatField(CertRecord.Value.Certificate),
                     Institute = FormatField(CertRecord.Value.Institute),
-                    Year = FormatField(CertRecord.Value.Year),
-                    Comment = FormatField(CertRecord.Value.Comment)
+                    Year = FormatField(CertRecord.Value.Year)
+                    //Comment = FormatField(CertRecord.Value.Comment)
                 });
 
             // Language
@@ -135,8 +140,8 @@ public class Curriculum
                 LanguageList.Add(new LanguageSet()
                 {
                     LanguageName = LangRecord.Value.LanguageName ?? "",
-                    LanguageLevel = LangRecord.Value.LanguageLevel ?? "",
-                    Comment = LangRecord.Value.Comment ?? ""
+                    LanguageLevel = LangRecord.Value.LanguageLevel ?? ""
+                    //Comment = LangRecord.Value.Comment ?? ""
                 });
 
             // Skill
@@ -145,8 +150,8 @@ public class Curriculum
                 SkillList.Add(new SkillSet()
                 {
                     Area = FormatField(SkillRecord.Value.Area),
-                    SkillDescription = FormatField(SkillRecord.Value.SkillDescription),
-                    Comment = FormatField(SkillRecord.Value.Comment)
+                    SkillDescription = FormatField(SkillRecord.Value.SkillDescription)
+                    //Comment = FormatField(SkillRecord.Value.Comment)
                 });
 
             // Project
@@ -154,7 +159,8 @@ public class Curriculum
                 foreach (KeyValuePair<string, Subtable1000061> PrjRecord in rec.Subtable1000061)
                     ProjectList.Add(new ProjectSet()
                     {
-                        ProjectId = FormatField(PrjRecord.Value.ProjectId).ToString().PadLeft(6,'0'),
+                        //ProjectId = FormatField(PrjRecord.Value.ProjectId).ToString().PadLeft(6,'0'),
+                        SortString = FormatField(PrjRecord.Value.Year).ToString(),
                         Client = FormatField(PrjRecord.Value.Client),
                         Industry = FormatField(PrjRecord.Value.Industry),
                         Year = FormatField(PrjRecord.Value.Year),
@@ -239,14 +245,14 @@ public class Curriculum
                 EducationTable.InsertRow(EducationTable.Rows[0], i, true);
 
             loopIndex = 0;
-            EducationList.Sort((x, y) => y.EducationId.CompareTo(x.EducationId));
+            EducationList.Sort((x, y) => y.SortString.CompareTo(x.SortString));
             foreach (EducationSet edu in EducationList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
                 EducationTable.Rows[loopIndex].ReplaceText("<Year>", edu.Year);
                 EducationTable.Rows[loopIndex].ReplaceText("<Title>", edu.Title);
                 EducationTable.Rows[loopIndex].ReplaceText("<School>", edu.School);
-                EducationTable.Rows[loopIndex].ReplaceText("<Comment>", edu.Comment);
+                //EducationTable.Rows[loopIndex].ReplaceText("<Comment>", edu.Comment);
                 loopIndex++;
             }
 
@@ -264,7 +270,7 @@ public class Curriculum
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
                 LanguageTable.Rows[loopIndex].ReplaceText("<LanguageName>", lang.LanguageName);
                 LanguageTable.Rows[loopIndex].ReplaceText("<LanguageLevel>", lang.LanguageLevel);
-                LanguageTable.Rows[loopIndex].ReplaceText("<Comment>", lang.Comment);
+                //LanguageTable.Rows[loopIndex].ReplaceText("<Comment>", lang.Comment);
                 loopIndex++;
             }
 
@@ -277,14 +283,14 @@ public class Curriculum
                 CertificateTable.InsertRow(CertificateTable.Rows[0], i, true);
 
             loopIndex = 0;
-            CertificateList.Sort((x, y) => y.CertificateId.CompareTo(x.CertificateId));
+            CertificateList.Sort((x, y) => y.SortString.CompareTo(x.SortString));
             foreach (CertificateSet cert in CertificateList)
             {
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
                 CertificateTable.Rows[loopIndex].ReplaceText("<Year>", cert.Year);
                 CertificateTable.Rows[loopIndex].ReplaceText("<Institute>", cert.Institute);
                 CertificateTable.Rows[loopIndex].ReplaceText("<Certificate>", cert.Certificate);
-                CertificateTable.Rows[loopIndex].ReplaceText("<Comment>", cert.Comment);
+                //CertificateTable.Rows[loopIndex].ReplaceText("<Comment>", cert.Comment);
                 loopIndex++;
             }
 
@@ -302,7 +308,7 @@ public class Curriculum
                 // popola le celle della tabella, loopIndex = 0 è la prima riga
                 SkillTable.Rows[loopIndex].ReplaceText("<Area>", skill.Area);
                 SkillTable.Rows[loopIndex].ReplaceText("<SkillDescription>", skill.SkillDescription);
-                SkillTable.Rows[loopIndex].ReplaceText("<Comment>", skill.Comment);
+                //SkillTable.Rows[loopIndex].ReplaceText("<Comment>", skill.Comment);
                 loopIndex++;
             }
 
@@ -315,8 +321,7 @@ public class Curriculum
                 ProjectTable.InsertRow(ProjectTable.Rows[0], i, true);
 
             loopIndex = 0;
-            ProjectList.Sort((x, y) => y.ProjectId.CompareTo(x.ProjectId));
-            //ProjectList = ProjectList.OrderBy(c => int.Parse(c.ProjectId)).ToList();
+            ProjectList.Sort((x, y) => y.SortString.CompareTo(x.SortString));
 
             foreach (ProjectSet prj in ProjectList)
             {
@@ -510,8 +515,8 @@ public partial class Subtable1000027
     [JsonProperty("LanguageLevel")]
     public string LanguageLevel { get; set; }
 
-    [JsonProperty("Comment")]
-    public string Comment { get; set; }
+    //[JsonProperty("Comment")]
+    //public string Comment { get; set; }
 }
 
 public partial class Subtable1000040
@@ -537,8 +542,8 @@ public partial class Subtable1000040
     [JsonProperty("Year")]
     public string Year { get; set; }
 
-    [JsonProperty("Comment")]
-    public string Comment { get; set; }
+    //[JsonProperty("Comment")]
+    //public string Comment { get; set; }
 }
 
 public partial class Subtable1000041
@@ -564,8 +569,8 @@ public partial class Subtable1000041
     [JsonProperty("Year")]
     public string Year { get; set; }
 
-    [JsonProperty("Comment")]
-    public string Comment { get; set; }
+    //[JsonProperty("Comment")]
+    //public string Comment { get; set; }
 }
 
 public partial class Subtable1000042
@@ -588,8 +593,8 @@ public partial class Subtable1000042
     [JsonProperty("SkillDescription")]
     public string SkillDescription { get; set; }
 
-    [JsonProperty("Comment")]
-    public string Comment { get; set; }
+    //[JsonProperty("Comment")]
+    //public string Comment { get; set; }
 }
 
 public partial class Subtable1000061

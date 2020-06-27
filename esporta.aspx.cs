@@ -75,19 +75,21 @@ public partial class Esporta : System.Web.UI.Page
             // deve selezionare tutte le persone su progetti chargable e solo se stessi su progetti non chargable
             // altrimenti tutti vedono spese e ore di progetti BD e INFRASTRUTTURALI a cui sono assegnati
 
-            if (bPersoneSelezionate)
-                sWhereClause =
-                    "   Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
-                    "   AND Persons_id IN (" + sListaPersoneSel + ")";
-            else // persone non selezionate estrare solo le ore non chargable delle persone associate al manager
+            //if (bPersoneSelezionate)
+            //    sWhereClause =
+            //        "   Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
+            //        "   AND Persons_id IN (" + sListaPersoneSel + ")";
+            //else // persone non selezionate estrare solo le ore non chargable delle persone associate al manager
                 sWhereClause =
                     " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
                     "   AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     " ) OR " +
                     " ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
-                    " AND Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )" +
                     " AND ( Persons_id = " + Session["persons_id"] + " OR Manager_id = " + Session["persons_id"] + ")" +
                     " ) ) ";
+
+            if (bPersoneSelezionate)
+                sWhereClause = sWhereClause + " AND Persons_id IN(" + sListaPersoneSel + ")";
 
         } // *** MANAGER / TEAM LEADER
 

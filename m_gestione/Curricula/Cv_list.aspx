@@ -46,7 +46,8 @@
         <div id="CVListTable"></div>
     </div>  
             
-    <div class="buttons">               
+    <div class="buttons">           
+<%--        <a href='https://www.aeonvis.it/timereport/m_gestione/Curricula/IstruzioniCV.html' target="_blank" style="color: #0000FF; text-decoration: underline">Esempi di compilazione</a> --%>
         <span id="Wordlink"></span>
         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>"  CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
     </div> <!--End buttons-->

@@ -113,7 +113,7 @@
                                 <div class="widget-content-wrapper">
                                     <div class="widget-content-left">
                                         <div class="widget-heading">Ore da caricare</div>
-                                        <div class="widget-subheading">lavorative</div>
+                                        <div class="widget-subheading">da inizio mese ad oggi</div>
                                     </div>
                                     <div class="widget-content-right">
                                         <div class="widget-numbers" id="OreNelMese-KPIValue0">-</div>

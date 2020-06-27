@@ -541,9 +541,9 @@
 
         // tooltip : hideDelay default 500, riduce tempo prima che sia nascosto il tooltip
         $('.hours').smallipop({
-            hideDelay: 100,
+            hideDelay: 0,
             theme: 'blue',
-            popupDelay: 500
+            popupDelay: 0
         });
 
         //select all the a tag with name equal to modal
