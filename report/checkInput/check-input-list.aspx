@@ -1,114 +1,159 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="check-input-list.aspx.cs" Inherits="report_checkInput_check_input_list" %>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
- <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
-<script src="/timereport/include/javascript/timereport.js"></script>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="check-input-list.aspx.cs" Inherits="m_report_checkinputlist" %>
 
 <!DOCTYPE html>
 
+<!-- Stili -->
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle.css" rel="stylesheet" /> 
+<link href="/timereport/include/standard/uploader/uploader.css" rel="stylesheet"  />
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" >
+
+<!-- Menù  -->
+<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
+<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+
+<!-- Jquery per date picker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script> 
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Tabulator  -->
+<script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script> <!-- Download excel da Tabulator -->
+
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head runat="server">
-    <title>Lista Ore</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>Richieste approvazione</title>
 </head>
 
 <body>
-   
-   <div id="TopStripe"></div> 
-
-    <div id="MainWindow">
-
-    <form id="form1" runat="server">
-
-    <!--**** Riquadro navigazione ***-->    
-    <div id="PanelWrap"> 
-
-    <!--**** Primo Box ***-->    
-    <div class="RoundedBox" >
-
-    <table width="760" border="0" class="GridTab">
-        <tr>
-        <td>
-            TR Chiuso:
-        </td>
-        <td>
-            <asp:DropDownList ID="DL_TRChiuso" runat="server" AutoPostBack="True"  CssClass="TabellaLista" >
-                <asp:ListItem Selected="True" Value="all">Tutti i valori</asp:ListItem>
-                <asp:ListItem Value="1">Chiuso</asp:ListItem>
-                <asp:ListItem Value="0">Non Chiuso</asp:ListItem>
-            </asp:DropDownList>
-        </td>
-        <td>
-            Società:</td>
-        <td>
-                <asp:DropDownList ID="DL_societa" runat="server" AutoPostBack="True" AppendDataBoundItems="True"
-                    DataSourceID="DS_societa" DataTextField="Name" DataValueField="Company_id" 
-                    Width="150px"  
-                    CssClass="TabellaLista" >
-                    <asp:ListItem Text="Tutti i valori" Value="all" />
-                </asp:DropDownList>
-                &nbsp;<asp:Button class=SmallOrangeButton ID="BTFiltra" runat="server" Text="<%$ appSettings: FILTER_TXT %>" />
-        </td>
-        </tr>
-        </table>
-
-    </div> <!--End roundedBox-->          
-    </div> <!--End PanelWrap-->
-
-    <div id="PanelWrap">  
-
-        <!-- *** GRID ***  -->
-        <asp:GridView ID="GV_ListaOre" runat="server" CssClass="GridView" GridLines="None" EnableModelValidation="True" AutoGenerateColumns="False"   >
-            <HeaderStyle CssClass="GV_header" />
-            <Columns>
-                <asp:BoundField datafield="Nome" headertext="Nome" SortExpression="Nome" />
-                <asp:BoundField datafield="Società" headertext="Società"/>
-                <asp:BoundField datafield="OreContratto" headertext="Ore Contratto"/>
-                 <asp:BoundField datafield="GGMancanti" headertext="GG Mancanti"/>
-                 <asp:BoundField datafield="StatoTR" headertext="Stato TR"/>
-                 <asp:BoundField datafield="GGMesePrecedente" headertext="Mese Precedente"/>
-                <asp:BoundField datafield="Dettagli" headertext="Dettagli" HtmlEncode="False" />
-            </Columns>
-            <FooterStyle CssClass="GV_footer" />
-            <RowStyle CssClass="GV_row" />
-            <AlternatingRowStyle CssClass="GV_row_alt"/>
-
-        </asp:GridView>
     
+    <div id="TopStripe"></div> 
+
+    <div id="MainWindow" >
+  
+    <form id="FVForm" runat="server"  >
+    
+    <div id="PanelWrap" style="width:720px" > 
+
+    <div class="StandardForm">        
+        <div id="ListTable"></div>
+    </div>  
+            
     <div class="buttons">               
-        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click"   />
-        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>"  CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;"  />
+        <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>"  CssClass="orangebutton" />
+        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>"  CssClass="greybutton" PostBackUrl="/timereport/report/checkInput/check-input-select.aspx" />
     </div> <!--End buttons-->
 
     </div> <!--End PanelWrap-->
-
+    
     </form>
 
     </div> <!-- END MainWindow -->
 
-    <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>
-    </div>  
+    <!-- **** FOOTER **** -->  
+    <div id="WindowFooter">       
+        <div ></div>        
+        <div  id="WindowFooter-L"> Aeonvis Spa <%= DateTime.Today.Year  %></div> 
+        <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
+        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>        
+     </div>    
 
-    <asp:SqlDataSource ID="DS_societa" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT DISTINCT Company.Company_id, Company.Name, Persons.Active FROM Company INNER JOIN Persons ON Company.Company_id = Persons.Company_id WHERE (Persons.Active = 1) ORDER BY Company.Name">
-    </asp:SqlDataSource>
-
+    <div id="mask"></div>  <!-- Mask to cover the whole screen -->
+        
 </body>
-</html>
 
+<script>
+
+    // ** VALIDAZIONI **
+    var btnRifiutatoClick = false;
+
+   // *** attiva validazione campi form
+    $('#formPersone').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+    });
+
+    // ***  Controllo che esista un commento se il progetto lo richiede ***
+    //window.Parsley.addValidator('testoObbligatorio', {
+    //        validateString: function (value) {
+
+    //            if (btnRifiutatoClick & $("#TBApprovalText1").val().length == 0)
+    //                return $.Deferred().reject("inserire un commento");
+    //            else
+    //                return true;
+    //        }
+    //});
+
+    // ** INTERFACCIA **
+
+    // ** EVENTI TRIGGER **
+    //trigger download of data.xlsx file
+    $("#btn_download").click(function(){
+        ListTable.download("xlsx", "ExportData.xlsx", {sheetName:"Dati"});
+    });    
+
+    // ** TABULATOR **
+
+    var editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        var data = cell.getRow().getData();
+
+        if (data.StatoTR != 'chiuso')
+            return "<i class='fa fa-address-card'></i>";
+        else
+            return "";
+
+    };  // icona edit
+
+    var ListTable = new Tabulator("#ListTable", {
+    //initialHeaderFilter: [{ field: "ApprovalStatus", value: 'REQU' } ], //valore iniziare dello stato per filtrare
+    paginationSize: 16, // this option can take any positive integer value (default = 10)
+    pagination:"local", //enable local pagination.
+    headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
+    ajaxURL:"/timereport/webservices/RP_Chiusure.asmx/GetListaChiusure", //ajax URL
+    ajaxParams: { meseLista: <%= Request.QueryString["mese"].ToString()  %> , annoLista :  <%= Request.QueryString["anno"].ToString()  %>}, //ajax parameters
+    ajaxConfig: "POST", //ajax HTTP request type
+    ajaxContentType:"json", // send parameters to the server as a JSON encoded string
+    layout: "fitColumns", //fit columns to width of table (optional)
+    ajaxResponse:function(url, params, response){
+        //url - the URL of the request
+        //params - the parameters passed with the request
+        //response - the JSON object returned in the body of the response.
+        return JSON.parse(response.d); //return the d property of a response json object
+    },
+    columns: [
+        { title: "Persons_Id", field: "Persons_Id", sorter: "number", visible: false },
+        { title: "Consulente", field: "Name", width: 150, sorter: "string", headerFilter: true },
+        { title: "Società", field: "CompanyName", width: 150, sorter: "string", headerFilter: true },
+        { title: "Manager", field: "Manager", width: 150, sorter: "string", headerFilter: true },
+        { title: "Ore Contratto", field: "OreContratto", sorter: "number", headerFilter: true },
+        { title: "GG Mancanti", field: "GGmancanti", sorter: "number", headerFilter: true },
+        { title: "Mese Precedente", field: "GGMesePrecedente", sorter: "number", headerFilter: true },
+        { title: "Chiuso", field: "TRChiuso", formatter: "tickCross", sorter: "string", headerFilter: "select",
+          headerFilterParams: { values: { "true": "true", "false": "false", "": "All" } }
+        },
+        { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { OpenUrl(cell.getRow().getData()) } },
+        ],
+    }); // Tabella principale
+
+    // ** FUNZIONI **
+    function OpenUrl(dati)
+    {
+
+        if (dati.StatoTR == 'chiuso')
+            return;
+
+        var url = dati.urlDetailPage;
+        window.open(url,'_blank');
+        return;
+    }
+
+
+</script>
+
+</html>
