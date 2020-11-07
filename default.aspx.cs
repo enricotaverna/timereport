@@ -115,7 +115,7 @@ public partial class defaultAspx : System.Web.UI.Page
 
             if (Convert.ToInt32(Session["ForcedAccount"]) != 0)  {
 				//** A.1 Carica progetti possibili
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT v_Projects.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType,ProjectType_Id, CodiceCliente  FROM ForcedAccounts RIGHT JOIN v_Projects ON ForcedAccounts.Projects_id = v_Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR v_Projects.Always_available = 1 ) AND v_Projects.active = 1 )  ORDER BY v_Projects.ProjectCode", this.Page);
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT v_Projects.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType,ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM ForcedAccounts RIGHT JOIN v_Projects ON ForcedAccounts.Projects_id = v_Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + Session["Persons_id"] + " OR v_Projects.Always_available = 1 ) AND v_Projects.active = 1 )  ORDER BY v_Projects.ProjectCode", this.Page);
 
 				//** A.2 Carica spese possibili				
 				//** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
@@ -129,7 +129,7 @@ public partial class defaultAspx : System.Web.UI.Page
                 }
 			else  {
 				//** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
-				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente  FROM v_Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
+				dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 ORDER BY ProjectCode", this.Page);
 				//** B.2 tutte le spese attive 							
                 dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", this.Page);
             }

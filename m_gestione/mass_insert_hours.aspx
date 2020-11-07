@@ -64,6 +64,9 @@
             Dim NewTrasferta As CheckBox = GV_Ore.FooterRow.FindControl("CB_Trasferta")
             Dim NewComment As TextBox = GV_Ore.FooterRow.FindControl("TX_Comment")
 
+            ' trova la società legata all'utente
+            Dim dr As DataRow = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " & ASPcompatility.FormatNumberDB(NewPersonaId.SelectedValue), Nothing)
+
             DShours.InsertParameters("Projects_Id").DefaultValue = NewProjectsId.SelectedValue
             DShours.InsertParameters("Persons_id").DefaultValue = NewPersonaId.SelectedValue
 
@@ -79,6 +82,11 @@
             DShours.InsertParameters("CancelFlag").DefaultValue = NewStorno.Checked
             DShours.InsertParameters("HourType_Id").DefaultValue = 1 ' valore di default
             DShours.InsertParameters("Comment").DefaultValue = NewComment.Text
+
+            DShours.InsertParameters("Company_id").DefaultValue = dr("Company_id")
+            Dim result = Utilities.GetManagerAndAccountId(NewProjectsId.SelectedValue)
+            DShours.InsertParameters("ClientManager_id").DefaultValue = result.Item1
+            DShours.InsertParameters("AccountManager_id").DefaultValue = result.Item2
 
             If NewStorno.Checked Then
                 DShours.InsertParameters("Hours").DefaultValue = DShours.InsertParameters("Hours").DefaultValue * -1
@@ -574,7 +582,7 @@
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
         SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.AccountingDate, Hours.CancelFlag, Hours.Comment, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto FROM Hours INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id ORDER BY Hours.Date, Hours.Projects_Id, Hours.Persons_id"  
         DeleteCommand="DELETE FROM [Hours] WHERE [Hours_Id] = @Hours_Id" 
-        InsertCommand="INSERT INTO [Hours] ([Projects_Id], [Persons_id], [Date], [Hours], [HourType_Id], [AccountingDate], [CancelFlag], [Comment], [CreatedBy], [CreationDate], [Activity_id]) VALUES (@Projects_Id, @Persons_id, @Date, @Hours, @HourType_Id, @AccountingDate, @CancelFlag, @Comment, @CreatedBy, @CreationDate, @activity_id)"                         
+        InsertCommand="INSERT INTO [Hours] ([Projects_Id], [Persons_id], [Date], [Hours], [HourType_Id], [AccountingDate], [CancelFlag], [Comment], [CreatedBy], [CreationDate], [Activity_id], Company_id, ClientManager_id, AccountManager_id) VALUES (@Projects_Id, @Persons_id, @Date, @Hours, @HourType_Id, @AccountingDate, @CancelFlag, @Comment, @CreatedBy, @CreationDate, @activity_id, @Company_id, @ClientManager_id, @AccountManager_id)"                         
         UpdateCommand="UPDATE Hours SET Projects_Id = @Projects_Id, Persons_id = @Persons_id, Date = @Date, Hours = @Hours, AccountingDate = @AccountingDate, CancelFlag = @CancelFlag, Comment = @Comment, LastModifiedBy = @LastModifiedBy, LastModificationDate = @LastModificationDate, Activity_Id = @Activity_Id WHERE (Hours_Id = @Hours_Id)" 
         onupdating="DShours_Updating">
                 <SelectParameters>
@@ -615,6 +623,9 @@
             <asp:Parameter Name="CreatedBy" Type="String" />
             <asp:Parameter Name="CreationDate" Type="DateTime" />
             <asp:Parameter Name="Activity_id" Type="Int32"  />         
+            <asp:Parameter Name="ClientManager_id" />
+            <asp:Parameter Name="AccountManager_id" />
+            <asp:Parameter Name="Company_id" />
 
         </InsertParameters>
     </asp:SqlDataSource>

@@ -221,7 +221,7 @@ public class Card
 
                 kpi = new KPISet();
                 kpi.KPIValue = calc.oreMancanti + "";
-                kpi.CSSClass = kpi.KPIValue == "0" ? "text-primary" : "text-warning"; 
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-primary" : "text-warning";
                 KPIList.Add(kpi);
 
                 kpi = new KPISet();
@@ -585,8 +585,12 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         JavaScriptSerializer js = new JavaScriptSerializer();
         ApprovalRequest appr = js.Deserialize<ApprovalRequest>(approvalRequest);
 
+        // recupera oggetto sessione
+        TRSession CurrentSession  = (TRSession)Session["CurrentSession"];
+        var result = Utilities.GetManagerAndAccountId(appr.projects_id);
+
         // ** 1 ** Crea la richiesta
-        sSQL = "INSERT INTO WF_ApprovalRequest (Persons_id, Projects_id , RequestType, FromDate, ToDate, Hours, Comment, ApprovalStatus, ApprovedBy, ApprovalNotifyList, CreationDate )" +
+        sSQL = "INSERT INTO WF_ApprovalRequest (Persons_id, Projects_id , RequestType, FromDate, ToDate, Hours, Comment, ApprovalStatus, ApprovedBy, ApprovalNotifyList, CreationDate, ClientManager_id, AccountManager_id, Company_id )" +
               "VALUES (" +
               ASPcompatility.FormatNumberDB(appr.persons_id) + "," +
               ASPcompatility.FormatNumberDB(appr.projects_id) + "," +
@@ -599,6 +603,9 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
               ASPcompatility.FormatNumberDB(appr.approvedBy) + "," +
               ASPcompatility.FormatStringDb(appr.notifyList) + "," +
               ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy")) +
+              ASPcompatility.FormatNumberDB(result.Item1) + "," +
+              ASPcompatility.FormatNumberDB(result.Item2) + "," +
+              ASPcompatility.FormatNumberDB(CurrentSession.Company_id) +
               ")";
 
         bool bResult = Database.ExecuteSQL(sSQL, null);

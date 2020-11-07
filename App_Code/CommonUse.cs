@@ -334,6 +334,19 @@ public class Utilities
 
         return sRet;
     }
+
+    public static Tuple<int, int> GetManagerAndAccountId(int Projects_id) {
+
+        DataTable dtProgettiForzati = (DataTable)HttpContext.Current.Session["dtProgettiForzati"];
+        DataRow[] rows = dtProgettiForzati.Select("Projects_id = " + Projects_id);
+
+        var tuple = new Tuple<int, int>(0, 0);
+
+        if (rows.Count() == 1)
+            tuple = new Tuple<int, int>( Convert.ToInt32(rows[0]["ClientManager_id"]), Convert.ToInt32(rows[0]["AccountManager_id"]));
+
+        return tuple;
+    }
 }
 
 public class CommonFunction

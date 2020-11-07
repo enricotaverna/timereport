@@ -69,6 +69,7 @@ public class RP_Chiusure : System.Web.Services.WebService
                   " ( SELECT  SUM(Hours)  FROM hours where Persons_id =  a.Persons_id and hours.date >= " + sDataInizio + " and hours.date <= " + sDataFine + " ) as oreMesePrecedente, " +
                   " ( SELECT MAX(stato) from logTR Where LogTR.Mese=" + meseLista + " AND LogTR.Anno=" + annoLista + " AND persons_id=a.Persons_id ) as stato " +
                   " FROM v_Persons as a " +
+                  " WHERE a.active='true' " +
                   " GROUP BY a.Persons_Id,  a.Name,  a.mail, a.CompanyName, a.ManagerName ,a.ContractHours  ORDER BY a.Name";
 
         // Esegue Select sulle persone attive

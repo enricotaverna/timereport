@@ -70,6 +70,9 @@
             Dim NewComment As TextBox = GV_Spese.FooterRow.FindControl("TX_Comment")
             Dim NewAccountingDate As TextBox = GV_Spese.FooterRow.FindControl("TB_AccountingDate")
 
+            ' trova la società legata all'utente
+            Dim dr As DataRow = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " & ASPcompatility.FormatNumberDB(NewPersonaId.SelectedValue), Nothing)
+
             DSExpenses.InsertParameters("Projects_Id").DefaultValue = NewProjectsId.SelectedValue
             DSExpenses.InsertParameters("Persons_id").DefaultValue = NewPersonaId.SelectedValue
             DSExpenses.InsertParameters("Date").DefaultValue = NewData.Text
@@ -81,6 +84,11 @@
             DSExpenses.InsertParameters("CompanyPayed").DefaultValue = CB_CompanyPayed.Checked
             DSExpenses.InsertParameters("Comment").DefaultValue = NewComment.Text
             DSExpenses.InsertParameters("AccountingDate").DefaultValue = NewAccountingDate.Text
+
+            DSExpenses.InsertParameters("Company_id").DefaultValue = dr("Company_id")
+            Dim result = Utilities.GetManagerAndAccountId(NewProjectsId.SelectedValue)
+            DSExpenses.InsertParameters("ClientManager_id").DefaultValue = result.Item1
+            DSExpenses.InsertParameters("AccountManager_id").DefaultValue = result.Item2
 
             ' Log
             DSExpenses.InsertParameters("CreatedBy").DefaultValue = Session("UserId")
@@ -521,7 +529,7 @@
         <asp:SqlDataSource ID="DSExpenses" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
             SelectCommand="SELECT expenses.expenses_Id, expenses.Projects_Id, expenses.Persons_id, expenses.Date, expenses.Amount, expenses.ExpenseType_Id, expenses.CancelFlag, expenses.creditcardpayed, expenses.CompanyPayed, expenses.invoiceflag,expenses.Comment, expenses.AccountingDate, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, ExpenseType.ExpenseCode + ' ' + ExpenseType.Name AS TipoSpesa FROM Expenses INNER JOIN Projects ON Expenses.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id INNER JOIN ExpenseType ON Expenses.ExpenseType_Id = ExpenseType.ExpenseType_Id ORDER BY Expenses.Date, Expenses.Projects_Id, Expenses.Persons_id"
             DeleteCommand="DELETE FROM [Expenses] WHERE [Expenses_Id] = @Expenses_Id" 
-            InsertCommand="INSERT INTO [Expenses] ([Projects_Id], [Persons_id], [Date], [Amount], [ExpenseType_Id], [CancelFlag],[InvoiceFlag],[CreditCardPayed], [CompanyPayed] ,[Comment], [CreatedBy], [CreationDate], [AccountingDate], [TipoBonus_id]) VALUES (@Projects_Id, @Persons_id, @Date, @amount, @ExpenseType_Id, @CancelFlag,@InvoiceFlag,@CreditCardPayed, @CompanyPayed, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id)"
+            InsertCommand="INSERT INTO [Expenses] ([Projects_Id], [Persons_id], [Date], [Amount], [ExpenseType_Id], [CancelFlag],[InvoiceFlag],[CreditCardPayed], [CompanyPayed] ,[Comment], [CreatedBy], [CreationDate], [AccountingDate], [TipoBonus_id], Company_id, ClientManager_id, AccountManager_id) VALUES (@Projects_Id, @Persons_id, @Date, @amount, @ExpenseType_Id, @CancelFlag,@InvoiceFlag,@CreditCardPayed, @CompanyPayed, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @Company_id, @ClientManager_id, @AccountManager_id)"
             UpdateCommand="UPDATE [Expenses] SET [Projects_Id] = @Projects_Id, [Persons_id] = @Persons_id, [Date] = @Date, [amount] = @amount, [ExpenseType_Id] = @ExpenseType_Id, [CancelFlag] = @CancelFlag, [CreditCardPayed] = @CreditCardPayed, [CompanyPayed] = @CompanyPayed, [InvoiceFlag] = @InvoiceFlag, [Comment] = @Comment, [LastModifiedBy] = @LastModifiedBy, [LastModificationDate] = @LastModificationDate, [AccountingDate] = @AccountingDate, [TipoBonus_id] = @TipoBonus_id WHERE [Expenses_Id] = @Expenses_Id"
             OnUpdating="DSExpenses_Updating">
             <SelectParameters>
@@ -570,6 +578,9 @@
                 <asp:Parameter Name="CreatedBy" Type="String" />
                 <asp:Parameter Name="CreationDate" Type="DateTime" />
                 <asp:Parameter Name="TipoBonus_id" Type="Int32" />
+                <asp:Parameter Name="ClientManager_id" />
+                <asp:Parameter Name="AccountManager_id" />
+                <asp:Parameter Name="Company_id" />
             </InsertParameters>
         </asp:SqlDataSource>
         <asp:ValidationSummary ID="ValidationSummary1" runat="server" ShowMessageBox="True"

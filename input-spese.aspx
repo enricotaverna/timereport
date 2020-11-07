@@ -425,8 +425,8 @@
 				<%--        INSERT--%>
 				<asp:SqlDataSource ID="DSSpese" runat="server"
 					ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-					SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id WHERE (Expenses_Id = @Expenses_Id)"
-					InsertCommand="INSERT INTO Expenses(Projects_Id, Persons_id, Date, ExpenseType_Id, Amount, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, Comment, CreatedBy, CreationDate, AccountingDate, TipoBonus_id) VALUES (@Projects_Id, @Persons_id, @Date, @ExpenseType_id, @Amount, @CancelFlag, @CreditCardPayed, @CompanyPayed, @InvoiceFlag, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id);"
+					SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name, Expenses.ClientManager_id, Expenses.AccountManager_id, Expenses.Company_id FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id WHERE (Expenses_Id = @Expenses_Id)"
+					InsertCommand="INSERT INTO Expenses(Projects_Id, Persons_id, Date, ExpenseType_Id, Amount, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, Comment, CreatedBy, CreationDate, AccountingDate, TipoBonus_id, ClientManager_id, AccountManager_id, Company_id) VALUES (@Projects_Id, @Persons_id, @Date, @ExpenseType_id, @Amount, @CancelFlag, @CreditCardPayed, @CompanyPayed, @InvoiceFlag, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @ClientManager_id, @AccountManager_id, @Company_id);"
 					UpdateCommand="UPDATE Expenses SET Amount = @Amount , ExpenseType_Id = @ExpenseType_Id, CancelFlag = @CancelFlag, Comment = @Comment, InvoiceFlag = @InvoiceFlag, CreditCardPayed = @CreditCardPayed, CompanyPayed = @CompanyPayed, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, TipoBonus_id = @TipoBonus_id WHERE (Expenses_Id = @Expenses_Id)"
 					OnInserting="DSSpese_Insert_Update" OnUpdating="DSSpese_Insert_Update" OnInserted="DSSpese_Inserted">
 
@@ -450,6 +450,9 @@
 						<asp:Parameter Name="CreationDate" />
 						<asp:Parameter Name="AccountingDate" Type="DateTime" />
 						<asp:Parameter Name="TipoBonus_id" />
+                        <asp:Parameter Name="ClientManager_id" />
+                        <asp:Parameter Name="AccountManager_id" />
+                        <asp:Parameter Name="Company_id" />
 					</InsertParameters>
 
 					<UpdateParameters>

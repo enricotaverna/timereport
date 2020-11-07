@@ -54,10 +54,6 @@ public partial class input_ore : System.Web.UI.Page
             
                 Label LBperson =   (Label)FVore.FindControl("LBperson");
                 LBperson.Text = (string)Session["UserName"];
-
-                //CheckBox CBWorkedInRemote = (CheckBox)FVore.FindControl("CBWorkedInRemote");
-                //CBWorkedInRemote.Checked = true ;
-
         }
 
     }
@@ -295,6 +291,11 @@ public partial class input_ore : System.Web.UI.Page
             // Audit
             e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+            // valori manager e società
+            e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
+            var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
+            e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
+            e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
         }
 
         // if in change

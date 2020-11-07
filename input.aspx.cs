@@ -16,11 +16,16 @@ public partial class input : System.Web.UI.Page
     public DataTable dtenses;
     public DataTable dtAssenze;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("DATI", "ORE");
         Auth.CheckPermission("DATI", "SPESE");
+
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
         // imposta session variables
         SetVariables();
@@ -56,7 +61,7 @@ public partial class input : System.Web.UI.Page
         if ((string)Session["type"] == "hours")
         {
 
-            DataTable dt = Database.GetData("Select projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment from hours where hours_id=" + param[1], this.Page);
+            DataTable dt = Database.GetData("Select projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, ClientManager_id, AccountManager_id, Company_id from hours where hours_id=" + param[1], this.Page);
 
                 if (dt.Rows.Count > 0)
                 {
@@ -66,7 +71,7 @@ public partial class input : System.Web.UI.Page
                     string strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                     // scrive il record copia!
-                    Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate) VALUES(" +
+                    Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) VALUES(" +
                                          ASPcompatility.FormatDateDb(param[0], false) + " , " +
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -79,6 +84,9 @@ public partial class input : System.Web.UI.Page
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
                                          ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
                                          ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
                                          " )"
                                         , this.Page);
                 }
@@ -91,7 +99,7 @@ public partial class input : System.Web.UI.Page
         {
 
             // leggi record da copiare
-            DataTable dt = Database.GetData("Select projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id, AccountingDate, comment from Expenses where Expenses_id=" + param[1], this.Page);
+            DataTable dt = Database.GetData("Select projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id, AccountingDate, comment, ClientManager_id, AccountManager_id, Company_id from Expenses where Expenses_id=" + param[1], this.Page);
 
             if (dt.Rows.Count > 0)    
                 {
@@ -101,7 +109,7 @@ public partial class input : System.Web.UI.Page
                     string strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                     // scrive il record copia!
-                    Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate) VALUES(" +
+                    Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) VALUES(" +
                                          ASPcompatility.FormatDateDb(param[0], false) + " , " +
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -116,6 +124,9 @@ public partial class input : System.Web.UI.Page
                                          ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
                                          ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
                                          ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
+                                         ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
                                          " )"
                                         , this.Page);
                 }
@@ -375,8 +386,8 @@ public partial class input : System.Web.UI.Page
                              "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
                              "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
                              "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
-                             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["LocationDescription"] +
-                             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["comment"] +
+                             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
+                             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
                              "<br>" +
                              "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
                              "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
@@ -649,8 +660,11 @@ WFIcon = "";
     {
         string cmd;
 
+        // trova progetto per recuperare dati manager ed account
+        var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(Request.Form["DDLProgetto"]));
+
         // inserisce record x trasferta
-        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id) " +
+        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id) " +
                 "values (" +
                 ASPcompatility.FormatDateDb(Request.Form["refDate"], false) + " ," +
                 "'" + Request.Form["DDLProgetto"] + "' ," +    // da dropdown
@@ -664,7 +678,11 @@ WFIcon = "";
                 "'false' ," +
                 "'" + Session["userId"] + "' ," +
                 ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
-                "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' )";
+                "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
+                "'" + result.Item1 + "' ," +
+                "'" + result.Item2 + "' ," +
+                "'" + CurrentSession.Company_id +
+                "' )";
 
         Database.ExecuteSQL(cmd, this.Page);
 

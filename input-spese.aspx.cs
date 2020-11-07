@@ -19,11 +19,15 @@ public partial class input_spese : System.Web.UI.Page
     public int lTipoBonus_id;
     public string lDataSpesa, lExpense_id;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("DATI", "SPESE");
-       
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
         //      Modo di default è insert, se richiamata con id va in change / display
         if (IsPostBack)
         {
@@ -318,6 +322,11 @@ public partial class input_spese : System.Web.UI.Page
             // Audit
             e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+            // valori manager e società
+            e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
+            var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
+            e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
+            e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
         }
 
         // if in change

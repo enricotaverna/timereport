@@ -22,6 +22,7 @@ public class TRSession
     public List<LocationRecord> LocationList = new List<LocationRecord>();
     // personal setting
     public int Persons_id;
+    public int Company_id;
     public int ContractHours;
 
     public TRSession(int inputPersons_id)
@@ -73,5 +74,6 @@ public class TRSession
     public void LoadPersonalSetting() {
         DataRow rdr = Database.GetRow("SELECT * from Persons WHERE persons_id= " + ASPcompatility.FormatNumberDB(Persons_id), null);
         ContractHours = Convert.ToInt16(rdr["ContractHours"].ToString());
+        Company_id = Convert.ToInt16(rdr["Company_id"].ToString());
     }
 }

@@ -282,6 +282,14 @@
                     newrow("CreationDate") = DateTime.Now()
                     newrow("TipoBonus_id") = iTipoBonus_id
 
+                    ' recupera oggetto sessione
+                    Dim CurrentSession As TRSession = Session("CurrentSession") ' recupera oggetto con variabili di sessione
+                    Dim result = Utilities.GetManagerAndAccountId(idProgetto)
+
+                    newrow("Company_id") = CurrentSession.Company_id
+                    newrow("ClientManager_id") = result.Item1
+                    newrow("AccountManager_id") = result.Item2
+
                     dsExpenses.Tables(0).Rows.Add(newrow)
                     Adapter.Update(dsExpenses)
 

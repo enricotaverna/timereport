@@ -156,14 +156,22 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
                             // not found -> create record
                             iRec++;
 
-                            using (SqlCommand cmdsql = new SqlCommand("INSERT INTO Hours (persons_id, projects_id, HourType_Id, date, hours,createdBy, creationDate) " + 
+                            // trova la società legata all'utente
+                            DataRow dr = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " + ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]), null);
+                            var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]));
+
+                            using (SqlCommand cmdsql = new SqlCommand("INSERT INTO Hours (persons_id, projects_id, HourType_Id, date, hours,createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) " + 
                                                                        "VALUES ('" + itPersona.Value.ToString() + "', '" + 
                                                                        ConfigurationManager.AppSettings["FESTIVI_PROJECT"]  + 
                                                                        "', '1'," + 
                                                                        ASPcompatility.FormatDateDb(drFestivo["calDay"].ToString()) + 
                                                                        " , " + ASPcompatility.FormatNumberDB(iContractHours) + " ," +
                                                                        ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " + 
-                                                                       ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"),true) + ")", connection))
+                                                                       ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"),true) + " , " +
+                                                                       ASPcompatility.FormatNumberDB(result.Item1) + " , " + // ClientManager_Id
+                                                                       ASPcompatility.FormatNumberDB(result.Item2) + " , " + // AccountManager_Id
+                                                                       ASPcompatility.FormatStringDb(dr["Company_id"].ToString()) + 
+                                                                       ")", connection))
                                 {
                                 try
                                 {

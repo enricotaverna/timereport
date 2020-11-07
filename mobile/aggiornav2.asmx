@@ -31,7 +31,7 @@ public class Spese
 
 public class TipoOre
 {
-    public int TipoOreId { get; set; }  
+    public int TipoOreId { get; set; }
     public string TipoOreName { get; set; }
 }
 
@@ -219,15 +219,15 @@ public class aggiorna : System.Web.Services.WebService
         DataTable dt = Database.GetData("SELECT activity_id, ([ActivityCode] + ' ' + [Name]) as ActivityNames FROM Activity WHERE ( Projects_id = " + Projects_id.ToString() + " )  ORDER BY ActivityCode", null);
 
         foreach (DataRow rs in dt.Rows)
+        {
+            var emp = new Activity
             {
-                var emp = new Activity
-                {
-                    ActivityId = (int)rs[0],
-                    ActivityName = rs[1].ToString()
-                };
-                ReturnList.Add(emp);
-            }
-     
+                ActivityId = (int)rs[0],
+                ActivityName = rs[1].ToString()
+            };
+            ReturnList.Add(emp);
+        }
+
         return ReturnList;
     } // GetProjectsList
 
@@ -253,6 +253,11 @@ public class aggiorna : System.Web.Services.WebService
             DataTable HoursTable = ds.Tables["Hours"];
             DataRow row = HoursTable.NewRow();
 
+            // recupera società e manager
+            DataRow drPerson = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " + ASPcompatility.FormatNumberDB(Person_id), null);
+            // recupera anagrafica progetto
+            DataRow drProject = Database.GetRow("SELECT ClientManager_id, AccountManager_id  FROM Projects WHERE Projects_id = " + ASPcompatility.FormatNumberDB(Projects_Id), null);
+
             row["Date"] = TbdateForHours;
             row["Projects_Id"] = Projects_Id;
             row["Activity_Id"] = Activity_Id;
@@ -261,6 +266,9 @@ public class aggiorna : System.Web.Services.WebService
             row["Hours"] = (CancelFlag == true ? -1 : 1) * TbHours;
             row["comment"] = comment.ToString();
             row["CancelFlag"] = CancelFlag;
+            row["Company_id"] = Convert.ToInt32(drPerson["Company_id"]);
+            row["AccountManager_id"] = Convert.ToInt32(drProject["AccountManager_id"]);
+            row["ClientManager_id"] = Convert.ToInt32(drProject["ClientManager_id"]);
             row["CreationDate"] = DateTime.Now;
             row["CreatedBy"] = get_userid(Person_id);
             HoursTable.Rows.Add(row);
