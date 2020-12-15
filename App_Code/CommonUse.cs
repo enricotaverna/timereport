@@ -408,7 +408,7 @@ public class CommonFunction
                 iOreLavorative = iOreLavorative + 1;
         }
 
-        iOreLavorative = iOreLavorative * CurrentSession.ContractHours;
+        iOreLavorative = iOreLavorative * CurrentSession.ContractHours; // ore lavorative nel mese
 
         ret.dOreLavorative = iOreLavorative;
         ret.dOreCaricate = iContaOre;
@@ -436,9 +436,16 @@ public class CommonFunction
 
     public static int NumeroGiorniLavorativi(DateTime startdate, DateTime enddate)
     {
-        var days = (enddate - startdate).Days + 1;
+        //var days = (enddate - startdate).Days + 1;
+        //return workDaysInFullWeeks(days) + workDaysInPartialWeek(startdate.DayOfWeek, days);
 
-        return workDaysInFullWeeks(days) + workDaysInPartialWeek(startdate.DayOfWeek, days);
+        double calcBusinessDays =  1 + ((enddate - startdate).TotalDays * 5 - (startdate.DayOfWeek - enddate.DayOfWeek) * 2) / 7;
+
+        if (enddate.DayOfWeek == DayOfWeek.Saturday) calcBusinessDays--;
+        if (startdate.DayOfWeek == DayOfWeek.Sunday) calcBusinessDays--;
+
+        return Convert.ToInt16(calcBusinessDays);
+
     }
 
     public static int workDaysInFullWeeks(int totalDays)

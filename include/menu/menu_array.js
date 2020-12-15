@@ -121,7 +121,7 @@ if (sUserLevel == AUTH_ADMIN) {
         , "Home", "/timereport/menu.aspx", , "Back to the home page", 1 // "Description Text", "URL", "Alternate URL", "Status", "Separator Bar"
         , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=MGR_Inserisci", , "", 1
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
-        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
+        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=EMP_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
         , (sLingua == 'it') ? "Amministrazione&nbsp;&nbsp;" : "Administration&nbsp;&nbsp;", "show-menu=ADMIN_MainMenu", , "", 1
         , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=ADM_HR", , "", 1
@@ -218,7 +218,6 @@ if (sUserLevel == AUTH_ADMIN) {
         ]);
 }
 
-
 // **** MENU MANAGER **** //
 if (sUserLevel == AUTH_MANAGER) {
 
@@ -228,7 +227,7 @@ if (sUserLevel == AUTH_MANAGER) {
         , "Home", "/timereport/menu.aspx", , "Back to the home page", 1 // "Description Text", "URL", "Alternate URL", "Status", "Separator Bar"
         , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=MGR_Inserisci", , "", 1
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
-        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=MGR_Utilita", , "", 1
+        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=EMP_Utilita", , "", 1
         , (sLingua == 'it') ? "Progetti&nbsp;&nbsp;" : "Projects&nbsp;&nbsp;", "show-menu=MNGR_Progetti", , "", 1
         , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=ADM_HR", , "", 1
         , "Logout&nbsp;&nbsp;", "/timereport/logout.aspx", , "", 1
@@ -257,7 +256,7 @@ if (sUserLevel == AUTH_TRAINER) {
         , "Home", "/timereport/menu.aspx", , "Back to the home page", 1 // "Description Text", "URL", "Alternate URL", "Status", "Separator Bar"
         , (sLingua == 'it') ? "Inserisci&nbsp;Dati&nbsp;&nbsp;" : "Input&nbsp;Data&nbsp;&nbsp;", "show-menu=FULL_Inserisci", , "", 1
         , "Report&nbsp;&nbsp;", "show-menu=COMMON_Report", , "", 1
-        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=COMMON_Utilita", , "", 1
+        , (sLingua == 'it') ? "Utilita'&nbsp;&nbsp;" : "Utility&nbsp;&nbsp;", "show-menu=EMP_Utilita", , "", 1
         , (sLingua == 'it') ? "HR&nbsp;&nbsp;" : "HR&nbsp;&nbsp;", "show-menu=COMMON_HR", , "", 1
         , "Logout&nbsp;&nbsp;", "/timereport/logout.aspx", , "", 1
     ]);
@@ -372,6 +371,14 @@ addmenu(menu = ["MNGR_TrainingReport",
 addmenu(menu = ["MGR_Utilita",
     , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
     , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Cambia password" : "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Change password", "/timereport/m_utilita/change-password.aspx", , , 1
+    // , "<img src=/timereport/images/icons/16x16/S_F_OKAY.gif border=0>&nbsp;Approva Richieste", "/timereport/m_gestione/Approval/Approval_list.aspx", , , 1 *** LEAVE_OFF  ***
+
+]);
+
+addmenu(menu = ["EMP_Utilita",
+    , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
+    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Cambia password" : "<img src=/timereport/images/icons/16x16/password.gif border=0>&nbsp;Change password", "/timereport/m_utilita/change-password.aspx", , , 1
+    , (sLingua == 'it') ? "<img src=/timereport/images/icons/16x16/S_COMPLE.gif border=0>&nbsp;Avvia Demo AWS" : "src=/timereport/images/icons/16x16/S_B_ACTY.gif border=0>&nbsp;Start AWS Demo", "/timereport/m_utilita/AWSClient/AWSClient.aspx", , , 1
     // , "<img src=/timereport/images/icons/16x16/S_F_OKAY.gif border=0>&nbsp;Approva Richieste", "/timereport/m_gestione/Approval/Approval_list.aspx", , , 1 *** LEAVE_OFF  ***
 
 ]);
