@@ -299,8 +299,11 @@
             { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
             { title: "Cost Rate", field: "CostRate", sorter: "number", width: 60, headerFilter: true },
             { title: "Bill Rate", field: "BillRate", sorter: "number", width: 60, headerFilter: true },
-            { formatter: trashIcon, width: 40, align: "center", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },
-            { formatter: editIcon, width: 40, align: "center", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },
+            <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE")) {
+                    Response.Write("{ formatter: trashIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },");
+                    Response.Write("\n");            
+                    Response.Write("{ formatter: editIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },");
+            } %>
         ],
     }); // Tabella principale
 
@@ -318,7 +321,7 @@
 
     } // inizilizza form in creazione
 
-    function T_leggiRecord(dati, riga) { 
+    function T_leggiRecord(dati, riga) {
 
         // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
         var values = "{'sProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";

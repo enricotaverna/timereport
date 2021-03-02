@@ -105,7 +105,7 @@ public class Auth
         
         // sessione scaduta
         if (     HttpContext.Current.Session["persons_id"] == null)
-            HttpContext.Current.Response.Redirect("/timereport/default.aspx");
+            HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
 
         // carica da memoria
         aAuthPermission = (DataRowCollection)HttpContext.Current.Session["AuthPermission"];
@@ -347,6 +347,33 @@ public class Utilities
 
         return tuple;
     }
+
+    public static void SetCookie(string key, string value) {
+
+        HttpCookie myCookie = HttpContext.Current.Request.Cookies["TRdata"];
+
+        if (myCookie == null)
+            myCookie = new HttpCookie("TRdata");
+
+        myCookie[key] = value;
+        
+        myCookie.Expires = DateTime.Now.AddYears(100);
+        HttpContext.Current.Response.Cookies.Add(myCookie);
+
+        return;
+    }
+
+    public static string GetCookie(string key)
+    {
+
+        HttpCookie myCookie = HttpContext.Current.Request.Cookies["TRdata"];
+
+        if (myCookie == null || myCookie[key] == null)
+            return "";
+       else                        
+            return  myCookie[key];
+    }
+
 }
 
 public class CommonFunction

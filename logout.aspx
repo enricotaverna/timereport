@@ -3,6 +3,8 @@
 
 
 <!DOCTYPE html>
+<!-- Stili -->
+<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
 
 <script runat="server">
 
@@ -15,7 +17,9 @@
         Session["persons_id"] = "";
         Session["nickname"] = "";
 
-        HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
+        
+
+        //HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
 
     }
 
@@ -27,9 +31,31 @@
     <title></title>
 </head>
 <body>
-    <form id="form1" runat="server">
-        <div>
-        </div>
+
+        <div id="MainWindow">
+
+        <div id="FormWrap" Class="StandardForm">
+
+        <form id="form_logout" runat="server"  >
+
+           <div class="formtitle">Timereport Logout</div>
+
+            <!-- *** Tipo Login ***  -->
+            <div class="input nobottomborder">
+
+                <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="" ></asp:Label>
+
+                <asp:Label CssClass="inputtext" runat="server" Text="Sessione terminata" ></asp:Label>
+
+            </div>
+
+
     </form>
+    
+    </div> <%-- END FormWrap  --%> 
+    
+    </div> <%-- END MainWindow --%> 
+
+
 </body>
 </html>

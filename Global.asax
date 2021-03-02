@@ -21,28 +21,10 @@
     protected void Application_BeginRequest(Object sender, EventArgs e)
     {
         //  Fired when an application request is received.
-
-        // *** Imposta lingua
-   
-        CultureInfo TRCultureInfo = new CultureInfo("it");
-
-        try
-        {
-            // recupera lingua da cookie, le sessioni non sono valorizzate qui
-            HttpCookie cCookie = HttpContext.Current.Request.Cookies.Get("lingua");
-
-            if (cCookie != null && cCookie.Value == "en")
-            {
-                TRCultureInfo = new CultureInfo("en");
-            }
-
-        }
-        catch
-        {
-            // resta it per dafault
-        }
-
-        Thread.CurrentThread.CurrentUICulture = TRCultureInfo;
+        if (Utilities.GetCookie("lingua") == "en")
+            Thread.CurrentThread.CurrentUICulture  = new CultureInfo("en");
+        else
+            Thread.CurrentThread.CurrentUICulture  = new CultureInfo("it");
 
     }
 

@@ -11,8 +11,13 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
     {
 
         //	Autorizzazione di display o creazione
-        Auth.CheckPermission("TRAINING", "CREATE");
+        Auth.CheckPermission("MASTERDATA", "COSTRATE_DISPLAY");
 
- 
+        if (!Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE"))
+        {
+            btn_crea.Visible = false;
+        }
+
+
     }
 }

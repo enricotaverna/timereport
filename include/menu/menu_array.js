@@ -357,8 +357,10 @@ addmenu(menu = ["MNGR_ReportManager",
 
 addmenu(menu =["MNGR_Economics",
         , , 180, 1, "", style1, , "", effect, , , , , , , , , , , ,
-        , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Cost Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=CR", , , 1
-        , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Bill Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=BR", , , 1
+        //, "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Cost Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=CR", , , 1
+        //, "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Bill Rate", "/timereport/report/rdlc/BillCostRateReport.aspx?ReportType=BR", , , 1
+        , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Cost Rate", "/timereport/m_gestione/CostRateAnno/CostRatePersona_list.aspx", , , 1
+        , "<img src=/timereport/images/icons/16x16/expenses.gif  border=0>&nbsp;Lista Bill Rate", "/timereport/m_gestione/CostRateAnno/CostRateProgetto_list.aspx", , , 1
         , "<img src=/timereport/images/icons/16x16/report.gif border=0>&nbsp;Report Revenue", "/timereport/report/EstraiRevenue/ReportRevenue.aspx", , , 1
 ]);
 
