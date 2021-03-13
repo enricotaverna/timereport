@@ -1,63 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 using System.Data.SqlClient;
-using System.Data;
-using Microsoft.Owin;
-using Owin;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OpenIdConnect;
 using System.Configuration;
+using System.Data;
+using Microsoft.Win32;
 
 public partial class defaultAspx : System.Web.UI.Page
 {
 	protected void Page_Load(object sender, EventArgs e)
 	{
-        string strSelect = "";
-        LblErrorMessage.Text = "";
+        
+        if ( Request["user"] != null )
+				TBusername.Text = Request["user"].ToString();
 
-        if (!IsPostBack) {
+		if (Request["password"] != null)
+			TBpassword.Text = Request["password"].ToString();
 
-            // recupera default
-            string AuthType = Utilities.GetCookie("AuthType");
+		if (Request["debug"] != null) 
+			Session["debug"] = Request["debug"].ToString();
 
-            if (AuthType == "" || AuthType == "LL")
-                DDLTipoLogin.SelectedValue = "LL";
-            else
-            {
-                DDLTipoLogin.SelectedValue = AuthType;
-            }
-        }
+        // in caso di postback                  
 
-        // in caso di postback o quando arriva da redirect 302 da Azure AD                 
-            if (IsPostBack || Request.IsAuthenticated)
-            {
-
-            Utilities.SetCookie("authType", DDLTipoLogin.SelectedValue); // salva tipo autenticazione didefault
-
-            if (DDLTipoLogin.SelectedValue == "AD")
-            {
-                    if (Request.IsAuthenticated )
-                        // autenticato da AD, recupero user con mail
-                        strSelect = "SELECT * FROM persons WHERE mail = " + ASPcompatility.FormatStringDb(System.Security.Claims.ClaimsPrincipal.Current.FindFirst("preferred_username").Value);
-                    else {
-                        AzureADLogin();
-                        return;
-                    }
-            }
-
-            if (DDLTipoLogin.SelectedValue == "LL") { 
-                // recupero user con user / pwd  
-                strSelect = "SELECT * FROM persons WHERE userId=" + ASPcompatility.FormatStringDb(TBusername.Text) +
-                             " AND password=" + ASPcompatility.FormatStringDb(TBpassword.Text);
-            }
+        if (IsPostBack)
+        {
 
             var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
             using (SqlConnection connection = new SqlConnection(connectionString))
 
             {
-
+                string strSelect = "SELECT * FROM persons WHERE userId=" + ASPcompatility.FormatStringDb(TBusername.Text) +
+                   " AND password=" + ASPcompatility.FormatStringDb(TBpassword.Text);
                 var dtLogin = new DataTable();
                 using (var da = new SqlDataAdapter(strSelect, connection))
                 {
@@ -80,14 +56,8 @@ public partial class defaultAspx : System.Web.UI.Page
                         }
                         else
                         {
-
-                            if (DDLTipoLogin.SelectedValue == "LL")
-                                LblErrorMessage.Text = "login errata";
-                            else
-                                LblErrorMessage.Text = "Utente MS365 non abilitato su Timereport, contattare ammministrazione";
-
+                            LblErrorMessage.Text = "Login errata";
                             return; // utente non trovato 
-
                         }
                     }
                     catch (Exception ex)
@@ -102,7 +72,7 @@ public partial class defaultAspx : System.Web.UI.Page
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                strSelect = "SELECT * FROM Options";
+                var strSelect = "SELECT * FROM Options";
                 var dtOption = new DataTable();
 
                 using (var da = new SqlDataAdapter(strSelect, connection))
@@ -197,6 +167,7 @@ public partial class defaultAspx : System.Web.UI.Page
         LblErrorMessage.Text = "";
 
         Response.Redirect("/timereport/menu.aspx");
+        //Response.Redirect("/timereport/report/EstraiRevenue/ReportRevenue.aspx");
 
         } // Ispostbak
 
@@ -234,22 +205,10 @@ public partial class defaultAspx : System.Web.UI.Page
 		Session["ExpensesProfile_id"] = rdr["ExpensesProfile_id"];
 
         // salva in cookie la preferenza di lingua
-        Utilities.SetCookie("lingua", rdr["Lingua"].ToString());
+        HttpCookie myCookie = new HttpCookie("lingua");
+		myCookie.Value = rdr["Lingua"].ToString();
+		myCookie.Expires = DateTime.Now.AddYears(100);
+		Response.Cookies.Add(myCookie);
 	}
-
-    // Azure Login
-    protected void AzureADLogin() 
-    {
-
-        if (!Request.IsAuthenticated)
-        {
-            HttpContext.Current.GetOwinContext().Authentication.Challenge(
-                new AuthenticationProperties { RedirectUri = ConfigurationManager.AppSettings["redirectUri"] },
-                OpenIdConnectAuthenticationDefaults.AuthenticationType);
-
-        }
-
-    }
-
 }
 

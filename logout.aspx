@@ -1,6 +1,6 @@
 ﻿<%@ Page Language="C#" %>
 <%@ Import Namespace="System.Configuration" %>
-
+<%@ Import Namespace="System.Security.Principal" %>
 
 <!DOCTYPE html>
 <!-- Stili -->
@@ -17,7 +17,8 @@
         Session["persons_id"] = "";
         Session["nickname"] = "";
 
-        
+        // logout
+   
 
         //HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
 
