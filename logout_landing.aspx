@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="logout.aspx.cs" Inherits="logoff" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="logout_landing.aspx.cs" Inherits="logoff" %>
 
 <!DOCTYPE html>
 <!-- Stili -->

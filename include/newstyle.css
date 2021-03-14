@@ -256,7 +256,7 @@ a, a:visited, a:hover, a:active {
 .formtitle {
     padding: 10px;
     line-height: 16px;
-    font-size: 13px;
+    font-size: 14px;
     text-shadow: -1px -1px #E87C19;
     color: #FFFFFF;
     font-weight: bold;
@@ -448,7 +448,7 @@ a, a:visited, a:hover, a:active {
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     padding: 6px 6px;
     color: dimgrey;
     /*text-shadow: -1px -1px #BABABA;*/
@@ -500,7 +500,7 @@ a, a:visited, a:hover, a:active {
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     padding: 6px 6px;
     color: #FFF;
     /*text-shadow: -1px -1px #FF9B19;*/
@@ -518,7 +518,7 @@ a, a:visited, a:hover, a:active {
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     padding: 6px 12px;
     color: #FFF;
     float: right;
@@ -535,7 +535,7 @@ a, a:visited, a:hover, a:active {
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     padding: 6px 12px;
     color: #FFF;
     float: right;

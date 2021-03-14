@@ -1,8 +1,30 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="logout.aspx.cs" Inherits="logoff" %>
+﻿<%@ Page Language="C#" %>
+<%@ Import Namespace="System.Configuration" %>
+<%@ Import Namespace="System.Security.Principal" %>
 
 <!DOCTYPE html>
 <!-- Stili -->
 <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+
+<script runat="server">
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        Session["UserLevel"] = "";
+        Session["UserId"] = "";
+        Session["UserName"] = "";
+        Session["persons_id"] = "";
+        Session["nickname"] = "";
+
+        // logout
+   
+
+        //HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
+
+    }
+
+</script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">

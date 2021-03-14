@@ -28,6 +28,11 @@ per disattivare richiesta assenza
 <!-- CSS override -->
 <style>
 
+    .auto-style1 {
+        width: 187px;
+        height: 189px;
+    }
+
 </style>
 
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -43,7 +48,8 @@ per disattivare richiesta assenza
 
         <form id="form_login" runat="server"  >
 
-           <div class="formtitle">Timereport Login</div>
+           <div class="formtitle"  >
+               <img alt="TR icon" style="width:22px;height:22px;vertical-align: middle" src="/timereport/favicon.ico" /> &nbsp;Timereport  </div>
 
             <!-- *** Tipo Login ***  -->
             <div class="input nobottomborder">
@@ -68,7 +74,7 @@ per disattivare richiesta assenza
             <!-- *** TEXT_BOX ***  -->
             <div class="input nobottomborder">
                 <asp:Label CssClass="inputtext" ID="LBpassword" runat="server" Text="Password:"></asp:Label>
-                <asp:TextBox CssClass="ASPInputcontent" style="width:210px" ID="TBpassword" runat="server"  data-parsley-required-message="insert password" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage" /> <%-- --%>
+                <asp:TextBox CssClass="ASPInputcontent" style="width:210px" ID="TBpassword" runat="server"  data-parsley-required-message="insert password" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage" TextMode="Password" /> <%-- --%>
             </div>
            
         <!-- *** BOTTONI ***  -->
