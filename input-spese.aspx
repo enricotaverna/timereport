@@ -234,8 +234,8 @@
 
 						<div class="formtitle">
 							<asp:Literal runat="server" Text="<%$ Resources:inserimento_spese%>" />
-			   <a href="AuditLog.aspx?RecordId=&amp;TableName=Expenses&amp;TYPE=U&amp;key=&lt;Expenses_Id=&gt;">
-				   <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource1" /></a>
+				 <a href="AuditLog.aspx?RecordId=<%=Request.QueryString["Expenses_Id"]%>&TableName=Expenses&TYPE=U&key=<Expenses_Id=<%=Request.QueryString["Expenses_Id"] %>>" >
+  				   <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource1" /></a>
 						</div>
 
 						<!-- *** LB Data ***  -->
@@ -330,8 +330,8 @@
 
 						<div class="formtitle">
 							 <asp:Literal runat="server" Text="<%$ Resources:inserimento_spese%>" />
-			   <a href="AuditLog.aspx?RecordId=&amp;TableName=Expenses&amp;TYPE=U&amp;key=&lt;Expenses_Id=&gt;">
-				   <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource2" /></a>
+					<a href="AuditLog.aspx?RecordId=<%=Request.QueryString["Expenses_Id"]%>&TableName=Expenses&TYPE=U&key=<Expenses_Id=<%=Request.QueryString["Expenses_Id"] %>>" >
+  				   <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource2" /></a>
 						</div>
 
 

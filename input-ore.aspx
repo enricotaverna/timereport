@@ -45,7 +45,7 @@
 
                         <div class="formtitle">
                             <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
-                            <a href="AuditLog.aspx?RecordId=&amp;TableName=Hours&amp;TYPE=U&amp;key=&lt;Hours_Id=&gt;">
+                            <a href="AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>" >
                                 <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource1" /></a>
                         </div>
 
@@ -247,7 +247,7 @@
                     <ItemTemplate>
                         <div class="formtitle">
                             <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
-                            <a href="AuditLog.aspx?RecordId=&amp;TableName=Hours&amp;TYPE=U&amp;key=&lt;Hours_Id=&gt;">
+                            <a href="AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>" >
                                 <asp:Image runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="ImageResource1" /></a>
                         </div>
 

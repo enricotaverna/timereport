@@ -79,9 +79,17 @@ per disattivare richiesta assenza
            
         <!-- *** BOTTONI ***  -->
         <div class="buttons">
-<%--                    <span class="testoPiccolo">Aeonvis Spa, <%= DateTime.Now.Year  %></span>--%>
+                    <%-- <span class="testoPiccolo">Aeonvis Spa, <%= DateTime.Now.Year  %></span>--%>
                     <asp:Label  CssClass="inputtext" ID="LblErrorMessage" runat="server" style="color:red;display:inline-block;width:280px; line-height:normal"></asp:Label>
-                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="Login" CssClass="orangebutton" />         
+<%--                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="Login" CssClass="orangebutton" />         --%>
+            
+                        <asp:LinkButton ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" style="text-align: center">
+                        <asp:Image ID="imgFolder" runat="server" ImageUrl="/timereport/images/icons/16x16/enter.png" style="left:-10px;position:relative;vertical-align:middle" />
+                        Login
+                        </asp:LinkButton>
+
+
+
         </div>  
 
     </form>
