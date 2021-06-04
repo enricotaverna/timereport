@@ -2,74 +2,88 @@
 
 <!DOCTYPE html>
 
-<!-- Stili -->
-<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="/timereport/include/newstyle.css" rel="stylesheet" /> 
-<link href="/timereport/include/standard/uploader/uploader.css" rel="stylesheet"  />
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" >
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery per date picker  -->
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script> 
+<!-- Jquery + parsley + datepicker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
 <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script> <!-- Download excel da Tabulator -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" >
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
-    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title>Richieste approvazione</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> <asp:Literal runat="server" Text="Lista Ore" /> </title>
 </head>
 
 <body>
     
-    <div id="TopStripe"></div> 
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-    <div id="MainWindow" >
-  
-    <form id="FVForm" runat="server"  >
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+
+    <form id="FVForm" runat="server">
+
+    <div class="row justify-content-center"  >
     
-    <div id="PanelWrap" style="width:720px" > 
-
-    <div class="StandardForm">        
+    <div class="StandardForm col-9" >
+        
         <div id="HoursListTable"></div>
-    </div>  
             
     <div class="buttons">               
         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>"  CssClass="orangebutton" />
         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>"  CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
     </div> <!--End buttons-->
 
-    </div> <!--End PanelWrap-->
+    </div> <!--End div-->
+        
+    </div> <!--End LastRow-->
     
     </form>
 
     </div> <!-- END MainWindow -->
 
-    <!-- **** FOOTER **** -->  
-    <div id="WindowFooter">       
-        <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa <%= DateTime.Today.Year  %></div> 
-        <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
-        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>        
-     </div>    
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>  
 
     <div id="mask"></div>  <!-- Mask to cover the whole screen -->
         
 </body>
 
+<!-- *** JAVASCRIPT *** -->
 <script>
+
+    // include di snippet html per menu
+    includeHTML();
+    InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
     // ** VALIDAZIONI **
     var btnRifiutatoClick = false;
@@ -110,7 +124,7 @@
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
     ajaxURL:"/timereport/webservices/WF_ApprovalWorkflow.asmx/GetHoursListTable", //ajax URL
-    ajaxParams: { persons_id: <%= Session["persons_id"]  %> , tipoOre :  <%= Request["tipoOre"]  %>, giorniInAvanti : 30 }, //ajax parameters
+    ajaxParams: { persons_id: <%= CurrentSession.Persons_id  %> , tipoOre :  <%= Request["tipoOre"]  %>, giorniInAvanti : 30 }, //ajax parameters
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string
     layout: "fitColumns", //fit columns to width of table (optional)

@@ -7,10 +7,17 @@ using System.Web.UI.WebControls;
 
 public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("ADMIN", "CUTOFF");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // valorizza DDL e mette default
         if (!IsPostBack) { 

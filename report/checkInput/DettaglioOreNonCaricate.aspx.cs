@@ -10,6 +10,9 @@ using System.Web.UI.WebControls;
 public partial class report_checkInput_DettaglioOreNonCaricate : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     // struttura della lista
     public class ClRecordLista
     {
@@ -27,6 +30,9 @@ protected void Page_Load(object sender, EventArgs e)
         string sPersons_id = Request.QueryString["persons_id"];
 
         Auth.CheckPermission("ADMIN", "CUTOFF");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Definisce tabella interna e lista
         DataTable dt = new DataTable();

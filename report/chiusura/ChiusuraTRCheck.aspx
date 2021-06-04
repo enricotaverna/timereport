@@ -1,129 +1,156 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ChiusuraTRCheck.aspx.cs" Inherits="report_chiusura_ChiusuraTRCheck"   %>
- 
-<%@ Register Src="/timereport/include/progress.ascx" TagPrefix="asp101" TagName="ProgressBar" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ChiusuraTRCheck.aspx.cs" Inherits="report_chiusura_ChiusuraTRCheck" %>
 
+<!DOCTYPE html>
 
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
- <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
 <script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Jquery + parsley + datepicker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
-    <title> Chiusura TimeReport </title>
-    <style type="text/css">
-        .auto-style1 {
-            width: 100%;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Chiusura Timereport" /></title>
 </head>
 
 <body>
 
-    <div id="TopStripe"></div> 
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-    <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
 
-    <div id="FormWrap" style="width:70%;margin-top:25px;" >
+        <form id="FVMain" runat="server">
 
-    <form id="FVForm" runat="server" Class="StandardForm" >
+            <div class="row justify-content-center">
 
-        <div class="formtitle" style="width:98%"> <asp:Literal runat="server" Text="<%$ Resources:titolo%>" /></div>
+                <div id="FormWrap" class="col-6 StandardForm">
 
-        <br />
+                    <div class="formtitle">
+                        <asp:Literal runat="server" Text="<%$ Resources:titolo%>" />
+                    </div>
 
-        <!-- *** ORE ***  -->
-        <table class="TabellaLista" >
-            <tr>
-                <td >
-            <asp:Image ID="CheckOreImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckOreImgResource1" Width="25px" />
-                </td>
-                <td>
-            <asp:Label ID="CheckOre" runat="server" Text="Ore Caricate" meta:resourcekey="CheckOreResource1"></asp:Label>
-                </td>
-                <td>
-            <asp101:ProgressBar id="pbarIEesque" runat="server" Style = "IEesque" Width = 100 />
-            <asp:Label ID="CheckOrePerc" runat="server" meta:resourcekey="CheckOrePercResource1"></asp:Label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-            <asp:Image ID="CheckTicketImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckTicketImgResource1"  Width="25px"  />
-                </td>
-                <td>
-            <asp:Label ID="CheckTicket" runat="server" Text="Check Ticket" meta:resourcekey="CheckTicketResource1"></asp:Label> </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-            <asp:Image ID="CheckSpeseImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1"  Width="25px"  />
-                </td>
-                <td>
-            <asp:Label ID="CheckSpese" runat="server" Text="Check Spese" meta:resourcekey="CheckSpeseResource1"></asp:Label> </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>
-            <asp:Image ID="CheckAssenzeImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1"  Width="25px"  />
-                </td>
-                <td>
-            <asp:Label ID="CheckAssenze" runat="server" Text="" meta:resourcekey="CheckAssenze"></asp:Label> </td>
-                <td>&nbsp;</td>
-            </tr>
-        </table>
+                    <div class="row mt-3 p-2">
+                        <div class="col-1">
+                            <asp:Image ID="CheckOreImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckOreImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-6">
+                            <asp:Label ID="CheckOre" runat="server" Text="Ore Caricate" meta:resourcekey="CheckOreResource1"></asp:Label>
+                        </div>
+                        <div class="col-3">
+                            <div class="progress">
+                                <div class="progress-bar" id="divbar" runat="server" role="progressbar" style="width: 10%"></div>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <asp:Label ID="CheckOrePerc" runat="server" meta:resourcekey="CheckOrePercResource1"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
 
-        <br />
-        <!-- *** BONUS / TICKET ***  -->
+                    <div class="row p-2">
+                        <div class="col-1">
+                            <asp:Image ID="CheckTicketAssentiImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckTicketImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-9">
+                            <asp:Label ID="CheckTicketAssenti" runat="server" Text="Check Ticket" meta:resourcekey="CheckTicketResource1"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
 
-        <br />
+                    <div class="row p-2">
+                        <div class="col-1">
+                                <asp:Image ID="CheckTicketHomeOfficeImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckTicketImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-9">
+                                <asp:Label ID="CheckTicketHomeOffice" runat="server" Text="Check Ticket" meta:resourcekey="CheckTicketResource1"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
 
-        <!-- *** SPESE ***  -->
+                    <div class="row p-2">
+                        <div class="col-1">
+                                <asp:Image ID="CheckSpeseImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-9">
+                                <asp:Label ID="CheckSpese" runat="server" Text="Check Spese" meta:resourcekey="CheckSpeseResource1"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
 
-        <!-- *** BOTTONI ***  -->
-        <div class="buttons">            
-            <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton"  Text="Chiudi TR" meta:resourcekey="InsertButtonResource1" OnClick="InsertButton_Click"    OnClientClick="return CheckIsRepeat();"  /> 
-            <asp:Button ID="btStampaRicevute" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Stampa giustificativi" meta:resourcekey="btStampaRicevuteResource1" /> 
-            <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="CancelButtonResource1"    />                    
-        </div>
+                    <div class="row p-2">
+                        <div class="col-1">
+                                <asp:Image ID="CheckAssenzeImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-9">
+                                <asp:Label ID="CheckAssenze" runat="server" Text="" meta:resourcekey="CheckAssenze"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
+   
+                    <!-- *** BOTTONI ***  -->
+                    <div class="buttons">
+                        <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Chiudi TR" meta:resourcekey="InsertButtonResource1" OnClick="InsertButton_Click" OnClientClick="return CheckIsRepeat();" />
+                        <asp:Button ID="btStampaRicevute" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Ricevute" meta:resourcekey="btStampaRicevuteResource1" />
+                        <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="CancelButtonResource1" />
+                    </div>
 
-    </form>
-    
-    </div> <%-- END FormWrap  --%> 
-    
-    </div> <%-- END MainWindow --%> 
+                </div>
+                <!-- END FormWrap  -->
 
-    <!-- **** FOOTER **** -->  
-    <div id="WindowFooter">       
-        <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa  <%= DateTime.Now.Year %></div> 
-        <div  id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>              
-        <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>      
-    </div> 
+            </div>
+            <!-- END Row  -->
 
-<script type="text/javascript">
+        </form>
 
-    var submit = 0; 
-    function CheckIsRepeat() {
-        if (++submit > 1) {
-            return false;
+    </div>
+    <!-- *** End container *** -->
+
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        var submit = 0;
+        function CheckIsRepeat() {
+            if (++submit > 1) {
+                return false;
+            }
         }
-    }
 
     </script>
 
-
 </body>
+
 </html>

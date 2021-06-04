@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="btStampaRicevuteResource1.Text" xml:space="preserve">
-    <value>Stampa giustificativi</value>
+    <value>Ricevute</value>
   </data>
   <data name="btStampaRicevuteResource1.ToolTip" xml:space="preserve">
     <value />
@@ -196,15 +196,21 @@
     <value> su </value>
   </data>
   <data name="ticket_msg1" xml:space="preserve">
-    <value>Ticket: Non rilevante</value>
+    <value>Controllo ticket assenti: Non rilevante</value>
   </data>
   <data name="ticket_msg2" xml:space="preserve">
-    <value>Ticket: Controllo ok</value>
+    <value>Ticket caricati: Controllo ok</value>
   </data>
   <data name="Titolo" xml:space="preserve">
     <value>Check chiusura Time Report</value>
   </data>
   <data name="CheckAssenze" xml:space="preserve">
     <value />
+  </data>
+  <data name="ticket_msg3" xml:space="preserve">
+    <value>Controllo ticket Home Office: Non rilevante</value>
+  </data>
+  <data name="ticket_msg4" xml:space="preserve">
+    <value>Ticket Smart Working: Controllo ok</value>
   </data>
 </root>

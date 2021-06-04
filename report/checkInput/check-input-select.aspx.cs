@@ -11,6 +11,9 @@ using System.IO;
 public partial class report_ricevute_ricevute_select : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         
@@ -18,6 +21,9 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
 
         // autority check in funzione del tipo chiamata della pagina
         Auth.CheckPermission("ADMIN", "CUTOFF");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // se premuto CancelButton torna indietro
         if (Request.Form["CancelButton"] != null)
@@ -65,10 +71,9 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
             //}
             //else  {
                 // se esistono file aggiunge cella con nome mese e link alla pagina
-                cell1.InnerHtml = "<a href='/timereport/report/checkInput/check-input-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "' ><input type='button' class='bottone_lista' value=" + mese.ToString("MMMM") + " /></a>";
+                cell1.InnerHtml = "<a href='/timereport/report/checkInput/check-input-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "' ><input type='button' class='bottone_lista grande' value=" + mese.ToString("MMMM") + " /></a>";
 
                 cell1.Align = "center";
-                cell1.Attributes.Add("class", "cella");
                 row.Cells.Add(cell1);
             //}
 

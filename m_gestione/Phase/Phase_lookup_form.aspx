@@ -1,147 +1,169 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Phase_lookup_form.aspx.cs" Inherits="m_gestione_Phase_Phase_lookup_list" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!-- Jquery   -->
-      
-<!-- Style -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
-     
-<!-- Jquery   -->
+<!DOCTYPE html>
+
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
+<style>
+    .ASPInputcontent {
+        width: 230px;
+    }
+</style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head runat="server">
-    <title>Phase</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Anagrafica Fase" />
+    </title>
 </head>
 
 <body>
 
-<div id="TopStripe"></div>  
- 
-<div id="MainWindow"> 
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-<div id="FormWrap" >
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="FormPhase" runat="server">
 
-    <form id="FormPhase" runat="server"  >
+            <div class="row justify-content-center" >
 
-    <asp:FormView ID="SchedaFase" runat="server" DataKeyNames="Phase_id" 
-        DataSourceID="DSPhase" EnableModelValidation="True" DefaultMode="Insert"
-        align="center" oniteminserted="SchedaFase_ItemInserted"  CssClass="StandardForm"
-        onitemupdated="SchedaFase_ItemUpdated" onmodechanging="SchedaFase_ModeChanging">
-        
-        <EditItemTemplate>
-         
-                <!-- *** TITOLO FORM ***  -->
-			    <div class="formtitle">Aggiorna fase</div> 
+                <div id="FormWrap" class="StandardForm col-5">
 
-          	   <!-- *** CODICE FASE ***  --> 
-               <div class="input nobottomborder"> 
-                     <div class="inputtext">Codice Fase: </div> 
-                     <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent" Enabled="False"/> 
-               </div>   
+                    <asp:FormView ID="SchedaFase" runat="server" DataKeyNames="Phase_id"
+                        DataSourceID="DSPhase" EnableModelValidation="True" DefaultMode="Insert"
+                        align="center" OnItemInserted="SchedaFase_ItemInserted" CssClass="StandardForm"
+                        OnItemUpdated="SchedaFase_ItemUpdated" OnModeChanging="SchedaFase_ModeChanging">
 
-	           <!-- *** DESCRIZIONE ***  --> 
-               <div class="input nobottomborder"> 
-                     <div class="inputtext">Descrizione: </div> 
-                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" 
-                                                                  data-parsley-Maxlength ="40" data-parsley-errors-container="#valMsg" data-parsley-required="true" />
-               </div>   
+                        <EditItemTemplate>
 
-               	<!-- *** PROGETTO ***  -->
-	            <div class="input nobottomborder">                        
-	                <div class="inputtext">Progetto:</div>  
-                    <label class="dropdown"  >
-                        <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>'></asp:DropDownList>
-                    </label>
-                </div>  
-                			
-	           <!-- *** BOTTONI  ***  -->
-               <div class="buttons">
-                    <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
-                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton"  />
-                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true"/>            
-               </div>  
+                            <!-- *** TITOLO FORM ***  -->
+                            <div class="formtitle">Aggiorna fase</div>
 
-        </EditItemTemplate>
+                            <!-- *** CODICE FASE ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Codice Fase: </div>
+                                <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent" Enabled="False" />
+                            </div>
 
-        <InsertItemTemplate>
+                            <!-- *** DESCRIZIONE ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Descrizione: </div>
+                                <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent"
+                                    data-parsley-Maxlength="40" data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                            </div>
 
-               <!-- *** TITOLO FORM ***  -->
-			   <div class="formtitle">Inserisci fase</div> 
+                            <!-- *** PROGETTO ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Progetto:</div>
+                                    <asp:DropDownList ID="DropDownList1" runat="server" CssClass="ASPInputcontent" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>'></asp:DropDownList>
+                            </div>
 
-               <!-- *** DESCRIZIONE ***  --> 
-               <div class="input nobottomborder"> 
-                     <div class="inputtext">Codice fase: </div> 
-                     <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent"
-                                          data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                            <!-- *** BOTTONI  ***  -->
+                            <div class="buttons">
+                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" />
+                                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true" />
+                            </div>
 
-               </div>   
+                        </EditItemTemplate>
 
-               <!-- *** DESCRIZIONE ***  --> 
-               <div class="input nobottomborder"> 
-                     <div class="inputtext">Descrizione: </div> 
-                     <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent" 
-                                  data-parsley-errors-container="#valMsg" data-parsley-required="true" />
-               </div>   
+                        <InsertItemTemplate>
 
-                <!-- *** PROGETTO ***  -->
-	            <div class="input nobottomborder">                        
-	                <div class="inputtext">Progetto:</div>  
-                        <label class="dropdown" style="width:245px" >
-                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True"
-                                              data-parsley-errors-container="#valMsg" data-parsley-required="true" >
-                            <asp:ListItem  Value="" Text="-- Selezionare un valore --"/></asp:DropDownList>
-                        </label>
-                </div>   
+                            <!-- *** TITOLO FORM ***  -->
+                            <div class="formtitle">Inserisci fase</div>
 
-               <!-- *** BOTTONI  ***  -->
-               <div class="buttons">
-                 <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
-                 <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" />
-                 <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true"/>                
-                </div>  
+                            <!-- *** DESCRIZIONE ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Codice fase: </div>
+                                <asp:TextBox ID="PhaseCodeTextBox" runat="server" Text='<%# Bind("PhaseCode") %>' CssClass="ASPInputcontent"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" />
 
-        </InsertItemTemplate>
+                            </div>
 
-        <ItemTemplate>
-            <%--*** NON UTILIZZATO ***--%>
-        </ItemTemplate>
+                            <!-- *** DESCRIZIONE ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Descrizione: </div>
+                                <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' CssClass="ASPInputcontent"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                            </div>
 
-    </asp:FormView>
+                            <!-- *** PROGETTO ***  -->
+                            <div class="input nobottomborder">
+                                <div class="inputtext">Progetto:</div>
+                                    <asp:DropDownList ID="DropDownList1" runat="server" CssClass="ASPInputcontent" DataSourceID="DSProject" DataTextField="ProjectName" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>' AppendDataBoundItems="True"
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                        <asp:ListItem Value="" Text="-- Selezionare un valore --" />
+                                    </asp:DropDownList>
+                            </div>
 
-    </form>
+                            <!-- *** BOTTONI  ***  -->
+                            <div class="buttons">
+                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" />
+                                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" formnovalidate="true" />
+                            </div>
 
-    </td></tr>           
+                        </InsertItemTemplate>
 
-    </table>
+                        <ItemTemplate>
+                            <%--*** NON UTILIZZATO ***--%>
+                        </ItemTemplate>
 
-    </div> <!-- END FormWrap -->
+                    </asp:FormView>
 
-  </div> <!-- END MainWindow -->
+                </div>
+                <!-- FormWrap -->
 
-    <!-- **** FOOTER **** -->  
-    <div id="WindowFooter">       
-        <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa <%= DateTime.Today.Year  %></div> 
-        <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
-        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>        
-     </div>  
+            </div>
+            <!-- LastRow -->
 
-        <asp:SqlDataSource ID="DSPhase" runat="server" 
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
-        SelectCommand="SELECT * FROM [Phase] WHERE ([Phase_id] = @PhaseId)" 
-        InsertCommand="INSERT INTO [Phase] ([PhaseCode], [Name], [Projects_id]) VALUES (@PhaseCode, @Name, @Projects_id)" 
-        UpdateCommand="UPDATE [Phase] SET [PhaseCode] = @PhaseCode, [Name] = @Name, [Projects_id] = @Projects_id WHERE [Phase_id] = @Phase_id">        
+        </form>
+        <!-- Form  -->
+    </div>
+    <!-- container --
+
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource ID="DSPhase" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [Phase] WHERE ([Phase_id] = @PhaseId)"
+        InsertCommand="INSERT INTO [Phase] ([PhaseCode], [Name], [Projects_id]) VALUES (@PhaseCode, @Name, @Projects_id)"
+        UpdateCommand="UPDATE [Phase] SET [PhaseCode] = @PhaseCode, [Name] = @Name, [Projects_id] = @Projects_id WHERE [Phase_id] = @Phase_id">
 
         <SelectParameters>
-        <asp:QueryStringParameter Name="PhaseId" QueryStringField="PhaseId" Type="String" />
+            <asp:QueryStringParameter Name="PhaseId" QueryStringField="PhaseId" Type="String" />
         </SelectParameters>
         <InsertParameters>
             <asp:Parameter Name="PhaseCode" Type="String" />
@@ -155,26 +177,29 @@
             <asp:Parameter Name="Phase_id" Type="Int32" />
         </UpdateParameters>
     </asp:SqlDataSource>
-
-    <asp:SqlDataSource ID="DSProject" runat="server" 
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" 
-        
-        SelectCommand="SELECT Projects_Id, ProjectCode + N' ' + left(Name,15) AS ProjectName FROM Projects WHERE (ClientManager_id = @ClientManager_id) AND (Active = 1) and ActivityOn = 1" 
-        onselecting="DSProject_Selecting">
+    <asp:SqlDataSource ID="DSProject" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Projects_Id, ProjectCode + N' ' + left(Name,15) AS ProjectName FROM Projects WHERE (ClientManager_id = @ClientManager_id) AND (Active = 1) and ActivityOn = 1"
+        OnSelecting="DSProject_Selecting">
         <SelectParameters>
             <asp:Parameter Name="ClientManager_id" />
         </SelectParameters>
     </asp:SqlDataSource>
 
-<script type="text/javascript">
+    <!-- *** JAVASCRIPT *** -->
+    <script type="text/javascript">
 
-    // *** Esclude i controlli nascosti *** 
-    $('#FormPhase').parsley({
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        // *** Esclude i controlli nascosti *** 
+        $('#FormPhase').parsley({
             excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
         });
 
-</script>
+    </script>
 
-</body >
+</body>
 
 </html>

@@ -11,9 +11,16 @@ using System.Configuration;
 
 public partial class report_ControlloProgettoList : System.Web.UI.Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         DataSet ds = (DataSet)Cache.Get("Export");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!Page.IsPostBack)
         {
@@ -28,7 +35,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
             GVAttivita.DataBind();
 
             // Valorizza indirizzo pagina chiamante
-            btn_back.OnClientClick = "window.location='/timereport/report/controllo_progetto/ControlloProgetto-select.aspx'; return(false);";        
+            btn_back.OnClientClick = "window.location='/timereport/report/controllo_progetto/ControlloProgetto-select.aspx'; return(false);";
         }
     }
 
@@ -73,7 +80,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     }
 
     // gestisce click su codice progetto per vedere dettaglio  
-    protected void LkProgetto_Click(object sender, EventArgs e) 
+    protected void LkProgetto_Click(object sender, EventArgs e)
     {
 
         // recupera i parametri dal linkbutton premuto
@@ -105,7 +112,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         DataSet ds = new DataSet("Export");
 
         SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-       
+
         // recupera i parametri dal linkbutton premuto
         string[] arg = new string[3];
         LinkButton LkBt = (LinkButton)sender;
@@ -125,7 +132,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
 
             sqlComm.Parameters.AddWithValue("@DataDA", Convert.ToDateTime(arg[2])); // Data primo carico
 
-            if ( arg[1].Trim().Length != 0)
+            if (arg[1].Trim().Length != 0)
                 sqlComm.Parameters.AddWithValue("@Activity_id", Convert.ToInt16(arg[1])); // codice attività
 
             sqlComm.Parameters.AddWithValue("@Project_id", Convert.ToInt16(arg[0])); // codice progetto
@@ -187,15 +194,16 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
 
         LinkButton lkbt = (LinkButton)e.Row.FindControl("LkRevenue");
 
-        if (lkbt != null) { 
+        if (lkbt != null)
+        {
 
-        // recupera i parametri dal linkbutton premuto
-        string[] arg = new string[2];
-        arg = lkbt.CommandArgument.ToString().Split(';');
+            // recupera i parametri dal linkbutton premuto
+            string[] arg = new string[2];
+            arg = lkbt.CommandArgument.ToString().Split(';');
 
-        // se prima data carico blank disabilita il link
-        if (arg[2].Trim().Length == 0)
-            lkbt.Enabled = false;
+            // se prima data carico blank disabilita il link
+            if (arg[2].Trim().Length == 0)
+                lkbt.Enabled = false;
         }
     }
 }

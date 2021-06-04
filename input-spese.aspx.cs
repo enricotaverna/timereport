@@ -52,7 +52,7 @@ public partial class input_spese : System.Web.UI.Page
 
             //              disabilita form in caso di cutoff
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
-            
+
             if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]) || lTipoBonus_id > 0)
                 FVSpese.ChangeMode(FormViewMode.ReadOnly);
             else
@@ -101,7 +101,7 @@ public partial class input_spese : System.Web.UI.Page
             divBottoni.Visible = false;
 
         // restituisce array con nome dei file o null se non si sono ricevute
-        string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), Session["UserName"].ToString().Trim(), lDataSpesa);
+        string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), CurrentSession.UserName, lDataSpesa);
 
         // Se non esistono immagini torna indietro
         if (filePaths == null || filePaths.Length == 0)
@@ -191,16 +191,31 @@ public partial class input_spese : System.Web.UI.Page
 
     protected void Bind_DDLprogetto()
     {
-        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+        DataTable dtProgettiForzati;
         DropDownList ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
         ddlProject.Items.Clear();
 
-        foreach (DataRow drRow in dtProgettiForzati.Rows)
+        switch (FVSpese.CurrentMode)
         {
-            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
-            if ( drRow["BloccoCaricoSpese"].ToString() != "True" ) // solo se carico spese è ammesso
-                ddlProject.Items.Add(liItem);
+            case FormViewMode.Insert:
+            case FormViewMode.Edit:
+
+                dtProgettiForzati = CurrentSession.dtProgettiForzati;
+
+                foreach (DataRow drRow in dtProgettiForzati.Rows)
+                {
+                    ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+                    if (drRow["BloccoCaricoSpese"].ToString() != "True") // solo se carico spese è ammesso
+                        ddlProject.Items.Add(liItem);
+                }
+
+                break;
+
+            case FormViewMode.ReadOnly:
+
+                ddlProject.DataSource = CurrentSession.dtProgettiTutti;
+                break;
         }
 
         ddlProject.DataTextField = "DescProgetto";
@@ -214,7 +229,7 @@ public partial class input_spese : System.Web.UI.Page
         if (FVSpese.CurrentMode == FormViewMode.Insert)
         {
             // prima cerca progetto sul giorno, se non lo trova mette ultimo default
-            DataRow drRecord = Database.GetRow("SELECT Projects_id FROM Hours WHERE persons_id = " + Session["persons_id"] + " AND date = " + ASPcompatility.FormatDateDb(Request["date"]), this.Page);
+            DataRow drRecord = Database.GetRow("SELECT Projects_id FROM Hours WHERE persons_id = " + CurrentSession.Persons_id + " AND date = " + ASPcompatility.FormatDateDb(Request["date"]), this.Page);
 
             if (drRecord != null)
                 ddlProject.SelectedValue = drRecord["Projects_id"].ToString();
@@ -226,7 +241,7 @@ public partial class input_spese : System.Web.UI.Page
     protected void Bind_DDLTipoSpesa()
     {
 
-        DataTable dtSpeseForzate = (DataTable)Session["dtSpeseForzate"];
+        DataTable dtSpeseForzate = CurrentSession.dtSpeseForzate;
         DropDownList ddlTipoSpesa = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
         String sTipoBonus_sel = "";
 
@@ -235,7 +250,7 @@ public partial class input_spese : System.Web.UI.Page
             sTipoBonus_sel = "";
         else
             sTipoBonus_sel = " AND TipoBonus_Id = 0 ";
-        
+
         ddlTipoSpesa.Items.Clear();
 
         // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
@@ -243,7 +258,7 @@ public partial class input_spese : System.Web.UI.Page
         {
 
             // in INSERT e EDIT non aggiunge le spese di tipo bonus
-            if ( drRow["TipoBonus_id"].ToString() == "0" || FVSpese.CurrentMode == FormViewMode.ReadOnly  )
+            if (drRow["TipoBonus_id"].ToString() == "0" || FVSpese.CurrentMode == FormViewMode.ReadOnly)
             {
                 ListItem liItem = new ListItem(drRow["descrizione"].ToString(), drRow["ExpenseType_Id"].ToString());
                 liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
@@ -299,13 +314,18 @@ public partial class input_spese : System.Web.UI.Page
             e.Command.Parameters["@ExpenseType_id"].Value = ddlList1.SelectedValue;
 
         // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-        DataTable dtTipoSpesa = (DataTable)Session["dtTipoSpesa"];
+        DataTable dtTipoSpesa = CurrentSession.dtSpeseForzate;
         DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + ddlList1.SelectedValue);
 
-        if (dr.Count() == 1)  // dovrebbe essere sempre così
+        if (dr.Count() == 1)
+        {  // dovrebbe essere sempre così
             e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32(dr[0]["TipoBonus_id"].ToString());
-        else
+            e.Command.Parameters["@AdditionalCharges"].Value = dr[0]["AdditionalCharges"];
+        }
+        else { 
             e.Command.Parameters["@TipoBonus_id"].Value = 0;
+            e.Command.Parameters["@AdditionalCharges"].Value = 0;
+        }
 
         // salva default per select list
         Session["ProjectCodeDefault"] = ddlList.SelectedValue;
@@ -316,7 +336,7 @@ public partial class input_spese : System.Web.UI.Page
         // solo insert
         if (FVSpese.CurrentMode == FormViewMode.Insert)
         {
-            e.Command.Parameters["@persons_id"].Value = Session["persons_id"];
+            e.Command.Parameters["@persons_id"].Value = CurrentSession.Persons_id;
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
             e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
             // Audit

@@ -7,10 +7,17 @@ using System.Web.UI.WebControls;
 
 public partial class m_gestione_Phase_Phase_lookup_list : System.Web.UI.Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("MASTERDATA", "WBS");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack) 
             if (Request.QueryString["PhaseId"] != null) {
@@ -22,7 +29,7 @@ public partial class m_gestione_Phase_Phase_lookup_list : System.Web.UI.Page
     protected void DSProject_Selecting(object sender, SqlDataSourceSelectingEventArgs e)
     {
         // visualizza solo progetti del manager
-        e.Command.Parameters[0].Value = Session["persons_id"];
+        e.Command.Parameters[0].Value = CurrentSession.Persons_id;
     }
 
     protected void SchedaFase_ItemInserted(object sender, FormViewInsertedEventArgs e)

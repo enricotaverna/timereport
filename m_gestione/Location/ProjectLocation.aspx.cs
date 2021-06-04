@@ -3,10 +3,17 @@ using System.Configuration;
 
 public partial class m_gestione_Location_ProjectLocation : System.Web.UI.Page
 {
-   protected void Page_Load(object sender, EventArgs e)
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
     {
         //	Autorizzazione di display o creazione
         Auth.CheckPermission("CONFIG", "TABLE");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // imposta la selezione della DDL progettlo
         if (!IsPostBack)

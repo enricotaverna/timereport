@@ -13,10 +13,16 @@ using System.Globalization;
 public partial class report_ricevute_select : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("REPORT", "TICKET_ALL");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Popola Drop Down con lista progetti
         if (!IsPostBack) {

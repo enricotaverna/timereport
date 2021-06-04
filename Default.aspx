@@ -1,5 +1,4 @@
-﻿<%@ Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="defaultAspx" %>
-
+﻿<%@  Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="defaultAspx" %>
 
 <!--
 
@@ -12,91 +11,101 @@ per disattivare richiesta assenza
 
 
 -->
- 
+
 <!DOCTYPE html>
 
- <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
-<!-- Jquery   -->
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
-<!-- CSS override -->
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
 <style>
-
-    .auto-style1 {
-        width: 187px;
-        height: 189px;
+    .ASPInputcontent {
+        width: 230px;
     }
-
 </style>
 
-    <html xmlns="http://www.w3.org/1999/xhtml">
-    
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title>Timereport</title>
+    <title>
+        <asp:Literal runat="server" Text="Timereport Login" />
+    </title>
+</head>
 
-    <body>
+<body>
 
-        <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="form_login" runat="server">
 
-        <div id="FormWrap" Class="StandardForm">
+            <div class="row justify-content-center">
 
-        <form id="form_login" runat="server"  >
+                <div id="FormWrap" class="col-4 StandardForm mt-5">
 
-           <div class="formtitle"  >
-               <img alt="TR icon" style="width:22px;height:22px;vertical-align: middle" src="/timereport/favicon.ico" /> &nbsp;Timereport  </div>
+                    <div class="formtitle">
+                        <img alt="TR icon" style="width: 22px; height: 22px; vertical-align: middle" src="/timereport/favicon.ico" />
+                        &nbsp;Timereport Login
+                    </div>
 
-            <!-- *** Tipo Login ***  -->
-            <div class="input nobottomborder">
+                    <!-- *** Tipo Login ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Login type:"></asp:Label>
+                             <asp:DropDownList ID="DDLTipoLogin" runat="server" CssClass="ASPInputcontent" >
+                                <asp:ListItem Enabled="true" Text="Local Login" Value="LL"></asp:ListItem>
+                                <asp:ListItem Text="Microsoft 365 Login" Value="AD"></asp:ListItem>
+                            </asp:DropDownList>
+                    </div>
 
-                <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Login type:" ></asp:Label>
+                    <!-- *** TEXT_BOX ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="LBusername" runat="server" Text="User name:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBusername" runat="server" data-parsley-required-message="insert user name" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage" />
+                    </div>
 
-                <label class="dropdown" >
-                    <asp:DropDownList ID="DDLTipoLogin" runat="server" style="width:220px">
-                        <asp:ListItem Enabled="true" Text="Local Login" Value="LL"></asp:ListItem>
-                        <asp:ListItem Text="Microsoft 365 Login" Value="AD"></asp:ListItem>
-                    </asp:DropDownList>
-                </label>
+                    <!-- *** TEXT_BOX ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="LBpassword" runat="server" Text="Password:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBpassword" runat="server" data-parsley-required-message="insert password" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage" TextMode="Password" />
+                        <%-- --%>
+                    </div>
 
-            </div>
+                    <!-- *** BOTTONI ***  -->
+                    <div class="buttons">
+                        <%-- <span class="testoPiccolo">Aeonvis Spa, <%= DateTime.Now.Year  %></span>--%>
+                        <asp:Label CssClass="inputtext" ID="LblErrorMessage" runat="server" Style="color: red; display: inline-block; width: 280px; line-height: normal"></asp:Label>
+                        <%--                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="Login" CssClass="orangebutton" />         --%>
 
-            <!-- *** TEXT_BOX ***  -->
-            <div class="input nobottomborder">
-                <asp:Label CssClass="inputtext" ID="LBusername" runat="server" Text="User name:"></asp:Label>
-                <asp:TextBox CssClass="ASPInputcontent" style="width:210px" ID="TBusername" runat="server" data-parsley-required-message="insert user name" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage"/>
-            </div>
-
-            <!-- *** TEXT_BOX ***  -->
-            <div class="input nobottomborder">
-                <asp:Label CssClass="inputtext" ID="LBpassword" runat="server" Text="Password:"></asp:Label>
-                <asp:TextBox CssClass="ASPInputcontent" style="width:210px" ID="TBpassword" runat="server"  data-parsley-required-message="insert password" data-parsley-required="true" data-parsley-errors-container="#LblErrorMessage" TextMode="Password" /> <%-- --%>
-            </div>
-           
-        <!-- *** BOTTONI ***  -->
-        <div class="buttons">
-                    <%-- <span class="testoPiccolo">Aeonvis Spa, <%= DateTime.Now.Year  %></span>--%>
-                    <asp:Label  CssClass="inputtext" ID="LblErrorMessage" runat="server" style="color:red;display:inline-block;width:280px; line-height:normal"></asp:Label>
-<%--                    <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" Text="Login" CssClass="orangebutton" />         --%>
-            
-                        <asp:LinkButton ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" style="text-align: center">
-                        <asp:Image ID="imgFolder" runat="server" ImageUrl="/timereport/images/icons/16x16/enter.png" style="left:-10px;position:relative;vertical-align:middle" />
-                        Login
+                        <asp:LinkButton ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Style="text-align: center">
+                            <asp:Image ID="imgFolder" runat="server" ImageUrl="/timereport/images/icons/16x16/enter.png" Style="left: -10px; position: relative; vertical-align: middle" />
+                            Login
                         </asp:LinkButton>
+                    </div>
 
-
-
-        </div>  
-
-    </form>
-    
-    </div> <%-- END FormWrap  --%> 
-    
-    </div> <%-- END MainWindow --%> 
+                </div>
+                <!-- END FormWrap  -->
+            </div>
+            <!-- END Row  -->
+        </form>
+    </div>
+    <!-- *** End container *** -->
 
     <script type="text/javascript">
 

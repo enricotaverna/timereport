@@ -5,18 +5,36 @@
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Globalization" %>
 
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-
-<!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<SCRIPT language=JavaScript src= "/timereport/include/menu/mmenu.js" type=text/javascript></SCRIPT>
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Lista valori" /></title>
+</head>
 
 <script runat="server">
 
@@ -25,13 +43,15 @@
     DataTable aRecord;
     int intCounter = 0;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
 
-        if ( Request["TableName"].ToString().Substring(0,2) == "HR" )
-                Auth.CheckPermission("TRAINING", "CREATE");  // Coordinatore Trainer
-        else
-                Auth.CheckPermission("CONFIG", "TABLE"); // amministrazione
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (Request["cancel_from_list"] == "Cancel")
             Response.Redirect("/timereport/menu.aspx");
@@ -63,7 +83,8 @@
         else
             aRecord = Database.GetData("SELECT * FROM " + Session["TableName"] + " ORDER BY " + Session["SortField"], this.Page);
 
-        if (aRecord.Rows.Count > 0) {
+        if (aRecord.Rows.Count > 0)
+        {
             bolRecordFound = true;
             strKeyName = aRecord.Columns[0].ColumnName;
         }
@@ -77,11 +98,10 @@
 
     }
 
-
     protected void DeleteIcon(string intIndex)
     {
 
-        if (Session["CheckTable"] == null || Session["CheckTable"] == "")
+        if (Session["CheckTable"] == null || Session["CheckTable"].ToString() == "")
         {
             Response.Write("<a href=lookup_list.aspx?action=delete&id=" + intIndex + "><img src=images/icons/16x16/trash.gif width=16 height=16 border=0></a>");
             return;
@@ -89,10 +109,10 @@
         else
         {
 
-            if (Database.RecordEsiste("SELECT TOP 1 " + strKeyName + " FROM " + Session["CheckTable"].ToString() + " WHERE " + strKeyName + "='" + intIndex + "'"))
-                Response.Write("<img src=images/transparent.gif width=16 height=16 border=0>");
-            else
+            if (!Database.RecordEsiste("SELECT TOP 1 " + strKeyName + " FROM " + Session["CheckTable"].ToString() + " WHERE " + strKeyName + "='" + intIndex + "'"))
                 Response.Write("<a href=lookup_list.aspx?action=delete&id=" + intIndex + "><img src=images/icons/16x16/trash.gif width=16 height=16 border=0></a>");
+            else
+                Response.Write("<span style='width:16px;'>&nbsp;</span>");
         }
     }
 
@@ -100,106 +120,113 @@
     public string GetDescription(string FieldName, string FieldValue)
     // ----------------------------------------------------------------------------
     {
-        string  strLookUpTable;
+        string strLookUpTable;
         DataRow drResult;
         string sResult = "";
 
         //  Strip uot the name of the lookup table
         strLookUpTable = FieldName.Substring(0, ((FieldName.ToUpper().IndexOf("_ID") + 1) - 1));
 
-        drResult = Database.GetRow("SELECT * FROM " + strLookUpTable +" WHERE " + FieldName + " = " + FieldValue, this.Page);
+        drResult = Database.GetRow("SELECT * FROM " + strLookUpTable + " WHERE " + FieldName + " = " + FieldValue, this.Page);
         sResult = drResult[1].ToString();
 
-        return(sResult);
+        return (sResult);
 
     }
 
-
 </script>
-
-<html>
-
-<head>
-
-	<title>Gestione Parametri</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-  
-</head>
-
 
 <body>
 
-	<div id="TopStripe"></div>
-	
-	<div id="MainWindow">
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-	<div id="FormWrap" class="StandardForm"> 
-	
-<form name="form1" runat="server" method="post" action="lookup_detail.aspx" >
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="FVMain" runat="server" method="post" action="lookup_detail.aspx">
 
-		<!-- *** TITOLO FORM ***  --> 
-		<div class="formtitle">Edit Tabella</div> 
+            <div class="row justify-content-center" >
 
-		<table class="TabellaLista">
-<%
-	if (bolRecordFound) // ' at least one record exists	
-	{
+                <div id="FormWrap" class="col-6 StandardForm">
 
-        intCounter = 0;
-		while (intCounter <= aRecord.Rows.Count-1)
-		{
+                    <!-- *** TITOLO FORM ***  -->
+                    <div class="formtitle">Edit Tabella</div>
 
-			if ((intCounter % 2) == 0)
-				Response.Write("<tr class=GV_row>");
-			else
-				Response.Write("<tr class=GV_row_alt>");
+                    <table  class="TabellaLista">
+                        <%
+                            if (bolRecordFound) // ' at least one record exists	
+                            {
 
-			for (int i = 1; i <= Convert.ToInt32(Session["FieldNumber"].ToString()); i++)
-			{
-				Response.Write("<td>");
+                                intCounter = 0;
+                                while (intCounter <= aRecord.Rows.Count - 1)
+                                {
 
-				// if the record is a counter get the description from the associated lookup table
-				if (aRecord.Columns[i].ColumnName.IndexOf("_id") > 0)
-					Response.Write(GetDescription( aRecord.Columns[i].ColumnName, aRecord.Rows[intCounter][i].ToString() ));
-				else
-					Response.Write(aRecord.Rows[intCounter][i]);
+                                    if ((intCounter % 2) == 0)
+                                        Response.Write("<tr class=GV_row>");
+                                    else
+                                        Response.Write("<tr class=GV_row_alt>");
 
-				Response.Write("</td>");
-			}
-%>      
-	  <td nowrap width="10%"> <div align="center"><a href="lookup_detail.aspx?action=update&Id=<%=aRecord.Rows[intCounter][0]%>"> 
-		  <img src="images/icons/16x16/modifica.gif" width="16" height="16" border="0"></a>&nbsp;&nbsp; 
-<% 
-			DeleteIcon( aRecord.Rows[intCounter][0].ToString() );
+                                    for (int i = 1; i <= Convert.ToInt32(Session["FieldNumber"].ToString()); i++)
+                                    {
+                                        Response.Write("<td>");
 
-			Response.Write("</div></td></tr>");
+                                        // if the record is a counter get the description from the associated lookup table
+                                        if (aRecord.Columns[i].ColumnName.IndexOf("_id") > 0)
+                                            Response.Write(GetDescription(aRecord.Columns[i].ColumnName, aRecord.Rows[intCounter][i].ToString()));
+                                        else
+                                            Response.Write(aRecord.Rows[intCounter][i]);
 
-			intCounter++;
-		}
+                                        Response.Write("</td>");
+                                    }
+                        %>
+                        <td nowrap width="10%" >
+                            <div align="center">
+                                <a href="lookup_detail.aspx?action=update&Id=<%=aRecord.Rows[intCounter][0]%>">
+                                    <img src="images/icons/16x16/modifica.gif" width="16" height="16" border="0"></a>&nbsp;&nbsp; 
+                                <% 
+                                            DeleteIcon(aRecord.Rows[intCounter][0].ToString());
 
-	} // if NOT objRS.EOF Then ' at least one record exists
+                                            Response.Write("</div></td></tr>");
 
-%>
-  </table>
-				<div class="buttons">
-                    <asp:button type="submit" runat="server" name="insert" Text="Crea" class="orangebutton" />
-					<asp:button PostBackUrl="/timereport/menu.aspx"  name="cancel_from_list" runat="server" type="submit" class="greybutton" Text="Annulla"/>
-				</div>
-</form>
+                                            intCounter++;
+                                        }
 
+                                    } // if NOT objRS.EOF Then ' at least one record exists
 
-	</div>  <!-- END FormWrap-->
+                                %>
+                    </table>
+                    <div class="buttons">
+                        <asp:Button type="submit" runat="server" name="insert" Text="Crea" class="orangebutton" />
+                        <asp:Button PostBackUrl="/timereport/menu.aspx" name="cancel_from_list" runat="server" type="submit" class="greybutton" Text="Annulla" />
+                    </div>
 
-	</div> <!-- END MainWindow -->
+                </div>
+                <!-- END FormWrap  -->
+            </div>
+            <!-- END Row  -->
+        </form>
+    </div>
+    <!-- *** End container *** -->
 
-	<!-- **** FOOTER **** -->  
-	<div id="WindowFooter">
-		<div></div>
-		<div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-		<div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
-		<div id="WindowFooter-R"><asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" /> <%= Session["UserName"]  %></div>
-	</div>
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>
 
+    <!-- *** JAVASCRIPT *** -->
+    <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+    </script>
 
 </body>
 

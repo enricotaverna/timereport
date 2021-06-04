@@ -2,61 +2,71 @@
 
 <!DOCTYPE html>
 
-<!-- Stili -->
-<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="/timereport/include/newstyle.css" rel="stylesheet" />
-<link href="/timereport/include/standard/uploader/uploader.css" rel="stylesheet" />
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery per date picker  -->
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
-<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script> <!-- Download excel da Tabulator -->
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<!-- Download excel da Tabulator -->
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title>Aggiorna Cost Rate</title>
+    <title><asp:Literal runat="server" Text="Cost Rate" /></title>
 </head>
 
 <body>
 
-    <div id="TopStripe"></div>
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-    <div id="MainWindow">
-
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
         <form id="FVForm" runat="server">
 
-            <div id="PanelWrap" style="width: 720px">
+            <div class="row justify-content-center">
 
-                <div class="StandardForm">
+                <div class="StandardForm col-11">
+
                     <div id="ProjectCostRateTable"></div>
-                </div>
 
-                <div class="buttons">
-                    <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" />
-                    <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>"  CssClass="orangebutton" />
-                     <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    <div class="buttons">
+                        <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" />
+                        <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    </div>
+                    <!--End buttons-->
+
                 </div>
-                <!--End buttons-->
+                <!--End div-->
 
             </div>
-            <!--End PanelWrap-->
+            <!--End LastRow-->
 
+            <!-- *** Finestra Dialogo *** -->
             <div id="ModalWindow">
+
                 <!--  Finestra Dialogo -->
 
                 <div id="dialog" class="window">
@@ -68,25 +78,23 @@
                         <div class="input nobottomborder">
                             <!-- ** PERSONA ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Consulente" /></div>
-                            <label class="dropdown">
+                                <asp:Literal runat="server" Text="Consulente" />
+                            </div>
                                 <asp:DropDownList ID="DDLPersons" runat="server" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id"
                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" AppendDataBoundItems="True">
                                     <asp:ListItem Text="-- selezionare un valore --" Value=""></asp:ListItem>
                                 </asp:DropDownList>
-                            </label>
                         </div>
 
                         <div class="input nobottomborder">
                             <!-- ** PROGETTO ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Progetto" /></div>
-                            <label class="dropdown">
+                                <asp:Literal runat="server" Text="Progetto" />
+                            </div>
                                 <asp:DropDownList ID="DDLProjects" runat="server" DataSourceID="DSProjects" DataTextField="ProjectName" DataValueField="Projects_id"
                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" AppendDataBoundItems="True">
                                     <asp:ListItem Text="-- selezionare un valore --" Value=""></asp:ListItem>
                                 </asp:DropDownList>
-                            </label>
                         </div>
 
                         <div class="input nobottomborder">
@@ -131,313 +139,319 @@
                 </div>
                 <%--DIALOG--%>
             </div>
-            <!--  Finestra Dialogo -->
 
         </form>
-
     </div>
-    <!-- END MainWindow -->
+    <!-- *** END Container *** -->
 
-    <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Today.Year  %></div>
-        <div id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
     </div>
 
     <div id="mask"></div>
     <!-- Mask to cover the whole screen -->
 
-</body>
+    <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource runat="server" ID="DSPersons"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [Persons] WHERE Active = 'true' ORDER BY Name"></asp:SqlDataSource>
+    <asp:SqlDataSource runat="server" ID="DSProjects"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY ProjectName"></asp:SqlDataSource>
 
-<script>
+    <!-- *** JAVASCRIPT *** -->
+    <script>
 
-    // ** VALIDAZIONI **
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
-    // *** attiva validazione campi form
-    $('#formPersone').parsley({
-        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
-    });
+        // ** VALIDAZIONI **
 
-    // controllo sulle date
-    // 1 - DataDa < DataA
-    // 2 - Se esiste già un record per la persona DataDa deve essere DataA + 1 giorno
-    window.Parsley.addValidator('dateinsequenza', function (value, requirement) {
-
-        var dataDaCompare = $("#TBDataDa").val().substring(6, 11) + $("#TBDataDa").val().substring(3, 5) + $("#TBDataDa").val().substring(0, 2);
-        var dataACompare = $("#TBDataA").val().substring(6, 11) + $("#TBDataA").val().substring(3, 5) + $("#TBDataA").val().substring(0, 2);
-
-        // controllo sequenza
-        if (dataDaCompare > dataACompare) {
-            $("#TBDataDa").parsley().addError('dateinsequenza', { message: 'Data inizio deve essere < data fine', updateClass: true });
-            return false;
-        }
-
-        // controllo sovrapposizione 
-        var dataAjax = "{ Persons_id: '" + $("#DDLPersons").val() + "', " +
-            " PersonsCostRate_id: '" + $("#TBPersonsCostRate_id").val() + "', " +
-            " DataDa: '" + $("#TBDataDa").val() + "', " +
-            " DataA: '" + $("#TBDataA").val() + "' }";
-
-        $.ajax({
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/CheckDate",
-            data: dataAjax,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            type: 'post',
-            async: false,
-            success: function (data) {
-                if (data.d != "true") { // esiste, quindi errore
-                    response = false;
-                    var myMsg = "Data inizio dovrebbe essere: " + data.d;
-                    $("#TBDataDa").parsley().removeError('dateinsequenza');
-                    $("#TBDataDa").parsley().addError('dateinsequenza', { message: myMsg });
-                }
-                else
-                    response = true;
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
-            }
+        // *** attiva validazione campi form
+        $('#formPersone').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
         });
-        return response;
-    }, 32);
-    //    .addMessage('it', 'dateinsequenza', 'Controllare le date di validità');
 
-    // ** INTERFACCIA **
+        // controllo sulle date
+        // 1 - DataDa < DataA
+        // 2 - Se esiste già un record per la persona DataDa deve essere DataA + 1 giorno
+        window.Parsley.addValidator('dateinsequenza', function (value, requirement) {
 
-    $("#TBDataA").datepicker($.datepicker.regional['it']);
-    $("#TBDataDa").datepicker($.datepicker.regional['it']);
+            var dataDaCompare = $("#TBDataDa").val().substring(6, 11) + $("#TBDataDa").val().substring(3, 5) + $("#TBDataDa").val().substring(0, 2);
+            var dataACompare = $("#TBDataA").val().substring(6, 11) + $("#TBDataA").val().substring(3, 5) + $("#TBDataA").val().substring(0, 2);
 
-    $(":checkbox").addClass("css-checkbox");     // attiva checkbox
-
-    // ** EVENTI TRIGGER **
-
-    //trigger download of data.xlsx file
-    $("#btn_download").click(function(){
-        ProjectCostRateTable.download("xlsx", "ExportData.xlsx", {sheetName:"Dati"});
-    });
-
-    $("#btn_crea").click(function (e) {
-
-        //Cancel the link behavior
-        e.preventDefault();
-
-        if (e.originalEvent.detail == 0)
-            return true;
-
-        initValue();  // inizializza campi
-
-        openDialogForm("#dialog");
-
-    });  // tasto crea record
-
-    $('#mask').click(function () {
-        $(this).hide();
-        $('.window').hide();
-    }); // chiude form modale
-
-    $("#btnSalvaModale").click(function (e) {
-
-        //Cancel the link behavior
-        e.preventDefault();
-
-        if (!$('#FVForm').parsley().validate())
-            return;
-
-        submitCreaAggiornaRecord();
-
-        $('#mask').hide();
-        $('.window').hide();
-
-    }); // bottone salva su form modale
-
-    $("#btnCancelModale").click(function (e) {
-        //Cancel the link behavior
-        e.preventDefault();
-        $('#FVForm').parsley().reset();
-
-        $('#mask').hide();
-        $('.window').hide();
-    }); // bottone chiude su form modale
-
-    // ** TABULATOR **
-
-    var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
-        return "<i class='fa fa-trash'></i>";
-    };  // icona cancella
-    var editIcon = function (cell, formatterParams, onRendered) { //plain text value
-        return "<i class='fa fa-edit'></i>";
-    };  // icona edit
-
-    var ProjectCostRateTable = new Tabulator("#ProjectCostRateTable", {
-        paginationSize: 18, // this option can take any positive integer value (default = 10)
-        pagination: "local", //enable local pagination.
-        headerFilterPlaceholder: "filtra i record...", //set column header placeholder text
-        ajaxURL: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRateTable", //ajax URL
-        ajaxParams: { sAnno: "" }, //ajax parameters
-        ajaxConfig: "POST", //ajax HTTP request type
-        ajaxContentType: "json", // send parameters to the server as a JSON encoded string
-        layout: "fitColumns", //fit columns to width of table (optional)
-        ajaxResponse: function (url, params, response) {
-            //url - the URL of the request
-            //params - the parameters passed with the request
-            //response - the JSON object returned in the body of the response.
-            return JSON.parse(response.d); //return the d property of a response json object
-        },
-        columns: [
-            { title: "ProjectCostRate_id", field: "ProjectCostRate_Id", sorter: "number", visible: false },
-            { title: "Persons_id", field: "Persons_id", sorter: "number", visible: false },
-            { title: "Project_id", field: "Project_id", sorter: "number", visible: false },
-            { title: "Da", field: "DataDa", sorter: "string", width: 80, headerFilter: true },
-            { title: "A", field: "DataA", sorter: "string", width: 80, headerFilter: true },
-            { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
-            { title: "Prj Code", field: "ProjectCode", sorter: "string", headerFilter: true },
-            { title: "Prj Name", field: "ProjectName", sorter: "string", headerFilter: true },
-            { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
-            { title: "Cost Rate", field: "CostRate", sorter: "number", width: 60, headerFilter: true },
-            { title: "Bill Rate", field: "BillRate", sorter: "number", width: 60, headerFilter: true },
-            <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE")) {
-                    Response.Write("{ formatter: trashIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },");
-                    Response.Write("\n");            
-                    Response.Write("{ formatter: editIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },");
-            } %>
-        ],
-    }); // Tabella principale
-
-    // ** FUNZIONI **
-
-    function initValue() {
-
-        $('#TBProjectCostRate_id').val('0'); // attenzione!
-        $('#DDLProjects').val('');
-        $('#TBComment').val('');
-        $('#TBCostRate').val('');
-        $('#TBBillRate').val('');
-        $('#TBDataDa').val('');
-        $('#TBDataA').val('');
-
-    } // inizilizza form in creazione
-
-    function T_leggiRecord(dati, riga) {
-
-        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{'sProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
-
-        $.ajax({
-
-            type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRate",
-            data: values,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-
-            success: function (msg) {
-
-                var objProjectCostRate = msg.d;
-
-                if (objProjectCostRate.ProjectCostRate_id > 0)
-                $('#TBProjectCostRate_id').val(objProjectCostRate.ProjectCostRate_id);
-                $('#DDLPersons').val(objProjectCostRate.Persons_id);
-                $('#DDLProjects').val(objProjectCostRate.Projects_id);
-                $('#TBCostRate').val(objProjectCostRate.CostRate);
-                $('#TBBillRate').val(objProjectCostRate.BillRate);
-                $('#TBDataDa').val(objProjectCostRate.DataDa);
-                $('#TBDataA').val(objProjectCostRate.DataA);
-                $('#TBComment').val(objProjectCostRate.Comment);
-
-                openDialogForm("#dialog");
-            },
-
-            error: function (xhr, textStatus, errorThrown) {
+            // controllo sequenza
+            if (dataDaCompare > dataACompare) {
+                $("#TBDataDa").parsley().addError('dateinsequenza', { message: 'Data inizio deve essere < data fine', updateClass: true });
                 return false;
             }
 
-        }); // ajax
+            // controllo sovrapposizione 
+            var dataAjax = "{ Persons_id: '" + $("#DDLPersons").val() + "', " +
+                " PersonsCostRate_id: '" + $("#TBPersonsCostRate_id").val() + "', " +
+                " DataDa: '" + $("#TBDataDa").val() + "', " +
+                " DataA: '" + $("#TBDataA").val() + "' }";
 
-    }  // leggi dati da record, chiamata da Tabulator
+            $.ajax({
+                url: "/timereport/webservices/WS_PersonsCostRate.asmx/CheckDate",
+                data: dataAjax,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data) {
+                    if (data.d != "true") { // esiste, quindi errore
+                        response = false;
+                        var myMsg = "Data inizio dovrebbe essere: " + data.d;
+                        $("#TBDataDa").parsley().removeError('dateinsequenza');
+                        $("#TBDataDa").parsley().addError('dateinsequenza', { message: myMsg });
+                    }
+                    else
+                        response = true;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+            return response;
+        }, 32);
+        //    .addMessage('it', 'dateinsequenza', 'Controllare le date di validità');
 
-    function T_cancellaRecord(dati, riga) {
+        // ** INTERFACCIA **
 
-        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{'ProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
+        $("#TBDataA").datepicker($.datepicker.regional['it']);
+        $("#TBDataDa").datepicker($.datepicker.regional['it']);
 
-        $.ajax({
+        $(":checkbox").addClass("css-checkbox");     // attiva checkbox
 
-            type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/DeleteProjectCostRate",
-            data: values,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
+        // ** EVENTI TRIGGER **
 
-            success: function (msg) {
-                // se call OK inserisce una riga sotto l'elemento 
-                if (msg.d == true) {
-                    riga.delete();
-                } else
-                    ShowPopup("Impossibile cancellare il record");
+        //trigger download of data.xlsx file
+        $("#btn_download").click(function () {
+            ProjectCostRateTable.download("xlsx", "ExportData.xlsx", { sheetName: "Dati" });
+        });
 
+        $("#btn_crea").click(function (e) {
+
+            //Cancel the link behavior
+            e.preventDefault();
+
+            if (e.originalEvent.detail == 0)
+                return true;
+
+            initValue();  // inizializza campi
+
+            openDialogForm("#dialog");
+
+        });  // tasto crea record
+
+        $('#mask').click(function () {
+            $(this).hide();
+            $('.window').hide();
+        }); // chiude form modale
+
+        $("#btnSalvaModale").click(function (e) {
+
+            //Cancel the link behavior
+            e.preventDefault();
+
+            if (!$('#FVForm').parsley().validate())
+                return;
+
+            submitCreaAggiornaRecord();
+
+            $('#mask').hide();
+            $('.window').hide();
+
+        }); // bottone salva su form modale
+
+        $("#btnCancelModale").click(function (e) {
+            //Cancel the link behavior
+            e.preventDefault();
+            $('#FVForm').parsley().reset();
+
+            $('#mask').hide();
+            $('.window').hide();
+        }); // bottone chiude su form modale
+
+        // ** TABULATOR **
+
+        var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
+            return "<i class='fa fa-trash'></i>";
+        };  // icona cancella
+        var editIcon = function (cell, formatterParams, onRendered) { //plain text value
+            return "<i class='fa fa-edit'></i>";
+        };  // icona edit
+
+        var ProjectCostRateTable = new Tabulator("#ProjectCostRateTable", {
+            paginationSize: 15, // this option can take any positive integer value (default = 10)
+            pagination: "local", //enable local pagination.
+            headerFilterPlaceholder: "filtra i record...", //set column header placeholder text
+            ajaxURL: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRateTable", //ajax URL
+            ajaxParams: { sAnno: "" }, //ajax parameters
+            ajaxConfig: "POST", //ajax HTTP request type
+            ajaxContentType: "json", // send parameters to the server as a JSON encoded string
+            layout: "fitColumns", //fit columns to width of table (optional)
+            ajaxResponse: function (url, params, response) {
+                //url - the URL of the request
+                //params - the parameters passed with the request
+                //response - the JSON object returned in the body of the response.
+                return JSON.parse(response.d); //return the d property of a response json object
             },
+            columns: [
+                { title: "ProjectCostRate_id", field: "ProjectCostRate_Id", sorter: "number", visible: false },
+                { title: "Persons_id", field: "Persons_id", sorter: "number", visible: false },
+                { title: "Project_id", field: "Project_id", sorter: "number", visible: false },
+                { title: "Da", field: "DataDa", sorter: "string", width: 80, headerFilter: true },
+                { title: "A", field: "DataA", sorter: "string", width: 80, headerFilter: true },
+                { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
+                { title: "Prj Code", field: "ProjectCode", sorter: "string", headerFilter: true },
+                { title: "Prj Name", field: "ProjectName", sorter: "string", headerFilter: true },
+                { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
+                { title: "Cost Rate", field: "CostRate", sorter: "number", width: 60, headerFilter: true },
+                { title: "Bill Rate", field: "BillRate", sorter: "number", width: 60, headerFilter: true },
+                <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE"))
+        {
+            Response.Write("{ formatter: trashIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },");
+            Response.Write("\n");
+            Response.Write("{ formatter: editIcon, width: 40, align: \"center\", cellClick: function(e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },");
+        } %>
+            ],
+        }); // Tabella principale
 
-            error: function (xhr, textStatus, errorThrown) {
-                return false;
-            }
+        // ** FUNZIONI **
 
-        }); // ajax
+        function initValue() {
 
-    } // cancella record, chiamata da Tabulator
+            $('#TBProjectCostRate_id').val('0'); // attenzione!
+            $('#DDLProjects').val('');
+            $('#TBComment').val('');
+            $('#TBCostRate').val('');
+            $('#TBBillRate').val('');
+            $('#TBDataDa').val('');
+            $('#TBDataA').val('');
 
-    function submitCreaAggiornaRecord() {
+        } // inizilizza form in creazione
 
-        if ($('#TBCostRate').val() == '')
-            $('#TBCostRate').val(0);
+        function T_leggiRecord(dati, riga) {
 
-        if ($('#TBBillRate').val() == '')
-            $('#TBBillRate').val(0);
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+            var values = "{'sProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
 
-        // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-        var values = "{ 'ProjectCostRate_id': '" + $('#TBProjectCostRate_id').val() + "', " +
-            "'Persons_id': '" + $('#DDLPersons').val() + "' , " +
-            "'Projects_id': '" + $('#DDLProjects').val() + "' , " +
-            "'CostRate': '" + $('#TBCostRate').val() + "' , " +
-            "'BillRate': '" + $('#TBBillRate').val() + "' , " +
-            "'Comment': '" + $('#TBComment').val() + "' , " +
-            "'DataDa': '" + $('#TBDataDa').val() + "' , " +
-            "'DataA': '" + $('#TBDataA').val() + "'   } ";
+            $.ajax({
 
-        $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_PersonsCostRate.asmx/GetProjectCostRate",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
 
-            type: "POST",
-            url: "/timereport/webservices/WS_PersonsCostRate.asmx/CreateUpdateProjectCostRate",
-            data: values,
-            async: false,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
+                success: function (msg) {
 
-            success: function (msg) {
-                // chiude dialogo
-                ProjectCostRateTable.replaceData() // ricarica tabella dopo insert
+                    var objProjectCostRate = msg.d;
 
-            },
+                    if (objProjectCostRate.ProjectCostRate_id > 0)
+                        $('#TBProjectCostRate_id').val(objProjectCostRate.ProjectCostRate_id);
+                    $('#DDLPersons').val(objProjectCostRate.Persons_id);
+                    $('#DDLProjects').val(objProjectCostRate.Projects_id);
+                    $('#TBCostRate').val(objProjectCostRate.CostRate);
+                    $('#TBBillRate').val(objProjectCostRate.BillRate);
+                    $('#TBDataDa').val(objProjectCostRate.DataDa);
+                    $('#TBDataA').val(objProjectCostRate.DataA);
+                    $('#TBComment').val(objProjectCostRate.Comment);
 
-            error: function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            }
+                    openDialogForm("#dialog");
+                },
 
-        }); // ajax
-    } // crea o aggiorna record selezionato, chiamata da btnSalvaModale
+                error: function (xhr, textStatus, errorThrown) {
+                    return false;
+                }
 
-</script>
+            }); // ajax
 
-<asp:sqldatasource runat="server" id="DSPersons"
-    connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-    selectcommand="SELECT * FROM [Persons] WHERE Active = 'true' ORDER BY Name"></asp:sqldatasource>
+        }  // leggi dati da record, chiamata da Tabulator
 
-<asp:sqldatasource runat="server" id="DSProjects"
-    connectionstring="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-    selectcommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY ProjectName"></asp:sqldatasource>
+        function T_cancellaRecord(dati, riga) {
 
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+            var values = "{'ProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_PersonsCostRate.asmx/DeleteProjectCostRate",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d == true) {
+                        riga.delete();
+                    } else
+                        ShowPopup("Impossibile cancellare il record");
+
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    return false;
+                }
+
+            }); // ajax
+
+        } // cancella record, chiamata da Tabulator
+
+        function submitCreaAggiornaRecord() {
+
+            if ($('#TBCostRate').val() == '')
+                $('#TBCostRate').val(0);
+
+            if ($('#TBBillRate').val() == '')
+                $('#TBBillRate').val(0);
+
+            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+            var values = "{ 'ProjectCostRate_id': '" + $('#TBProjectCostRate_id').val() + "', " +
+                "'Persons_id': '" + $('#DDLPersons').val() + "' , " +
+                "'Projects_id': '" + $('#DDLProjects').val() + "' , " +
+                "'CostRate': '" + $('#TBCostRate').val() + "' , " +
+                "'BillRate': '" + $('#TBBillRate').val() + "' , " +
+                "'Comment': '" + $('#TBComment').val() + "' , " +
+                "'DataDa': '" + $('#TBDataDa').val() + "' , " +
+                "'DataA': '" + $('#TBDataA').val() + "'   } ";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_PersonsCostRate.asmx/CreateUpdateProjectCostRate",
+                data: values,
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // chiude dialogo
+                    ProjectCostRateTable.replaceData() // ricarica tabella dopo insert
+
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+
+            }); // ajax
+        } // crea o aggiorna record selezionato, chiamata da btnSalvaModale
+
+    </script>
+
+</body>
 
 </html>

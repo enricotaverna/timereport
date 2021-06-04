@@ -17,12 +17,17 @@ public partial class SFimport_select : System.Web.UI.Page
     static int ExpectedFulfillmentDateIndex;
     static DataTable dtFiltraMese;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             Auth.CheckPermission("REPORT", "PROJECT_FORCED");
 
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
     }
 
     //

@@ -9,9 +9,16 @@ using System.Web.UI.WebControls;
 
 public partial class persons_lookup_form : System.Web.UI.Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         Auth.CheckPermission("MASTERDATA", "PERSONE");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack)
             if (Request.QueryString["Persons_Id"] != null)

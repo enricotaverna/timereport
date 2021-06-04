@@ -10,11 +10,18 @@ using System.IO;
 
 public partial class calendario_festiviList: System.Web.UI.Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         DataSet ds = (DataSet)Cache.Get("Festivi");
 
         Auth.CheckPermission("REPORT","ECONOMICS");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!Page.IsPostBack)
         {

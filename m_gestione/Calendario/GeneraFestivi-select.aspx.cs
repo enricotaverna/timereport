@@ -12,10 +12,16 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
     // attivata MARS 
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("CONFIG", "TABLE");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Popola Drop Down con lista progetti
         if (!IsPostBack)

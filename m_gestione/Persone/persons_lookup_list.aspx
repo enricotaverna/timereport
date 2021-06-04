@@ -2,12 +2,15 @@
 
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!DOCTYPE html>
 
 <script runat="server">
 
     Public strMessage As String
     Dim strQueryOrdering As String = " ORDER BY Persons.Name "
+
+    Public CurrentSession As TRSession
 
     Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs)
 
@@ -17,10 +20,11 @@
         Dim sWhere As String = ""
 
         Auth.CheckPermission("MASTERDATA", "PERSONE")
+        CurrentSession = Session("CurrentSession")
 
         ' Imposta il SelectCommand in base al contenuto della lista dropdown
         If DL_flattivo.SelectedValue <> "all" Or _
-      (Session("Persons_DL_flattivo_val") <> Nothing And Not IsPostBack) Then
+(Session("Persons_DL_flattivo_val") <> Nothing And Not IsPostBack) Then
             sWhere = " WHERE Persons.Active IN (@DL_flattivo)"
         End If
 
@@ -93,115 +97,141 @@
 
 </script>
 
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Jquery + parsley + datepicker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head runat="server">
-    <title>Lista persone</title>
-    <link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Anagrafica persone" />
+    </title>
 </head>
-
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session("userLevel")%> type =text/javascript></SCRIPT>
-
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
 
 <body>
 
-    <div id="TopStripe"></div>  
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=Session("userlevel") %>.html"></div>
 
-    <div id="MainWindow"> 
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="form1" runat="server">
 
-    <form id="form1" runat="server">
+            <!--**** Riquadro navigazione ***-->
+            <div class="row justify-content-center">
 
-    <!--**** Riquadro navigazione ***-->    
-    <div id="PanelWrap">  
+                <!--**** Primo Box ***-->
+                <div class="col-9 RoundedBox">
 
-    <!--**** Primo Box ***-->    
-    <div class="RoundedBox" >
-    
-    <table width="760" border="0" >
-        <tr>
-        <td>
-            Attivo:
-        </td>
-        <td>
-            <asp:DropDownList ID="DL_flattivo" runat="server" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged"
-                OnPreRender="DL_flattivo_Load" >
-                <asp:ListItem Value="all">Tutti i valori</asp:ListItem>
-                <asp:ListItem Selected="True" Value="1">Attivo</asp:ListItem>
-                <asp:ListItem Value="0">Non attivo</asp:ListItem>
-            </asp:DropDownList>
-        </td>
-        <td>
-            Nome:
-        </td>
-        <td>
-            <asp:TextBox ID="TB_Nome" runat="server" OnTextChanged="TB_Codice_TextChanged" OnLoad="TB_Nome_Load"
-                 ></asp:TextBox>
-            &nbsp;<asp:Button ID="Button1" class=SmallOrangeButton runat="server" Text="<%$ appSettings: FILTER_TXT %>" />
-        </td>
-        </tr>
-    </table>
+                    <table width="100%" border="0">
+                        <tr>
+                            <td>Attivo:
+                            </td>
+                            <td>
+                                <asp:DropDownList ID="DL_flattivo" runat="server" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged"
+                                    OnPreRender="DL_flattivo_Load">
+                                    <asp:ListItem Value="all">Tutti i valori</asp:ListItem>
+                                    <asp:ListItem Selected="True" Value="1">Attivo</asp:ListItem>
+                                    <asp:ListItem Value="0">Non attivo</asp:ListItem>
+                                </asp:DropDownList>
+                            </td>
+                            <td>Nome:
+                            </td>
+                            <td>
+                                <asp:TextBox ID="TB_Nome" CssClass="ASPInputcontent" runat="server" OnTextChanged="TB_Codice_TextChanged" OnLoad="TB_Nome_Load"></asp:TextBox>
+                                &nbsp;<asp:Button ID="Button1" class="SmallOrangeButton" runat="server" Text="<%$ appSettings: FILTER_TXT %>" />
+                            </td>
+                        </tr>
+                    </table>
 
-    </div> <!--End roundedBox-->     
-    </div> <!--End PanelWrap-->
+                </div>
+                <!-- *** End col *** -->
+            </div>
+            <!-- *** End row *** -->
 
-    <div id="PanelWrap">
+            <!--**** tabella principale ***-->
+            <div class="row justify-content-center pt-3">
+                <div class="col-9 px-0">
 
-    <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
-        DataSourceID="PersonsLookUpSqlDataSource" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
-        OnRowDeleting="GridView1_RowDeleting"
-        AllowPaging="True" PageSize="15" DataKeyNames="Persons_id" 
-            GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
-        <FooterStyle CssClass="GV_footer" />
-        <RowStyle Wrap="False" CssClass="GV_row" />
-        <Columns>
-            <asp:BoundField DataField="Nome" HeaderText="Nome" SortExpression="Nome" />
-            <asp:BoundField DataField="Ruolo" HeaderText="Ruolo" SortExpression="Ruolo" />
-            <asp:BoundField DataField="NomeSocieta" HeaderText="Società" 
-                SortExpression="NomeSocieta" />
-            <asp:CheckBoxField DataField="active" HeaderText="Attivo" />
-            <asp:BoundField DataField="attivo_da" HeaderText="Attivo da" 
-                DataFormatString="{0:dd-MM-yyyy}" SortExpression="attivo_da" />
-            <asp:CommandField ShowDeleteButton="True" ButtonType="Image" 
-                    DeleteImageUrl="/timereport/images/icons/16x16/trash.gif" 
-                    SelectImageUrl="/timereport/images/icons/16x16/modifica.gif" 
-                    ShowSelectButton="True" />
+                    <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
+                        DataSourceID="PersonsLookUpSqlDataSource" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                        OnRowDeleting="GridView1_RowDeleting"
+                        AllowPaging="True" PageSize="15" DataKeyNames="Persons_id"
+                        GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
+                        <FooterStyle CssClass="GV_footer" />
+                        <RowStyle Wrap="False" CssClass="GV_row" />
+                        <Columns>
+                            <asp:BoundField DataField="Nome" HeaderText="Nome" SortExpression="Nome" />
+                            <asp:BoundField DataField="Ruolo" HeaderText="Ruolo" SortExpression="Ruolo" />
+                            <asp:BoundField DataField="NomeSocieta" HeaderText="Società"
+                                SortExpression="NomeSocieta" />
+                            <asp:CheckBoxField DataField="active" HeaderText="Attivo" />
+                            <asp:BoundField DataField="attivo_da" HeaderText="Attivo da"
+                                DataFormatString="{0:dd-MM-yyyy}" SortExpression="attivo_da" />
+                            <asp:CommandField ShowDeleteButton="True" ButtonType="Image"
+                                DeleteImageUrl="/timereport/images/icons/16x16/trash.gif"
+                                SelectImageUrl="/timereport/images/icons/16x16/modifica.gif"
+                                ShowSelectButton="True" />
 
-        </Columns>
-        <PagerStyle CssClass="GV_footer" />
-        <HeaderStyle CssClass="GV_header" />
-        <AlternatingRowStyle CssClass="GV_row_alt " />
-    </asp:GridView>
+                        </Columns>
+                        <PagerStyle CssClass="GV_footer" />
+                        <HeaderStyle CssClass="GV_header" />
+                        <AlternatingRowStyle CssClass="GV_row_alt " />
+                    </asp:GridView>
 
-    <div class="buttons">       
+                    <div class="buttons">
 
-    <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>"   CssClass="orangebutton"
-        PostBackUrl="/timereport/m_gestione/persone/persons_lookup_form.aspx" />
-    <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>"   CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
-    
+                        <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton"
+                            PostBackUrl="/timereport/m_gestione/persone/persons_lookup_form.aspx" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+
+                    </div>
+
+                </div>
+                <!-- *** End col *** -->
+            </div>
+            <!-- *** End row *** -->
+        </form>
+    </div>
+    <!--*** End Container *** -->
+
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= session("CutoffDate") %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= Session("UserName")  %></div>
+            </div>
+        </footer>
     </div>
 
-    </div>
-
-    </form>
-
-    </div> <!-- END MainWindow -->
-
-        <!-- **** FOOTER **** -->   
-    <div id="WindowFooter">        
-        <div ></div>         
-        <div  id="WindowFooter-L"> Aeonvis Spa <%= Year(now())  %></div>  
-        <div  id="WindowFooter-C">cutoff: <%=session("CutoffDate")%>  </div>               
-        <div id="WindowFooter-R">Utente: <%= Session("UserName")  %></div>         
-     </div> 
-
-         <asp:SqlDataSource ID="DS_Persone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        
+    <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource ID="DS_Persone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name,Persons.Active, Persons.Attivo_da FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>
     </asp:SqlDataSource>
-        
     <asp:SqlDataSource ID="PersonsLookUpSqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         DeleteCommand="DELETE FROM [Persons] WHERE [Persons_id] = @Persons_id">
         <SelectParameters>
@@ -214,6 +244,14 @@
         </DeleteParameters>
     </asp:SqlDataSource>
 
+    <!-- *** JAVASCRIPT *** -->
+    <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+    </script>
 
 </body>
 </html>

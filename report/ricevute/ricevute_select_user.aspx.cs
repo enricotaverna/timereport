@@ -9,6 +9,9 @@ using System.Threading;
 public partial class report_ricevute_ricevute_select : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         
@@ -19,6 +22,9 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
             Auth.CheckPermission("REPORT", "TICKET_ALL");
         else
             Auth.CheckPermission("REPORT", "TICKET_USER");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // se premuto CancelButton torna indietro
         if (Request.Form["CancelButton"] != null)
@@ -68,18 +74,16 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
                 // se non esistono aggiunge cella con nome mese
                 cell1.InnerHtml = mfi.GetMonthName(i+1);
                 cell1.Align = "center";
-                cell1.Attributes.Add("class", "cella");
                 row.Cells.Add(cell1);
             }
             else  {
                 // se esistono file aggiunge cella con nome mese e link alla pagina
                 if (mode == "admin")
-                    cell1.InnerHtml = "<input type='button' class='bottone_lista' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "&mode=admin') />";
+                    cell1.InnerHtml = "<input type='button' class='bottone_lista grande' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "&mode=admin') />";
                 else
-                    cell1.InnerHtml = "<input type='button' class='bottone_lista' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "') />";
+                    cell1.InnerHtml = "<input type='button' class='bottone_lista grande' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "') />";
 
                 cell1.Align = "center";
-                cell1.Attributes.Add("class", "cella");
                 row.Cells.Add(cell1);
             }
 

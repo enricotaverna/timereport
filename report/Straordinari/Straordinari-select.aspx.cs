@@ -11,6 +11,9 @@ using System.IO;
 public partial class straordinari_select : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         
@@ -18,6 +21,9 @@ public partial class straordinari_select : System.Web.UI.Page
 
         // autority check in funzione del tipo chiamata della pagina
             Auth.CheckPermission("REPORT", "ADMIN");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // se premuto CancelButton torna indietro
         if (Request.Form["CancelButton"] != null)
@@ -59,15 +65,13 @@ public partial class straordinari_select : System.Web.UI.Page
                 // > mese attuale
                 cell1.InnerHtml = mese.ToString("MMMM");
                 cell1.Align = "center";
-                cell1.Attributes.Add("class", "cella");
                 row.Cells.Add(cell1);
             }
             else  {
                 // se esistono file aggiunge cella con nome mese e link alla pagina
-                cell1.InnerHtml = "<input type='button' onClick=\"location.href = '/timereport/report/Straordinari/Straordinari-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'\" class='bottone_lista' value=" + mese.ToString("MMMM") + " />";
+                cell1.InnerHtml = "<input type='button' onClick=\"location.href = '/timereport/report/Straordinari/Straordinari-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'\" class='bottone_lista grande' value=" + mese.ToString("MMMM") + " />";
 
                 cell1.Align = "center";
-                cell1.Attributes.Add("class", "cella");
                 row.Cells.Add(cell1);
             }
 

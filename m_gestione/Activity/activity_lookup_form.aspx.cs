@@ -13,11 +13,17 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
 
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
     static string prevPage = String.Empty;
-            
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("MASTERDATA", "WBS");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack )
         {
@@ -43,7 +49,7 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
 
             conn.Open();
 
-            SqlCommand cmd = new SqlCommand("Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where Active = 1 AND ActivityOn = 1 AND ClientManager_id = " + Session["persons_id"] + " ORDER BY iProgetto", conn);
+            SqlCommand cmd = new SqlCommand("Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto", conn);
         
             SqlDataReader dr = cmd.ExecuteReader();
             DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLprogetto");
@@ -55,7 +61,7 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
             ddlList.DataTextField = "iProgetto";
             ddlList.DataValueField = "Projects_Id";
             if ( Request.QueryString["Projects_id"] != null ) // in caso di update seleziona il valore nella dropdown list
-                ddlList.SelectedValue = Request.QueryString["Projects_id"];
+                ddlList.SelectedValue = Request.QueryString["Projects_id"].ToString();
             ddlList.DataBind();
             conn.Close();
             

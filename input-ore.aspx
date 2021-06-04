@@ -1,417 +1,419 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-ore.aspx.cs" Inherits="input_ore" EnableEventValidation="False" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<!-- Style -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
-     
-<!-- Jquery   -->
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" NoExpenses=<%= Session["NoExpenses"]%> Lingua=<%= Session["lingua"]%>  UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head id="Head1" runat="server">
+
+<head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>
-        <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
+        <asp:Literal runat="server" Text="<%$ Resources:titolo%>" />
     </title>
 </head>
 
 <body>
 
-    <div id="TopStripe"></div>
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-    <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="FormOre" runat="server" data-parsley-validate>
 
-        <div id="FormWrap" class="StandardForm" > 
+            <div class="row justify-content-center">
 
-            <form id="FormOre" runat="server" data-parsley-validate>
+                <div id="FormWrap" class="col-5 StandardForm">
 
-                <asp:FormView ID="FVore" runat="server" DataKeyNames="Hours_Id"
-                    DataSourceID="DSore" align="center" DefaultMode="Edit"
-                    OnItemInserted="FVore_ItemInserted" OnItemUpdated="FVore_ItemUpdated"
-                    OnDataBound="FVore_DataBound" 
-                    OnModeChanging="FVore_modechanging" CellPadding="0">
+                    <asp:FormView ID="FVore" runat="server" DataKeyNames="Hours_Id"
+                        DataSourceID="DSore" align="center" DefaultMode="Edit"
+                        OnItemInserted="FVore_ItemInserted" OnItemUpdated="FVore_ItemUpdated"
+                        OnDataBound="FVore_DataBound"
+                        OnModeChanging="FVore_modechanging" CellPadding="0">
 
-                    <%-- EDIT --%>
-                    <EditItemTemplate>
+                        <%-- EDIT --%>
+                        <EditItemTemplate>
 
-                        <div class="formtitle">
-                            <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
-                            <a href="AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>" >
-                                <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource1" /></a>
-                        </div>
+                            <div class="formtitle">
+                                <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
+                                <a href="./m_utilita/AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>">
+                                    <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="Image1Resource1" /></a>
+                            </div>
 
-                        <!-- *** LB Data ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource1" ></asp:Label>
-                            <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date","{0:d}") %>' meta:resourcekey="LBdateResource1" ></asp:Label>
-                            <asp:Label ID="Label13" runat="server" Text='<%# Bind("name") %>' meta:resourcekey="Label13Resource1"></asp:Label>
-                        </div>
+                            <!-- *** LB Data ***  -->
+                            <div class="input">
+                                <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource1"></asp:Label>
+                                <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date","{0:d}") %>' meta:resourcekey="LBdateResource1"></asp:Label>
+                                <asp:Label ID="Label13" runat="server" Text='<%# Bind("name") %>' meta:resourcekey="Label13Resource1"></asp:Label>
+                            </div>
 
-                        <!-- *** DDL Progetto ***  -->
-                        <!-- messaggio parsley di errore disabilitato dropdown-->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
-                            
-                            <label class="dropdown"> <!-- per stile CSS -->
+                            <!-- *** DDL Progetto ***  -->
+                            <!-- messaggio parsley di errore disabilitato dropdown-->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
+                                <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLprogettoResource1" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" >
+                                    meta:resourcekey="DDLprogettoResource1"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                 </asp:DropDownList>
-                            </label>
+                            </div>
 
-                        </div>
-
-                        <!-- *** DDL Attività ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource1"></asp:Label>
-                            
-                            <label id="lbDDLAttivita" class="dropdown">  <!-- per stile CSS -->
+                            <!-- *** DDL Attività ***  -->
+                            <div class="input nobottomborder" id="lbDDLAttivita">
+                                <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource1"></asp:Label>
+                                <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLAttivitaResource1" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" >
+                                    meta:resourcekey="DDLAttivitaResource1"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                     <asp:ListItem meta:resourcekey="ListItemResource1">--seleziona attività--</asp:ListItem>
                                 </asp:DropDownList>
-                            </label>
-                        </div>
+                            </div>
 
-                        <!-- *** DDL Location ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
-                            
-                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
+                            <!-- *** DDL Location ***  -->
+                            <div class="input" id="lbDDLLocation">
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                                <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
-                                    data-parsley-required="true" data-parsley-errors-container="#valMsg" >
+                                    data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                     <asp:ListItem>-- seleziona valore --</asp:ListItem>
                                 </asp:DropDownList>
-                            </label>
+                                <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server" Width="270px" Text='<%# Bind("LocationDescription") %>'
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" />
 
-                            <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server"  width="270px"   Text='<%# Bind("LocationDescription") %>'  
-                            data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                            </div>
 
-                        </div>
-
-                        <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
-                        <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
-                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
+                            <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
 
-                        <!-- *** TB Ore ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
-                            <span class="input2col">
-                                <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
-                            </span>
+                            <!-- *** TB Ore ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
+                                <span class="input2col">
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1"
+                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
+                                </span>
 
-                            <!-- *** Checkboc Remote ***  -->
-<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                                <!-- *** Checkboc Remote ***  -->
+                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
                             <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
-                            <!-- *** Checkboc Storno ***  -->
-                            <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
-                            <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
+                                <!-- *** Checkboc Storno ***  -->
+                                <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
+                                <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
-                        </div>
+                            </div>
 
-                        <!-- *** TB Comment ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource1"></asp:Label>
-                            <asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea"
-                                Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource1" 
-                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-testo-obbligatorio="true" />
-                        </div>
+                            <!-- *** TB Comment ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource1"></asp:Label>
+                                <asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea"
+                                    Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource1"
+                                    data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-testo-obbligatorio="true" />
+                            </div>
 
-                        <!-- *** TB Competenza ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource1"></asp:Label>
-                            <asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource1"  autocomplete="off"
-                                data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                        </div>
+                            <!-- *** TB Competenza ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource1"></asp:Label>
+                                <asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource1" autocomplete="off"
+                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                            </div>
 
-                        <div class="buttons">
-                            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
-                            <asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
-                            <asp:Button ID="UpdateCancelButton" runat="server"  CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" formnovalidate />
-                        </div>
+                            <!-- *** BOTTONI ***  -->
+                            <div class="buttons">
+                                <div id="valMsg" class="parsely-single-error"></div>
+                                <asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
+                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                            </div>
 
-                    </EditItemTemplate>
+                        </EditItemTemplate>
 
-                    <%-- INSERT --%>
-                    <InsertItemTemplate>
+                        <%-- INSERT --%>
+                        <InsertItemTemplate>
 
-                        <div class="formtitle">
-                            <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" /></div>
+                            <div class="formtitle">
+                                <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
+                            </div>
 
-                        <!-- *** LB Data ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource2"></asp:Label>
-                            <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date") %>' meta:resourcekey="LBdateResource2"></asp:Label>
-                            <asp:Label ID="LBperson" runat="server" Text='<%# Bind("persons_id") %>' meta:resourcekey="LBpersonResource1"></asp:Label>
-                        </div>
+                            <!-- *** LB Data ***  -->
+                            <div class="input">
+                                <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource2"></asp:Label>
+                                <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date") %>' meta:resourcekey="LBdateResource2"></asp:Label>
+                                <asp:Label ID="LBperson" runat="server" Text='<%# Bind("persons_id") %>' meta:resourcekey="LBpersonResource1"></asp:Label>
+                            </div>
 
-                        <!-- *** DDL Progetto ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource2"></asp:Label>
+                            <!-- *** DDL Progetto ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource2"></asp:Label>
 
-                            <label class="dropdown"> <!-- per stile CSS -->
+                                <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
                                     meta:resourcekey="DDLprogettoResource2" data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                            </label>
 
-                        </div>
+                            </div>
 
-                        <!-- *** DDL Attività ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource2"></asp:Label>
-                            
-                            <label id="lbDDLAttivita" class="dropdown"> <!-- per stile CSS -->
+                            <!-- *** DDL Attività ***  -->
+                            <div class="input nobottomborder" id="lbDDLAttivita">
+                                <asp:Label CssClass="inputtext" ID="Label6" runat="server" Text="Attività" meta:resourcekey="Label6Resource2"></asp:Label>
+                                <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLAttivitaResource2" data-parsley-required="true" 
+                                    meta:resourcekey="DDLAttivitaResource2" data-parsley-required="true"
                                     data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                            </label>
+                            </div>
 
-                        </div>
-
-                        <!-- *** DDL Location ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
-                            
-                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" 
+                            <!-- *** DDL Location ***  -->
+                            <div class="input" id="lbDDLLocation">
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                            </label>
+                                <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server" Width="270px"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                            </div>
 
-                            <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server"  width="270px"   
-                            data-parsley-errors-container="#valMsg" data-parsley-required="true" />
-   
-                        </div>
+                            <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
+                            <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
-                        <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
-                        <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
-                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <!-- *** TB Ore ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
+                                <span class="input2col">
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
+                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
+                                </span>
 
-                        <!-- *** TB Ore ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
-                            <span class="input2col">
-                                <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2" 
-                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
-                            </span>
-
-                            <!-- *** Checkboc Remote ***  -->
-<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                                <!-- *** Checkboc Remote ***  -->
+                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
                             <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
-                            <!-- *** Checkboc Storno ***  -->
-                            <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />
-                            <asp:Label AssociatedControlID="CancelFlagCheckBox"  runat="server" Text="Storno" meta:resourcekey="Label5Resource1" ></asp:Label>
+                                <!-- *** Checkboc Storno ***  -->
+                                <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />
+                                <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
-                        </div>
+                            </div>
 
-                        <!-- *** TB Comment ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource2"></asp:Label>
-                            <asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea"
-                                Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource2" 
-                                data-parsley-validate-if-empty="" data-parsley-errors-container="#valMsg" data-parsley-testo-obbligatorio="true" />
-                        </div>
+                            <!-- *** TB Comment ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource2"></asp:Label>
+                                <asp:TextBox ID="TBComment" runat="server" Rows="5" CssClass="textarea"
+                                    Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" meta:resourcekey="TBCommentResource2"
+                                    data-parsley-validate-if-empty="" data-parsley-errors-container="#valMsg" data-parsley-testo-obbligatorio="true" />
+                            </div>
 
-                        <!-- *** TB Competenza ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource2"></asp:Label>
-                            <asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate") %>' Columns="8" meta:resourcekey="TBAccountingDateResource2"  autocomplete="off"
-                                data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                        </div>
+                            <!-- *** TB Competenza ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource2"></asp:Label>
+                                <asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate") %>' Columns="8" meta:resourcekey="TBAccountingDateResource2" autocomplete="off"
+                                    data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                            </div>
 
-                        <div class="buttons">
-                            <div id="valMsg"" class="parsely-single-error" style="display:inline-block;width:130px"></div>
-                            <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" meta:resourcekey="InsertButtonResource1" />
-                            <asp:Button ID="UpdateCancelButton" runat="server"  CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource2" formnovalidate />
-                        </div>
+                            <!-- *** BOTTONI ***  -->
+                            <div class="buttons">
+                                <div id="valMsg" class="parsely-single-error"></div>
+                                <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
+                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                            </div>
 
-                    </InsertItemTemplate>
+                        </InsertItemTemplate>
 
-                    <%-- DISPLAY --%>
-                    <ItemTemplate>
-                        <div class="formtitle">
-                            <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
-                            <a href="AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>" >
-                                <asp:Image runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="ImageResource1" /></a>
-                        </div>
+                        <%-- DISPLAY --%>
+                        <ItemTemplate>
+                            <div class="formtitle">
+                                <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
+                                <a href="./m_utilita/AuditLog.aspx?RecordId=<%=Request.QueryString["hours_id"]%>&TableName=Hours&TYPE=U&key=<Hours_Id=<%=Request.QueryString["hours_id"] %>>">
+                                    <asp:Image runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" meta:resourcekey="ImageResource1" /></a>
+                            </div>
 
-                        <!-- *** LB Data ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource3"></asp:Label>
-                            <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date","{0:d}") %>' meta:resourcekey="LBdateResource3"></asp:Label>
-                            <asp:Label ID="LBperson" runat="server" Text='<%# Bind("name") %>' meta:resourcekey="LBpersonResource2"></asp:Label>
-                        </div>
+                            <!-- *** LB Data ***  -->
+                            <div class="input">
+                                <asp:Label CssClass="inputtext" ID="Label11" runat="server" Text="Data" meta:resourcekey="Label11Resource3"></asp:Label>
+                                <asp:Label class="input2col" ID="LBdate" runat="server" Text='<%# Bind("Date","{0:d}") %>' meta:resourcekey="LBdateResource3"></asp:Label>
+                                <asp:Label ID="LBperson" runat="server" Text='<%# Bind("name") %>' meta:resourcekey="LBpersonResource2"></asp:Label>
+                            </div>
 
-                        <!-- *** DDL Progetto ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource3"></asp:Label>
-                            <label class="dropdown">
+                            <!-- *** DDL Progetto ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource3"></asp:Label>
                                 <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
                                     Enabled="False"
                                     meta:resourcekey="DDLprogettoResource3">
                                 </asp:DropDownList>
-                            </label>
-                        </div>
+                            </div>
 
-                        <!-- *** DDL Attività ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="Attività" meta:resourcekey="Label8Resource1"></asp:Label>
-                            <label id="lbDDLAttivita" class="dropdown">
+                            <!-- *** DDL Attività ***  -->
+                            <div class="input nobottomborder" id="lbDDLAttivita">
+                                <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="Attività" meta:resourcekey="Label8Resource1"></asp:Label>
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
                                     Enabled="False" Width="240px" meta:resourcekey="DDLAttivitaResource3">
                                 </asp:DropDownList>
-                            </label>
-                        </div>
+                            </div>
 
-                        <!-- *** DDL Location ***  -->
-                        <div class="input">
-                            <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
-                            
-                            <label id="lbDDLLocation" class="dropdown"> <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" Enabled="False" >
+                            <!-- *** DDL Location ***  -->
+                            <div class="input" id="lbDDLLocation">
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" Enabled="False">
                                 </asp:DropDownList>
-                            </label>
+                                <asp:TextBox CssClass="ASPInputcontent" Enabled="False" ID="TBLocation" runat="server" Width="270px" Text='<%# Bind("LocationDescription") %>' />
 
-                            <asp:TextBox CssClass="ASPInputcontent" Enabled="False" ID="TBLocation" runat="server"  width="270px" Text='<%# Bind("LocationDescription") %>' />
+                            </div>
 
-                        </div>
+                            <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
+                            <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
-                         <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
-                        <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
-                        <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
+                            <!-- *** TB Ore ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource3"></asp:Label>
+                                <span class="input2col">
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
+                                </span>
 
-                        <!-- *** TB Ore ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource3"></asp:Label>
-                            <span class="input2col">
-                                <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
-                            </span>
-
-                            <!-- *** Checkboc Remote ***  -->
-<%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
+                                <!-- *** Checkboc Remote ***  -->
+                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
                             <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
-                            <!-- *** Checkboc Storno ***  -->
+                                <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="disCancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
                                 <asp:Label runat="server" AssociatedControlID="disCancelFlagCheckBox" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
-                        </div>
+                            </div>
 
-                        <div class="input nobottomborder">
-                            <asp:Label CssClass="inputtext" ID="CommentTextBox" runat="server" Text="Nota" meta:resourcekey="CommentTextBoxResource1"></asp:Label>
-                            <asp:TextBox ID="TextBox2" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" Enabled="False" meta:resourcekey="TextBox2Resource1" />
-                        </div>
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="CommentTextBox" runat="server" Text="Nota" meta:resourcekey="CommentTextBoxResource1"></asp:Label>
+                                <asp:TextBox ID="TextBox2" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" Enabled="False" meta:resourcekey="TextBox2Resource1" />
+                            </div>
 
-                        <!-- *** TB Comment ***  -->
-                        <div class="input nobottomborder">
-                            <asp:Label ID="LBAccountingDate" runat="server" Text="Competenza" CssClass="inputtext" meta:resourcekey="LBAccountingDateResource3"></asp:Label>
-                            <asp:TextBox ID="TBAccountingDate" enabled="false" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' CssClass="ASPInputcontent" Columns="8" Width="100px" meta:resourcekey="LBAccountingDateDisplayResource1"></asp:TextBox>
-                        </div>
+                            <!-- *** TB Comment ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label ID="LBAccountingDate" runat="server" Text="Competenza" CssClass="inputtext" meta:resourcekey="LBAccountingDateResource3"></asp:Label>
+                                <asp:TextBox ID="TBAccountingDate" Enabled="false" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' CssClass="ASPInputcontent" Columns="8" Width="100px" meta:resourcekey="LBAccountingDateDisplayResource1"></asp:TextBox>
+                            </div>
 
-                        <!-- *** TB Competenza ***  -->
-                        <div class="buttons">
-                            <asp:Button ID="UpdateCancelButton" CssClass="greybutton" runat="server"  CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource3" />
+                            <!-- *** BOTTONI ***  -->
+                            <div class="buttons">
+                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                            </div>
 
-                        </div>
+                        </ItemTemplate>
 
-                    </ItemTemplate>
+                    </asp:FormView>
 
-                </asp:FormView>
+                </div>
+                <!-- FormWrap -->
 
-                <asp:SqlDataSource ID="DSprogetti" runat="server"
-                    ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT Projects_Id, ProjectCode + ' ' + left(Name,20) AS iProgetto FROM Projects where active = 'true' and activityON = 'true' order by ProjectCode"></asp:SqlDataSource>
-                <asp:SqlDataSource ID="DStipoore" runat="server"
-                    ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT HourType_Id, HourTypeCode + ' ' + Name AS iTipoOra FROM HourType"></asp:SqlDataSource>
-                <asp:SqlDataSource ID="DSattivita" runat="server"
-                    ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
-                <asp:SqlDataSource ID="DSore" runat="server"
-                    ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-                    SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-                    InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id)"
-                    UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType WHERE (Hours_Id = @Hours_id)"
-                    OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
+            </div>
+            <!-- LastRow -->
 
-                    <InsertParameters>
-                        <asp:Parameter Name="Projects_id" />
-                        <asp:Parameter Name="Persons_id" />
-                        <asp:Parameter Name="Date" />
-                        <asp:Parameter Name="HourType_id" DefaultValue="1" />
-                        <asp:Parameter Name="Hours" />
-                        <asp:Parameter Name="CancelFlag" />
-                        <asp:Parameter Name="Comment" />
-                        <asp:Parameter Name="LocationKey" />
-                        <asp:Parameter Name="LocationType" />
-                        <asp:Parameter Name="LocationDescription" />
-                        <asp:Parameter Name="ClientManager_id" />
-                        <asp:Parameter Name="AccountManager_id" />
-                        <asp:Parameter Name="Company_id" />
-                        <asp:Parameter Name="TransferFlag" />
-                        <asp:Parameter Name="Activity_id" />
-                        <asp:Parameter Name="CreatedBy" />
-                        <asp:Parameter Name="CreationDate" />
-                        <asp:Parameter Name="AccountingDate" Type="DateTime" />
-                        <asp:Parameter Name="WorkedInRemote"/>
-                    </InsertParameters>
-                    <SelectParameters>
-                        <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
-                    </SelectParameters>
-                    <UpdateParameters>
-                        <asp:Parameter Name="Hours" />
-                        <asp:Parameter Name="HourType_Id" DefaultValue="1" />
-                        <asp:Parameter Name="CancelFlag" />
-                        <asp:Parameter Name="Comment" />
-                        <asp:Parameter Name="TransferFlag" />
-                        <asp:Parameter Name="Activity_id" />
-                        <asp:Parameter Name="Projects_Id" />
-                        <asp:Parameter Name="LocationKey" />
-                        <asp:Parameter Name="LocationType" />
-                        <asp:Parameter Name="LocationDescription" />
-                        <asp:Parameter Name="Hours_id" />
-                        <asp:Parameter Name="CreatedBy" />
-                        <asp:Parameter Name="CreationDate" />
-                        <asp:Parameter Name="LastModifiedBy" />
-                        <asp:Parameter Name="LastModificationDate" />
-                        <asp:Parameter Name="AccountingDate" Type="DateTime" />
-                        <asp:Parameter Name="WorkedInRemote"/>
-                    </UpdateParameters>
-                </asp:SqlDataSource>
+        </form>
+        <!-- Form  -->
+    </div>
+    <!-- container -->
 
-            </form>
-
-        </div>
-        <%--        DISPLAY--%>
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
     </div>
 
-    <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Today.Year  %></div>
-        <div id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">
-            <asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" />
-            <%= Session["UserName"]  %></div>
-    </div>
+    <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource ID="DSprogetti" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Projects_Id, ProjectCode + ' ' + left(Name,20) AS iProgetto FROM Projects where active = 'true' and activityON = 'true' order by ProjectCode"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DStipoore" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT HourType_Id, HourTypeCode + ' ' + Name AS iTipoOra FROM HourType"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSattivita" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSore" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id)"
+        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType WHERE (Hours_Id = @Hours_id)"
+        OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
+        <InsertParameters>
+            <asp:Parameter Name="Projects_id" />
+            <asp:Parameter Name="Persons_id" />
+            <asp:Parameter Name="Date" />
+            <asp:Parameter Name="HourType_id" DefaultValue="1" />
+            <asp:Parameter Name="Hours" />
+            <asp:Parameter Name="CancelFlag" />
+            <asp:Parameter Name="Comment" />
+            <asp:Parameter Name="LocationKey" />
+            <asp:Parameter Name="LocationType" />
+            <asp:Parameter Name="LocationDescription" />
+            <asp:Parameter Name="ClientManager_id" />
+            <asp:Parameter Name="AccountManager_id" />
+            <asp:Parameter Name="Company_id" />
+            <asp:Parameter Name="TransferFlag" />
+            <asp:Parameter Name="Activity_id" />
+            <asp:Parameter Name="CreatedBy" />
+            <asp:Parameter Name="CreationDate" />
+            <asp:Parameter Name="AccountingDate" Type="DateTime" />
+            <asp:Parameter Name="WorkedInRemote" />
+        </InsertParameters>
+        <SelectParameters>
+            <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
+        </SelectParameters>
+        <UpdateParameters>
+            <asp:Parameter Name="Hours" />
+            <asp:Parameter Name="HourType_Id" DefaultValue="1" />
+            <asp:Parameter Name="CancelFlag" />
+            <asp:Parameter Name="Comment" />
+            <asp:Parameter Name="TransferFlag" />
+            <asp:Parameter Name="Activity_id" />
+            <asp:Parameter Name="Projects_Id" />
+            <asp:Parameter Name="LocationKey" />
+            <asp:Parameter Name="LocationType" />
+            <asp:Parameter Name="LocationDescription" />
+            <asp:Parameter Name="Hours_id" />
+            <asp:Parameter Name="CreatedBy" />
+            <asp:Parameter Name="CreationDate" />
+            <asp:Parameter Name="LastModifiedBy" />
+            <asp:Parameter Name="LastModificationDate" />
+            <asp:Parameter Name="AccountingDate" Type="DateTime" />
+            <asp:Parameter Name="WorkedInRemote" />
+        </UpdateParameters>
+    </asp:SqlDataSource>
+
+    <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         // *** Page Load ***  
         $(function () {
@@ -423,7 +425,7 @@
             $("#FVore_DDLhidden").hide();
             $("#FVore_DDLHiddenLocation").hide();
             $('#lbDDLAttivita').hide();
-            $('#lbDDLLocation').hide();
+            $('#FVore_DDLLocation').hide();
 
             $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
 
@@ -463,7 +465,7 @@
 
         });
 
-         // *** popola controllo delle attività *** 
+        // *** popola controllo delle attività *** 
         function BindActivity() {
 
             var ActivityOn = $("#FVore_DDLprogetto").find("option:selected").attr("data-ActivityOn");
@@ -471,7 +473,7 @@
             if (ActivityOn != "True") {  // progetto non richiede le attività 
                 $("#FVore_DDLAttivita").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
                 $('#lbDDLAttivita').hide();
-                }
+            }
             else {
                 // aggiunge selezione vuota
                 $("#FVore_DDLAttivita").append($('<option>', { value: '', text: '--- seleziona un elemento ---' }));
@@ -494,7 +496,7 @@
 
             // se DDL valorizzato a 99999 attiva il testo libero
             if ($("#FVore_DDLLocation").val() == 'T:99999') {
-                $('#FVore_TBLocation').show(); 
+                $('#FVore_TBLocation').show();
                 return;
             }
 
@@ -502,7 +504,7 @@
             $("#FVore_DDLLocation").children().remove(); // pulisce tutti gli item della  DropDown 
             if (typeof LocationOn == 'undefined') {  // non esiste l'attributo 
                 $("#FVore_DDLLocation").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
-                $('#lbDDLLocation').hide();
+                $('#FVore_DDLLocation').hide();
             }
             else {
                 // aggiunge selezione vuota
@@ -520,24 +522,24 @@
 
                 $("#FVore_DDLLocation").append($('<option>', { value: 'T:99999', text: '-- Testo Libero --' }));
 
-                $('#lbDDLLocation').show(); // visualizza DropDown
+                $('#FVore_DDLLocation').show(); // visualizza DropDown
 
                 $('#FVore_TBLocation').val(""); // reset e spegnimento campo
-                $('#FVore_TBLocation').hide(); 
+                $('#FVore_TBLocation').hide();
             }
         }
 
         // Mostra box testo in caso della corrispondente selezione della DDL Location
-        $("#FVore_DDLLocation").change(function() {
+        $("#FVore_DDLLocation").change(function () {
             if ($("#FVore_DDLLocation").val() == 'T:99999') // mostra Box Testo
             {
-                $('#lbDDLLocation').hide();
-                $('#FVore_TBLocation').show();  
+                $('#FVore_DDLLocation').hide();
+                $('#FVore_TBLocation').show();
             }
         });
 
         // Se campo vien sblancato riattiva il DDL
-        $("#FVore_TBLocation").change(function() {
+        $("#FVore_TBLocation").change(function () {
             if ($("#FVore_TBLocation").val() == '') // mostra Box Testo
             {
                 $('#FVore_DDLLocation').val('');

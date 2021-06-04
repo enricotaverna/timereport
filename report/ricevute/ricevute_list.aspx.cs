@@ -21,6 +21,11 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
         public string shortFileName { get; set; }
     }
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    string sInvoiceFlag = "";
+
     List<IndexFileObj> IndexFile = new List<IndexFileObj>();
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -30,6 +35,9 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             Auth.CheckPermission("REPORT", "TICKET_ALL");
         else
             Auth.CheckPermission("REPORT", "TICKET_USER");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // pulisce lista
         IndexFile.Clear();
@@ -57,9 +65,14 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             SQLDSricevute.SelectParameters["tipospesa"].DefaultValue = Request.QueryString["tipospesa"].ToString(); // tipospesa da DDL
             }
         else         // se mode != admin forza con la variabile di sessione
-            SQLDSricevute.SelectParameters["persons_id"].DefaultValue = Session["persons_id"].ToString(); // persona da variabile di sessione
+            SQLDSricevute.SelectParameters["persons_id"].DefaultValue = CurrentSession.Persons_id.ToString(); // persona da variabile di sessione
 
-        SQLDSricevute.SelectParameters["invoiceflag"].DefaultValue = Request.QueryString["invoiceflag"].ToString(); // flag fattura
+        if (Request.QueryString["invoiceflag"] == null)
+            sInvoiceFlag = "";
+        else
+            sInvoiceFlag = Request.QueryString["invoiceflag"].ToString();
+
+        SQLDSricevute.SelectParameters["invoiceflag"].DefaultValue = sInvoiceFlag; // flag fattura
 
         // carico array con i nomi dei file caricati sul mese in analisi
         Carica_Lista(mese, anno, Request.QueryString["mode"]);
@@ -165,10 +178,10 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             var stExpenses_id = filePaths[i].Substring(start, filePaths[i].LastIndexOf("-") - start);
 
             // se specificato il flag fattura seleziona solo ricevute corrispondenti
-            if (Request.QueryString["invoiceflag"].ToString() != "" )
+            if (sInvoiceFlag != "" )
             {
                 if (!Database.RecordEsiste("Select expenses_id from expenses where expenses_id=" + ASPcompatility.FormatStringDb(stExpenses_id) +
-                                             " AND invoiceflag=" + ASPcompatility.FormatStringDb(Request.QueryString["invoiceflag"].ToString()), null))
+                                             " AND invoiceflag=" + ASPcompatility.FormatStringDb(sInvoiceFlag), null))
                     continue; // salta al prossimo record
             }
 

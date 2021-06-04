@@ -7,11 +7,17 @@ using System.Web.UI.WebControls;
 
 public partial class m_report_checkinputlist : System.Web.UI.Page
 {
-   protected void Page_Load(object sender, EventArgs e)
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("ADMIN", "CUTOFF");
 
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
     }
 }

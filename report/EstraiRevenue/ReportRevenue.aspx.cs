@@ -15,11 +15,17 @@ public partial class report_esportaAttivita : System.Web.UI.Page
     // attivata MARS 
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             Auth.CheckPermission("REPORT", "PROJECT_FORCED");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack) {
             DDLManager.SelectedIndex = 0;
@@ -138,7 +144,7 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
         {
             DDLManager.ClearSelection();
-            DDLManager.Items.FindByValue(Session["Persons_id"].ToString()).Selected = true;
+            DDLManager.Items.FindByValue(CurrentSession.Persons_id.ToString()).Selected = true;
             DDLManager.Enabled = false;
         }
     }

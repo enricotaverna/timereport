@@ -14,15 +14,21 @@ using System.Data.OleDb;
 public partial class report_Straordinarit_list : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Init(object sender, EventArgs e)
     {
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Carica la griglia dei risultati 
         if (!IsPostBack) 
         {
             Page_setup();
-            CostruiciGriglia();
         }
+        CostruiciGriglia();
     }
 
     protected void Page_setup()

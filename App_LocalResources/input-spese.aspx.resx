@@ -562,7 +562,7 @@
     <value>Carica file</value>
   </data>
   <data name="giustificativi" xml:space="preserve">
-    <value>ricevute</value>
+    <value>Ricevute</value>
   </data>
   <data name="inserimento_spese" xml:space="preserve">
     <value>Inserimento spese</value>
@@ -572,5 +572,8 @@
   </data>
   <data name="messaggioNonEsisteProgetto" xml:space="preserve">
     <value>Su questo giorno non sono state caricate commesse</value>
+  </data>
+  <data name="titolo" xml:space="preserve">
+    <value>Inserimento Spese</value>
   </data>
 </root>

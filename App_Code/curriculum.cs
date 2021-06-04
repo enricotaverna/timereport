@@ -409,6 +409,9 @@ public class CurriculumList {
 
         var response = client.Execute(request); // risposta in response.Content
 
+        if (response == null) // nessuna risposta
+            return;
+
         // converte la stringa nel modello dati 
         Dictionary<string, Dictionary<string, string>> model = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(response.Content);
         foreach(var item in model) {

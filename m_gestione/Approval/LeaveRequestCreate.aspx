@@ -59,11 +59,9 @@
                 <!-- *** DDL Progetto ***  -->
                 <div class="input nobottomborder">
                     <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
-                    <label class="dropdown">
                         <asp:DropDownList ID="DDLProject" runat="server" AppendDataBoundItems="True"
                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
                         </asp:DropDownList>
-                    </label>
                 </div>
 
                 <!-- *** COMMENT ***  -->
@@ -276,7 +274,7 @@
                 "', requestType:'" + requestType +
                 "', fromDate:'" + $('#TBFromDate').val() +
                 "', toDate:'" + $('#TBToDate').val() +
-                "', persons_id:'<%=Session["persons_id"] %>" +
+                "', persons_id:'<%=CurrentSession.Persons_id %>" +
                 "', projects_id:'" + $('#DDLProject').val() +
                 "', hours:'" + oreNonNull +
                 "', comment:'" + $('#TBComment').val() +

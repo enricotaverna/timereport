@@ -61,7 +61,7 @@
         <br />
 
         <label runat="server" id="TitoloTabellaRicevute" style="visibility:hidden" ><H1>Giustificativi</H1></label>
-        <table id="TabellaRicevute" runat="server"  class="TabellaStampa"></table>
+        <table id="TabellaRicevute" runat="server" ></table>
     
     </div>
     </form>

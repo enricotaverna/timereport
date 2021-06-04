@@ -25,53 +25,41 @@ public partial class input_ore : System.Web.UI.Page
     {
 
         Auth.CheckPermission("DATI", "ORE");
-        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
- 
-//      Modo di default è insert, se richiamata con id va in change / display
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
+        //      Modo di default è insert, se richiamata con id va in change / display
         if (IsPostBack)
             return;
 
-//      in caso di update recupera il valore del progetto e attività
+        //      in caso di update recupera il valore del progetto e attività
         if (Request.QueryString["hours_id"] != null)
-            {
-                Get_record(Request.QueryString["hours_id"]);
+        {
 
-//              disabilita form in caso di cutoff
-                Label LBdate = (Label)FVore.FindControl("LBdate");
+            Get_record(Request.QueryString["hours_id"]);
 
-                if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]))
-                    FVore.ChangeMode(FormViewMode.ReadOnly);
-                else
-                    FVore.ChangeMode(FormViewMode.Edit);
+            //              disabilita form in caso di cutoff
+            Label LBdate = (Label)FVore.FindControl("LBdate");
 
-            } 
-            else // insert
-            {
-                FVore.ChangeMode(FormViewMode.Insert);
+            if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]))
+                FVore.ChangeMode(FormViewMode.ReadOnly);
+            else
+                FVore.ChangeMode(FormViewMode.Edit);
 
-                Label LBdate = (Label)FVore.FindControl("LBdate");
-                LBdate.Text = Request.QueryString["date"];
-            
-                Label LBperson =   (Label)FVore.FindControl("LBperson");
-                LBperson.Text = (string)Session["UserName"];
+        }
+        else // insert
+        {
+            FVore.ChangeMode(FormViewMode.Insert);
+
+            Label LBdate = (Label)FVore.FindControl("LBdate");
+            LBdate.Text = Request.QueryString["date"];
+
+            Label LBperson = (Label)FVore.FindControl("LBperson");
+            LBperson.Text = (string)Session["UserName"];
         }
 
     }
-
-    //protected void ValidaAttivita(object source, ServerValidateEventArgs args)
-    //{
-    //    DropDownList ddlActivity = (DropDownList)FVore.FindControl("DDLAttivita");
-    //    ValidationClass c = new ValidationClass();
-
-    //    if (ddlActivity.Enabled && ddlActivity.SelectedValue == "")
-    //         args.IsValid = false;               
-    //    else
-    //        args.IsValid = true;
-
-    //    // accende / spegne campo in errore
-    //    c.SetErrorOnField(args.IsValid,FVore,"DDLAttivita");
-        
-    //}
 
     protected void Get_record(string strHours_Id)
     {
@@ -86,45 +74,60 @@ public partial class input_ore : System.Web.UI.Page
 
     protected void Bind_DDLprogetto()
     {
-
-        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
-
-        // cancella le righe soggette a Workflow
-        //var rows = dtProgettiForzati.Select("WorkflowType != null");
-        foreach (DataRow row in dtProgettiForzati.Rows) { 
-            if ( row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
-                row.Delete();
-        }
-        dtProgettiForzati.AcceptChanges();
+        DataTable dtProgettiForzati;
 
         ddlProject = (DropDownList)FVore.FindControl("DDLprogetto");
-
         ddlProject.Items.Clear();
         ddlProject.Items.Add(new ListItem(GetLocalResourceObject("DDLprogetto.testo").ToString(), ""));
 
-        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
-        foreach (DataRow drRow in dtProgettiForzati.Rows)
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        switch (FVore.CurrentMode)
         {
-            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
-            liItem.Attributes.Add("data-ActivityOn", drRow["ActivityOn"].ToString());
-            liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
+            case FormViewMode.Insert:
+            case FormViewMode.Edit:
+                dtProgettiForzati = CurrentSession.dtProgettiForzati;
 
-            // dati per messaggio di errore
-            if (drRow["TestoObbligatorio"].ToString() == "True")
-                liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
-            else
-                liItem.Attributes.Add("data-desc-message", "");
+                // cancella le righe soggette a Workflow
+                //var rows = dtProgettiForzati.Select("WorkflowType != null");
+                foreach (DataRow row in dtProgettiForzati.Rows)
+                {
+                    if (row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
+                        row.Delete();
+                }
+                dtProgettiForzati.AcceptChanges();
 
-            // se chargable filtro per cliente, altrimenti per progetto
-            string prjType = drRow["ProjectType_Id"].ToString();
-            if (prjType  == ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] )
-                liItem.Attributes.Add("data-filterlocation", drRow["CodiceCliente"].ToString().TrimEnd());
-            else if (prjType == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] ||
-                     prjType == ConfigurationManager.AppSettings["PROGETTO_INTERNAL_INVESTMENT"] ||
-                     prjType == ConfigurationManager.AppSettings["PROGETTO_INFRASTRUCTURE"] )
-                liItem.Attributes.Add("data-filterlocation", drRow["Projects_id"].ToString());
+                // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
+                foreach (DataRow drRow in dtProgettiForzati.Rows)
+                {
+                    ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+                    liItem.Attributes.Add("data-ActivityOn", drRow["ActivityOn"].ToString());
+                    liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
 
-            ddlProject.Items.Add(liItem);
+                    // dati per messaggio di errore
+                    if (drRow["TestoObbligatorio"].ToString() == "True")
+                        liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
+                    else
+                        liItem.Attributes.Add("data-desc-message", "");
+
+                    // se chargable filtro per cliente, altrimenti per progetto
+                    string prjType = drRow["ProjectType_Id"].ToString();
+                    if (prjType == ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"])
+                        liItem.Attributes.Add("data-filterlocation", drRow["CodiceCliente"].ToString().TrimEnd());
+                    else if (prjType == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] ||
+                             prjType == ConfigurationManager.AppSettings["PROGETTO_INTERNAL_INVESTMENT"] ||
+                             prjType == ConfigurationManager.AppSettings["PROGETTO_INFRASTRUCTURE"])
+                        liItem.Attributes.Add("data-filterlocation", drRow["Projects_id"].ToString());
+
+                    ddlProject.Items.Add(liItem);
+                }
+
+                break;
+
+            case FormViewMode.ReadOnly:
+
+                ddlProject.DataSource = CurrentSession.dtProgettiTutti;
+                break;
         }
 
         ddlProject.DataTextField = "DescProgetto";
@@ -138,12 +141,12 @@ public partial class input_ore : System.Web.UI.Page
         if (FVore.CurrentMode == FormViewMode.Insert)
             ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
 
-     }
+    }
 
     public void Bind_DDLAttivita()
     {
         DropDownList ddlActivity = (DropDownList)FVore.FindControl("DDLHidden");
-        DropDownList ddlLocation= (DropDownList)FVore.FindControl("DDLHiddenLocation");
+        DropDownList ddlLocation = (DropDownList)FVore.FindControl("DDLHiddenLocation");
 
         DropDownList ddlActivity_temp = (DropDownList)FVore.FindControl("DDLAttivita");
         DropDownList ddlLocation_temp = (DropDownList)FVore.FindControl("DDLLocation");
@@ -161,9 +164,9 @@ public partial class input_ore : System.Web.UI.Page
         // loop su tutte le location bufferizzate e carica elemento della DDL
         foreach (LocationRecord rec in CurrentSession.LocationList)
         {
-            ListItem liItem = new ListItem(rec.LocationDescription, rec.LocationType +":"+ rec.LocationKey); // chiave dell'item DDL fatta da "P/C" + ":" + Location_id
+            ListItem liItem = new ListItem(rec.LocationDescription, rec.LocationType + ":" + rec.LocationKey); // chiave dell'item DDL fatta da "P/C" + ":" + Location_id
             // chiave codice cliente o Projects_id, usato per filtrare con jquery le opzioni
-            liItem.Attributes.Add("data-filterlocation", rec.ParentKey); 
+            liItem.Attributes.Add("data-filterlocation", rec.ParentKey);
             ddlLocation.Items.Add(liItem);
             ddlLocation_temp.Items.Add(liItem);
         }
@@ -186,7 +189,7 @@ public partial class input_ore : System.Web.UI.Page
 
         ListItem liEmpty2 = new ListItem("-- selezionare un valore --", "");
         ddlActivity.Items.Add(liEmpty2);
-        ddlActivity_temp.Items.Add(liEmpty2);   
+        ddlActivity_temp.Items.Add(liEmpty2);
 
         foreach (DataRow drRow in dtAct.Rows)
         {
@@ -207,8 +210,9 @@ public partial class input_ore : System.Web.UI.Page
         ddlActivity.SelectedValue = lActivity_id != "" ? lActivity_id : "";
         ddlLocation.SelectedValue = lLocationKey != "" ? lLocationKey : "";
 
-       // se in creazione imposta il default di progetto 
-        if (FVore.CurrentMode == FormViewMode.Insert & dtAct.Rows.Count > 0) { 
+        // se in creazione imposta il default di progetto 
+        if (FVore.CurrentMode == FormViewMode.Insert & dtAct.Rows.Count > 0)
+        {
             ddlActivity.SelectedValue = (string)Session["ActivityDefault"];
             //ddlLocation.SelectedValue = (string)Session["LocationDefault"]; non vogliamo default sulla location
         }
@@ -216,15 +220,15 @@ public partial class input_ore : System.Web.UI.Page
 
     protected void FVore_modechanging(object sender, FormViewModeEventArgs e)
     {
-//      se premuto tasto cancel torna indietro
+        //      se premuto tasto cancel torna indietro
         if (e.CancelingEdit)
             Response.Redirect("input.aspx");
     }
 
     protected void FVore_ItemInserted(object sender, FormViewInsertedEventArgs e)
     {
-            
-            Response.Redirect("input.aspx");
+
+        Response.Redirect("input.aspx");
     }
 
     protected void FVore_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
@@ -256,22 +260,24 @@ public partial class input_ore : System.Web.UI.Page
 
         DropDownList ddlList = (DropDownList)FVore.FindControl("DDLprogetto");
         e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
-        
+
         DropDownList ddlList1 = (DropDownList)FVore.FindControl("DDLAttivita");
         if (ddlList1.SelectedValue != null)
             e.Command.Parameters["@Activity_id"].Value = ddlList1.SelectedValue;
 
         // Se valorizzato la DDL
         DropDownList ddlList2 = (DropDownList)FVore.FindControl("DDLLocation");
-        if (ddlList2.SelectedValue != "") { 
+        if (ddlList2.SelectedValue != "")
+        {
             e.Command.Parameters["@LocationKey"].Value = ddlList2.SelectedValue.Substring(2); // chiave della location
-            e.Command.Parameters["@LocationType"].Value = ddlList2.SelectedValue.Substring(0,1); // tipo C o P della location
+            e.Command.Parameters["@LocationType"].Value = ddlList2.SelectedValue.Substring(0, 1); // tipo C o P della location
             e.Command.Parameters["@LocationDescription"].Value = ddlList2.SelectedItem.Text;
         }
 
         // Se valorizzato il testo libero
         TextBox TBLocation = (TextBox)FVore.FindControl("TBLocation");
-        if (TBLocation.Text != "") { 
+        if (TBLocation.Text != "")
+        {
             e.Command.Parameters["@LocationDescription"].Value = TBLocation.Text;
             e.Command.Parameters["@LocationType"].Value = "T";
             e.Command.Parameters["@LocationKey"].Value = "99999";
@@ -285,7 +291,7 @@ public partial class input_ore : System.Web.UI.Page
         // solo insert
         if (FVore.CurrentMode == FormViewMode.Insert)
         {
-            e.Command.Parameters["@Persons_id"].Value = Session["persons_id"];
+            e.Command.Parameters["@Persons_id"].Value = CurrentSession.Persons_id;
             Label LBdate = (Label)FVore.FindControl("LBdate");
             e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
             // Audit
@@ -302,26 +308,26 @@ public partial class input_ore : System.Web.UI.Page
         if (FVore.CurrentMode == FormViewMode.Edit)
         {
             // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];  
+            e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];
             e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         }
     }
 
     protected void FVore_DataBound(object sender, EventArgs e)
     {
-//      formattta il campo numerico delle ore, nel DB le ore stornate sono negative
-        if (Request.QueryString["action"] == "fetch") {
+        //      formattta il campo numerico delle ore, nel DB le ore stornate sono negative
+        if (Request.QueryString["action"] == "fetch")
+        {
             TextBox TBHours1 = (TextBox)FVore.FindControl("HoursTextBox");
             double HoursValue = Math.Abs(Convert.ToDouble(TBHours1.Text));
             TBHours1.Text = HoursValue.ToString();
-             }
+        }
 
         if (Request.QueryString["hours_id"] != null)
         {
-          //              Valorizza progetto e attività
+            //              Valorizza progetto e attività
             Bind_DDLprogetto();
             Bind_DDLAttivita();
-
         }
         else // insert
         {
@@ -330,7 +336,7 @@ public partial class input_ore : System.Web.UI.Page
         }
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
-        if ( !Auth.ReturnPermission("ADMIN", "CUTOFF") )
+        if (!Auth.ReturnPermission("ADMIN", "CUTOFF"))
         {
             Label LBAccountingDate = (Label)FVore.FindControl("LBAccountingDate");
             TextBox TBAccountingDate = (TextBox)FVore.FindControl("TBAccountingDate");
@@ -339,7 +345,7 @@ public partial class input_ore : System.Web.UI.Page
             LBAccountingDate.Visible = false;
             TBAccountingDate.Visible = false;
 
-        }     
+        }
     }
 
     protected override void InitializeCulture()

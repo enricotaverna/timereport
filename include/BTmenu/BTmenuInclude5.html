@@ -1,0 +1,222 @@
+﻿<!-- ============= COMPONENT ============== -->
+<div class="container bg-dark">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/timereport/menu.aspx"><img src="/timereport/apple-touch-icon.png" width="30" height="30" alt=""></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="main_nav">
+                <ul class="navbar-nav me-auto">
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- INSERISCI -------- -->
+                    <li class="nav-item dropdown hover">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Inserisci</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/timereport/input.aspx?type=hours">Ore</a></li>
+                            <li><a class="dropdown-item" href="/timereport/input.aspx?type=expenses">Spese</a></li>
+                            <li><a class="dropdown-item" href="/timereport/input.aspx?type=bonus">Ticket</a></li>
+                            <li><a class="dropdown-item" href="/timereport/m_utilita/upload-expenses-xls.aspx"> Upload spese </a></li>
+                        </ul>
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- REPORT -------- -->
+                    <li class="nav-item dropdown hover">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Report</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/timereport/esporta.aspx">Ore e Spese</a></li>
+                            <li><a class="dropdown-item" href="/timereport/report/ricevute/ricevute_select_user.aspx">Giustificativi</a></li>
+                        </ul>
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- PROGETTI -------- -->
+                    <li class="nav-item dropdown hover has-megamenu ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Progetti</a>
+                        <div class="dropdown-menu megamenu" role="menu">
+                            <div class="row g-3">
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Anagrafiche</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Project/projects_lookup_list.aspx">Progetti</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Phase/Phase_lookup_list.aspx">Fasi</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/activity/activity_lookup_list.aspx">Attività</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Economics</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/CostRateAnno/CostRatePersona_list.aspx">Cost Rate</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/CostRateAnno/CostRateProgetto_list.aspx">Bill Rate</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Reporting</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/ReportRevenue.aspx">Revenue</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/attivita/ReportAttivita-select.aspx">Attività</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/controllo_progetto/ControlloProgetto-select.aspx">Controllo progetto (old)</a></li>
+                                    </ul>
+                                </div>
+                            </div><!-- end row -->
+                        </div> <!-- dropdown-mega-menu.// -->
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- AMMINISTRAZIONE -------- -->
+                    <li class="nav-item dropdown hover has-megamenu ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Amministrazione</a>
+                        <div class="dropdown-menu megamenu" role="menu">
+                            <div class="row g-3">
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Chiusura</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Cutoff/cutoff.aspx">Cutoff</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/checkInput/check-input-select.aspx">Check inserimenti</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/chiusura/Amm_chiusureTR.aspx">Riapri Timereport</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/ricevute/ricevute_select.aspx?mode=admin">Stampa ricevute</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Anagrafiche</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/customer/customer_lookup_list.aspx">Clienti</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Project/projects_lookup_list.aspx">Progetti</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Modifiche massive</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/mass_insert_hours.aspx">Ore</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/mass_insert_expenses.aspx">Spese</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Persone</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Persone/persons_lookup_list.aspx">Anagrafica</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx">Forza progetti e spese</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Calendario/Calendario_list.aspx">Calendari</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/Calendario/GeneraFestivi-select.aspx">Genera Festivi</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Economics</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/CostRateAnno/CostRatePersona_list.aspx">Cost Rate</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/CostRateAnno/CostRateProgetto_list.aspx">Bill Rate</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/ProjectRevenueData.aspx">Dati progetto</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/rdlc/CostRateReport.aspx">Download Cost Rate</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Calcolo revenue</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/SFimport_select.aspx">Import Sales Force</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/SpeseImport_select.aspx">Import spese</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/RevenuManualAdj.aspx">Forzature manuali</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/CalcolaRevenue.aspx">Calcolo revenue</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/EstraiRevenue/ReportRevenue.aspx">Report revenue</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Report</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/report/straordinari/Straordinari-select.aspx">Straordinari</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/report/general-download.aspx?query=SELECT+Persons.Name+AS+NomePersona,+AuthUserLevel.name,+Persons.Attivo_da,+Persons.Attivo_fino,+Projects.ProjectCode,+Projects.Name+AS+NomeProgetto,+Projects.active+FROM+ForcedAccounts+INNER+JOIN+Persons+ON+Persons.Persons_id+=+ForcedAccounts.Persons_id+INNER+JOIN+AuthUserLevel+ON+AuthUserLevel.UserLevel_id+=+persons.UserLevel_id+INNER+JOIN+Projects+ON+Projects.Projects_id=ForcedAccounts.Projects_id+WHERE+Projects.active=1+and+Persons.active=1">Progetti e persone attive</a></li>
+                                    </ul>
+                                </div>
+
+                            </div><!-- end row -->
+                        </div> <!-- dropdown-mega-menu.// -->
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- HR -------- -->
+                    <li class="nav-item dropdown hover has-megamenu ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">HR</a>
+                        <div class="dropdown-menu megamenu" role="menu">
+                            <div class="row g-3">
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Curriculum</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/curricula/CV_list.aspx">Elenco CV</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Catalogo</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=HR_CourseType&SortField=CourseTypeName&FieldNumber=1&init=true&CheckTable=HR_Course">Tipo Corsi</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=HR_Product&SortField=ProductName&FieldNumber=1&init=true&CheckTable=HR_Course">Prodotti</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=HR_CourseVendor&SortField=VendorName&FieldNumber=1&init=true&CheckTable=HR_Course">Vendor</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/training/CourseCatalog.aspx">Catalogo corsi</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Piano training</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/training/trainingplan_create.aspx">Crea</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/training/trainingplan_schedule.aspx">Schedula</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/training/TrainingPlan_evaluate.aspx">Valuta</a></li>
+                                    </ul>
+                                </div><!-- end col-3 -->
+                                <div class="col-lg-3 col-6">
+                                    <h6 class="title">Reporting</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a class="dropdown-item" href="/timereport/report/Rdlc/ReportExecute.aspx?ReportName=HR_CourseCatalog">Catalogo</a></li>
+                                        <li><a class="dropdown-item" href="/timereport/m_gestione/training/TrainingPlan_report.aspx">Piano di training</a></li>
+                                    </ul>
+                                </div>
+                            </div><!-- end row -->
+                        </div> <!-- dropdown-mega-menu.// -->
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!-- -------- CONFIGURAZIONE -------- -->
+                    <li class="nav-item dropdown hover">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Configurazione</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/timereport/m_gestione/AuthPermission/AuthPermission.aspx">Autorizzazioni</a></li>
+                            <li><a class="dropdown-item" href="/timereport/m_gestione/Location/ClientLocation.aspx">Client Location</a></li>
+                            <li><a class="dropdown-item" href="/timereport/m_gestione/Location/ProjectLocation.aspx">Project Location</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=TipoContratto&CheckTable=Projects&SortField=Descrizione&FieldNumber=1&init=true">Tipo Contratto</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=MetodoPagamento&SortField=MetodoPagamento&FieldNumber=2&init=true">Metodo di Pagamento</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=TerminiPagamento&SortField=TerminiPagamento&FieldNumber=2&init=true">Termini di Pagamento</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=ExpenseType&SortField=ExpenseCode&FieldNumber=2&CheckTable=Expenses&init=true">Tipo Spese</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=Company&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true">Società</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=Roles&SortField=Name&FieldNumber=1&CheckTable=Persons&init=true">Ruoli</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=ProjectType&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true">Tipo progetti</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=HourType&SortField=HourTypeCode&FieldNumber=2&CheckTable=Hours&init=true">Tipo ore</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=Channels&SortField=Name&FieldNumber=1&CheckTable=Projects&init=true">Canali</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=TipoBonus&SortField=Descrizione&FieldNumber=1&CheckTable=Expenses&init=true">Tipo Bonus</a></li>
+                            <li><a class="dropdown-item" href="/timereport/lookup_list.aspx?TableName=ConsultantType&SortField=ConsultantTypeName&FieldNumber=1&CheckTable=Persons&init=true">Tipo Consulenza</a></li>
+                        </ul>
+                    </li>
+                    <!-- -------- menu item end// -------- -->
+                    <!--</ul>--> <!-- navbar-nav end//  -->
+                    <!--<ul class="navbar-nav ms-auto">-->
+                </ul> <!-- navbar-nav end//  -->
+                <!-- USER -->
+                <div class="nav-item dropdown">
+
+                    <ul class="navbar-nav me-auto">
+                        <!-- -------- menu item end// -------- -->
+                        <!-- -------- USER -------- -->
+                        <li class="nav-item dropdown hover">
+
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fas fa-user-circle" style="color:white;font-size:1.8rem;"></i></a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/timereport/m_utilita/change-password.aspx">Cambia password</a></li>
+                                <li><a class="dropdown-item" href="/timereport/m_utilita/change-color.aspx">Cambia sfondo</a></li>
+                                <li><a class="dropdown-item" href="/timereport/logout.aspx">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div> <!-- dropdown-menu.// -->
+
+            </div> <!-- navbar-collapse.// -->
+            </div>
+    </nav>
+
+</div> <!-- container-fluid.// -->
+<!-- ============= COMPONENT END// ============== -->

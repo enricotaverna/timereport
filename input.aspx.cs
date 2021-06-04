@@ -21,11 +21,11 @@ public partial class input : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
         Auth.CheckPermission("DATI", "ORE");
         Auth.CheckPermission("DATI", "SPESE");
 
-        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"]; 
 
         // imposta session variables
         SetVariables();
@@ -33,112 +33,14 @@ public partial class input : System.Web.UI.Page
         // Cambia inpostazioni controlli su schermo;
         ChangeScreen();
 
-        // gestisce creazione record per drag&drop
-        if (Request["__EVENTTARGET"] == "drag&drop")
-        {
-            ProcessDragDrop(Request["__EVENTARGUMENT"]);
-        }
+        // gestisce creazione record per drag&drop - SOSTITUITA DA SERVIZIO FRONTEND
+        //if (Request["__EVENTTARGET"] == "drag&drop")
+        //{
+        //    ProcessDragDrop(Request["__EVENTARGUMENT"]);
+        //}
 
         if ((string)Session["type"] == "bonus")
             BindDDLProjects();
-    }
-
-    //   ********************************************************************************************
-    //   ProcessDragDrop() 
-    //      01/2014
-    //      La funzione legge i paramentri di input (id record da copiare, data in cui copiarlo)
-    //      quindi in base al tipo sessione legge il record originale e effettua una INSERT
-    //      alla data specificata
-    //   *********************************************************************************************
-    protected void ProcessDragDrop(string input)
-    {
-        string[] param = input.Split(new Char[] { ';' });
-
-        // se TR è chiuso esce
-        if (!Convert.ToBoolean(Session["InputScreenChangeMode"]))
-            return;
-
-        if ((string)Session["type"] == "hours")
-        {
-
-            DataTable dt = Database.GetData("Select projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, ClientManager_id, AccountManager_id, Company_id from hours where hours_id=" + param[1], this.Page);
-
-                if (dt.Rows.Count > 0)
-                {
- 
-                    // formata alcuni campi per successiva scrittura                            
-                    Double iHours = Convert.ToDouble(dt.Rows[0]["hours"]);
-                    string strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
-
-                    // scrive il record copia!
-                    Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) VALUES(" +
-                                         ASPcompatility.FormatDateDb(param[0], false) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatNumberDB(iHours) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["hourType_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["CancelFlag"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["TransferFlag"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["Activity_id"].ToString()) + " , " +
-                                         strAccountingDate + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
-                                         ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
-                                         " )"
-                                        , this.Page);
-                }
-
-            CaricaBufferOre(); // refresh ore
-
-        } // Session["type"] == "hours")
-
-        if ((string)Session["type"] == "expenses" || (string)Session["type"] == "bonus")
-        {
-
-            // leggi record da copiare
-            DataTable dt = Database.GetData("Select projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id, AccountingDate, comment, ClientManager_id, AccountManager_id, Company_id from Expenses where Expenses_id=" + param[1], this.Page);
-
-            if (dt.Rows.Count > 0)    
-                {
-                    // formata alcuni campi per successiva scrittura                            
-                    double iAmount = Convert.ToDouble(dt.Rows[0]["Amount"]);
-
-                    string strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
-
-                    // scrive il record copia!
-                    Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) VALUES(" +
-                                         ASPcompatility.FormatDateDb(param[0], false) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatNumberDB(iAmount) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["ExpenseType_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["CancelFlag"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["CreditCardPayed"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["CompanyPayed"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["InvoiceFlag"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["TipoBonus_id"].ToString()) + " , " +
-                                         strAccountingDate + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
-                                         ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
-                                         ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
-                                         " )"
-                                        , this.Page);
-                }
-
-            CaricaBufferSpese(); // refresh spese
-
-        } // Session["type"] == "hours")
-
-        if ((string)Session["type"] == "leave")
-        {
-            // **** drag & drop non abilitato su richieste assenza **
-        }
     }
   
     //   ****************************************
@@ -147,7 +49,7 @@ public partial class input : System.Web.UI.Page
     protected void BindDDLProjects()
     {
 
-        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+        DataTable dtProgettiForzati = CurrentSession.dtProgettiForzati;
 
         DDLProgetto.DataSource = dtProgettiForzati;
         DDLProgetto.DataTextField = "DescProgetto";
@@ -168,16 +70,13 @@ public partial class input : System.Web.UI.Page
         // se TR chiuso spegne il bottone e mette la scrita
         if (bTRChiuso)
         {
-            btChiudiTR.Visible = false; lbTRChiuso.Visible = true;
+            btChiudiTR.Visible = false; 
         }
         else
         {
-            btChiudiTR.Visible = true; lbTRChiuso.Visible = false;
+            btChiudiTR.Visible = true; 
         }
 
-        //// se non Beta Tester non fa comparire bottone
-        //    if (!Convert.ToBoolean(Session["BetaTester"]))
-        //        { btChiudiTR.Visible = false; lbTRChiuso.Visible = false; } 
     }
 
     //   ****************************************
@@ -227,7 +126,7 @@ public partial class input : System.Web.UI.Page
         intMonth = Convert.ToUInt16(Session["month"].ToString());
 
         // se il cutoff non è passato controlla che il TR non sia chiuso
-        string sCmd = "SELECT * from logTR Where persons_id='" + Session["persons_id"] + "' AND stato=1 AND Mese='" + Session["month"] + "' AND Anno='" + Session["Year"] + "'";
+        string sCmd = "SELECT * from logTR Where persons_id='" + CurrentSession.Persons_id + "' AND stato=1 AND Mese='" + Session["month"] + "' AND Anno='" + Session["Year"] + "'";
 
         if (Database.RecordEsiste(sCmd, this.Page))
             bTRChiuso = true;
@@ -249,7 +148,7 @@ public partial class input : System.Web.UI.Page
         int iStart;
  
         // legge i file nel mese / utente
-        string[] filePaths = TrovaRicevuteLocale(-1, Session["username"].ToString(), Session["year"].ToString() + Session["month"].ToString() + "01");
+        string[] filePaths = TrovaRicevuteLocale(-1,  CurrentSession.UserName, Session["year"].ToString() + Session["month"].ToString() + "01");
 
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
@@ -284,7 +183,7 @@ public partial class input : System.Web.UI.Page
         // seleziona tutte le ore da primo a ultimo del mese
         string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, CreatedBy, CreationDate, ApprovalStatus, ApprovalRequest_Id, LocationDescription " +
                         " FROM Hours INNER JOIN projects ON hours.projects_id=projects.projects_id LEFT OUTER JOIN Activity ON Activity.Activity_id = Hours.Activity_id " +
-                        " WHERE hours.Persons_id=" + Session["Persons_id"] +
+                        " WHERE hours.Persons_id=" + CurrentSession.Persons_id +
                         " AND hours.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                         " AND hours.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
@@ -301,7 +200,7 @@ public partial class input : System.Web.UI.Page
         // seleziona tutte le ore da primo a ultimo del mese
         string sQuery = "SELECT *, b.Name as ProjectName" +
                         " FROM WF_ApprovalRequest AS a INNER JOIN projects as b ON a.projects_id=b.projects_id " +
-                        " WHERE a.Persons_id=" + Session["Persons_id"] +
+                        " WHERE a.Persons_id=" + CurrentSession.Persons_id +
                         " AND a.FromDate >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                         " AND a.FromDate <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
@@ -318,11 +217,11 @@ public partial class input : System.Web.UI.Page
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + Session["Persons_id"] + " AND expenses.TipoBonus_id = 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
         else if ((string)Session["type"] == "bonus")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + Session["Persons_id"] + " AND expenses.TipoBonus_id <> 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
@@ -629,22 +528,21 @@ WFIcon = "";
                                    // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
                         DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
 
-                        //                        if (!Database.RecordEsiste("SELECT * FROM Expenses WHERE Date=" + ASPcompatility.FormatDateDb(strDate, false) + " AND Persons_id = " + Session["Persons_id"] + " AND TipoBonus_id <> '' ", this.Page) & !bHoliday)
                         if ( !bHoliday) // giorno on è un festivo
                         {
 
                             string sDisplay="";
 
-                            if (drFound.Count() != 0) // se ci sono item le icone viaggio e ticket vengono spente
+                            if (drFound.Count() != 0) // se ci sono item le icone viaggio e ticket vengono spente <img align=right src=images/icons/16x16/restaurant.png  border=0>
                                 sDisplay = "style='display:none'";
 
                             // id hdrIcn usato per nascondere le icone
-                            Response.Write("<span " + sDisplay + " id='hdrIcon" + sISODate + "'><a href='#' class='tktRest' restDate='" + sISODate + "'><img align=right src=images/icons/16x16/restaurant.png  border=0></a>");
+                            Response.Write("<span " + sDisplay + " id='hdrIcon" + sISODate + "'><a href='#' class='tktRest' restDate='" + sISODate + "'><i class='fas fa-utensils'></i></a>");
 
                             strProject = GetProject(sDate);
 
                             // il titolo del link viene impostato uguale alla data per essere poi impostato da javascript nella finestra modale
-                            Response.Write("<a title=" + sDate + ";" + strProject + " href=#dialog name=modal><img align=right src=images/icons/16x16/travel.png border=0></a><span>");
+                            Response.Write("<a title=" + sDate + ";" + strProject + " href=#dialog name=modal>  <img align=right src=images/icons/16x16/travel.png border=0></a><span>");
                         }
 
                         break;
@@ -664,11 +562,11 @@ WFIcon = "";
         var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(Request.Form["DDLProgetto"]));
 
         // inserisce record x trasferta
-        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id) " +
+        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges) " +
                 "values (" +
                 ASPcompatility.FormatDateDb(Request.Form["refDate"], false) + " ," +
                 "'" + Request.Form["DDLProgetto"] + "' ," +    // da dropdown
-                "'" + Session["persons_id"] + "' ," +
+                "'" + CurrentSession.Persons_id + "' ," +
                 "'" + Request.Form["DDLBonus"] + "' ," +     // da dropdown
                 "'1' ," +
                 ASPcompatility.FormatStringDb(Request.Form["SedeViaggio"]) + ", " +
@@ -681,8 +579,9 @@ WFIcon = "";
                 "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
                 "'" + result.Item1 + "' ," +
                 "'" + result.Item2 + "' ," +
-                "'" + CurrentSession.Company_id +
-                "' )";
+                "'" + CurrentSession.Company_id + "' ," +
+                "'false' " +
+                " )";
 
         Database.ExecuteSQL(cmd, this.Page);
 

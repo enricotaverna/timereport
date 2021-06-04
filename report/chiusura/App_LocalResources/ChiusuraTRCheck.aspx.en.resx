@@ -204,4 +204,7 @@
   <data name="Titolo" xml:space="preserve">
     <value>Time report check</value>
   </data>
+  <data name="ticket_msg3" xml:space="preserve">
+    <value>Ticket not relevant</value>
+  </data>
 </root>

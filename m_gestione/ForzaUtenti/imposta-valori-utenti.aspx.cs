@@ -11,21 +11,27 @@ using System.Configuration;
 public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     // id della persona
     private static string sPersonaSelezionata;
+    public static string sNomeConsulente;
 
     protected void Page_Load(object sender, EventArgs e)
     {
 
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
         if (!IsPostBack)
         {
 
-            // salva l'id della persona
-            sPersonaSelezionata = Request["IdPersonaSelezionata"];
+            sPersonaSelezionata = Request["IdPersonaSelezionata"].ToString();
 
             // recupera nome                        
             DataRow drPersons = Database.GetRow("Select Name from Persons where Persons_id=" + sPersonaSelezionata, this.Page);
-  //          lbNome.Text = lbNome.Text + drPersons["name"];
+            sNomeConsulente = drPersons["name"].ToString();
 
         }
 
@@ -75,7 +81,6 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
         Response.Redirect("/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx");
     }
 
-
     protected void LBSpese_DataBound(object sender, EventArgs e)
     {
 
@@ -85,7 +90,7 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
         foreach (ListItem li in LBSpese.Items)
         {
             DataRow[] drRow = dtForcedExpenses.Select("ExpenseType_id = " + li.Value.ToString());
-            
+
             if (drRow.Count() > 0)
                 li.Selected = true;
         }
@@ -105,5 +110,5 @@ public partial class m_gestione_ForzaUtenti_imposta_valori_utenti : System.Web.U
         }
 
     }
-    
+
 }

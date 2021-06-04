@@ -12,10 +12,16 @@ using System.IO;
 public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("TRAINING", "REPORT");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack) {
             /* Popola dropdown con i valori        */

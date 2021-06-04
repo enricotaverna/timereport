@@ -86,13 +86,13 @@ public class ValidationClass
 
 public class Auth
 {
-    public static void LoadPermission(string persons_id)
+    public static void LoadPermission(int persons_id)
     {
 
         // Carica le permissione dell'utente in una tabella e la memorizza in una variabile di sessione
         DataRowCollection AuthPermission;
 
-        AuthPermission = ASPcompatility.GetRows(" SELECT c.AuthTask, c.AuthActivity from Persons as a " + " INNER JOIN AuthPermission as b ON b.UserLevel_id = a.UserLevel_id " + " INNER JOIN AuthActivity as c ON c.AuthActivity_id = b.AuthActivity_id " + " WHERE a.persons_id = '" + persons_id + "'");
+        AuthPermission = ASPcompatility.GetRows(" SELECT c.AuthTask, c.AuthActivity from Persons as a " + " INNER JOIN AuthPermission as b ON b.UserLevel_id = a.UserLevel_id " + " INNER JOIN AuthActivity as c ON c.AuthActivity_id = b.AuthActivity_id " + " WHERE a.persons_id = " + ASPcompatility.FormatNumberDB(persons_id) );
 
         HttpContext.Current.Session["AuthPermission"] = AuthPermission;
     }
@@ -102,9 +102,11 @@ public class Auth
     {
         DataRowCollection aAuthPermission;
         int f;
-        
+
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+
         // sessione scaduta
-        if (     HttpContext.Current.Session["persons_id"] == null)
+        if ( CurrentSession == null)
             HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
 
         // carica da memoria
@@ -154,16 +156,11 @@ public class Auth
 public class Utilities
 {
 
-    public static void CheckAutMobile(int PageLevel)
+    public static void CheckAutMobile(int UserLevel, int PageLevel)
     {
-
-        // sessione scaduta
-        if (HttpContext.Current.Session["userLevel"] == null)
-            HttpContext.Current.Response.Redirect("/timereport/mobile/login.aspx");
      
-        // Mancato auth        
-        
-        if (  Int32.Parse(HttpContext.Current.Session["userLevel"].ToString()) < PageLevel)
+        // Mancato auth                
+        if (UserLevel < PageLevel)
             HttpContext.Current.Response.Redirect("/timereport/mobile/login.aspx");
     }
 
@@ -337,8 +334,9 @@ public class Utilities
 
     public static Tuple<int, int> GetManagerAndAccountId(int Projects_id) {
 
-        DataTable dtProgettiForzati = (DataTable)HttpContext.Current.Session["dtProgettiForzati"];
-        DataRow[] rows = dtProgettiForzati.Select("Projects_id = " + Projects_id);
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+
+        DataRow[] rows = CurrentSession.dtProgettiForzati.Select("Projects_id = " + Projects_id);
 
         var tuple = new Tuple<int, int>(0, 0);
 
@@ -617,7 +615,7 @@ public class CheckChiusura
         public string UnitOfMeasure;
     }
 
-    public static int CheckTicket(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
+    public static int CheckTicketAssenti(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
     {
         // Funzione ritorna
         // 0 = nessun problema
@@ -645,9 +643,14 @@ public class CheckChiusura
                                              " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"]  + "  AND " +
                                              " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
 
+        DataTable dtHomeOffice = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
+                                             " FROM Hours AS a " +
+                                             " WHERE LocationDescription LIKE '%" + ConfigurationManager.AppSettings["HOME_OFFICE"] + "%'  AND " +
+                                             " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
+
         //dtFerie.PrimaryKey = new DataColumn[] { dtFerie.Columns["hours_id"] };
 
-        // cicla sui giorni del mese
+        // cicla sui giorni del mese, controllo giorni senza ticket
         for (f = 1; f <= DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)); f++)
         {
             sDate = f.ToString().PadLeft(2,'0') + "/" + sMese.PadLeft(2, '0') + "/" + sAnno;
@@ -657,8 +660,9 @@ public class CheckChiusura
             if ((int)Convert.ToDateTime(sDate).DayOfWeek != 6 & (int)Convert.ToDateTime(sDate).DayOfWeek != 0)
             {
 
-                // controlla che non sia festivo
-                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (   dtFerie.Rows.Count == 0 ||  dtFerie.Select("date = '" + sDate + "'").Length == 0  ) ) // dtFerie.Rows.Contains(sDate) ) )
+                // controlla che non sia festivo e non sia una giornata di Smart Working
+                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (   dtFerie.Rows.Count == 0 ||  dtFerie.Select("date = '" + sDate + "'").Length == 0  ) 
+                    && ( dtHomeOffice.Select("date = '" + sDate + "'").Length == 0 ) )
                 {
 
                     // controlla che sia caricato un ticket
@@ -680,6 +684,51 @@ public class CheckChiusura
                     }
                 }
             }
+        }
+
+            return iRet;
+    }
+
+    public static int CheckTicketHomeOffice(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
+    {
+        // Funzione ritorna
+        // 0 = nessun problema
+        // 1 = warning
+        // 2 = errore
+        // La lista di oggetti contiene le anomalie secondo la struttura della class CheckAnomalia
+
+        int iRet = 0;
+        ListaAnomalie.Clear();
+
+        string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
+        string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
+
+        // carica ticket caricati nel mese
+        DataTable dtTicket = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date from Expenses where persons_id=" + persons_id + " AND TipoBonus_id<>'0' AND date >= " + dFirst + " AND date <= " + dLast, null/* TODO Change to default(_) if this is not a reference type */);
+
+        DataTable dtHomeOffice = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
+                                             " FROM Hours AS a " +
+                                             " WHERE LocationDescription LIKE '%" + ConfigurationManager.AppSettings["HOME_OFFICE"] + "%'  AND " +
+                                             " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
+
+        // cicla sui ticket, controlla ticket caricati su giorni HOME OFFICE
+        foreach (DataRow i in dtTicket.Rows)
+        {
+
+            // se il giorno è in Home Office alza un'anomalia
+            if (dtHomeOffice.Select("date = '" + i["date"] + "'").Length != 0)
+            {
+                // Alza anomalia e carica lista
+                iRet = 1;
+
+                CheckAnomalia a = new CheckAnomalia();
+                a.Data = Convert.ToDateTime(i["date"]);
+                a.Tipo = "M";
+                a.Descrizione = "Ticket caricato su giornata in HOME OFFICE";
+
+                ListaAnomalie.Add(a);
+            }
+
         }
 
         return iRet;

@@ -7,10 +7,17 @@ using System.Web.UI.WebControls;
 
 public partial class m_Calendario_lookup_list : System.Web.UI.Page
 {
-   protected void Page_Load(object sender, EventArgs e)
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("CONFIG", "TABLE");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Inizializza elementi form
         if (!Page.IsPostBack)

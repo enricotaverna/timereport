@@ -12,11 +12,18 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
     const string RQS_TICKET = "01";
     const string RQS_SPESA = "02";
     const string RQS_ASSENZA = "03";
+    const string RQS_TICKET_HOMEOFFICE = "04";
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
 
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("BASE", "CLOSETR");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         DataTable dt = new DataTable();
         List<CheckChiusura.CheckAnomalia> ListaAnomalie = new List<CheckChiusura.CheckAnomalia> { };
@@ -25,9 +32,9 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 
         if (Request.QueryString["type"] == RQS_TICKET) // check ticket
         {
-            CheckChiusura.CheckTicket(Session["Month"].ToString(),
+            CheckChiusura.CheckTicketAssenti(Session["Month"].ToString(),
                                                        Session["Year"].ToString(),
-                                                       Session["persons_id"].ToString(),
+                                                       CurrentSession.Persons_id.ToString(),
                                                                ref ListaAnomalie);
 
             //  popola grid di visualizzazione
@@ -45,12 +52,35 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
                 dt.Rows.Add(dr);
             }
         }
-    
+
+        if (Request.QueryString["type"] == RQS_TICKET_HOMEOFFICE) // check ticket
+        {
+            CheckChiusura.CheckTicketHomeOffice(Session["Month"].ToString(),
+                                                       Session["Year"].ToString(),
+                                                       CurrentSession.Persons_id.ToString(),
+                                                               ref ListaAnomalie);
+
+            //  popola grid di visualizzazione
+            dt.Reset();
+            // costruisce la struttura della tabella di output
+            dt.Columns.Add("Data");
+            dt.Columns.Add("Descrizione");
+
+            foreach (CheckChiusura.CheckAnomalia curr in ListaAnomalie)
+            {
+                // popola la tabella
+                DataRow dr = dt.NewRow();
+                dr["Data"] = curr.Data.ToShortDateString();
+                dr["Descrizione"] = curr.Descrizione.ToString();
+                dt.Rows.Add(dr);
+            }
+        }
+
         if (Request.QueryString["type"] == RQS_SPESA) // check spese 
         {
             CheckChiusura.CheckSpese(Session["Month"].ToString(),
                                                        Session["Year"].ToString(),
-                                                       Session["persons_id"].ToString(),
+                                                       CurrentSession.Persons_id.ToString(),
                                                        ref ListaAnomalie);
 
             // costruisce la struttura della tabella di output
@@ -82,7 +112,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
         {
             CheckChiusura.CheckAssenze(Session["Month"].ToString(),
                                                        Session["Year"].ToString(),
-                                                       Session["persons_id"].ToString(),
+                                                       CurrentSession.Persons_id.ToString(),
                                                                ref ListaAnomalie);
 
             //  popola grid di visualizzazione

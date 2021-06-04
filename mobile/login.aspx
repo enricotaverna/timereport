@@ -25,45 +25,36 @@
         else
         {
 
-               if (!Convert.ToBoolean(dt.Rows[0]["ForcedAccount"]) )
-                {
-                    ErrMsg = "Utente non valido, mancano limitazioni su progetti";
-                    return(false); // Utente non valido, mancano limitazioni su progetti
-                }
-
-                // verifica che sia attivo
-                if (!Convert.ToBoolean(dt.Rows[0]["active"]) )
-                {
-                    ErrMsg = "Utente non attivo";
-                    return(false); // Utente non attivo
-                }
-
-                // AUTENTICATO: SAVA COOCKIE
-                if (RbCookie.Checked)
-                {
-                    // Salva Cookie
-                    HttpCookie myCookie = new HttpCookie("userName");
-                    myCookie.Value = Request["userid"];
-                    myCookie.Expires = DateTime.Now.AddYears(100);
-                    Response.Cookies.Add(myCookie);
-                }
-                else
-                {
-                    // Pulisci Cookie
-                    HttpCookie myCookie = new HttpCookie("userName");
-                    myCookie.Value = "";
-                    myCookie.Expires = DateTime.Now.AddYears(100);
-                    Response.Cookies.Add(myCookie);
-                }
-
-                // utente autenticato
-                Session["UserId"] = dt.Rows[0]["UserId"];
-                Session["UserName"] = dt.Rows[0]["Name"];
-                Session["persons_id"] = dt.Rows[0]["Persons_Id"];
-                Session["userLevel"] = dt.Rows[0]["userlevel_ID"];
-
-                return(true);
+            if (!Convert.ToBoolean(dt.Rows[0]["ForcedAccount"]) )
+            {
+                ErrMsg = "Utente non valido, mancano limitazioni su progetti";
+                return(false); // Utente non valido, mancano limitazioni su progetti
             }
+
+            // verifica che sia attivo
+            if (!Convert.ToBoolean(dt.Rows[0]["active"]) )
+            {
+                ErrMsg = "Utente non attivo";
+                return(false); // Utente non attivo
+            }
+
+            // AUTENTICATO: SAVA COOCKIE
+            if (RbCookie.Checked)
+                // Salva Cookie
+                Utilities.SetCookie("MobileUserName", Request["userid"]);
+            else
+            {
+                // Pulisci Cookie
+                Utilities.SetCookie("MobileUserName", "");
+            }
+
+            // Inizializza variabile di sessoine
+            TRSession CurrentSession = new TRSession( Convert.ToInt32(dt.Rows[0]["Persons_Id"].ToString()));
+            Session["CurrentSession"] = CurrentSession;
+
+            // utente autenticato
+            return(true);
+        }
     }
 
     protected void Page_Load(object sender, EventArgs e) {
@@ -73,11 +64,8 @@
         if (!IsPostBack)
         {
             //  Default userid
-            if (Request.Cookies["userName"] != null)
-            {
-                HttpCookie aCookie = Request.Cookies["userName"];
-                userid.Text = Server.HtmlEncode(aCookie.Value);
-            }
+            if (Utilities.GetCookie("MobileUserName") != null)
+                userid.Text = Server.HtmlEncode(Utilities.GetCookie("MobileUserName"));
 
             // reset messaggio errore
             ErrorMsg.Text = "";
@@ -89,7 +77,7 @@
             ErrMsg = "";
 
             if ( CheckLogin(ref ErrMsg) )
-                Response.Redirect("menu.aspx");
+                Response.Redirect("/timereport/mobile/mobile-menu.aspx");
             else
             {
                 // display messaggio di errore
@@ -182,6 +170,7 @@
         <!-- /footer -->
     </div>
     <!-- /page -->
+
 </body>
 
 </html>

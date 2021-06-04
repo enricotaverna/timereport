@@ -12,11 +12,16 @@ using System.Configuration;
 public partial class Calendario_lookup_form : System.Web.UI.Page
 {
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-            
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("CONFIG", "TABLE");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Imposta modalità display
         SetDisplayMode();

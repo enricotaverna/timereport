@@ -10,8 +10,14 @@ public partial class m_gestione_LeaveRequestCreate : System.Web.UI.Page
 {
     public string lProject_id;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack)
         {
@@ -24,7 +30,7 @@ public partial class m_gestione_LeaveRequestCreate : System.Web.UI.Page
     protected void Bind_DDLprogetto()
     {
 
-        DataTable dtProgettiForzati = (DataTable)Session["dtProgettiForzati"];
+        DataTable dtProgettiForzati = CurrentSession.dtProgettiForzati;
 
         DDLProject.Items.Clear();
         DDLProject.Items.Add(new ListItem("-- selezionare una causale --", ""));

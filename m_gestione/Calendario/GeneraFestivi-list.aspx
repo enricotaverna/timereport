@@ -1,94 +1,112 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="GeneraFestivi-list.aspx.cs" Inherits="calendario_festiviList" EnableEventValidation="false"  %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="GeneraFestivi-list.aspx.cs" Inherits="calendario_festiviList" EnableEventValidation="false" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
- <!-- Stili -->
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-        
-<!-- Menù  -->
-<SCRIPT language=JavaScript src= "/timereport/include/menu/menu_array.js" id="IncludeMenu" UserLevel=<%= Session["userLevel"]%> type =text/javascript></SCRIPT>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Jquery   -->
-<link   rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>   
-<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script> 
-<script src="/timereport/include/jquery/jquery-ui.min.js"></script> 
+<!-- Jquery + parsley + datepicker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 
-<script>
-
-    // JQUERY
-
-</script>
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-<head id="Head1" runat="server">
-    <title> Report Revenue </title>
+<head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Genera Festivi" /></title>
 </head>
 
 <body>
 
-    <div id="TopStripe"></div> 
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-    <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+        <form id="form1" runat="server">
 
- 
+            <!--**** Riquadro navigazione ***-->
+            <div class="row justify-content-center" >
 
-    <form id="NOME_FORM" runat="server" CssClass="StandardForm" >
-    
-    <div id="PanelWrap" style="overflow-x:auto">  
+                <!--**** Primo Box ***-->
+                <div class="col-9 RoundedBox  p-0">
 
-        <div style="overflow-x:auto">
+                    <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True" CssClass="GridView" GridLines="None"
+                        AllowSorting="True" PageSize="15" AutoGenerateColumns="False"    OnPageIndexChanging="GVAttivita_PageIndexChanging">
 
-        <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True"  CssClass="TabellaLista" GridLines="None"
-                AllowSorting="True" PageSize="15"  AutoGenerateColumns="False" CellPadding="5" OnPageIndexChanging="GVAttivita_PageIndexChanging"  >
+                        <FooterStyle CssClass="GV_footer" />
+                        <RowStyle Wrap="False" CssClass="GV_row" />
+                        <PagerStyle CssClass="GV_footer" />
+                        <HeaderStyle CssClass="GV_header" />
+                        <AlternatingRowStyle CssClass="GV_row_alt " />
 
-                <FooterStyle CssClass="GV_footer" />
-                <RowStyle Wrap="False" CssClass="GV_row" />
-                <PagerStyle CssClass="GV_footer" />
-                <HeaderStyle CssClass="GV_header" />
-                 <AlternatingRowStyle CssClass="GV_row_alt " />
+                        <Columns>
+                            <asp:TemplateField HeaderText="Stato">
+                                <ItemTemplate>
+                                    <asp:Image ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="16px" ImageAlign="Middle" />
+                                </ItemTemplate>
+                                <ItemStyle Width="10%" />
+                            </asp:TemplateField>
+                            <asp:BoundField DataField="status" HeaderText="status" SortExpression="status" Visible="false" />
+                            <asp:BoundField DataField="Message" HeaderText="Message" SortExpression="Message" />
 
-                <Columns>
-                    <asp:TemplateField HeaderText="Stato">
-                        <ItemTemplate> 
-                          <asp:Image ID="ImgStato" Runat="Server" ImageUrl=<%# Eval("ImgUrl") %> Height="16px" ImageAlign="Middle" />
-                        </ItemTemplate>
-                        <ItemStyle Width="10%" />
-                    </asp:TemplateField>
-                    <asp:BoundField DataField="status" HeaderText="status" SortExpression="status" Visible="false" />
-                    <asp:BoundField DataField="Message" HeaderText="Message" SortExpression="Message"  />
- 
-                </Columns>
+                        </Columns>
 
-          </asp:GridView> 
+                    </asp:GridView>
 
-      </div>
-                
-    <div class="buttons">  
-        
-        <%--Messaggio se nessun dato selezionato --%>
-        <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>                     
-        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click"   />
-        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>"  CssClass="greybutton"  />
+                    <div class="buttons">
 
-    </div> <!--End buttons-->
+                        <%--Messaggio se nessun dato selezionato --%>
+                        <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
+                        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    </div>
+                    <!--End buttons-->
 
-    </div> <%-- END PanelWrap  --%> 
+                </div>
+                <!-- *** End col *** -->
+            </div>
+            <!-- *** End row *** -->
 
-    </form>
-    
+        </form>
+    </div>
+    <!--*** End Container *** -->
 
-    </div> <%-- END MainWindow --%> 
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>
 
-    <!-- **** FOOTER **** -->  
-    <div id="WindowFooter">       
-        <div ></div>        
-        <div  id="WindowFooter-L"> Aeonvis Spa    <%= DateTime.Today.Year  %></div> 
-        <div  id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>              
-        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>        
-     </div> 
+    <!-- *** JAVASCRIPT *** -->
+    <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+    </script>
 
 </body>
+
 </html>

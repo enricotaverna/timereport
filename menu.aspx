@@ -2,200 +2,192 @@
 
 <!DOCTYPE html>
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" noexpenses='<%= Session["NoExpenses"]%>' lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery   -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
-<%--<script src="/timereport/include/jquery/jquery-ui.min.js"></script>--%>
-
-<!-- Required meta tags -->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css" />
-<link href="/timereport/include/dashboard.css" rel="stylesheet" type="text/css" />
-
-<!-- INCLUDE JS TIMEREPORT   -->
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<%--<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>--%>
 <script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- INCLUDE CHARTJS   -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<!-- Jquery   -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
+<%--<link href="/timereport/include/dashboard.css" rel="stylesheet" />--%>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>Time Report</title>
 </head>
 
-
 <body>
 
-    <style>
-        .hoverOn:hover {
-            cursor: pointer;
-        }
+    <!--**** Riquadro navigazione ***-->
+    <form id="MainForm" runat="server">
 
-        /*.card {
-            width: 12rem;
-        }*/
-    </style>
-    <div id="TopStripe"></div>
-    <div id="MainWindow">
+        <!-- *** APPLICTION MENU *** -->
+        <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
 
-        <!--**** Riquadro navigazione ***-->
-        <form id="form1" runat="server">
+        <div class="container MainWindowBackground" style="padding-top:20px">
 
-            <div class="container">
-                <!-- *** container *** -->
+            <!-- *** 1 Row *** -->
+            <div class="row" id="row1" runat="server">
 
-                <!-- *** 1 Row *** -->
-                <div class="row" id="row1" runat="server">
-
-                    <!--  *** Box TRAINING DA VALUTARE ***    -->
-                    <div class="col-md-4" id="TrainingDaValutare" runat="server">
-                        <div class="card my-2 widget-content hoverOn" >
-                            <div class="widget-content-wrapper">
-                                <div class="widget-content-left">
-                                    <div class="widget-heading">Training da valutare</div>
-                                    <div class="widget-subheading">concluso entro 120gg</div>
-                                </div>
-                                <div class="widget-content-right">
-                                    <div class="widget-numbers"><span id="TrainingDaValutare-KPIValue0">0</span></div>
-                                </div>
+                <!--  *** Box TRAINING DA VALUTARE ***    -->
+                <div class="col-md-4" id="TrainingDaValutare" runat="server">
+                    <div class="card my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Training da valutare</div>
+                                <div class="widget-subheading">concluso entro 120gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="TrainingDaValutare-KPIValue0">0</span></div>
                             </div>
                         </div>
                     </div>
-
-                    <!--  *** Box CV ***    -->
-                    <div class="col-md-4" id="CVdaConfermare" runat="server">
-                        <div class="card  my-2 widget-content hoverOn">
-                            <div class="widget-content-wrapper">
-                                <div class="widget-content-left">
-                                    <div class="widget-heading">Curriculum da confermare</div>
-                                    <div class="widget-subheading">da parte manager</div>
-                                </div>
-                                <div class="widget-content-right">
-                                    <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--  *** Box GG TRAINING ***    -->
-                    <div class="col-md-4" id="GiorniTraining" runat="server">
-                        <div class="card  my-2 widget-content hoverOn">
-                            <div class="widget-content-wrapper">
-                                <div class="widget-content-left">
-                                    <div class="widget-heading">Giornate training team</div>
-                                    <div class="widget-subheading">prossimi 30 gg</div>
-                                </div>
-                                <div class="widget-content-right">
-                                    <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-                <!-- *** 1 Row *** -->
 
-                <!-- *** 2 Row *** -->
-                <div class="row" id="row2" runat="server">
-
-                    <!--  *** Box ORE CARICATE ***    -->
-                    <div class="col-md-4">
-                        <div class="card my-2 widget-content hoverOn" id="OreNelMese">
-                            <div class="widget-content-outer">
-                                <div class="widget-content-wrapper">
-                                    <div class="widget-content-left">
-                                        <div class="widget-heading">Ore da caricare</div>
-                                        <div class="widget-subheading">da inizio mese ad oggi</div>
-                                    </div>
-                                    <div class="widget-content-right">
-                                        <div class="widget-numbers" id="OreNelMese-KPIValue0">-</div>
-                                    </div>
-                                </div>
-                                <div class="widget-progress-wrapper">
-                                    <div class="progress-bar-lg progress-bar-animated progress">
-                                        <div id="OreNelMeseProgressBar" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                    </div>
-                                    <div class="progress-sub-label">
-                                        <div class="sub-label-left">ore caricate su totale mese</div>
-                                        <div class="sub-label-right" id="OreNelMese-KPIValue1">-</div>
-                                    </div>
-                                </div>
+                <!--  *** Box CV ***    -->
+                <div class="col-md-4" id="CVdaConfermare" runat="server">
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Curriculum da confermare</div>
+                                <div class="widget-subheading">da parte manager</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!--  *** Box vuoto ***    -->
-                    <div class="col-md-4" id="Div2" runat="server">
+                <!--  *** Box GG TRAINING ***    -->
+                <div class="col-md-4" id="GiorniTraining" runat="server">
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Giornate training team</div>
+                                <div class="widget-subheading">prossimi 30 gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <!--  *** Box ASSENZE ***    -->
-                    <div class="col-md-4" id="GiorniAssenza" runat="server">
+            </div>
+            <!-- *** 1 Row *** -->
 
-                        <div class="card  my-2 widget-content hoverOn">
+            <!-- *** 2 Row *** -->
+            <div class="row" id="row2" runat="server">
+
+                <!--  *** Box ORE CARICATE ***    -->
+                <div class="col-md-4">
+                    <div class="card my-2 widget-content hoverOn" id="OreNelMese">
+                        <div class="widget-content-outer">
                             <div class="widget-content-wrapper">
                                 <div class="widget-content-left">
-                                    <div class="widget-heading">Giornate assenza team</div>
-                                    <div class="widget-subheading">prossimi 30 gg</div>
+                                    <div class="widget-heading">Ore da caricare</div>
+                                    <div class="widget-subheading">da inizio mese ad oggi</div>
                                 </div>
                                 <div class="widget-content-right">
-                                    <div class="widget-numbers text-success"><span id="GiorniAssenza-KPIValue0">-</span></div>
+                                    <div class="widget-numbers" id="OreNelMese-KPIValue0">-</div>
+                                </div>
+                            </div>
+                            <div class="widget-progress-wrapper">
+                                <div class="progress-bar-lg progress-bar-animated progress">
+                                    <div id="OreNelMeseProgressBar" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress-sub-label">
+                                    <div class="sub-label-left">ore caricate su totale mese</div>
+                                    <div class="sub-label-right" id="OreNelMese-KPIValue1">-</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <!-- *** 2 Row *** -->
 
-                <!-- *** 3 Row *** -->
-                <div class="row" id="row3" runat="server">
+                <!--  *** Box vuoto ***    -->
+                <div class="col-md-4" id="Div2" runat="server">
+                </div>
 
-                    <!--  *** Box SPESE NEL MESE ***    -->
-                    <div class="col-md-4 my-2 hoverOn" id="SpeseNelMese">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <div class="widget-content p-0">
-                                    <div class="widget-content-outer">
-                                        <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Spese Mese</div>
-                                                <div class="widget-subheading" id="SpeseNelMese-KPIValue2">-</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue0">-</div>
-                                            </div>
+                <!--  *** Box ASSENZE ***    -->
+                <div class="col-md-4" id="GiorniAssenza" runat="server">
+
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Giornate assenza team</div>
+                                <div class="widget-subheading">prossimi 30 gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-success"><span id="GiorniAssenza-KPIValue0">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- *** 2 Row *** -->
+
+            <!-- *** 3 Row *** -->
+            <div class="row" id="row3" runat="server">
+
+                <!--  *** Box SPESE NEL MESE ***    -->
+                <div class="col-md-4 my-2 hoverOn" id="SpeseNelMese">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div class="widget-content p-0">
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left">
+                                            <div class="widget-heading">Spese Mese</div>
+                                            <div class="widget-subheading" id="SpeseNelMese-KPIValue2">-</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue0">-</div>
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="widget-content p-0">
-                                    <div class="widget-content-outer">
-                                        <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Chilometri</div>
-                                                <div class="widget-subheading">mese corrente</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue1">-</div>
-                                            </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="widget-content p-0">
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left">
+                                            <div class="widget-heading">Chilometri</div>
+                                            <div class="widget-subheading">mese corrente</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue1">-</div>
                                         </div>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
-                    </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
 
-                    <!--  *** Box GRAFICO ***    -->
-                    <%--        <div class="main- card mx-3 col-md-4 card">
+                <!--  *** Box GRAFICO ***    -->
+                <%--        <div class="main- card mx-3 col-md-4 card">
                         <div class="card-body">
                             <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
                                 <div class="chartjs-size-monitor-expand" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
@@ -209,88 +201,85 @@
                             <canvas id="verticalBar" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
                         </div>
                     </div>--%>
+            </div>
+            <!-- *** 3 Row *** -->
+
+            <!-- *** 4 Row *** -->
+            <div class="row" id="row4" runat="server">
+
+                <!--  *** ListaLocation ***    -->
+                <div id="ListaLocation" class="col-md-4 my-2">
+                    <div class="main-card card">
+                        <div class="card-body">
+                            <table class="mb-0 table">
+                                <thead>
+                                    <tr class="widget-heading">
+                                        <th>Luogo</th>
+                                        <th>Ore</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="ListaLocation-KPIDescription0"></td>
+                                        <td id="ListaLocation-KPIValue0"></td>
+                                    </tr>
+                                    <tr>
+                                        <td id="ListaLocation-KPIDescription1"></td>
+                                        <td id="ListaLocation-KPIValue1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td id="ListaLocation-KPIDescription2"></td>
+                                        <td id="ListaLocation-KPIValue2"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <!-- *** 3 Row *** -->
 
-                <!-- *** 4 Row *** -->
-                <div class="row" id="row4" runat="server">
-
-                    <!--  *** ListaLocation ***    -->
-                    <div id="ListaLocation" class="col-md-4 my-2">
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <table class="mb-0 table">
-                                    <thead>
-                                        <tr>
-                                            <th>Luogo</th>
-                                            <th>Ore</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td id="ListaLocation-KPIDescription0"></td>
-                                            <td id="ListaLocation-KPIValue0"></td>
-                                        </tr>
-                                        <tr>
-                                            <td id="ListaLocation-KPIDescription1"></td>
-                                            <td id="ListaLocation-KPIValue1"></td>
-                                        </tr>
-                                        <tr>
-                                            <td id="ListaLocation-KPIDescription2"></td>
-                                            <td id="ListaLocation-KPIValue2"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                <!--  *** Box RICHIESTE ***    -->
+                <div class="col-md-4" id="RichiesteAperte" runat="server">
+                    <div class="card my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Richieste assenza</div>
+                                <div class="widget-subheading">da approvare</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-warning"><span id="RichiesteAperte-KPIValue0">-</span></div>
                             </div>
                         </div>
                     </div>
-
-
-                    <!--  *** Box RICHIESTE ***    -->
-                    <div class="col-md-4" id="RichiesteAperte" runat="server">
-                        <div class="card my-2 widget-content hoverOn">
-                            <div class="widget-content-wrapper">
-                                <div class="widget-content-left">
-                                    <div class="widget-heading">Richieste assenza</div>
-                                    <div class="widget-subheading">da approvare</div>
-                                </div>
-                                <div class="widget-content-right">
-                                    <div class="widget-numbers text-warning"><span id="RichiesteAperte-KPIValue0">-</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-                <!-- *** 4 Row *** -->
 
             </div>
-            <!-- *** container *** -->
+            <!-- *** 4 Row *** -->
 
-        </form>
+        </div>
+        <!-- *** End container *** -->
 
-    </div>
-    <!-- END MainWindow -->
-
-
+    </form>
 
     <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-        <% if (Session["persons_id"].ToString() == "1")
-            {
-                string sConn = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString.ToString();
-                Response.Write("&nbsp; " + sConn.Substring(12, 13) + "&nbsp; " + sConn.Substring(36, 20));
-            }
-        %>
-        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">
-            <asp:Literal runat="server" Text="<%$ Resources:timereport, Utente %>" />
-            <%= Session["UserName"]  %>
-        </div>
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">
+                    Aeonvis Spa <%= DateTime.Now.Year %>
+                    <% if (CurrentSession.Persons_id.ToString() == "1")
+                        {
+                            string sConn = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString.ToString();
+                            Response.Write("&nbsp; " + sConn.Substring(36, 15));
+                        }
+                    %>
+                </div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
     </div>
 
+    <!-- *** JAVASCRIPT ***-->
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -324,7 +313,7 @@
             });
 
             // Richiama Web Service per aggiornamento KPI
-            var values = "{ iPersons_id : '<%= Session["persons_id"]  %>', cutoffDate :  '<%= Session["cutoffDate"]  %>'  }";
+            var values = "{ iPersons_id : '<%= CurrentSession.Persons_id.ToString()  %>', cutoffDate :  '<%= Session["cutoffDate"]  %>'  }";
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateCardKPI",
@@ -359,41 +348,11 @@
                     alert(xhr.responseText);
                 }
             }); // ajax
-
-
-
         });
 
-
-        //var ctx = document.getElementById('verticalBar').getContext('2d');
-        //var chart = new Chart(ctx, {
-        //    // The type of chart we want to create
-        //    type: 'bar',
-
-        //    // The data for our dataset
-        //    data: {
-        //        labels: ['Rimborso', 'Km', 'CartaC'],
-        //        datasets: [{
-        //            label: 'Mese corrente',
-        //            backgroundColor: 'rgb(255, 0, 0)',
-        //            borderColor: 'rgb(255, 0, 0)',
-        //            data: [0, 10, 5]
-        //        }, {
-        //            label: 'Mese -1',
-        //            backgroundColor: 'rgb(0, 255, 0)',
-        //            borderColor: 'rgb(0, 255, 0)',
-        //            data: [0, 10, 5]
-        //        }, {
-        //            label: 'Media 6 mesi',
-        //            backgroundColor: 'rgb(0, 0, 255)',
-        //            borderColor: 'rgb(0, 0, 255)',
-        //            data: [5, 10, 15]
-        //        }]
-        //    },
-
-        //    // Configuration options go here
-        //    options: {}
-        //});
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
     </script>
 

@@ -41,6 +41,9 @@ public class MyConstants
 
     // 
     public static int DAYS_TO_EVALUATE = 120; // da quanti giorni max è scaduto il training da valutare
+
+    // default background color
+    public static string BACKGROUND_COLOR_DEFAULT = "#c0c0c0"; // silver
 }
 
 // usata per passare i parametri variabili come lista tra procedure

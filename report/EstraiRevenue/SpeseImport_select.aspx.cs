@@ -16,6 +16,9 @@ public partial class SFimport_select : System.Web.UI.Page
     static int ExpectedMarginIndex;
     static int ExpectedFulfillmentDateIndex;
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
@@ -24,6 +27,9 @@ public partial class SFimport_select : System.Web.UI.Page
 
         if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             Auth.CheckPermission("REPORT", "PROJECT_FORCED");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (!IsPostBack)
             ASPcompatility.SelectAnnoMese(ref DDLAnnoMese, 5, 1);             /* Popola dropdown con i valori        */

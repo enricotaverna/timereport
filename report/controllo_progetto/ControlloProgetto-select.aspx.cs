@@ -13,11 +13,16 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 {
     // attivata MARS 
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
 
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("REPORT", "ECONOMICS");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Popola Drop Down con lista progetti
         if (!IsPostBack) {
@@ -263,7 +268,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
             cmd = new SqlCommand("SELECT a.Projects_Id, a.ProjectCode + ' ' + left(a.Name,20) AS Descrizione FROM Projects as a" +
                                  " INNER JOIN ForcedAccounts as b ON b.Projects_id = a.Projects_id " + 
                                  " WHERE a.active = 'true' AND a.TipoContratto_id=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] +
-                                 "  AND  b.Persons_id = " + Session["persons_id"] + 
+                                 "  AND  b.Persons_id = " + CurrentSession.Persons_id + 
                                  " ORDER BY a.ProjectCode", conn);
 
         // Se ADMIN imposta tutti i progetti di tipo FIXED 
@@ -317,8 +322,8 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         //if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
         //{
         //    DDLManager.Items.Clear();
-        //    DDLManager.Items.Add(new ListItem(Session["UserName"].ToString(), Session["Persons_id"].ToString()));
-        //    DDLManager.SelectedValue = Session["Persons_id"].ToString();
+        //    DDLManager.Items.Add(new ListItem(Session["UserName"].ToString(), CurrentSession.Persons_id.ToString()));
+        //    DDLManager.SelectedValue = CurrentSession.Persons_id.ToString();
         //}
     }
 

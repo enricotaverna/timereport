@@ -10,10 +10,17 @@ using System.Configuration;
 
 public partial class m_gestione_AuthPermission_AuthPermission : Page
 {
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("CONFIG", "AUTHORIZATION");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (DDLUserLevel.SelectedValue.Length == 0)
             LBPermissions.Visible = false;

@@ -8,11 +8,15 @@ using System.Web.UI.WebControls;
 
 public partial class menu : System.Web.UI.Page
 {
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.CheckPermission("BASE", "MENU");
-
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+        
         // disattiva box Richiesta Assenza
         if (ConfigurationManager.AppSettings["LEAVE_ON"] == "false")
             RichiesteAperte.Visible = false;

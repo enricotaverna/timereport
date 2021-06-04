@@ -621,7 +621,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
             nDays = 1;
 
         if (appr.requestType == "RG") // più date, default le ore ad ore contratto
-            appr.hours = Convert.ToInt32(Session["ContractHours"].ToString());
+            appr.hours = CurrentSession.ContractHours; 
 
         DateTime currDate = Convert.ToDateTime(appr.fromDate);
         for (int i = 0; i <= nDays; i++)
@@ -650,7 +650,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
 
         // calcola il numero di ore = giorni lavorativi * ore contratto
         if (appr.hours == 0)
-            appr.hours = Convert.ToInt32(Session["ContractHours"].ToString()) * iNumWorkingDays;
+            appr.hours = CurrentSession.ContractHours * iNumWorkingDays;
 
         // ** 3 ** Se tutto ok invia la mail
         if (bResult)

@@ -7,12 +7,19 @@ using System.Web.UI.WebControls;
 
 public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
 {
-   protected void Page_Load(object sender, EventArgs e)
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
     {
 
         //	Autorizzazione di display o creazione
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
             Auth.CheckPermission("MASTERDATA", "PROJECT_FORCED");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // Inizializza elementi form
         if (!Page.IsPostBack)
@@ -40,7 +47,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
                        " ( Projects.CodiceCliente = @CodiceCliente or @CodiceCliente = '0' )";
 
         // se manager limita i progetti visibili
-        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND ( Projects.ClientManager_id=" + Session["Persons_id"] + " OR Projects.AccountManager_id=" + Session["Persons_id"] + ")" : sWhere;
+        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND ( Projects.ClientManager_id=" + CurrentSession.Persons_id + " OR Projects.AccountManager_id=" + CurrentSession.Persons_id + ")" : sWhere;
 
         DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta " +
                                          " FROM Projects " +
@@ -147,7 +154,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         {
 
             DDLManager.ClearSelection();
-            DDLManager.Items.FindByValue(Session["Persons_id"].ToString()).Selected = true;
+            DDLManager.Items.FindByValue(CurrentSession.Persons_id.ToString()).Selected = true;
             DDLManager.Enabled = false;
         }
     }

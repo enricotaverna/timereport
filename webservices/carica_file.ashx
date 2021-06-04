@@ -4,11 +4,6 @@ using System;
 using System.Web;
 using System.IO;
 using System.Configuration;
-using System.Collections.Generic;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.Data;
-using System.Data.SqlClient;
 using System.Web.Script.Serialization;
 using System.Web.SessionState;
 
@@ -37,7 +32,7 @@ public class carica_file : IHttpHandler, IRequiresSessionState
             try
             {
                 // costruisce il nome directory, formato data da chiamata WS AAAA-MM-GG    
-                string TargetLocation = context.Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + Tbdate.Substring(6, 4) + "\\" + Tbdate.Substring(3, 2) + "\\" + UserName.Trim() + "\\";
+                string TargetLocation = context.Server.MapPath(ConfigurationManager.AppSettings["PATH_RICEVUTE"]) + Tbdate.Substring(6, 4) + "\\" + Tbdate.Substring(3, 2) + "\\" + UserName.Trim() + "\\";
 
                 // se non esiste la directory la crea
                 DirectoryInfo DITargetLocation = new DirectoryInfo(TargetLocation);
@@ -48,7 +43,7 @@ public class carica_file : IHttpHandler, IRequiresSessionState
                 string ext = Path.GetExtension(strFileName);
                 string filename = "fid-" + expenses_id + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ext;
                 string FilePath = TargetLocation + filename;
-                string WebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + Tbdate.Substring(6, 4) + "\\" + Tbdate.Substring(3, 2) + "\\" + UserName.Trim() + "\\" + filename;
+                string WebPath = ConfigurationManager.AppSettings["PATH_RICEVUTE"] + Tbdate.Substring(6, 4) + "\\" + Tbdate.Substring(3, 2) + "\\" + UserName.Trim() + "\\" + filename;
                 
                 // salva il file
                 context.Request.Files[0].SaveAs(FilePath); 

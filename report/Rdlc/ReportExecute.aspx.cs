@@ -5,11 +5,17 @@ using Microsoft.Reporting.WebForms;
 
 public partial class report_Rdl_Default : System.Web.UI.Page
 {
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
         string sSQL = "";
         string sSQL2 = "";
         string sPath = "";
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         string SReportType = Request["ReportName"] != null ? Request["ReportName"].ToString() : "";
 

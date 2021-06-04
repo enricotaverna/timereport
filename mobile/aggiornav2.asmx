@@ -1,4 +1,4 @@
-﻿<%@ WebService Language="C#" Class="aggiorna" %>
+﻿<%@ WebService Language="C#" Class="Aggiorna" %>
 
 using System;
 using System.Web;
@@ -59,9 +59,17 @@ public class VerificaBloccoSpese
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
-
-public class aggiorna : System.Web.Services.WebService
+public class Aggiorna : System.Web.Services.WebService
 {
+
+    //public TRSession CurrentSession = new TRSession();
+
+    //// Validatore custom obbligatorietà campo note su form spese
+    //[WebMethod]
+    //public void InitSession(int Persons_id)
+    //{
+    //    CurrentSession.TRSessionInit(Persons_id);
+    //}
 
     // Validatore custom obbligatorietà campo note su form spese
     [WebMethod]
@@ -80,9 +88,9 @@ public class aggiorna : System.Web.Services.WebService
         else
         {
             // ritorna un solo record 
-            rc.TestoObbligatorio = ( dt.Rows[0]["TestoObbligatorio"] == DBNull.Value  ) ? false : Convert.ToBoolean(dt.Rows[0]["TestoObbligatorio"]);
-            rc.MessaggioDiErrore =  dt.Rows[0]["MessaggioDiErrore"].ToString();
-            rc.NomeSpesa =  dt.Rows[0]["Name"].ToString();
+            rc.TestoObbligatorio = (dt.Rows[0]["TestoObbligatorio"] == DBNull.Value) ? false : Convert.ToBoolean(dt.Rows[0]["TestoObbligatorio"]);
+            rc.MessaggioDiErrore = dt.Rows[0]["MessaggioDiErrore"].ToString();
+            rc.NomeSpesa = dt.Rows[0]["Name"].ToString();
         }
 
         return rc;
@@ -136,50 +144,20 @@ public class aggiorna : System.Web.Services.WebService
 
     } // BloccoCaricoSpese
 
-    //// Leggi tipo Ore *** NON PIU USATO  ****
-    //[WebMethod]
-    //public List<TipoOre> GetTipoOreList()
-    //{
-
-    //    var ReturnList = new List<TipoOre>();
-
-    //    SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-    //    SqlDataAdapter adapter = new SqlDataAdapter("SELECT HourType_Id, HourTypeCode + ' : ' + Name AS codice, ValoreDefault FROM HourType ORDER BY ValoreDefault DESC", conn);
-    //    SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
-
-    //    DataSet ds = new DataSet("DSTipoOreList");
-    //    adapter.Fill(ds, "TipoOreList");
-
-    //    int i = 0;
-    //    foreach (DataRow rs in ds.Tables[0].Rows)
-    //    {
-
-    //        var emp = new TipoOre
-    //        {
-    //            TipoOreId = (int)rs[0],
-    //            TipoOreName = rs[1].ToString(),
-    //        };
-    //        ReturnList.Add(emp);
-    //    }
-
-    //    // Return JSON data         
-    //    return ReturnList;
-
-    //} // GetTipoOreList
-
     //  ***** Leggi Spese ****   
-    [WebMethod]
+    [WebMethod(EnableSession = true)] // per avere variabili di sessione 
     public List<Spese> GetSpeseList(int Person_id)
     {
         var ReturnList = new List<Spese>();
-        DataTable dt = Database.GetData("SELECT ForcedExpensesPers.ExpenseType_Id, ExpenseType.ExpenseCode + ' : ' + ExpenseType.Name AS codice FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ( ( ForcedExpensesPers.Persons_id=" + Person_id.ToString() + " ) AND ( ExpenseType.Active=1 AND TipoBonus_id=0) )  ORDER BY ExpenseType.ExpenseCode", null);
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
 
-        foreach (DataRow rs in dt.Rows)
+        foreach (DataRow rs in CurrentSession.dtSpeseForzate.Rows)
         {
             var emp = new Spese
             {
-                SpeseId = (int)rs[0],
-                SpeseName = rs[1].ToString()
+                SpeseId = (int)rs["ExpenseType_Id"],
+                SpeseName = rs["descrizione"].ToString()
             };
             ReturnList.Add(emp);
         }
@@ -189,20 +167,19 @@ public class aggiorna : System.Web.Services.WebService
     } // GetSpesaList
 
     //  ***** Leggi progetti ****   
-    [WebMethod]
+    [WebMethod(EnableSession = true)] // per avere variabili di sessione 
     public List<Projects> GetProjectsList(int Person_id)
     {
         var ReturnList = new List<Projects>();
-        DataTable dt = Database.GetData("SELECT DISTINCT ForcedAccounts.Projects_Id, ProjectCode, ([ProjectCode] + ' ' + [Name]) as PrgNames FROM Projects " +
-                                           " INNER JOIN ForcedAccounts ON Projects.Projects_id = ForcedAccounts.Projects_id " +
-                                           " WHERE ( ForcedAccounts.Persons_id=" + Person_id.ToString() + " OR Projects.Always_available = 'true')" +
-                                           " AND active = 'true' ORDER BY Projects.ProjectCode", null);
-        foreach (DataRow rs in dt.Rows)
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+
+        foreach (DataRow rs in CurrentSession.dtProgettiForzati.Rows)
         {
             var emp = new Projects
             {
-                ProjectId = (int)rs[0],
-                ProjectName = rs[2].ToString()
+                ProjectId = (int)rs["Projects_Id"],
+                ProjectName = rs["DescProgetto"].ToString()
             };
             ReturnList.Add(emp);
         }
@@ -231,11 +208,33 @@ public class aggiorna : System.Web.Services.WebService
         return ReturnList;
     } // GetProjectsList
 
+    //  ***** Leggi e filtra location in base al progetto o cliente ****   
+    [WebMethod(EnableSession = true)] // per avere variabili di sessione 
+    public List<LocationRecord> GetLocationList(int Projects_id)
+    {
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+        List<LocationRecord> retList = new List<LocationRecord>();
+
+        // recupera cliente associato al progetto
+        DataRow dr = Database.GetRow("SELECT CodiceCliente FROM Projects WHERE Projects_id =  " + ASPcompatility.FormatNumberDB(Projects_id), null);
+
+        // Filtra elenco location
+        foreach (LocationRecord lr in CurrentSession.LocationList)
+        {
+            if (lr.ParentKey == Projects_id.ToString() || lr.ParentKey == dr["CodiceCliente"].ToString())
+                retList.Add(lr);
+        }
+        return retList;
+    } // GetLocationList
+
     //  ***** Aggiorna Ore ****   
-    [WebMethod]
-    public string salvaore(string TbdateForHours, int TbHours, int Person_id, int Projects_Id, int Activity_Id, int HourType_Id, string comment,  bool CancelFlag)
+    [WebMethod(EnableSession = true)] // per avere variabili di sessione 
+    public string salvaore(string TbdateForHours, int TbHours, int Person_id, int Projects_Id, int Activity_Id, int HourType_Id, string comment, bool CancelFlag, string LocationKey, string LocationType, string LocationDescription)
     {
         string sResult;
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
 
         SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
@@ -258,6 +257,11 @@ public class aggiorna : System.Web.Services.WebService
             // recupera anagrafica progetto
             DataRow drProject = Database.GetRow("SELECT ClientManager_id, AccountManager_id  FROM Projects WHERE Projects_id = " + ASPcompatility.FormatNumberDB(Projects_Id), null);
 
+            // recupera dati relativi alla location da salvare sul record ore
+            //LocationRecord lr = CurrentSession.LocationList.Find(x => x.LocationKey == LocationKey);
+            //if (lr == null)
+            //    lr = new LocationRecord();
+
             row["Date"] = TbdateForHours;
             row["Projects_Id"] = Projects_Id;
             row["Activity_Id"] = Activity_Id;
@@ -270,6 +274,10 @@ public class aggiorna : System.Web.Services.WebService
             row["AccountManager_id"] = Convert.ToInt32(drProject["AccountManager_id"]);
             row["ClientManager_id"] = Convert.ToInt32(drProject["ClientManager_id"]);
             row["CreationDate"] = DateTime.Now;
+            row["CreatedBy"] = get_userid(Person_id);
+            row["LocationKey"] = LocationKey;
+            row["LocationType"] = LocationType;
+            row["LocationDescription"] = LocationDescription;
             row["CreatedBy"] = get_userid(Person_id);
             HoursTable.Rows.Add(row);
 
@@ -319,10 +327,16 @@ public class aggiorna : System.Web.Services.WebService
 
             TbExpenseAmount = TbExpenseAmount.Replace('.', ',');
 
+            // recupera flag AdditionalCharges
+            DataRow dr = Database.GetRow("SELECT AdditionalCharges FROM ExpenseType WHERE ExpenseType_id  = " + ASPcompatility.FormatNumberDB(ExpenseType_Id), null);
+            DataRow dr1 = Database.GetRow("SELECT ClientManager_id, AccountManager_id FROM Projects WHERE Projects_id  = " + ASPcompatility.FormatNumberDB(Projects_Id), null);
+            DataRow dr2 = Database.GetRow("SELECT Company_id FROM Persons WHERE Persons_id  = " + ASPcompatility.FormatNumberDB(Person_id), null);
+
             row["Date"] = Tbdate;
             row["Projects_Id"] = Projects_Id;
             row["Persons_Id"] = Person_id;
             row["ExpenseType_Id"] = ExpenseType_Id;
+            row["AdditionalCharges"] = dr["AdditionalCharges"];
             row["TipoBonus_Id"] = 0; // solo tipo bonus
             row["amount"] = (CancelFlag == true ? -1 : 1) * Convert.ToSingle(TbExpenseAmount);
             row["comment"] = comment.ToString();
@@ -330,6 +344,9 @@ public class aggiorna : System.Web.Services.WebService
             row["CompanyPayed"] = CompanyPayed;
             row["CancelFlag"] = CancelFlag;
             row["InvoiceFlag"] = InvoiceFlag;
+            row["ClientManager_id"] = dr1["ClientManager_id"];
+            row["AccountManager_id"] = dr1["AccountManager_id"];
+            row["Company_id"] = dr2["Company_id"];
             row["CreationDate"] = DateTime.Now;
             row["CreatedBy"] = get_userid(Person_id);
 
@@ -355,14 +372,14 @@ public class aggiorna : System.Web.Services.WebService
             conn.Close();
         }
 
-        if (strFileName.Trim()=="")
+        if (strFileName.Trim() == "")
             return ("true");
 
         // *** SALVA IMMAGINE ***
         try
         {
             // costruisce il nome directory, formato data da chiamata WS AAAA-MM-GG    
-            string TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + Tbdate.Substring(0, 4) + "\\" + Tbdate.Substring(5, 2) + "\\" + UserName.Trim() + "\\";
+            string TargetLocation = Server.MapPath(ConfigurationManager.AppSettings["PATH_RICEVUTE"]) + Tbdate.Substring(0, 4) + "\\" + Tbdate.Substring(5, 2) + "\\" + UserName.Trim() + "\\";
 
 
             // se non esiste la directory la crea

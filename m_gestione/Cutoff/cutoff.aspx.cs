@@ -5,9 +5,15 @@ using System.Threading;
 
 public partial class Templates_TemplateForm : System.Web.UI.Page
 {
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        Auth.CheckPermission("ADMIN", "CUTOFF");
 
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
     }
 
     protected void UpdateCancelButton_Click(object sender, EventArgs e)

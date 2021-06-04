@@ -7,11 +7,16 @@ using System.Web.UI.WebControls;
 
 public partial class m_gestione_Cv_list : System.Web.UI.Page
 {
-   protected void Page_Load(object sender, EventArgs e)
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
     {
 
         Auth.ReturnPermission("REPORT", "CURRICULA");
-            
- 
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
     }
 }

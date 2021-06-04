@@ -44,7 +44,7 @@
         </script>
         <form id="aspnetForm" runat="server" method="post" name="myForm">
         <div data-role="header" data-position="fixed">
-            <a href='./menu.aspx?id=<%= Request.QueryString["id"] %>' class='ui-btn-left' data-icon='arrow-l' rel=external>Back</a>
+            <a href='./mobile-menu.aspx?id=<%= Request.QueryString["id"] %>' class='ui-btn-left' data-icon='arrow-l' rel=external>Back</a>
             <h1>
                 Report Ore
                 <%                      
