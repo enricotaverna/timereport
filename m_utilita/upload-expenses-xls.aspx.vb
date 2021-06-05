@@ -22,27 +22,10 @@ Partial Class m_utilita_upload_expenses_xls1
     End Sub
 
     Protected Sub btnUpload_Click(ByVal sender As Object, ByVal e As System.EventArgs)
-        If FileUpload1.HasFile Then
-            Dim FileName As String = Path.GetFileName(FileUpload1.PostedFile.FileName)
-            Dim Extension As String = Path.GetExtension(FileUpload1.PostedFile.FileName)
-            Dim FolderPath As String = ConfigurationManager.AppSettings("FolderPath")
-
-            Dim FilePath As String = Server.MapPath(FolderPath + FileName)
-            FileUpload1.SaveAs(FilePath)
-            Import_Data(FilePath, Extension, True)
-        End If
-    End Sub
-
-    Private Sub Import_Data(ByVal FilePath As String, ByVal Extension As String, ByVal isHDR As String)
-
-        Dim i, f As Integer
-        Dim idProgetto As Integer
-        Dim idSpesa As Integer
 
         ' record layout
         ' Risorsa (0); Data (1);Progetto (2); Tipo Spesa (3);Valore (4);Pagato (5);Storno (6); Note (7)
 
-        '       Const RISORSA = 0 ' codice esistente
         Dim DATA = 0 ' formato campo, data oltre cutt-off
         Dim PROGETTO = 1 ' codice ammesso
         Dim TIPOSPESA = 2 ' codice ammesso
@@ -54,53 +37,34 @@ Partial Class m_utilita_upload_expenses_xls1
         Dim NOTA = 8
 
         Dim c = New ValidationClass
-
-        ' ****** IMPORT da EXCEL in DATASET ******************
-        Dim conStr As String = ""
-        Select Case Extension
-            Case ".xls"
-                'Excel 97-03
-                conStr = ConfigurationManager.ConnectionStrings("Excel03ConString") _
-                           .ConnectionString
-                Exit Select
-            Case ".xlsx"
-                'Excel 07
-                conStr = ConfigurationManager.ConnectionStrings("Excel07ConString") _
-                              .ConnectionString
-                Exit Select
-            Case Else
-                messaggio.Text = GetLocalResourceObject("msgErrore").ToString
-                Return
-        End Select
-
-        conStr = String.Format(conStr, FilePath, isHDR)
-
-        Dim connExcel As New OleDbConnection(conStr)
-        Dim cmdExcel As New OleDbCommand()
-        Dim oda As New OleDbDataAdapter()
         Dim dt As New DataTable()
-
-        cmdExcel.Connection = connExcel
-
-        'Get the name of First Sheet
-        connExcel.Open()
-        Dim dtExcelSchema As DataTable
-        dtExcelSchema = connExcel.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, Nothing)
-        Dim SheetName As String = dtExcelSchema.Rows(0)("TABLE_NAME").ToString()
-        connExcel.Close()
-
-        'Read Data from First Sheet
-        connExcel.Open()
-        cmdExcel.CommandText = "Select * From [" & SheetName & "]"
-        oda.SelectCommand = cmdExcel
-        oda.Fill(dt)
-        connExcel.Close()
 
         ' ****************** FINE IMPORT da EXCEL in DATASET ******************
 
         Dim dr As DataRow
         Dim iTipoBonus_id As Integer
         Dim aDateBonus As New ArrayList ' usato per verificare doppi bonus su stesso giorno
+
+        Dim i, f As Integer
+        Dim idProgetto As Integer
+        Dim idSpesa As Integer
+
+        If Not FUFile.HasFile Then
+            Return
+        End If
+
+        Dim ErrorMessage As String = ""
+        dt = Utilities.ImportExcel(FUFile, ErrorMessage)
+
+        If IsNothing(dt) Then
+            Utilities.CreateMessageAlert(Me.Page, "Errore in caricamento file: " & ErrorMessage, "")
+            Return
+        End If
+
+        If dt.Rows.Count = 0 Then
+            Utilities.CreateMessageAlert(Me.Page, "Errore in caricamento file: " & ErrorMessage, "")
+            Return
+        End If
 
         For Each dr In dt.Rows
 
@@ -115,7 +79,7 @@ Partial Class m_utilita_upload_expenses_xls1
             ' Verifica formato data
             If Not IsDate(dr(DATA).ToString) Then
                 messaggio.Text = messaggio.Text & Chr(13) &
-                                "Row " & i & GetLocalResourceObject("msg1").ToString ' data non valida
+                                "ThenRow " & i & GetLocalResourceObject("msg1").ToString ' data non valida
                 Continue For
             End If
 
@@ -138,11 +102,11 @@ Partial Class m_utilita_upload_expenses_xls1
                dr(CCREDITO).ToString <> "X" And dr(CCREDITO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg16").ToString ' ": valore flag 'Carta di Credito' non riconosciuto"
-                Continue For
-            End If
+            Continue For
+        End If
 
-            ' valori flag                               
-            If dr(PAGATO).ToString.Trim <> "" And
+        ' valori flag                               
+        If dr(PAGATO).ToString.Trim <> "" And
                dr(PAGATO).ToString <> "X" And dr(PAGATO).ToString <> "x" Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg4").ToString ' ": valore flag 'PAGATO con cc' non riconosciuto"
@@ -174,7 +138,7 @@ Partial Class m_utilita_upload_expenses_xls1
 
             ' tipo spesa aperta per persona
             Dim aSpeseForzate As DataTable
-            aSpeseForzate = Session("dtSpeseForzate")
+            aSpeseForzate = CurrentSession.dtSpeseForzate
 
             For f = 0 To (aSpeseForzate.Rows.Count - 1)
                 If aSpeseForzate.Rows.Item(f).Item(1).ToString.Trim = dr(TIPOSPESA).ToString.Trim Then
@@ -207,7 +171,7 @@ Partial Class m_utilita_upload_expenses_xls1
             If iTipoBonus_id > 0 Then
 
                 ' Se sullo stesso giorno esiste già una spesa "Bonus" da errore
-                If Database.RecordEsiste("Select Expenses_Id from Expenses INNER JOIN ExpenseType ON ExpenseType.ExpenseType_id = Expenses.ExpenseType_id where ( persons_id = " & Session("persons_id") _
+                If Database.RecordEsiste("Select Expenses_Id from Expenses INNER JOIN ExpenseType ON ExpenseType.ExpenseType_id = Expenses.ExpenseType_id where ( persons_id = " & CurrentSession.Persons_id _
                                        & " AND Expenses.Date = " & ASPcompatility.FormatDateDb(dr(DATA)) & " And ExpenseType.TipoBonus_id > 0 )") Then
                     messaggio.Text = messaggio.Text & Chr(13) & "Row " & i & GetLocalResourceObject("msg10").ToString & dr(TIPOSPESA).ToString.Trim & " - " & dr(DATA).ToString.Substring(1, 10) ' ": Bonus/ticket già presente nel DB per lo stesso giorno "
                     Continue For
@@ -234,7 +198,7 @@ Partial Class m_utilita_upload_expenses_xls1
 
             Dim aProgettiForzati As DataTable
             If idProgetto = 0 Then ' non precedentemente impostato in caso di ticket restaurant
-                aProgettiForzati = Session("dtProgettiForzati")
+                aProgettiForzati = CurrentSession.dtProgettiForzati
 
                 For f = 0 To (aProgettiForzati.Rows.Count - 1)
                     If aProgettiForzati.Rows.Item(f).Item(1).ToString.Trim = dr(PROGETTO).ToString.Trim Then
@@ -260,7 +224,8 @@ Partial Class m_utilita_upload_expenses_xls1
 
                     conn = New SqlConnection(ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString)
 
-                    Adapter = New SqlDataAdapter("Select * from Expenses", conn)
+                    ' Top per non caricare l'intera tabella!
+                    Adapter = New SqlDataAdapter("Select top 1 * from Expenses", conn)
 
                     Dim cb As SqlCommandBuilder = New SqlCommandBuilder(Adapter)
                     Adapter.UpdateCommand = cb.GetUpdateCommand()
@@ -270,7 +235,7 @@ Partial Class m_utilita_upload_expenses_xls1
 
                     Dim newrow As DataRow = dsExpenses.Tables(0).NewRow()
 
-                    newrow("persons_id") = Session("persons_id")
+                    newrow("persons_id") = CurrentSession.Persons_id
                     newrow("date") = dr(DATA).ToString
                     newrow("Projects_id") = idProgetto
                     newrow("ExpenseType_id") = idSpesa
@@ -290,13 +255,11 @@ Partial Class m_utilita_upload_expenses_xls1
                     End If
 
                     newrow("Comment") = dr(NOTA)
-                    newrow("CreatedBy") = Session("persons_id")
+                    newrow("CreatedBy") = CurrentSession.UserName
                     newrow("CreationDate") = DateTime.Now()
                     newrow("TipoBonus_id") = iTipoBonus_id
                     newrow("AdditionalCharges") = drExpenseType("AdditionalCharges")
 
-                    ' recupera oggetto sessione
-                    Dim CurrentSession As TRSession = Session("CurrentSession") ' recupera oggetto con variabili di sessione
                     Dim result = Utilities.GetManagerAndAccountId(idProgetto)
 
                     newrow("Company_id") = CurrentSession.Company_id

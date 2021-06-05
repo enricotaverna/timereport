@@ -46,10 +46,16 @@ public partial class m_gestione_Activity_activity_lookup_form : System.Web.UI.Pa
   
     protected void LoadDDLprogetto()
     {
-
             conn.Open();
+        string sqlCmd;
 
-            SqlCommand cmd = new SqlCommand("Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto", conn);
+            // visualizza solo progetti del manager
+            if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 and active = 1 AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
+            else
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 and active = 1  ORDER BY iProgetto";
+
+            SqlCommand cmd = new SqlCommand(sqlCmd, conn);
         
             SqlDataReader dr = cmd.ExecuteReader();
             DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLprogetto");

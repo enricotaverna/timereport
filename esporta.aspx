@@ -25,7 +25,7 @@
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
-<!-- ** stili per sumo dropdonw ** -->
+<!-- ** stili per sumo dropdonw ** --> 
 <style>
     .custom-checkboxradio-label {
         padding: .5em 1em !important;

@@ -11,6 +11,8 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!-- SheetJS js-xlsx  -->
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
@@ -49,7 +51,7 @@
                     <div class="row p-2">
                         <div class="col-2"></div>
                         <div class="col-7">
-                            <asp:FileUpload ID="FileUpload1" runat="server" meta:resourcekey="FileUpload1Resource1" 
+                            <asp:FileUpload ID="FUFile" runat="server" meta:resourcekey="FileUpload1Resource1" 
                             data-parsley-required="true"  />
                             <asp:Button type="submit" class="orangebutton" ID="UploadFile" Text="Upload File" runat="server" OnClick="btnUpload_Click"  meta:resourcekey="UploadFileResource1" />&nbsp;&nbsp;
                             <asp:CheckBox ID="simulazione" runat="server" Text=" Esecuzione di prova" Checked="True" meta:resourcekey="simulazioneResource1" />
@@ -88,7 +90,7 @@
                     <ul class="mt-2">
                         <li>
                             <asp:Literal runat="server" Text="<%$ Resources:istr_riga1%>" />
-                            <asp:HyperLink ID="HyperLink1" runat="server" Target="_blank" NavigateUrl="/timereport/m_utilita/templateSpese.xlsx" meta:resourcekey="HyperLink1Resource1" CssClass="link-primary">template excel</asp:HyperLink>
+                            <asp:HyperLink ID="HyperLink1" runat="server" Target="_blank" NavigateUrl="/timereport/m_utilita/template/templateSpese.xlsx" meta:resourcekey="HyperLink1Resource1" CssClass="link-primary">template excel</asp:HyperLink>
                         </li>
                         <li>
                             <asp:Literal runat="server" Text="<%$ Resources:istr_riga2%>" />

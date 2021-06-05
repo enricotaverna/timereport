@@ -150,7 +150,7 @@ public partial class Esporta : System.Web.UI.Page
             sWhereClause = Addclause(sWhereClause, "company_id = " + ASPcompatility.FormatStringDb(DDLsocieta.SelectedValue));
 
         if (DDLManager.SelectedValue != "")
-            sWhereClause = Addclause(sWhereClause, "ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue));
+            sWhereClause = Addclause(sWhereClause, "( ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + " OR (ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + ") )" ) ;
 
         if (!string.IsNullOrEmpty(sWhereClause))
             sWhereClause = sWhereClause + " AND ";

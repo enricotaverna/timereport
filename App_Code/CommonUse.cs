@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExcelDataReader;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
@@ -166,8 +167,9 @@ public class Utilities
 
     public static void CreateMessageAlert(ref Page aspxPage, string strMessage, string strKey)
     {
-        string strScript = "<script language=JavaScript>alert('"
-                                            + strMessage + "')</script>";
+        string strScript = "<script language=JavaScript>" +
+                           " alert('" + strMessage + "') " +
+                           " </script>";
 
         if ((!aspxPage.IsStartupScriptRegistered(strKey)))
             aspxPage.RegisterStartupScript(strKey, strScript);
@@ -237,6 +239,41 @@ public class Utilities
 
         HttpContext.Current.Response.Write(stringWrite.ToString());
         HttpContext.Current.Response.End();
+    }
+
+    public static DataTable ImportExcel(FileUpload FileUploadControl, ref string ErrorMessage) {
+
+        DataTable dtResult = null;
+        string FileName = Path.GetFileName(FileUploadControl.PostedFile.FileName);
+        //string Extension = Path.GetExtension(FileUpload.PostedFile.FileName);
+        string FolderPath = ConfigurationManager.AppSettings["FolderPath"];
+        string FilePath = HttpContext.Current.Server.MapPath(FolderPath + FileName);
+
+        try
+        {
+            FileUploadControl.SaveAs(FilePath);
+
+            using (var stream = File.Open(FilePath, FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx)
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    // Choose one of either 1 or 2:
+                    dtResult = reader.AsDataSet().Tables[0];
+
+                    // The result of each spreadsheet is in result.Tables
+                }
+            }
+            ErrorMessage = "";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage= ex.Message;
+        }
+
+        return dtResult;
     }
 
     public static string CheckboxListSelections(CheckBoxList list)

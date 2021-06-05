@@ -53,7 +53,7 @@
 
                     <div class="input nobottomborder">
                         <div class="inputtext">File (.xls)</div>
-                        <asp:FileUpload ID="FileUpload" runat="server" class="jfilestyle" data-text="seleziona" data-inputSize="160px" accept=".xls"
+                        <asp:FileUpload ID="FileUpload" runat="server" class="jfilestyle" data-text="seleziona" data-inputSize="160px" accept=".xlsx"
                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-obbligofile="true" />
                     </div>
 
@@ -82,7 +82,7 @@
                     </div>
 
                     <!--  *** AZIONE *** -->
-                    <div class="input nobottomborder">
+                    <div class="input">
                         <div class="inputtext">Azione</div>
                         <asp:RadioButtonList ID="RBTipoReport" runat="server" RepeatColumns="1" data-parsley-obbligofile="true" data-parsley-mandatory>
                             <asp:ListItem Selected="True" Value="1">Upload</asp:ListItem>
@@ -90,6 +90,10 @@
                         </asp:RadioButtonList>
                     </div>
 
+                    <div class="input nobottomborder">
+                        <div class="inputtext">File di esempio</div>
+                        <asp:HyperLink ID="HyperLink1" runat="server" Target="_blank" NavigateUrl="/timereport/report/EstraiRevenue/template/revenue-spese-template.xlsx" CssClass="link-primary">template excel</asp:HyperLink>
+                    </div>
 
                     <br />
 

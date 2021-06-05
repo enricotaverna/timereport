@@ -10,7 +10,7 @@ using System.Web.UI.WebControls;
 public partial class m_gestione_Activity_activity_lookup_list : System.Web.UI.Page
 {
     public string strMessage;
-    string strQueryOrdering = " ORDER BY Activity.ActivityCode ";
+    string strQueryOrdering = " ORDER BY Projects.ProjectCode, Activity.ActivityCode ";
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -25,7 +25,9 @@ public partial class m_gestione_Activity_activity_lookup_list : System.Web.UI.Pa
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
-        sWhere = "WHERE Projects.clientmanager_id = " + CurrentSession.Persons_id;
+        // limita ai suoi progetti in caso di manager
+        if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")) 
+            sWhere = "WHERE Projects.clientmanager_id = " + CurrentSession.Persons_id;
 
         // Imposta il SelectCommand in base al contenuto della lista dropdown
         if ( DL_flattivo.SelectedValue != "all" || (Session["DL_flattivo_val_att"] != null && !IsPostBack))
@@ -40,15 +42,15 @@ public partial class m_gestione_Activity_activity_lookup_list : System.Web.UI.Pa
             sWhere = sWhere + sC1 + "Activity.ActivityCode LIKE '%' + (@TB_Codice) + '%' ";
         }
 
-        DSAttivita.SelectCommand = "SELECT Activity.ActivityCode, Activity.Name, Activity.Active, Activity.Projects_id as Projectsid, Activity.Phase_id as Phaseid, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Phase.PhaseCode + '  ' + Phase.name AS Fase, Activity.Activity_id, Activity.RevenueBudget, Activity.MargineProposta FROM Activity " +
+        DSAttivita.SelectCommand = "SELECT Activity.ActivityCode, Activity.Name, Activity.Active, Activity.Projects_id as Projectsid, c.name as NomeManager, Activity.Phase_id as Phaseid, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Phase.PhaseCode + '  ' + Phase.name AS Fase, Activity.Activity_id, Activity.RevenueBudget, Activity.MargineProposta FROM Activity " +
                                    "INNER JOIN Projects ON Activity.Projects_id = Projects.Projects_Id " +
+                                   "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
                                    "LEFT OUTER JOIN Phase ON Activity.Phase_id = Phase.Phase_id " + sWhere + strQueryOrdering;
 
         if (!IsPostBack && Session["GridActivityPageNumber"]  != null) {
             // Imposta indice di aginazione
             GridView1.PageIndex = Convert.ToInt32(Session["GridActivityPageNumber"].ToString());
         }
-
     }
 
     // invia all form attività, progetto e fase. progetto e fase verranno utiizzati per inizializzare
@@ -109,6 +111,22 @@ public partial class m_gestione_Activity_activity_lookup_list : System.Web.UI.Pa
             Page lPage = this.Page;
             Utilities.CreateMessageAlert(ref lPage, "Cancellazione non possibile, attività già utilizzata su tabella ore", "strKey1");
         }
+    }
+
+    protected void DSprogetti_Selecting(object sender, SqlDataSourceSelectingEventArgs e)
+    {
+        // visualizza solo progetti del manager
+        if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
+        {
+            e.Command.Parameters["@managerid"].Value = CurrentSession.Persons_id;
+            e.Command.Parameters["@selAll"].Value = 0;
+        }
+        else
+        { // admin
+            e.Command.Parameters["@managerid"].Value = "";
+            e.Command.Parameters["@selAll"].Value = 1;
+        }
+
     }
 
     protected void GridView1_PageIndexChanging(Object sender, GridViewPageEventArgs e)

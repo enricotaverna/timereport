@@ -17,6 +17,7 @@ public class carica_immagine : IHttpHandler, IRequiresSessionState
 
         // estrae il file e i suoi dati
         HttpPostedFile fileupload = context.Request.Files[0];
+        // codice user + filename
         string strFileName = Path.GetFileName(fileupload.FileName);
         //string strExtension = Path.GetExtension(fileupload.FileName).ToLower();
 

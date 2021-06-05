@@ -111,7 +111,7 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSmanager" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) and ( Roles_id = '1' OR Roles_id = '2' OR Roles_id = '3') and Company_id = '1'   ORDER BY Name"></asp:SqlDataSource>
+        SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) and ( UserLevel_ID = '4' OR UserLevel_ID = '5' ) and Company_id = '1'   ORDER BY Name"></asp:SqlDataSource>
 
     <asp:SqlDataSource ID="DSPersons" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"

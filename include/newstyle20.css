@@ -565,7 +565,7 @@ select {
 }
 
     .GridView td, .GridView th {
-        padding: 1px 5px 1px 5px;
+        padding: 4px 4px 4px 4px;
     }
 
 .GV_header {

@@ -28,6 +28,8 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
                 Utilities.SetCookie("background-color", BackgroundColor.Value);
                 CurrentSession.BackgroundColor = BackgroundColor.Value;
             }
+            else
+                CurrentSession.BackgroundColor = "";
 
             // imposta cookie se settato image
             if (BackgroundImg.Value != "")
@@ -35,6 +37,8 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
                 Utilities.SetCookie("background-image", BackgroundImg.Value.Replace("\"", "'"));
                 CurrentSession.BackgroundImage = BackgroundImg.Value.Replace("\"", "'");
             }
+            else
+                CurrentSession.BackgroundImage = "";
 
             // imposta il messaggio che verrò dato sulla pagina di menu
             Response.Redirect("/timereport/menu.aspx");

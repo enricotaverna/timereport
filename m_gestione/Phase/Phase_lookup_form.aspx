@@ -179,10 +179,13 @@
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSProject" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Projects_Id, ProjectCode + N' ' + left(Name,15) AS ProjectName FROM Projects WHERE (ClientManager_id = @ClientManager_id) AND (Active = 1) and ActivityOn = 1"
+        SelectCommand="SELECT Projects_Id, ProjectCode + N' ' + left(Name,15) AS ProjectName FROM Projects WHERE (ClientManager_id = @ClientManager_id OR @selAll = 1) AND (Active = 1) and ActivityOn = 1"
         OnSelecting="DSProject_Selecting">
         <SelectParameters>
             <asp:Parameter Name="ClientManager_id" />
+        </SelectParameters>
+        <SelectParameters>
+            <asp:Parameter Name="selAll" />
         </SelectParameters>
     </asp:SqlDataSource>
 

@@ -22,7 +22,9 @@
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <style>
-    .inputtext, .ASPInputcontent { Width: 170px; }
+    .inputtext, .ASPInputcontent {
+        Width: 280px;
+    }
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -46,17 +48,17 @@
 
             <!--**** Riquadro navigazione ***-->
             <div class="form-group row justify-content-center">
-                <div class="col-6 RoundedBox">
+                <div class="col-9 RoundedBox">
                     <div class="row">
-                        <div class="col-1">
+                        <div class="col-2">
                             <label class="inputtext">Progetto</label>
                         </div>
-                        <div class="col-4">
-                            <asp:DropDownList ID="DL_progetto" runat="server" AutoPostBack="True" AppendDataBoundItems="True"
-                                DataSourceID="DSprogetti" DataTextField="iProgetto" DataValueField="Projects_Id"
-                                OnSelectedIndexChanged="DL_progetto_SelectedIndexChanged1" OnDataBound="DL_progetto_DataBound"
+                        <div class="col-7">
+                            <asp:DropDownList ID="DL_progetto" DataSourceID="DSProgetti" runat="server" AutoPostBack="True" AppendDataBoundItems="True"
+                                DataTextField="iProgetto" DataValueField="Projects_Id"
+                                OnSelectedIndexChanged="DL_progetto_SelectedIndexChanged"
                                 CssClass="ASPInputcontent">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
+                                <asp:ListItem Text="Tutti i valori" Value="" />
                             </asp:DropDownList>
                         </div>
                     </div>
@@ -68,13 +70,13 @@
 
             <!--**** tabella principale ***-->
             <div class="row justify-content-center pt-3">
-                <div class="col-6 px-0">
+                <div class="col-9 px-0">
 
-                    <asp:GridView ID="GridView1" runat="server" AllowPaging="True" CssClass="GridView"
+                    <asp:GridView ID="GVList" runat="server" AllowPaging="True" CssClass="GridView"
                         AutoGenerateColumns="False" DataKeyNames="Phase_id"
                         DataSourceID="DSPhase" EnableModelValidation="True"
-                        OnRowDeleting="GridView1_RowDeleting" GridLines="None"
-                        OnSelectedIndexChanged="GridView1_SelectedIndexChanged" AllowSorting="True" PageSize="15">
+                        OnRowDeleting="GVList_RowDeleting" GridLines="None"
+                        OnSelectedIndexChanged="GVList_SelectedIndexChanged" AllowSorting="True" PageSize="15">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <PagerStyle CssClass="GV_footer" />
@@ -85,6 +87,8 @@
                                 SortExpression="NomeProgetto" ReadOnly="True" />
                             <asp:BoundField DataField="NomeFase" HeaderText="Fase"
                                 SortExpression="NomeFase" />
+                            <asp:BoundField DataField="NomeManager" HeaderText="Manager"
+                                SortExpression="NomeManager" />
                             <asp:BoundField DataField="Phase_id" HeaderText="Phaseid" Visible="False"
                                 SortExpression="Phase_id" />
                             <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image" HeaderText="Azioni"
@@ -122,21 +126,21 @@
     <asp:SqlDataSource ID="DSPhase" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         DeleteCommand="DELETE FROM Phase WHERE (Phase_id = @Phase_id)"
-        SelectCommand="*** costruita in page load ***">
-
-        <SelectParameters>
-            <asp:SessionParameter Name="sel_managerid" SessionField="persons_id" />
-            <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
-        </SelectParameters>
-
+        SelectCommand="**">
         <DeleteParameters>
             <asp:Parameter Name="Phase_id" Type="Int32" />
         </DeleteParameters>
     </asp:SqlDataSource>
-    <asp:SqlDataSource ID="DSprogetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @managerid) AND (Active = 1) and (ActivityOn = 1) ORDER BY iProgetto">
+
+    <asp:SqlDataSource ID="DSprogetti" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand = "SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @ClientManager_id OR @selAll = 1 ) AND (Active = 1) and (ActivityOn = 1) ORDER BY iProgetto"
+        OnSelecting="DSprogetti_Selecting">
         <SelectParameters>
-            <asp:SessionParameter Name="managerid" SessionField="persons_id" />
+            <asp:Parameter Name="ClientManager_id" />
+        </SelectParameters>
+        <SelectParameters>
+            <asp:Parameter Name="selAll" />
         </SelectParameters>
     </asp:SqlDataSource>
 

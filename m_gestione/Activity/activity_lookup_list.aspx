@@ -76,9 +76,11 @@
                             </asp:DropDownList>
                         </div>
 
-                    </div> <!-- End row -->
+                    </div>
+                    <!-- End row -->
 
-                    <div class="row mt-2"> <!-- margine per separare le righe -->
+                    <div class="row mt-2">
+                        <!-- margine per separare le righe -->
 
                         <div class="col-1">
                             <label class="inputtext">Attività</label>
@@ -90,8 +92,10 @@
                         </div>
                         <div class="col-6"></div>
 
-                    </div> <!-- Fine Row -->  
-                </div> <!-- Fine RoundedBox -->  
+                    </div>
+                    <!-- Fine Row -->
+                </div>
+                <!-- Fine RoundedBox -->
             </div>
             <!-- *** Fine riquadro navigazione *** -->
 
@@ -113,6 +117,7 @@
                             <asp:BoundField DataField="Name" HeaderText="Descrizione" SortExpression="Name" />
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
+                            <asp:BoundField DataField="NomeManager" HeaderText="Manager" SortExpression="NomeManager" />
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="RevenueBudget" DataFormatString="{0:n0}" />
                             <asp:BoundField DataField="MargineProposta" HeaderText="Margine" ReadOnly="True" SortExpression="MargineProposta" DataFormatString="{0:P1}" />
                             <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image"
@@ -158,7 +163,6 @@
         <SelectParameters>
             <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue"
                 Type="String" />
-            <asp:SessionParameter Name="sel_managerid" SessionField="persons_id" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
             <asp:ControlParameter ControlID="TB_Codice" DefaultValue="%" Name="TB_codice" PropertyName="Text" />
         </SelectParameters>
@@ -167,9 +171,13 @@
         </DeleteParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSprogetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @managerid) AND (Active = 1) AND (ActivityOn = 1) ORDER BY iProgetto">
+        SelectCommand="SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @managerid OR @selAll = 1 ) AND (Active = 1) AND (ActivityOn = 1) ORDER BY iProgetto"
+        OnSelecting="DSprogetti_Selecting">
         <SelectParameters>
             <asp:SessionParameter Name="managerid" SessionField="persons_id" />
+        </SelectParameters>
+        <SelectParameters>
+            <asp:Parameter Name="selAll" />
         </SelectParameters>
     </asp:SqlDataSource>
 

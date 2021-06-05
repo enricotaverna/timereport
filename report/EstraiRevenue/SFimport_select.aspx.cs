@@ -5,6 +5,7 @@ using System.IO;
 using ExcelDataReader;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Web.UI;
 
 public partial class SFimport_select : System.Web.UI.Page
 {
@@ -42,11 +43,20 @@ public partial class SFimport_select : System.Web.UI.Page
 
         DataTable dtSFdata = null;
         DataTable dtResult;
+        String sErrorMessage = "";
 
         if (!FileUpload.HasFile)
             return;
         else
-            dtSFdata = LeggiFileExcel();
+        {
+            dtSFdata = Utilities.ImportExcel(FileUpload, ref sErrorMessage);
+            if ( dtSFdata == null)
+            {
+                Page lPage = this.Page;
+                Utilities.CreateMessageAlert(ref lPage, "Errore in caricamento: " + sErrorMessage, "");
+                return;
+            }
+        }
 
         // Inizializza valori colonne in base al nome dei campi
         ConfigReportColumns(dtSFdata);
@@ -336,48 +346,50 @@ public partial class SFimport_select : System.Web.UI.Page
             if ((string)dt.Rows[0][i] == "Expected Margin")
                 ExpectedMarginIndex = i;
             if ((string)dt.Rows[0][i] == "Expected fulfillment date")
-                ExpectedFulfillmentDateIndex = i;
+                ExpectedFulfillmentDateIndex = i; 
         }
     }
 
     // Lettura file excel
     // Richiede installazione del paccheto ExcelDataReader.DataSet
     // VS Package Manager Console Install-Package <package>
-    // https://github.com/ExcelDataReader/ExcelDataReader
-    protected DataTable LeggiFileExcel()
-    {
+    // https://github.com/ExcelDataReader/ExcelDataReaderù
+    // Sostituito da Utilities.ImportExcel
 
-        DataTable dtResult= null;
+    //protected DataTable LeggiFileExcel()
+    //{
 
-        try
-        {
-            string FileName = Path.GetFileName(FileUpload.PostedFile.FileName);
-            string Extension = Path.GetExtension(FileUpload.PostedFile.FileName);
-            string FolderPath = ConfigurationManager.AppSettings["FolderPath"];
-            string FilePath = Server.MapPath(FolderPath + FileName);
-            FileUpload.SaveAs(FilePath);
+    //    DataTable dtResult= null;
 
-            using (var stream = File.Open(FilePath, FileMode.Open, FileAccess.Read))
-            {
-                // Auto-detect format, supports:
-                //  - Binary Excel files (2.0-2003 format; *.xls)
-                //  - OpenXml Excel files (2007 format; *.xlsx)
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
-                {
-                    // Choose one of either 1 or 2:
-                    dtResult = reader.AsDataSet().Tables[0];
+    //    try
+    //    {
+    //        string FileName = Path.GetFileName(FileUpload.PostedFile.FileName);
+    //        string Extension = Path.GetExtension(FileUpload.PostedFile.FileName);
+    //        string FolderPath = ConfigurationManager.AppSettings["FolderPath"];
+    //        string FilePath = Server.MapPath(FolderPath + FileName);
+    //        FileUpload.SaveAs(FilePath);
 
-                    // The result of each spreadsheet is in result.Tables
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ClientScript.RegisterStartupScript(Page.GetType(), "ErrorMessage", "<script language=JavaScript>alert('" + ex.Message + "');</script>", true);
-        }
+    //        using (var stream = File.Open(FilePath, FileMode.Open, FileAccess.Read))
+    //        {
+    //            // Auto-detect format, supports:
+    //            //  - Binary Excel files (2.0-2003 format; *.xls)
+    //            //  - OpenXml Excel files (2007 format; *.xlsx)
+    //            using (var reader = ExcelReaderFactory.CreateReader(stream))
+    //            {
+    //                // Choose one of either 1 or 2:
+    //                dtResult = reader.AsDataSet().Tables[0];
 
-        return dtResult;
-    }
+    //                // The result of each spreadsheet is in result.Tables
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        ClientScript.RegisterStartupScript(Page.GetType(), "ErrorMessage", "<script language=JavaScript>alert('" + ex.Message + "');</script>", true);
+    //    }
+
+    //    return dtResult;
+    //}
 
 
 

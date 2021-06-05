@@ -29,7 +29,16 @@ public partial class m_gestione_Phase_Phase_lookup_list : System.Web.UI.Page
     protected void DSProject_Selecting(object sender, SqlDataSourceSelectingEventArgs e)
     {
         // visualizza solo progetti del manager
-        e.Command.Parameters[0].Value = CurrentSession.Persons_id;
+        if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
+        {
+            e.Command.Parameters["@ClientManager_id"].Value = CurrentSession.Persons_id;
+            e.Command.Parameters["@selAll"].Value = 0;
+        }
+        else { // admin
+            e.Command.Parameters["@ClientManager_id"].Value = "";
+            e.Command.Parameters["@selAll"].Value = 1;
+        }
+
     }
 
     protected void SchedaFase_ItemInserted(object sender, FormViewInsertedEventArgs e)

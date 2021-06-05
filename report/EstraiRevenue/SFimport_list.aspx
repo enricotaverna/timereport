@@ -2,32 +2,32 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Style -->
-<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
-<link href="/timereport/include/jquery/fileupload/jquery-filestyle.css" rel="stylesheet" />
-
-<!-- Jquery   -->
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
-<script src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-<script src="/timereport/include/jquery/fileupload/jquery-filestyle.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
-<script type="text/javascript" src="/timereport/include/javascript/xlsx.dataset/xlsx.full.min.js"></script>
-<!-- per download in Tabulator -->
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<!-- Download excel da Tabulator -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head id="Head1" runat="server">
     <title>Import Sales Force</title>
@@ -45,7 +45,7 @@
 
             <div class="row justify-content-center">
 
-                <div  class="StandardForm col-11">
+                <div class="StandardForm col-11">
 
                     <!--  *** VERSIONE *** -->
                     <asp:Table ID="TBSFImport" runat="server">
@@ -80,7 +80,7 @@
                     <div class="buttons">
                         <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
                         <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" CommandName="Exec" />
-                        <asp:Button ID="BTRefresh" runat="server" Text="refresh" CssClass="orangebutton" />
+                        <asp:Button ID="BTRefresh" runat="server" Text="<%$ appSettings: REFRESH_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="BTDownload" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" CommandName="download" />
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.location.href='/timereport/report/EstraiRevenue/SFimport_select.aspx';return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                     </div>
@@ -191,17 +191,17 @@
             columns: [
                 { title: "ProcessingStatus", sorter: "string", headerFilter: "input", formatterParams: { allowTruthy: true }, width: 40, frozen: true, },
                 { title: "ProjectCode", sorter: "string", headerFilter: "input", width: 100, frozen: true, },
-                { title: "OpportunityName", sorter: "string", headerFilter: "input", width: 80, frozen: true, },
-                { title: "OpportunityId", sorter: "string", headerFilter: "input", width: 80 },
+                { title: "OpportunityName", sorter: "string", headerFilter: "input", width: 90, frozen: true, },
+                { title: "OpportunityId", sorter: "string", headerFilter: "input", width: 90 },
                 { title: "TRProjectsId", visible: false },
                 { title: "SFEngagementType", sorter: "string", headerFilter: "input", width: 80 },
                 { title: "TREngagementType", sorter: "string", headerFilter: "input", width: 80 },
                 { title: "SFAmount", sorter: "string", headerFilter: "input", width: 80 },
                 { title: "TRAmount", sorter: "string", headerFilter: "input", width: 80 },
-                { title: "SFExpectedMargin", sorter: "string", headerFilter: "input", width: 80 },
-                { title: "TRExpectedMargin", sorter: "string", headerFilter: "input", width: 80 },
-                { title: "SFExpectedFulfillmentDate", sorter: "string", headerFilter: "input", width: 80 },
-                { title: "TRExpectedFulfillmentDate", sorter: "string", headerFilter: "input", width: 80 },
+                { title: "SFExpectedMargin", sorter: "string", headerFilter: "input", width: 90 },
+                { title: "TRExpectedMargin", sorter: "string", headerFilter: "input", width: 90 },
+                { title: "SFExpectedFulfillmentDate", sorter: "string", headerFilter: "input", width: 90 },
+                { title: "TRExpectedFulfillmentDate", sorter: "string", headerFilter: "input", width: 90 },
                 { title: "ProcessingMessage", sorter: "string", headerFilter: "input" },
                 //{ title: "C", formatter: "tickCross", formatterParams: { allowEmpty: true }, width: 30, frozen: true, }, // , responsive: 1, cellClick: function (e, cell) { var a = cell.getValue(); if (a == "") cell.setValue("1"); else if(a == "1") cell.setValue("")} },
             ],

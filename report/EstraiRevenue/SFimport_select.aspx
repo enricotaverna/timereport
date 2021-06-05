@@ -53,7 +53,7 @@
 
                     <div class="input nobottomborder">
                         <div class="inputtext">File</div>
-                        <asp:FileUpload ID="FileUpload" runat="server" class="jfilestyle" data-text="seleziona" data-inputSize="160px" accept=".xls"
+                        <asp:FileUpload ID="FileUpload" runat="server" class="jfilestyle" data-text="seleziona" data-inputSize="160px" accept=".xlsx"
                             data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-error-message="Specificare un nome file" />
                     </div>
 
@@ -68,12 +68,17 @@
                             </asp:DropDownList>
                     </div>
 
+                    <div class="input nobottomborder">
+                        <div class="inputtext">File di esempio</div>
+                        <asp:HyperLink ID="HyperLink1" runat="server" Target="_blank" NavigateUrl="/timereport/report/EstraiRevenue/template/sf-template.xlsx" CssClass="link-primary">template excel</asp:HyperLink>
+                    </div>
+
                     <br />
 
                     <div class="buttons">
                         <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
                         <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: EXEC_TXT %>" CssClass="orangebutton" CommandName="Exec" OnClick="Sottometti_Click" />
-                        <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
+                        <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.location.href='/timereport/menu.aspx';return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                     </div>
 
                 </div>

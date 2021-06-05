@@ -26,7 +26,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (!IsPostBack) {
             /* Popola dropdown con i valori        */
             ASPcompatility.SelectYears(ref DDLAnno);
-            DDLAnno.SelectedIndex = 0;
+            DDLAnno.SelectedIndex = 0; 
         }
    
     }
