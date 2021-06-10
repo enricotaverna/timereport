@@ -56,8 +56,9 @@
 
                     <div class="formtitle">
                         <asp:Literal runat="server" Text="<%$ Resources:titolo%>" />
+                        <asp:button runat="server" type="button" class="btn-close float-end" OnClick="ButtonClick"></asp:button>
                     </div>
-
+                    
                     <div class="accordion" id="accordionExample">
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingOne">
@@ -100,7 +101,7 @@
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
                                     <div class="form-group">
-                                        <label for="exampleFormControlFile1">Carica Immagine</label>
+                                        <label for="exampleFormControlFile1">Carica Immagine (max 4MB)</label>
                                         <input type="file" class="form-control-file" id="CaricaImmagine" name="files[]">
                                     </div>
                                 </div>
@@ -113,10 +114,10 @@
                     <asp:HiddenField ID="BackgroundImg" runat="server" />
 
                     <!-- *** BOTTONI ***  -->
-                    <div class="buttons">
+<%--                    <div class="buttons">
                         <div id="valMsg" class="col parsely-single-error"></div>
-                        <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>" OnClick="ButtonClick" formnovalidate />
-                    </div>
+                        <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>"  formnovalidate />
+                    </div>--%>
 
                 </div>
                 <!-- END FormWrap  -->
@@ -150,38 +151,6 @@
         // Lingua
         window.Parsley.setLocale('<%=Session["lingua"]%>');
 
-        // *** Validazione che richiama un servizio, bisogna mettere il tag data-parsley-username sull'elemento del form *** //
-        window.Parsley.addValidator('username', function (value, requirement) {
-            var response = false;
-            var dataAjax = "{ sPassword: '" + value + "' , " + " sUserName: '<%=CurrentSession.Persons_id%>' }"
-
-            $.ajax({
-                url: "/timereport/webservices/WStimereport.asmx/CheckPassword",
-                data: dataAjax,
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                type: 'post',
-                async: false,
-                success: function (data) {
-                    if (data.d == "false")
-                        response = false;
-                    else
-                        response = true;
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                }
-            });
-            return response;
-        }, 32)
-            .addMessage('en', 'username', 'Password not valid')
-            .addMessage('it', 'username', 'Password non valida');
-
-        $('#FVMain').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
-        });
-
         $('.pickColor').click(function () {
             $('#BackgroundColor').val($(this).css('background-color')); // colore da passare al backend con il post
             $('.MainWindowBackground').css("background-color", $(this).css('background-color'));
@@ -204,20 +173,24 @@
             dataType: 'json',
             // caricamento parte alla selezione del file
             autoUpload: true,
-            // Allowed file types and size
-            acceptFileTypes: /(jpg)|(jpeg)|(png)$/i,
-            // Resize immagini
-            disableImageResize: /Android(?!.*Chrome)|Opera/
-                .test(window.navigator && navigator.userAgent),
-            imageMaxWidth: 3000,
-            imageMaxHeight: 2000,
-            imageCrop: false, // no cropped images
-            // progress bar (vedi elemento con classe bar nel form di upload)
-            progress: function (e, data) {
-                //var bar = $('.bar');
-                //var progress = parseInt(data.loaded / data.total * 100, 10);
-                //var percentVal = progress + '%';
-                //bar.width(percentVal);
+            add: function (e, data) {
+                var uploadErrors = [];
+
+                var acceptFileTypes = /\/(jpg)|(jpeg)|(png)$/i;
+                if (data.originalFiles[0]['type'].length && !acceptFileTypes.test(data.originalFiles[0]['type'])) {
+                    uploadErrors.push('Tipo file non accettato');
+                }
+
+                console.log(data.originalFiles[0]['size']);
+                if (data.originalFiles[0]['size'] > 4 * 1000 * 1024) {
+                    uploadErrors.push('Dimensione del file troppo grande');
+                }
+                if (uploadErrors.length > 0) {
+                    alert(uploadErrors.join("\n"));
+                } else {
+                    //data.context = $('<p/>').text('In caricamento...').appendTo(document.body);
+                    data.submit();
+                }
             },
         })
             .bind('fileuploaddone', function (e, data) {

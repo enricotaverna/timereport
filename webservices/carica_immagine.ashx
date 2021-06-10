@@ -14,6 +14,8 @@ public class carica_immagine : IHttpHandler, IRequiresSessionState
     {
         // contenuto del file
         HttpPostedFile file = context.Request.Files[0];
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];                
 
         // estrae il file e i suoi dati
         HttpPostedFile fileupload = context.Request.Files[0];
@@ -27,15 +29,20 @@ public class carica_immagine : IHttpHandler, IRequiresSessionState
             // *** SALVA FILE  ***
             try
             {
-                // costruisce il nome directory, formato data da chiamata WS AAAA-MM-GG    
-                string TargetLocation = context.Server.MapPath(ConfigurationManager.AppSettings["PATH_IMMAGINI"]);
+                // costruisce il nome directory    
+                string TargetLocation = context.Server.MapPath(ConfigurationManager.AppSettings["PATH_IMMAGINI"] + CurrentSession.Persons_id.ToString() + "/" );
+
+                // se non esiste la directory la crea
+                DirectoryInfo DITargetLocation = new DirectoryInfo(TargetLocation);
+                if (!DITargetLocation.Exists)
+                    DITargetLocation.Create();
 
                 // costruisce il nome file     
                 string ext = Path.GetExtension(strFileName);
                 string filename = "PersonalBkgrImg" + ext;
                 //string filename = Path.GetFileName(strFileName);
                 string FilePath = TargetLocation + filename;
-                string WebPath = ConfigurationManager.AppSettings["PATH_IMMAGINI"] +  filename;
+                string WebPath = ConfigurationManager.AppSettings["PATH_IMMAGINI"] +  CurrentSession.Persons_id.ToString() + "/" + filename;
 
                 // salva il file
                 context.Request.Files[0].SaveAs(FilePath);
@@ -53,7 +60,7 @@ public class carica_immagine : IHttpHandler, IRequiresSessionState
                 context.Response.Write(jsondata);
 
             }
-            catch (Exception exp)
+            catch (InvalidCastException exp)
             {
                 //    Console.WriteLine("Error: " + exp);
             }

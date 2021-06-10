@@ -187,11 +187,13 @@ public class Utilities
 
         HttpContext.Current.Response.Clear();
         HttpContext.Current.Response.AddHeader("content-disposition", "attachment;filename=Export.xls");
-        HttpContext.Current.Response.Charset = "";
+        HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.Unicode;
+        HttpContext.Current.Response.ContentType = "application/vnd.xls";
+        HttpContext.Current.Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
 
         // // If you want the option to open the Excel file without saving then
         // // comment out the line below
-        HttpContext.Current.Response.ContentType = "application/vnd.xls";
+
         // //create a string writer
         StringWriter stringWrite = new StringWriter();
 
@@ -224,12 +226,14 @@ public class Utilities
 
         HttpContext.Current.Response.Clear();
         HttpContext.Current.Response.AddHeader("content-disposition", "attachment;filename=Export.xls");
-        HttpContext.Current.Response.Charset = "";
+        HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.Unicode;
+        HttpContext.Current.Response.ContentType = "application/vnd.xls";
+        HttpContext.Current.Response.BinaryWrite(System.Text.Encoding.Unicode.GetPreamble());
 
         // // If you want the option to open the Excel file without saving then
         // // comment out the line below
         // // Response.Cache.SetCacheability(HttpCacheability.NoCache);
-        HttpContext.Current.Response.ContentType = "application/vnd.xls";
+
         // create a string writer
         System.IO.StringWriter stringWrite = new System.IO.StringWriter();
         // create an htmltextwriter which uses the stringwriter
@@ -541,7 +545,7 @@ public class CommonFunction
 
         try
         {
-            // recupera lingua da cookie, le sessioni non sono valorizzate qui
+            // recupera lingua da cookie, le sessioni non sono valorizzate qui 
             HttpCookie cCookie = HttpContext.Current.Request.Cookies.Get("lingua");
 
             if (!(cCookie == null) & cCookie.Value == "en")

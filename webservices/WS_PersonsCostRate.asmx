@@ -302,6 +302,12 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
 
         DateTime dMaxDBData;
 
+        // se DataDa e DataA coincidono con date già presenti è solo una modifica di importo -> allora OK
+        if (Database.RecordEsiste("SELECT * FROM PersonsCostRate WHERE Persons_id =" + ASPcompatility.FormatStringDb(Persons_id) +
+                                  " AND DataDa = " + ASPcompatility.FormatDateDb(DataDa) +
+                                  " AND DataA = " + ASPcompatility.FormatDateDb(DataA)))
+            return "true";
+
         if ( PersonsCostRate_id == "0")
         {
             // se primo inserimento per la persona ok

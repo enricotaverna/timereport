@@ -81,7 +81,7 @@
                         <!-- margine per separare le righe -->
 
                         <div class="col-1">
-                            <label class="inputtext">Manager</label>
+                            <label class="inputtext">Mngr/Acnt</label>
                         </div>
                         <div class="col-4">
                             <asp:DropDownList ID="DDLManager" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
@@ -110,7 +110,7 @@
 
                     <asp:GridView ID="GVProjects" runat="server" AllowSorting="True" AutoGenerateColumns="False"
                         DataSourceID="DSProgetti" CssClass="GridView" OnSelectedIndexChanged="GVProjects_SelectedIndexChanged"
-                        AllowPaging="True" PageSize="15" DataKeyNames="projectcode,projects_id"
+                        AllowPaging="True" PageSize="12" DataKeyNames="projectcode,projects_id"
                         GridLines="None" EnableModelValidation="True" OnRowCommand="GVProjects_RowCommand" OnDataBound="GVProjects_DataBound" OnPageIndexChanging="GVProjects_PageIndexChanging">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
@@ -120,6 +120,7 @@
                             <asp:BoundField DataField="ProjectCode" HeaderText="Codice" SortExpression="ProjectCode" />
                             <asp:BoundField DataField="ProjectName" HeaderText="Nome" SortExpression="ProjectName" />
                             <asp:BoundField DataField="ManagerName" HeaderText="Manager" SortExpression="ManagerName" />
+                            <asp:BoundField DataField="AccountName" HeaderText="Account" SortExpression="AccountName" />
                             <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget" DataFormatString="{0:###,###}" />
                             <asp:BoundField DataField="BudgetABAP" HeaderText="Bdg ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###}" />

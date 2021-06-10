@@ -49,8 +49,9 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         // se manager limita i progetti visibili
         sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND ( Projects.ClientManager_id=" + CurrentSession.Persons_id + " OR Projects.AccountManager_id=" + CurrentSession.Persons_id + ")" : sWhere;
 
-        DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta " +
+        DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, Projects.Name AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, b.Name as AccountName, ProjectType.Name AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta " +
                                          " FROM Projects " +
+                                         " LEFT OUTER JOIN Persons AS b ON Projects.AccountManager_id = b.Persons_id " +
                                          " LEFT OUTER JOIN Persons ON Projects.ClientManager_id = Persons.Persons_id " +
                                          " LEFT OUTER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id LEFT OUTER JOIN Customers ON Projects.CodiceCliente = Customers.CodiceCliente" + sWhere + strQueryOrdering;             
     } 
@@ -143,7 +144,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
     {
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
         {
-            GVProjects.Columns[11].Visible = false;
+            GVProjects.Columns[12].Visible = false;
         }
     }
 

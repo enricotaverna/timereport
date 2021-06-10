@@ -58,9 +58,8 @@
                             <label class="inputtext">Attivo</label>
                         </div>
                         <div class="col-5">
-                            <asp:DropDownList ID="DL_flattivo" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged"
-                                OnPreRender="DL_flattivo_Load">
-                                <asp:ListItem Value="all">Tutti i valori</asp:ListItem>
+                            <asp:DropDownList ID="DL_flattivo" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged" >
+                                <asp:ListItem Value="99">Tutti i valori</asp:ListItem>
                                 <asp:ListItem Selected="True" Value="1">Attivo</asp:ListItem>
                                 <asp:ListItem Value="0">Non attivo</asp:ListItem>
                             </asp:DropDownList>
@@ -72,7 +71,7 @@
                             <asp:DropDownList ID="DL_progetto" runat="server" class="ASPInputcontent" AutoPostBack="True" AppendDataBoundItems="True"
                                 DataSourceID="DSprogetti" DataTextField="iProgetto" DataValueField="Projects_Id"
                                 OnSelectedIndexChanged="DL_progetto_SelectedIndexChanged" OnDataBound="DL_progetto_DataBound">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
+                                <asp:ListItem Text="Tutti i valori" Value="0" />
                             </asp:DropDownList>
                         </div>
 
@@ -81,17 +80,23 @@
 
                     <div class="row mt-2">
                         <!-- margine per separare le righe -->
-
+                        <div class="col-1">
+                            <label class="inputtext">Manager</label>
+                        </div>
+                        <div class="col-5">
+                            <asp:DropDownList ID="DDLManager" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
+                                DataSourceID="DSManager" DataTextField="Name" DataValueField="Persons_id" OnDataBound="DDLManager_DataBound">
+                                <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
                         <div class="col-1">
                             <label class="inputtext">Attività</label>
                         </div>
-                        <div class="col-4">
+                        <div class="col-5">
                             <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"
-                                OnLoad="TB_Codice_Load"></asp:TextBox>
+                                ></asp:TextBox>
                             &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
                         </div>
-                        <div class="col-6"></div>
-
                     </div>
                     <!-- Fine Row -->
                 </div>
@@ -105,7 +110,7 @@
 
                     <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
                         DataSourceID="DSAttivita" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
-                        AllowPaging="True" PageSize="15" OnRowDeleting="GridView1_RowDeleting" DataKeyNames="Activity_id,Projectsid,Phaseid"
+                        AllowPaging="True" PageSize="12" OnRowDeleting="GridView1_RowDeleting" DataKeyNames="Activity_id,Projectsid,Phaseid"
                         GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
@@ -157,14 +162,20 @@
     </div>
 
     <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource ID="DSManager" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        <SelectParameters>
+            <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
+        </SelectParameters>
+    </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSAttivita" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="** costruita in page load **"
         DeleteCommand="DELETE FROM Activity WHERE (Activity_id = @Activity_id)">
         <SelectParameters>
-            <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue"
-                Type="String" />
+            <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue" Type="String" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
             <asp:ControlParameter ControlID="TB_Codice" DefaultValue="%" Name="TB_codice" PropertyName="Text" />
+            <asp:ControlParameter ControlID="DDLmanager" Name="persons_id" PropertyName="SelectedValue" />
         </SelectParameters>
         <DeleteParameters>
             <asp:Parameter Name="Activity_id" />

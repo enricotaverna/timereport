@@ -315,6 +315,7 @@
                                         <asp:Label AssociatedControlID="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS" Style="padding-right: 40px"></asp:Label>
 
                                         <br />
+                                        <div class="inputtext">&nbsp;</div>
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
@@ -615,7 +616,7 @@
                                         <asp:Label AssociatedControlID="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>
 
                                         <br />
-
+                                        <div class="inputtext">&nbsp;</div>
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
@@ -623,14 +624,12 @@
 
                                     <!-- *** Tipo Workflow ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Tipo Workflow</div>
-                                        
+                                        <div class="inputtext">Tipo Workflow</div>                                     
                                             <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
                                                 DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
                                                 DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+                                            </asp:DropDownList>                                        
                                     </div>
 
                                     <!-- *** NOTE ***  -->
@@ -910,6 +909,7 @@
                                         <asp:CheckBox ID="DisAlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
                                         <asp:Label AssociatedControlID="DisAlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>
 
+                                        <div class="inputtext">&nbsp;</div>
                                         <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="DisBloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
