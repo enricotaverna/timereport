@@ -177,4 +177,16 @@
   <data name="exportoreNonChargable" xml:space="preserve">
     <value>Hours (incl. not chargable)</value>
   </data>
+  <data name="Attivi" xml:space="preserve">
+    <value>Actives</value>
+  </data>
+  <data name="Codice progetto" xml:space="preserve">
+    <value>Project code</value>
+  </data>
+  <data name="Progetti" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="Tutti" xml:space="preserve">
+    <value>All</value>
+  </data>
 </root>

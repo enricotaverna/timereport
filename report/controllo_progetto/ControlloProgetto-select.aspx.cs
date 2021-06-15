@@ -318,13 +318,6 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 
         // Cancellata, la selezione viene fatta in base ai progetti forzati
 
-        // Se manager forza la DDL al solo valore del manager
-        //if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-        //{
-        //    DDLManager.Items.Clear();
-        //    DDLManager.Items.Add(new ListItem(Session["UserName"].ToString(), CurrentSession.Persons_id.ToString()));
-        //    DDLManager.SelectedValue = CurrentSession.Persons_id.ToString();
-        //}
     }
 
 }

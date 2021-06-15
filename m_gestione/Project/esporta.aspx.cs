@@ -19,13 +19,8 @@ public partial class Esporta : System.Web.UI.Page
             // Popola dropdown con i valori          
             ASPcompatility.SelectYears(ref DDLFromYear);
             ASPcompatility.SelectYears(ref DDLToYear);
-            ASPcompatility.SelectMonths(ref DDLFromMonth, Session["lingua"].ToString());
-            ASPcompatility.SelectMonths(ref DDLToMonth, Session["lingua"].ToString());
-
-            // aggiunge Export not chargable
-            //if (Session["BetaTester"].ToString() != "False") {
-            //    RBTipoExport.Items.Add(new ListItem("Ore non chargable","3"));
-            //}
+            ASPcompatility.SelectMonths(ref DDLFromMonth, CurrentSession.Language);
+            ASPcompatility.SelectMonths(ref DDLToMonth, CurrentSession.Language);
  
         }
     }

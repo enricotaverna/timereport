@@ -44,6 +44,9 @@ public class RevenueMeseItem
 [System.Web.Script.Services.ScriptService]
 public class WS_EstraiRevenue  : System.Web.Services.WebService {
 
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
     // Check versione per consentire calcolo revenue
     [WebMethod(EnableSession = true)]
     public bool CheckVersion(string RevenueVersionCode, string Anno, string Mese)
@@ -351,6 +354,8 @@ public class WS_EstraiRevenue  : System.Web.Services.WebService {
     public bool CreaRevenueMese(string Persons_id, string Projects_id, string RevenueVersionCode, string AnnoMese, string TipoRecord)
     {
 
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
         // recupera i dati obbligatori per il popolamento del record.
         DataRow drPrj = Database.GetRow("SELECT a.ProjectCode as CodiceProgetto, a.Name as NomeProgetto, B.Descrizione as TipoProgetto, ClientManager_id, CodiceCliente as CodiceCliente FROM Projects as a " +
                                          "LEFT JOIN TipoContratto as b ON b.TipoContratto_id = a.TipoContratto_id " +
@@ -376,7 +381,7 @@ public class WS_EstraiRevenue  : System.Web.Services.WebService {
         DataRow drTpCons = Database.GetRow("SELECT  ConsultantTypeName as TipoConsulente FROM ConsultantType " +
                                          "WHERE ConsultantType_id = " + ASPcompatility.FormatStringDb(drPer["ConsultantType_id"].ToString()), null);
 
-        string sCommento = "inserito il: " + DateTime.Now.ToString() + " da " + Session["userid"];
+        string sCommento = "inserito il: " + DateTime.Now.ToString() + " da " + CurrentSession.UserName;
 
         string sInsert = "INSERT INTO RevenueMese " +
                          "(Persons_id, Projects_id, RevenueVersionCode, TipoRecord, AnnoMese, NomePersona, TipoConsulente, CodiceProgetto, NomeProgetto, NomeSocieta, TipoProgetto, ClientManager_id, NomeManager, NomeCliente, Comment) " +

@@ -53,7 +53,7 @@ public partial class input_spese : System.Web.UI.Page
             //              disabilita form in caso di cutoff
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
 
-            if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]) || lTipoBonus_id > 0)
+            if (Convert.ToDateTime(LBdate.Text) < CurrentSession.dCutoffDate || lTipoBonus_id > 0)
                 FVSpese.ChangeMode(FormViewMode.ReadOnly);
             else
                 FVSpese.ChangeMode(FormViewMode.Edit);
@@ -70,7 +70,7 @@ public partial class input_spese : System.Web.UI.Page
             LBdate.Text = Request.QueryString["date"];
 
             Label LBperson = (Label)FVSpese.FindControl("LBperson");
-            LBperson.Text = (string)Session["UserName"];
+            LBperson.Text = (string)CurrentSession.UserName;
 
             TextBox TBAmount = (TextBox)FVSpese.FindControl("TBAmount");
             if (Convert.ToInt16(Session["TipoBonus_IdDefault"]) > 0)
@@ -108,7 +108,7 @@ public partial class input_spese : System.Web.UI.Page
             return;
 
         // loop per stampare immagini
-        string stWebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + lDataSpesa.Substring(0, 4) + "/" + lDataSpesa.Substring(4, 2) + "/" + Session["UserName"].ToString().Trim() + "/";
+        string stWebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + lDataSpesa.Substring(0, 4) + "/" + lDataSpesa.Substring(4, 2) + "/" + CurrentSession.UserName + "/";
         string stFile = "";
 
         for (int i = 0; i < filePaths.Length; i++)
@@ -340,7 +340,7 @@ public partial class input_spese : System.Web.UI.Page
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
             e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
             // Audit
-            e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserName;
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
             // valori manager e società
             e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
@@ -353,7 +353,7 @@ public partial class input_spese : System.Web.UI.Page
         if (FVSpese.CurrentMode == FormViewMode.Edit)
         {
             // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserName;
             e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         }
     }
@@ -372,10 +372,6 @@ public partial class input_spese : System.Web.UI.Page
 
     protected void FVSpese_DataBound(object sender, EventArgs e)
     {
-
-        // Attiva bottone ricevute solo per beta tester
-        //if ( !Convert.ToBoolean(Session["BetaTester"]) && FVSpese.CurrentMode == FormViewMode.Insert)
-        //    ((Button)FVSpese.FindControl("RicevuteButton")).Visible = false;
 
         //      formattta il campo numerico delle spese, nel DB le spese stornate sono negative
         if (Request.QueryString["action"] == "fetch")

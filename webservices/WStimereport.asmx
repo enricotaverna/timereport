@@ -60,6 +60,7 @@ public class WStimereport : System.Web.Services.WebService {
     public string[]  CancellaId(string Id)
     {
 
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
         string[] sRet= new string[2]; // parametri tornati dalla funzione
 
@@ -101,7 +102,7 @@ public class WStimereport : System.Web.Services.WebService {
                 {
                     Database.ExecuteSQL("DELETE FROM expenses WHERE expenses_id='" + Id +"'", null);
 
-                    string[] filePaths = TrovaRicevuteLocale(Id, Session["UserName"].ToString(), sDate);
+                    string[] filePaths = TrovaRicevuteLocale(Id, CurrentSession.UserName, sDate);
 
                     if (filePaths != null) {
                         for (int i = 0; i < filePaths.Length; i++) // cancella file
@@ -259,6 +260,7 @@ public class WStimereport : System.Web.Services.WebService {
         DataTable dt;
         string strAccountingDate = "";
 
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
         // se TR è chiuso esce
         if (!Convert.ToBoolean(Session["InputScreenChangeMode"]))
@@ -295,7 +297,7 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationKey"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationType"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationDescription"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(CurrentSession.UserName) + " , " +
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
@@ -342,7 +344,7 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["TipoBonus_id"].ToString()) + " , " +
                                      strAccountingDate + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(CurrentSession.UserName) + " , " +
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +

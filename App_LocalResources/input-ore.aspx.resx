@@ -249,4 +249,7 @@
   <data name="CBWorkedInRemote.Text" xml:space="preserve">
     <value>Remoto</value>
   </data>
+  <data name="Label2.Text" xml:space="preserve">
+    <value>Luogo</value>
+  </data>
 </root>

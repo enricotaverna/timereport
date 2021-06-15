@@ -98,7 +98,7 @@
     <%-- *** ModalWindow *** --%>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>                        
 
     <!-- *** MainWindow *** -->
     <div class="container MainWindowBackground" style="padding-top:20px" >
@@ -109,7 +109,7 @@
             <div class="col-5 RoundedBox">
 
                 <%
-                    CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(Session["lingua"].ToString());
+                    CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
                     DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
 
                     int intMonth = Convert.ToInt32(Session["month"]);
@@ -140,8 +140,8 @@
 
             <!--**** Secondo Box ***-->
             <div class="col-5 RoundedBox">
-                            <button type="submit" class="btn btn-outline-secondary float-end mx-1" onclick="window.location.href='input.aspx?month=<%=  DateTime.Now.Month %>&year=<%=DateTime.Now.Year%>'"><i class="px-2 fas fa-calendar-alt"></i>Mese corrente</button>
-                            <button id="btChiudiTR" type="submit" class="btn btn-outline-secondary float-end mx-1"   runat="server" onclick="window.location.href='./report/chiusura/ChiusuraTRCheck.aspx'"><i class="px-2 fas fa-lock"></i>Chiudi Timereport</button>
+                            <button type="submit" class="btn btn-outline-secondary float-end mx-1" onclick="window.location.href='input.aspx?month=<%=  DateTime.Now.Month %>&year=<%=DateTime.Now.Year%>'"><i class="px-2 fas fa-calendar-alt"></i><asp:Literal runat="server" Text="<%$ Resources:mese_corrente%>"/></button>
+                            <button id="btChiudiTR" type="submit" class="btn btn-outline-secondary float-end mx-1"   runat="server" onclick="window.location.href='./report/chiusura/ChiusuraTRCheck.aspx'"  ><i class="px-2 fas fa-lock"></i><asp:Literal runat="server" Text="<%$ Resources:chiudi_timereport%>"/></button>
             </div>
             <!--End roundedBox-->
 
@@ -286,7 +286,7 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
                 <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>

@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="chilometri" xml:space="preserve">
-    <value>Chilometri totali:</value>
+  <data name="Chilometri" xml:space="preserve">
+    <value>Chilometri</value>
+  </data>
+  <data name="da_inizio_mese_ad_oggi" xml:space="preserve">
+    <value>da inizio mese ad oggi</value>
+  </data>
+  <data name="Luogo" xml:space="preserve">
+    <value>Luogo</value>
   </data>
   <data name="mese" xml:space="preserve">
     <value>Mese: </value>
+  </data>
+  <data name="mese_corrente" xml:space="preserve">
+    <value>mese corrente</value>
   </data>
   <data name="messaggi" xml:space="preserve">
     <value>Messaggi</value>
@@ -132,8 +141,17 @@
   <data name="Msg_mobile" xml:space="preserve">
     <value>Con l'app Mobile puoi caricare le spese con una fotografia, clicca per vedere il link.</value>
   </data>
+  <data name="Ore" xml:space="preserve">
+    <value>Ore</value>
+  </data>
   <data name="ore_caricate" xml:space="preserve">
     <value>Ore caricate: </value>
+  </data>
+  <data name="ore_caricate_su_totale_mese" xml:space="preserve">
+    <value>ore caricate su totale mese</value>
+  </data>
+  <data name="Ore_da_caricare" xml:space="preserve">
+    <value>Ore da caricare</value>
   </data>
   <data name="ore_lavorative" xml:space="preserve">
     <value>Ore lavorative</value>
@@ -143,5 +161,8 @@
   </data>
   <data name="spese_da_rimborsare" xml:space="preserve">
     <value>Spese da rimborsare: </value>
+  </data>
+  <data name="Spese_Mese" xml:space="preserve">
+    <value>Spese Mese</value>
   </data>
 </root>

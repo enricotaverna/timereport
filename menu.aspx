@@ -40,7 +40,7 @@
     <form id="MainForm" runat="server">
 
         <!-- *** APPLICTION MENU *** -->
-        <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+        <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
         <div class="container MainWindowBackground" style="padding-top:20px">
 
@@ -104,8 +104,8 @@
                         <div class="widget-content-outer">
                             <div class="widget-content-wrapper">
                                 <div class="widget-content-left">
-                                    <div class="widget-heading">Ore da caricare</div>
-                                    <div class="widget-subheading">da inizio mese ad oggi</div>
+                                    <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:Ore_da_caricare %>" /></div>
+                                    <div class="widget-subheading"><asp:Literal runat="server" Text="<%$ Resources:da_inizio_mese_ad_oggi %>" /></div>
                                 </div>
                                 <div class="widget-content-right">
                                     <div class="widget-numbers" id="OreNelMese-KPIValue0">-</div>
@@ -116,7 +116,7 @@
                                     <div id="OreNelMeseProgressBar" class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
                                 </div>
                                 <div class="progress-sub-label">
-                                    <div class="sub-label-left">ore caricate su totale mese</div>
+                                    <div class="sub-label-left"><asp:Literal runat="server" Text="<%$ Resources:ore_caricate_su_totale_mese %>" /></div>
                                     <div class="sub-label-right" id="OreNelMese-KPIValue1">-</div>
                                 </div>
                             </div>
@@ -158,7 +158,7 @@
                                 <div class="widget-content-outer">
                                     <div class="widget-content-wrapper">
                                         <div class="widget-content-left">
-                                            <div class="widget-heading">Spese Mese</div>
+                                            <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:Spese_Mese %>" /></div>
                                             <div class="widget-subheading" id="SpeseNelMese-KPIValue2">-</div>
                                         </div>
                                         <div class="widget-content-right">
@@ -173,8 +173,8 @@
                                 <div class="widget-content-outer">
                                     <div class="widget-content-wrapper">
                                         <div class="widget-content-left">
-                                            <div class="widget-heading">Chilometri</div>
-                                            <div class="widget-subheading">mese corrente</div>
+                                            <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:Chilometri %>" /></div>
+                                            <div class="widget-subheading"><asp:Literal runat="server" Text="<%$ Resources:mese_corrente %>" /></div>
                                         </div>
                                         <div class="widget-content-right">
                                             <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue1">-</div>
@@ -214,8 +214,8 @@
                             <table class="mb-0 table">
                                 <thead>
                                     <tr class="widget-heading">
-                                        <th>Luogo</th>
-                                        <th>Ore</th>
+                                        <th><asp:Literal runat="server" Text="<%$ Resources:Luogo %>" /></th>
+                                        <th><asp:Literal runat="server" Text="<%$ Resources:Ore %>" /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -273,7 +273,7 @@
                         }
                     %>
                 </div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
                 <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
@@ -313,7 +313,7 @@
             });
 
             // Richiama Web Service per aggiornamento KPI
-            var values = "{ iPersons_id : '<%= CurrentSession.Persons_id.ToString()  %>', cutoffDate :  '<%= Session["cutoffDate"]  %>'  }";
+            var values = "{ iPersons_id : '<%= CurrentSession.Persons_id.ToString()  %>', cutoffDate :  '<%= CurrentSession.sCutoffDate  %>'  }";
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateCardKPI",

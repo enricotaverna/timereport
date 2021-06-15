@@ -123,41 +123,20 @@
   <data name="chiudi_timereport" xml:space="preserve">
     <value>Chiudi Timereport</value>
   </data>
-  <data name="DDLBonusResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLProgettoResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="InsertButtonResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label1Resource1.Text" xml:space="preserve">
     <value>Progetto</value>
-  </data>
-  <data name="Label1Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label7Resource1.Text" xml:space="preserve">
     <value>Rimborso</value>
   </data>
-  <data name="Label7Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="mese_corrente" xml:space="preserve">
-    <value>mese corrente</value>
+    <value>Mese Corrente</value>
   </data>
   <data name="ORE" xml:space="preserve">
     <value>Ore</value>
   </data>
   <data name="PageResource1.Title" xml:space="preserve">
     <value>Input data</value>
-  </data>
-  <data name="SedeViaggioResource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SedeViaggioResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="SPESE" xml:space="preserve">
     <value>Spese</value>
@@ -166,19 +145,13 @@
     <value>Timereport Chiuso</value>
   </data>
   <data name="Titolo" xml:space="preserve">
-    <value>Input dati</value>
-  </data>
-  <data name="UpdateCancelButtonResource1.ToolTip" xml:space="preserve">
-    <value />
+    <value>Calendario</value>
   </data>
   <data name="VAL_SedeViaggioResource1.ErrorMessage" xml:space="preserve">
     <value>RequiredFieldValidator</value>
   </data>
   <data name="VAL_SedeViaggioResource1.Text" xml:space="preserve">
     <value>inserire sede</value>
-  </data>
-  <data name="VAL_SedeViaggioResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="oreUOM" xml:space="preserve">
     <value>ore</value>

@@ -96,7 +96,7 @@
             DSExpenses.InsertParameters("AccountManager_id").DefaultValue = result.Item2
 
             ' Log
-            DSExpenses.InsertParameters("CreatedBy").DefaultValue = Session("UserId")
+            DSExpenses.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserName
             DSExpenses.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
 
             ' Valorizza tipo Bonus e AdditionalCharges se il tipo spesa è di tipo bonus
@@ -182,7 +182,7 @@
         e.Command.Parameters("@AdditionalCharges").Value = drExpenseType("AdditionalCharges")
 
         ' Audit    
-        e.Command.Parameters("@LastModifiedBy").Value = Session("UserId")
+        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserName
         e.Command.Parameters("@LastModificationDate").Value = DateTime.Now()
 
     End Sub
@@ -228,7 +228,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=Session("userlevel") %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=CurrentSession.UserLevel %>-<%=CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -314,7 +314,7 @@
                 <div class="col-11 px-0">
 
                     <asp:GridView ID="GV_Spese" runat="server" AllowPaging="True" CssClass="GridView"
-                        AllowSorting="True" AutoGenerateColumns="False" PageSize="20" ShowFooter="True"
+                        AllowSorting="True" AutoGenerateColumns="False" PageSize="16" ShowFooter="True"
                         OnRowCommand="GV_Spese_RowCommand" DataSourceID="DSExpenses" GridLines="None"
                         DataKeyNames="expenses_Id">
                         <FooterStyle CssClass="GV_footer" />
@@ -571,8 +571,8 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= session("CutoffDate") %></div>
-                <div class="col-md-4" id="WindowFooter-R"><%= Session("UserName")  %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
     </div>

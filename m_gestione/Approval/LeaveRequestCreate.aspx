@@ -1,25 +1,37 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="LeaveRequestCreate.aspx.cs" Inherits="m_gestione_LeaveRequestCreate" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<!-- Stili -->
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link href="/timereport/include/newstyle.css" rel="stylesheet" type="text/css">
-<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery   -->
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
 
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+
+<!-- Tabulator  -->
+<script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<!-- Download excel da Tabulator -->
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+
+<style>
+    .inputtext, .ASPInputcontent {
+        Width: 170px;
+    }
+</style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -29,120 +41,134 @@
 
 <body>
 
-    <div id="TopStripe"></div>
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
-    <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
 
-        <div id="FormWrap">
+        <form id="formLeaveRequest" runat="server" >
 
-            <form id="formLeaveRequest" runat="server" class="StandardForm">
+            <div class="row justify-content-center">
 
-                <div class="formtitle">Comunicazione Assenza</div>
+                <div id="FormWrap" class="StandardForm col-6">
 
-                <!-- *** DATA INIZIO  ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Periodo da"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ID="TBFromDate" runat="server" MaxLength="10" Rows="8" Width="100px"
-                        data-parsley-required="true" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" Enabled="False" />
+                    <div class="formtitle">Comunicazione Assenza</div>
 
-                    <asp:Label class="css-label" ID="LBToDate" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" ID="TBToDate" runat="server" Width="100px" data-parsley-dateinsequenza="true" data-parsley-datanelmese="true"
-                        data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                </div>
+                    <!-- *** DATA INIZIO  ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Periodo da"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBFromDate" runat="server" MaxLength="10" Rows="8" Width="100px"
+                            data-parsley-required="true" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" Enabled="False" />
 
-                <!-- *** ORE ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore"></asp:Label>
-                    <asp:TextBox CssClass="ASPInputcontent" data-parsley-validate-if-empty="true" data-parsley-mandatory-if-single-date="true" data-parsley-pattern="^\d+(,\d+)?$|^$" ID="TBOre" runat="server" Columns="10" data-parsley-errors-container="#valMsg" />
-                </div>
+                        <asp:Label class="css-label" ID="LBToDate" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBToDate" runat="server" Width="100px" data-parsley-dateinsequenza="true" data-parsley-datanelmese="true"
+                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                    </div>
 
-                <!-- *** DDL Progetto ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
+                    <!-- *** ORE ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" data-parsley-validate-if-empty="true" data-parsley-mandatory-if-single-date="true" data-parsley-pattern="^\d+(,\d+)?$|^$" ID="TBOre" runat="server" Columns="10" data-parsley-errors-container="#valMsg" />
+                    </div>
+
+                    <!-- *** DDL Progetto ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
                         <asp:DropDownList ID="DDLProject" runat="server" AppendDataBoundItems="True"
                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
                         </asp:DropDownList>
+                    </div>
+
+                    <!-- *** COMMENT ***  -->
+                    <div class="input ">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Commento"></asp:Label>
+                        <asp:TextBox ID="TBComment" runat="server" Rows="3" CssClass="textarea" Style="margin-bottom: 10px; height: 50px" TextMode="MultiLine" Columns="30" />
+                    </div>
+
+
+                    <!-- *** SEZIONE APPROVAZIONE ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Stato"></asp:Label>
+                        <asp:Label class="input2col" Style="width: 160px" ID="LBApprovalStatusDesc" runat="server"></asp:Label>
+                        <asp:Label ID="LBApprovalStatus" runat="server" Visible="False"></asp:Label>
+                        <%-- per memorizzare valore usato da jquery --%>
+                        <asp:Label runat="server" ID="LBdate"></asp:Label>
+                    </div>
+
+                    <!-- *** Manager ***  -->
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Manager"></asp:Label>
+                        <asp:Label ID="LBManager" runat="server" CssClass="inputtext" />
+                    </div>
+
+                    <div style="position: absolute">
+                        <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+
+                        <!-- *** DDL Notifica ***  -->
+
+                        <span id="HideChange">
+                            <!-- *** a seconda della modalità del form viene acceso/spento ***  -->
+                            <span class="inputtext nobottomborder" style="margin-top: 0px">Notifica</span>
+                            <asp:ListBox ID="LBNotifica" runat="server" AppendDataBoundItems="True" Width="240px" SelectionMode="Multiple"
+                                DataValueField="persons_id" multiple="multiple" class="sumoSelectClass" Style="margin-left: -30px; color: #777"></asp:ListBox>
+                        </span>
+
+                        <span id="HideCreate">
+                            <span class="inputtext nobottomborder" style="margin-top: 0px">Nota manager</span>
+                            <asp:TextBox ID="TBApprovalText1" runat="server" Rows="3" CssClass="textarea" Style="margin-bottom: 10px; margin-left: -30px; height: 50px" TextMode="MultiLine" Columns="30" />
+                        </span>
+
+                    </div>
+
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+
+                    <!-- *** BOTTONI ***  -->
+                    <div class="buttons">
+                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
+                        <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" PostBackUrl="/timereport/input.aspx" />
+                    </div>
+
                 </div>
+                <!-- END FormWrap  -->
+            </div>
 
-                <!-- *** COMMENT ***  -->
-                <div class="input ">
-                    <asp:Label CssClass="inputtext" runat="server" Text="Commento"></asp:Label>
-                    <asp:TextBox ID="TBComment" runat="server" Rows="3" CssClass="textarea" Style="margin-bottom: 10px;height:50px" TextMode="MultiLine" Columns="30" />
-                </div>
+        </form>
 
-
-                <!-- *** SEZIONE APPROVAZIONE ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label CssClass="inputtext" runat="server" Text="Stato"></asp:Label>
-                    <asp:Label class="input2col" Style="width: 160px" ID="LBApprovalStatusDesc" runat="server"></asp:Label>
-                    <asp:Label ID="LBApprovalStatus" runat="server" Visible="False"></asp:Label>
-                    <%-- per memorizzare valore usato da jquery --%>
-                    <asp:Label runat="server" ID="LBdate"></asp:Label>
-                </div>
-
-                <!-- *** Manager ***  -->
-                <div class="input nobottomborder">
-                    <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Manager"></asp:Label>
-                    <asp:Label ID="LBManager" runat="server" CssClass="inputtext"  />
-                </div>
-
-                <div style="position: absolute" >
-                    <!-- aggiunto per evitare il troncamento della dropdonwlist -->
-
-                    <!-- *** DDL Notifica ***  -->
-
-                    <span id="HideChange">
-                        <!-- *** a seconda della modalità del form viene acceso/spento ***  -->
-                        <span class="inputtext nobottomborder" style="margin-top: 0px">Notifica</span>
-                        <asp:ListBox ID="LBNotifica" runat="server" AppendDataBoundItems="True" Width="240px" SelectionMode="Multiple"
-                            DataValueField="persons_id" multiple="multiple" class="sumoSelectClass" Style="margin-left: -30px; color: #777"></asp:ListBox>
-                    </span>
-
-                    <span id="HideCreate">
-                        <span class="inputtext nobottomborder" style="margin-top: 0px">Nota manager</span>
-                        <asp:TextBox ID="TBApprovalText1" runat="server" Rows="3" CssClass="textarea" Style="margin-bottom: 10px;margin-left:-30px;height:50px" TextMode="MultiLine" Columns="30" />
-                    </span>
-
-                </div>
-
-                <br />
-                <br />
-                <br />
-                <br />
-
-                <!-- *** BOTTONI ***  -->
-                <div class="buttons">
-                    <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
-                    <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
-                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" PostBackUrl="/timereport/input.aspx" />
-                </div>
-
-            </form>
-
-        </div>
-        <%-- END FormWrap  --%>
     </div>
-    <%-- END MainWindow --%>
+    <!-- END MainWindow  -->
 
     <!-- Per output messaggio conferma salvataggio -->
     <div id="dialog" style="display: none"></div>
 
-    <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-        <div id="WindowFooter-C">cutoff: <%=Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">Utente: <%=Session["UserName"]%></div>
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
     </div>
+    >
 
     <script type="text/javascript">
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         var approvalStatus = "";
 
         // *** PARSLEY VALIDATOR ***
 
         // controllo sulle date
-        window.Parsley.addValidator('dateinsequenza',{
+        window.Parsley.addValidator('dateinsequenza', {
             validate: function (value, requirement) {
 
                 // controllo solo se ToDate è valorizzata
@@ -153,7 +179,7 @@
                 var dataACompare = $("#TBToDate").val().substring(6, 11) + $("#TBToDate").val().substring(3, 5) + $("#TBToDate").val().substring(0, 2);
 
                 // controllo sequenza
-                if (dataDaCompare > dataACompare) 
+                if (dataDaCompare > dataACompare)
                     return false;
 
             },
@@ -164,7 +190,7 @@
         });
 
         // controllo sulle date
-        window.Parsley.addValidator('datanelmese',{
+        window.Parsley.addValidator('datanelmese', {
             validate: function (value, requirement) {
 
                 // controllo solo se ToDate è valorizzata
@@ -188,9 +214,9 @@
 
         // campo ore valorizzato solo se campo ToDate è blank
         // ATTENZIONE: Le maiuscole diventano "-" nel controllo
-        window.Parsley.addValidator('mandatoryIfSingleDate',{
+        window.Parsley.addValidator('mandatoryIfSingleDate', {
             validate: function (value, requirement) {
-                if ( $("#TBOre").val() == 0 & $("#TBToDate").val().length == 0 ) 
+                if ($("#TBOre").val() == 0 & $("#TBToDate").val().length == 0)
                     return false;
                 else
                     return true;
@@ -280,7 +306,7 @@
                 "', comment:'" + $('#TBComment').val() +
                 "', notifyList:'" + listaNotifica +
                 "', approvedBy: '<%= Session["ApprovalManager_id"]%>" +
-                "', personName:'<%=Session["UserName"]%>" + 
+                "', personName:'<%= CurrentSession.UserName%>" + 
                 "', managerName:'<%=Session["ApprovalManagerName"]%>" +
                 "', approvalStatusDescription:'" + $('#LBApprovalStatusDesc').text() +
                 "', projectName:'" + $('#DDLProject option:selected').text() +
@@ -390,12 +416,12 @@
                         $('#LBManager').text(objAppr.managerName);
 
                         // descrizione stato ed icona    
-                        if (objAppr.approvalStatus == "APPR" | objAppr.approvalStatus == "NOTF" )
+                        if (objAppr.approvalStatus == "APPR" | objAppr.approvalStatus == "NOTF")
                             $('#LBApprovalStatusDesc').html("<img style='vertical-align: middle' src ='/timereport/images/icons/16x16/WF_OK.png' border = 0 > &nbsp;" + objAppr.approvalStatusDescription);
-                        else if (objAppr.approvalStatus == "REJE" )
+                        else if (objAppr.approvalStatus == "REJE")
                             $('#LBApprovalStatusDesc').html("<img style='vertical-align: middle' src ='/timereport/images/icons/16x16/WF_Delete.png' border = 0 > &nbsp;" + objAppr.approvalStatusDescription);
                         else
-                            $('#LBApprovalStatusDesc').html("<img style='vertical-align: middle' src ='/timereport/images/icons/16x16/warning.png' border = 0 > &nbsp;" +objAppr.approvalStatusDescription );
+                            $('#LBApprovalStatusDesc').html("<img style='vertical-align: middle' src ='/timereport/images/icons/16x16/warning.png' border = 0 > &nbsp;" + objAppr.approvalStatusDescription);
 
                         $('#TBNotifica').val(objAppr.notifyList);
 

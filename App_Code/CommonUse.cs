@@ -353,24 +353,24 @@ public class Utilities
         return sRet;
     }
 
-    public static string GetCutoffDate(string strPeriod, string strMonth, string strYear, string strType)
+    public static DateTime GetCutoffDate(string strPeriod, string strMonth, string strYear, string strType)
     {
-        string sRet;
+        DateTime ret;
 
         // calc the cutoff date based on the input parameter
         if (strPeriod == "1")
         {
             if (strType == "end")
-                sRet =  "15/" + strMonth + "/" + strYear;
+                ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 15);  
             else
-                sRet = "1/" + strMonth + "/" + strYear;
+                ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 1);
         }
         else if (strType == "end")
-            sRet = (DateTime.DaysInMonth( Convert.ToInt32(strYear), Convert.ToInt32(strMonth))).ToString() + "/" + strMonth + "/" + strYear;
+            ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), DateTime.DaysInMonth(Convert.ToInt32(strYear), Convert.ToInt32(strMonth)));
         else
-            sRet = "16" + "/" + strMonth + "/" + strYear;
+            ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 16);
 
-        return sRet;
+        return ret;
     }
 
     public static Tuple<int, int> GetManagerAndAccountId(int Projects_id) {
@@ -543,17 +543,10 @@ public class CommonFunction
         // PROVATA IN SOSTITUZIONE DI GLOBAL.ASAX    
         CultureInfo sRet = new CultureInfo("it");
 
-        try
-        {
-            // recupera lingua da cookie, le sessioni non sono valorizzate qui 
-            HttpCookie cCookie = HttpContext.Current.Request.Cookies.Get("lingua");
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
 
-            if (!(cCookie == null) & cCookie.Value == "en")
+        if (CurrentSession.Language == "en")
                 sRet = new CultureInfo("en");
-        }
-        catch
-        {
-        }
 
         return sRet;
     }

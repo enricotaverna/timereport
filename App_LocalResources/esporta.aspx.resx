@@ -180,4 +180,16 @@
   <data name="exportoreNonChargable" xml:space="preserve">
     <value>Ore (incl. non chargable)</value>
   </data>
+  <data name="Attivi" xml:space="preserve">
+    <value>Attivi</value>
+  </data>
+  <data name="Codice_progetto" xml:space="preserve">
+    <value>Codice progetto</value>
+  </data>
+  <data name="Progetti" xml:space="preserve">
+    <value>Progetti</value>
+  </data>
+  <data name="Tutti" xml:space="preserve">
+    <value>Tutti</value>
+  </data>
 </root>

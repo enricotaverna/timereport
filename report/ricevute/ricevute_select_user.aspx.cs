@@ -59,7 +59,7 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
         // init
         DateTime mese = new DateTime(2014, 1, 1);
 
-        CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(Session["lingua"].ToString());
+        CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
         DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
 
         // cicla per dodici mesi
@@ -111,7 +111,7 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
                 TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sAnno + "\\" + sMese + "\\";
             else
                 // costruisci il pach di ricerca: public + anno + mese + nome persona 
-                TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sAnno + "\\" + sMese + "\\" + Session["UserName"].ToString().Trim() + "\\";
+                TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sAnno + "\\" + sMese + "\\" + CurrentSession.UserName + "\\";
 
             // carica immagini, se solo mese è ricorsivo sulle subdirectories
             filePaths = Directory

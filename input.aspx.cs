@@ -10,7 +10,6 @@ using System.Threading;
 
 public partial class input : System.Web.UI.Page
 {   
-    public int intMonth;
     public bool bTRChiuso;
     public DataTable dtHours;
     public DataTable dtenses;
@@ -123,8 +122,6 @@ public partial class input : System.Web.UI.Page
         CaricaBufferSpese();
         CaricaBufferAssenze();
 
-        intMonth = Convert.ToUInt16(Session["month"].ToString());
-
         // se il cutoff non è passato controlla che il TR non sia chiuso
         string sCmd = "SELECT * from logTR Where persons_id='" + CurrentSession.Persons_id + "' AND stato=1 AND Mese='" + Session["month"] + "' AND Anno='" + Session["Year"] + "'";
 
@@ -134,7 +131,7 @@ public partial class input : System.Web.UI.Page
             bTRChiuso = false;
 
         // calcola se la pagina è modificabile o no controllando data cutoff e chiusura TR
-        if (Convert.ToDateTime(Session["CutoffDate"]) > Convert.ToDateTime("01" + "/" + Session["month"] + "/" + Session["year"]) || bTRChiuso == true)
+        if (CurrentSession.dCutoffDate > Convert.ToDateTime("01" + "/" + Session["month"] + "/" + Session["year"]) || bTRChiuso == true)
             Session["InputScreenChangeMode"] = false;
         else
             Session["InputScreenChangeMode"] = true;
@@ -497,7 +494,7 @@ WFIcon = "";
                 bHoliday = false;
             }
 
-            CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(Session["lingua"].ToString());
+            CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
             DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
             Response.Write(mfi.DayNames[intDayWeek] + " " + intDayNumber);
         }
@@ -574,7 +571,7 @@ WFIcon = "";
                 "'false' ," +
                 "'false' ," +
                 "'false' ," +
-                "'" + Session["userId"] + "' ," +
+                "'" + CurrentSession.UserName  + "' ," +
                 ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
                 "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
                 "'" + result.Item1 + "' ," +

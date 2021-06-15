@@ -12,7 +12,9 @@ using System.Configuration;
 
 public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
 {
-    
+
+    public TRSession CurrentSession;
+
     public class AWSInstance
     {
         public int StatusCode { get; set; }
@@ -23,8 +25,13 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+
         Auth.CheckPermission("STARTAWS", "DISPLAY");
-        SetPageData();
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
+        //SetPageData();
     }
 
     // chiama API e valorizza stato dell'istanza
@@ -135,4 +142,10 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
         SetPageData(); // refresh pagina
 
     }
+
+    protected void UpdateCancelButton_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("/timereport/menu.aspx");
+    }
+
 }

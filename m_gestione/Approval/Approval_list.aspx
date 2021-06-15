@@ -2,32 +2,34 @@
 
 <!DOCTYPE html>
 
-<!-- Stili -->
-<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="/timereport/include/newstyle.css" rel="stylesheet" />
-<link href="/timereport/include/uploader/uploader.css" rel="stylesheet" />
-<link rel="stylesheet" href="/timereport/include/jquery/jquery-ui.min.css" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js"></script>
 
-<!-- Menù  -->
-<script language="JavaScript" src="/timereport/include/menu/menu_array.js" id="IncludeMenu" lingua='<%= Session["lingua"]%>' userlevel='<%= Session["userLevel"]%>' type="text/javascript"></script>
-<script language="JavaScript" src="/timereport/include/menu/mmenu.js" type="text/javascript"></script>
-
-<!-- Jquery per date picker  -->
+<!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
 <script src="/timereport/include/parsley/parsley.min.js"></script>
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<!-- Download excel da Tabulator -->
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 
 <style>
-    /* compatta spazi tra righe del form */
-    .inputtext {
-        height: 35px;
+    .inputtext, .ASPInputcontent {
+        Width: 170px;
     }
 </style>
 
@@ -40,25 +42,31 @@
 
 <body>
 
-    <div id="TopStripe"></div>
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
-    <div id="MainWindow">
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
 
         <form id="FVForm" runat="server">
 
-            <div style="width: 720px">
+            <!--**** tabella principale ***-->
+            <div class="row justify-content-center pt-3">
+                <div class="col-9 px-0">
 
-                <div class="StandardForm">
                     <div id="ApprovalListTable"></div>
-                </div>
 
-                <div class="buttons">
-                    <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+
+                    <div class="buttons">
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    </div>
+                    <!--End buttons-->
+
                 </div>
-                <!--End buttons-->
+                <!--End div-->
 
             </div>
-            <!--End div-->
+            <!--End LastRow-->
 
             <div id="ModalWindow">
                 <!--  Finestra Dialogo -->
@@ -72,28 +80,32 @@
                         <div class="input nobottomborder">
                             <!-- ** DATA RICHIESTA ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Data richiesta" /></div>
+                                <asp:Literal runat="server" Text="Data richiesta" />
+                            </div>
                             <asp:Label CssClass="inputtext" ID="LBCreationDate" runat="server" />
                         </div>
 
                         <div class="input  nobottomborder">
                             <!-- ** Stato ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Stato" /></div>
+                                <asp:Literal runat="server" Text="Stato" />
+                            </div>
                             <asp:Label ID="LBApprovalStatus" class="inputtext" runat="server" Style="width: 200px" />
                         </div>
 
                         <div class="input">
                             <!-- ** PERSONA ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Consulente" /></div>
+                                <asp:Literal runat="server" Text="Consulente" />
+                            </div>
                             <asp:Label ID="LBPersonName" CssClass="inputtext" runat="server" />
                         </div>
 
                         <div class="input  nobottomborder">
                             <!-- ** DATA RICHIESTA ** -->
                             <div class="inputtext">
-                                <asp:Literal runat="server" Text="Periodo" /></div>
+                                <asp:Literal runat="server" Text="Periodo" />
+                            </div>
                             <asp:Label ID="LBFromDate" class="inputtext" runat="server" />
                             <asp:Label ID="LBToDate" class="inputtext" runat="server" />
                         </div>
@@ -132,16 +144,18 @@
             <!--  Finestra Dialogo -->
 
         </form>
-
     </div>
-    <!-- END MainWindow -->
+    <!-- *** END Container *** -->
 
-    <!-- **** FOOTER **** -->
-    <div id="WindowFooter">
-        <div></div>
-        <div id="WindowFooter-L">Aeonvis Spa <%= DateTime.Today.Year  %></div>
-        <div id="WindowFooter-C">cutoff: <%= Session["CutoffDate"]%>  </div>
-        <div id="WindowFooter-R">Utente: <%= Session["UserName"]  %></div>
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
     </div>
 
     <div id="mask"></div>
@@ -149,7 +163,12 @@
 
 </body>
 
+<!-- *** JAVASCRIPT *** -->
 <script>
+
+    // include di snippet html per menu and background color mgt
+    includeHTML();
+    InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
     // ** VALIDAZIONI **
     var btnRifiutatoClick = false;

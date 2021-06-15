@@ -123,41 +123,20 @@
   <data name="chiudi_timereport" xml:space="preserve">
     <value>Close Timereport</value>
   </data>
-  <data name="DDLBonusResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="DDLProgettoResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
-  <data name="InsertButtonResource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="Label1Resource1.Text" xml:space="preserve">
     <value>Project</value>
-  </data>
-  <data name="Label1Resource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="Label7Resource1.Text" xml:space="preserve">
     <value>Allowance</value>
   </data>
-  <data name="Label7Resource1.ToolTip" xml:space="preserve">
-    <value />
-  </data>
   <data name="mese_corrente" xml:space="preserve">
-    <value>current month</value>
+    <value>Current Month</value>
   </data>
   <data name="ORE" xml:space="preserve">
     <value>Hours</value>
   </data>
   <data name="PageResource1.Title" xml:space="preserve">
     <value>Data input</value>
-  </data>
-  <data name="SedeViaggioResource1.Text" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SedeViaggioResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="SPESE" xml:space="preserve">
     <value>Expenses</value>
@@ -166,19 +145,13 @@
     <value>Timereport closed</value>
   </data>
   <data name="Titolo" xml:space="preserve">
-    <value>Input data</value>
-  </data>
-  <data name="UpdateCancelButtonResource1.ToolTip" xml:space="preserve">
-    <value />
+    <value>Calendar</value>
   </data>
   <data name="VAL_SedeViaggioResource1.ErrorMessage" xml:space="preserve">
     <value>RequiredFieldValidator</value>
   </data>
   <data name="VAL_SedeViaggioResource1.Text" xml:space="preserve">
     <value>Input the location</value>
-  </data>
-  <data name="VAL_SedeViaggioResource1.ToolTip" xml:space="preserve">
-    <value />
   </data>
   <data name="oreUOM" xml:space="preserve">
     <value>hrs</value>

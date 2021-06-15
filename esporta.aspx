@@ -55,7 +55,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+        <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -71,8 +71,8 @@
                         <div class="row">
                             <div class="col-5">
                                 <div class="btn-group" role="group">
-                                    <asp:Button ID="btPrjAttivi" CommandName="btPrjAttivi" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="Attivi" />
-                                    <asp:Button ID="btPrjAll" CommandName="btPrjAll" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="Tutti" />
+                                    <asp:Button ID="btPrjAttivi" CommandName="btPrjAttivi" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="<%$ Resources: Attivi %>" />
+                                    <asp:Button ID="btPrjAll" CommandName="btPrjAll" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="<%$ Resources: Tutti %>" />
                                 </div>
                                 <div runat="server" id="btChargeable" class="btn-group ms-2" role="group">
                                     <asp:Button ID="btCharge" CommandName="btCharge" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="Chargeable" />
@@ -241,7 +241,7 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
                 <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
@@ -291,7 +291,7 @@
             //$('#mask').css({ 'width': 0, 'height': 0 });
 
             // imposta css della listbox
-            $('#CBLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
+            $('#CBLProgetti').SumoSelect({ placeholder: '<%= GetLocalResourceObject("Progetti").ToString()  %> ', search: true, searchText: '<%= GetLocalResourceObject("Codice_progetto").ToString()  %> ' });
             $('#CBLPersone').SumoSelect({ placeholder: 'Persone', search: true, searchText: 'Codice progetto' });
 
             // cancella selezione dei radiobutton in caso sia stato selezionato l'altro gruppo

@@ -32,8 +32,8 @@ public partial class Esporta : System.Web.UI.Page
             // Popola dropdown con i valori          
             ASPcompatility.SelectYears(ref DDLFromYear);
             ASPcompatility.SelectYears(ref DDLToYear);
-            ASPcompatility.SelectMonths(ref DDLFromMonth, Session["lingua"].ToString());
-            ASPcompatility.SelectMonths(ref DDLToMonth, Session["lingua"].ToString());
+            ASPcompatility.SelectMonths(ref DDLFromMonth, CurrentSession.Language );
+            ASPcompatility.SelectMonths(ref DDLToMonth, CurrentSession.Language);
 
         }
     }

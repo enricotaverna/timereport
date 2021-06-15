@@ -105,9 +105,9 @@ public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
 
             // controlli passati, cancella il record
             if (e.CommandName == "lock" )
-                Database.ExecuteSQL("UPDATE LOGTR SET Stato ='1', LastModifiedBy = '" + Session["UserId"] + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
+                Database.ExecuteSQL("UPDATE LOGTR SET Stato ='1', LastModifiedBy = '" + CurrentSession.UserName + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
             else
-                Database.ExecuteSQL("UPDATE LOGTR SET Stato ='0', LastModifiedBy = '" + Session["UserId"] + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
+                Database.ExecuteSQL("UPDATE LOGTR SET Stato ='0', LastModifiedBy = '" + CurrentSession.UserName + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
 
             // forza refresh
             GVLogTR.DataBind();

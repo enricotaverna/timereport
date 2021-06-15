@@ -172,7 +172,7 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
                                                                        "', '1'," + 
                                                                        ASPcompatility.FormatDateDb(drFestivo["calDay"].ToString()) + 
                                                                        " , " + ASPcompatility.FormatNumberDB(iContractHours) + " ," +
-                                                                       ASPcompatility.FormatStringDb(Session["UserId"].ToString()) + " , " + 
+                                                                       ASPcompatility.FormatStringDb(CurrentSession.UserName) + " , " + 
                                                                        ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"),true) + " , " +
                                                                        ASPcompatility.FormatNumberDB(result.Item1) + " , " + // ClientManager_Id
                                                                        ASPcompatility.FormatNumberDB(result.Item2) + " , " + // AccountManager_Id

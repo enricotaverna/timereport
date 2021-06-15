@@ -30,11 +30,14 @@ public class TRSession
     public int Company_id;
     public int ContractHours;
     public string UserName;
+    public string Language; // it or en
     public int UserLevel;
-    public string CutoffDate;
+    public string sCutoffDate;
+    public DateTime dCutoffDate;
     public Boolean ForcedAccount;
     public string BackgroundColor;
     public string BackgroundImage;
+    public int Calendar_id;
 
     public TRSession(int inputPersons_id) {
         Persons_id = inputPersons_id;
@@ -118,12 +121,15 @@ public class TRSession
         UserName = rdr["Name"].ToString();
         UserLevel = Convert.ToInt16(rdr["UserLevel_ID"].ToString());
         ForcedAccount = rdr["ForcedAccount"].ToString() == "True" ? true : false;
+        Language = rdr["Lingua"].ToString();
+        Calendar_id = Convert.ToInt16(rdr["calendar_id"].ToString());
     }
 
     public void LoadOptions()
     {
         DataRow rdr = Database.GetRow("SELECT * from Options", null);
-        CutoffDate = Utilities.GetCutoffDate(rdr["cutoffPeriod"].ToString(), rdr["cutoffMonth"].ToString(), rdr["cutoffYear"].ToString(), "end");
+        dCutoffDate = Utilities.GetCutoffDate(rdr["cutoffPeriod"].ToString(), rdr["cutoffMonth"].ToString(), rdr["cutoffYear"].ToString(), "end");
+        sCutoffDate = dCutoffDate.ToString("d");
     }
 
     public void LoadPersonalSetting()

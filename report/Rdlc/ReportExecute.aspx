@@ -43,7 +43,7 @@
 <body style="background-color: white">
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container-fluid ">

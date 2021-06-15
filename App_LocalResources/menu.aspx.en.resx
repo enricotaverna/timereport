@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="chilometri" xml:space="preserve">
-    <value>Tot Kilometers:</value>
+  <data name="Chilometri" xml:space="preserve">
+    <value>Kilometers</value>
+  </data>
+  <data name="da_inizio_mese_ad_oggi" xml:space="preserve">
+    <value>Since month start to today</value>
+  </data>
+  <data name="Luogo" xml:space="preserve">
+    <value>Location</value>
   </data>
   <data name="mese" xml:space="preserve">
     <value>Month: </value>
+  </data>
+  <data name="mese_corrente" xml:space="preserve">
+    <value>current month</value>
   </data>
   <data name="messaggi" xml:space="preserve">
     <value>Messages</value>
@@ -132,8 +141,17 @@
   <data name="Msg_mobile" xml:space="preserve">
     <value>Click to receive link to mobile app</value>
   </data>
+  <data name="Ore" xml:space="preserve">
+    <value>Hours</value>
+  </data>
   <data name="ore_caricate" xml:space="preserve">
     <value>Input hours: </value>
+  </data>
+  <data name="ore_caricate_su_totale_mese" xml:space="preserve">
+    <value>Loaded hours / total month hours</value>
+  </data>
+  <data name="Ore_da_caricare" xml:space="preserve">
+    <value>Hours to load</value>
   </data>
   <data name="ore_lavorative" xml:space="preserve">
     <value>Working hours: </value>
@@ -143,5 +161,11 @@
   </data>
   <data name="spese_da_rimborsare" xml:space="preserve">
     <value>Refundable expenses: </value>
+  </data>
+  <data name="Spese_Mese" xml:space="preserve">
+    <value>Month Expenses</value>
+  </data>
+  <data name="titolo" xml:space="preserve">
+    <value>PROVA PROVA</value>
   </data>
 </root>

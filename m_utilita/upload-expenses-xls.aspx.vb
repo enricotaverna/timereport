@@ -130,7 +130,7 @@ Partial Class m_utilita_upload_expenses_xls1
             End If
 
             ' data oltre cutoff
-            If dr(DATA) <= Convert.ToDateTime(Session("CutOffDate")) Then
+            If dr(DATA) <= CurrentSession.sCutoffDate Then
                 messaggio.Text = messaggio.Text & Chr(13) &
                                 "Row " & i & GetLocalResourceObject("msg7").ToString ' ": data del file antecedente al cut-off"
                 Continue For

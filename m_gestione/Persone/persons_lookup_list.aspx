@@ -130,7 +130,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=Session("userlevel") %>.html"></div>
+	<div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -219,8 +219,8 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= session("CutoffDate") %></div>
-                <div class="col-md-4" id="WindowFooter-R"><%= Session("UserName")  %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
     </div>

@@ -119,8 +119,6 @@ public partial class defaultAspx : System.Web.UI.Page
                         if (dtOption.Rows.Count == 1)
                         {
                             var rwOption = dtOption.Rows[0];
-                            Session["CutoffDate"] = Utilities.GetCutoffDate(rwOption["cutoffPeriod"].ToString(), rwOption["cutoffMonth"].ToString(), rwOption["cutoffYear"].ToString(), "end");
-
                         }
                         else
                         {
@@ -138,23 +136,12 @@ public partial class defaultAspx : System.Web.UI.Page
                 }
             }
 
-            // inizializza alcune variabili        
-            Session["NoActive"] = 1;
-            Session["NoPersActive"] = 1;
-
             // Carica spese e progetti possibili
-            //DataTable dtProgettiForzati = null;
-            //DataTable dtSpeseForzate = null;
-            DataTable dtTipoSpesa = null;
             DataTable dtApprovalManagerList = null;
 
             // Carica Manager per approvazione ore
             dtApprovalManagerList = Database.GetData("SELECT persons_id, name, mail FROM Persons WHERE active=1 AND (roles_id = 1 OR roles_id=2) ORDER BY Name", this.Page);
             Session["dtApprovalManagerList"] = dtApprovalManagerList;
-
-            // Carica in buffer tipo spesa
-            dtTipoSpesa = Database.GetData("Select ExpenseType_id, TipoBonus_id, AdditionalCharges from ExpenseType", this.Page);
-            Session["dtTipoSpesa"] = dtTipoSpesa;
 
             // *** carica autorizzazioni ***
             Auth.LoadPermission(CurrentSession.Persons_id);
@@ -164,7 +151,7 @@ public partial class defaultAspx : System.Web.UI.Page
 
             // *** Carica datatable con giorni di ferie        
             MyConstants.DTHoliday.Clear();
-            MyConstants.DTHoliday = Database.GetData("SELECT calDay FROM CalendarHolidays Where Calendar_id = " + Convert.ToInt16(Session["calendar_id"]), this.Page);
+            MyConstants.DTHoliday = Database.GetData("SELECT calDay FROM CalendarHolidays Where Calendar_id = " + CurrentSession.Calendar_id, this.Page);
 
             MyConstants.DTHoliday.PrimaryKey = new DataColumn[] { MyConstants.DTHoliday.Columns["calDay"] };
             //*** Carica datatable con giorni di ferie (FINE)   
@@ -190,23 +177,6 @@ public partial class defaultAspx : System.Web.UI.Page
             Session["ApprovalManagerName"] = drRecord["Name"].ToString(); ; // usato in Jquery per post
             Session["ApprovalManagerMail"] = drRecord["Mail"].ToString(); ; // usato in Jquery per post
         }
-
-        // valorizza variabili di sessione
-        Session["UserLevel"] = rdr["UserLevel_ID"];
-        Session["UserId"] = rdr["UserId"].ToString();
-        Session["UserName"] = rdr["Name"]; 
-//      Session["persons_id"] = rdr["persons_id"];
-        Session["calendar_id"] = rdr["calendar_id"];
-        Session["lingua"] = rdr["Lingua"];
-        Session["BetaTester"] = string.IsNullOrEmpty(rdr["BetaTester"].ToString()) ? false : rdr["BetaTester"]; // abilita nuove funzionalità
-        Session["CartaCreditoAziendale"] = rdr["CartaCreditoAziendale"];
-
-        // Manage forced account for subcontractors
-        if (Convert.ToInt32(rdr["ForcedAccount"]) == 1)
-            Session["ForcedAccount"] = 1;
-        else
-            Session["ForcedAccount"] = 0;
-        Session["ExpensesProfile_id"] = rdr["ExpensesProfile_id"];
 
         // salva in cookie la preferenza di lingua
         Utilities.SetCookie("lingua", rdr["Lingua"].ToString());

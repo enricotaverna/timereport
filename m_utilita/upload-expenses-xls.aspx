@@ -33,7 +33,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -42,7 +42,7 @@
 
             <div class="row justify-content-center pt-3">
 
-                <div id="FormWrap" class="StandardForm col-9">
+                <div id="FormWrap" class="StandardForm col-8">
 
                     <div class="formtitle">
                         <asp:Literal runat="server" Text="<%$ Resources:titolo%>" />
@@ -52,8 +52,7 @@
                         <div class="col-2"></div>
                         <div class="col-7">
                             <asp:FileUpload ID="FUFile" runat="server" meta:resourcekey="FileUpload1Resource1" 
-                            data-parsley-required="true"  />
-                            <asp:Button type="submit" class="orangebutton" ID="UploadFile" Text="Upload File" runat="server" OnClick="btnUpload_Click"  meta:resourcekey="UploadFileResource1" />&nbsp;&nbsp;
+                            data-parsley-required="true"  data-parsley-errors-container="#valMsg"/>
                             <asp:CheckBox ID="simulazione" runat="server" Text=" Esecuzione di prova" Checked="True" meta:resourcekey="simulazioneResource1" />
                         </div>
                     </div>
@@ -78,6 +77,13 @@
                         </div>
                     </div>
 
+                            <!-- *** BOTTONI  ***  -->
+                            <div class="buttons">
+                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <asp:Button type="submit" class="orangebutton" ID="UploadFile" Text="Upload File" runat="server" OnClick="btnUpload_Click"  meta:resourcekey="UploadFileResource1" />&nbsp;&nbsp;
+                                <asp:Button ID="Button1" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>"  formnovalidate="" />
+                            </div>
+
                 </div>
                 <!-- *** End FormWrap *** -->
             </div>
@@ -85,7 +91,7 @@
 
             <!-- *** Istruzioni *** -->
             <div class="row justify-content-center pt-3">
-                <div class="col-9 RoundedBox">
+                <div class="col-8 RoundedBox">
                     <asp:Label CssClass="h5" runat="server" Text='<%$ Resources:istruzioni%>' />
                     <ul class="mt-2">
                         <li>
@@ -111,7 +117,7 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
                 <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
@@ -125,6 +131,11 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         $("#UploadFile").click(function () {
+
+            $('#fileUpload').parsley().validate();
+
+            if (!$('#fileUpload').parsley().isValid())
+                return;
 
             MaskScreen(true);
         });

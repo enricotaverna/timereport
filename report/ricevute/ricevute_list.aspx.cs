@@ -88,7 +88,6 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
     {
 
         // loop per stampare immagini
-        //string stWebPath = ConfigurationSettings.AppSettings["PATH_RICEVUTE"] + lDataSpesa.Substring(0, 4) + "/" + lDataSpesa.Substring(4, 2) + "/" + Session["UserName"].ToString().Trim() + "/";
         string stFile = "";
         HtmlTableRow row = new HtmlTableRow(); // aggiunge riga  
 
@@ -146,7 +145,7 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             
             if (mode != "admin")
                 // costruisci il pach di ricerca: public + anno + mese + nome persona 
-                TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + anno + "\\" + mese + "\\" + Session["UserName"].ToString().Trim() + "\\";            
+                TargetLocation = Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + anno + "\\" + mese + "\\" + CurrentSession.UserName + "\\";            
             
             // carica immagini, se solo mese è ricorsivo sulle subdirectories
             filePaths = Directory

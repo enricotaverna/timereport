@@ -97,7 +97,7 @@
             End If
 
             ' Log
-            DShours.InsertParameters("CreatedBy").DefaultValue = Session("UserId")
+            DShours.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserName
             DShours.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
 
             DShours.Insert()
@@ -158,7 +158,7 @@
         End If
 
         ' Audit    
-        e.Command.Parameters("@LastModifiedBy").Value = Session("UserId")
+        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserName
         e.Command.Parameters("@LastModificationDate").Value = DateTime.Now()
     End Sub
 
@@ -285,7 +285,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=Session("userlevel") %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%=CurrentSession.UserLevel %>-<%=CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -363,7 +363,7 @@
                     <!--**** tabella principale ***-->
                     <asp:GridView ID="GV_Ore" runat="server" AllowPaging="True" CssClass="GridView"
                         AllowSorting="True" AutoGenerateColumns="False"
-                        DataKeyNames="Hours_Id" PageSize="20" ShowFooter="True"
+                        DataKeyNames="Hours_Id" PageSize="16" ShowFooter="True"
                         OnRowCommand="GV_Ore_RowCommand" DataSourceID="DShours" GridLines="None" OnRowDataBound="GV_Ore_OnRowDataBound" EnableModelValidation="True" OnRowUpdating="GV_Ore_RowUpdating">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle CssClass="GV_row" />
@@ -510,7 +510,7 @@
                                         ValidationGroup="Insert"></asp:RegularExpressionValidator>
                                 </FooterTemplate>
                                 <ItemTemplate>
-                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>' CssClass="hours" ToolTip="pippo"></asp:Label>
+                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>' ></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Competenza" SortExpression="AccountingDate">
@@ -619,8 +619,8 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= session("CutoffDate") %></div>
-                <div class="col-md-4" id="WindowFooter-R"><%= Session("UserName")  %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
     </div>

@@ -42,7 +42,7 @@ public partial class input_ore : System.Web.UI.Page
             //              disabilita form in caso di cutoff
             Label LBdate = (Label)FVore.FindControl("LBdate");
 
-            if (Convert.ToDateTime(LBdate.Text) < Convert.ToDateTime(Session["CutoffDate"]))
+            if (Convert.ToDateTime(LBdate.Text) < CurrentSession.dCutoffDate)
                 FVore.ChangeMode(FormViewMode.ReadOnly);
             else
                 FVore.ChangeMode(FormViewMode.Edit);
@@ -56,7 +56,7 @@ public partial class input_ore : System.Web.UI.Page
             LBdate.Text = Request.QueryString["date"];
 
             Label LBperson = (Label)FVore.FindControl("LBperson");
-            LBperson.Text = (string)Session["UserName"];
+            LBperson.Text = (string)CurrentSession.UserName;
         }
 
     }
@@ -295,7 +295,7 @@ public partial class input_ore : System.Web.UI.Page
             Label LBdate = (Label)FVore.FindControl("LBdate");
             e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
             // Audit
-            e.Command.Parameters["@CreatedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserName;
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
             // valori manager e società
             e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
@@ -308,7 +308,7 @@ public partial class input_ore : System.Web.UI.Page
         if (FVore.CurrentMode == FormViewMode.Edit)
         {
             // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = Session["UserId"];
+            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserName;
             e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         }
     }

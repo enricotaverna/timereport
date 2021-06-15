@@ -15,13 +15,15 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
+        if (!IsPostBack) {
+            BackgroundColor.Value = CurrentSession.BackgroundColor;
+            BackgroundImg.Value = CurrentSession.BackgroundImage;
+        }
+
     }
 
     protected void ButtonClick(object sender, EventArgs e)
     {
-        if (Page.IsValid)
-        {
-
             // imposta cookie se settato colore sfondo
             if (BackgroundColor.Value != "")
             {
@@ -46,8 +48,6 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 
             // imposta il messaggio che verrò dato sulla pagina di menu
             Response.Redirect("/timereport/menu.aspx");
-
-        }
     }
 
     protected override void InitializeCulture()

@@ -29,7 +29,9 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
         TextBox TBanno = (TextBox)FVMain.FindControl("TBAnno");
 
         // imposta sessione
-        Session["CutOffDate"] = Utilities.GetCutoffDate(DDLPeriodo.SelectedValue.ToString(), DDLMese.SelectedValue.ToString(), TBanno.Text, "end");
+        CurrentSession.dCutoffDate = Utilities.GetCutoffDate(DDLPeriodo.SelectedValue.ToString(), DDLMese.SelectedValue.ToString(), TBanno.Text, "end");
+        CurrentSession.sCutoffDate = CurrentSession.dCutoffDate.ToString("d");
+        Session["CurrentSession"] = CurrentSession;
 
         // imposta il messaggio che verrò dato sulla pagina di menu
         Response.Redirect("/timereport/menu.aspx?msgno=200&msgtype=I");

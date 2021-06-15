@@ -44,7 +44,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground" id="test">
@@ -63,7 +63,7 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingOne">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Colore
+                                    <asp:Literal runat="server" Text="<%$ Resources:Colore %>" />
                                 </button>
                             </h2>
                             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
@@ -79,7 +79,7 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingTwo">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Sfondo
+                                    <asp:Literal runat="server" Text="<%$ Resources:Sfondo %>" />
                                 </button>
                             </h2>
                             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
@@ -95,13 +95,13 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingThree">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    Personalizza
+                                    <asp:Literal runat="server" Text="<%$ Resources:Personalizza %>" />
                                 </button>
                             </h2>
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
                                     <div class="form-group">
-                                        <label for="exampleFormControlFile1">Carica Immagine (max 4MB)</label>
+                                        <label for="exampleFormControlFile1"><asp:Literal runat="server" Text="<%$ Resources:Carica_Immagine %>" /></label>
                                         <input type="file" class="form-control-file" id="CaricaImmagine" name="files[]">
                                     </div>
                                 </div>
@@ -132,7 +132,7 @@
         <footer class="footer mt-auto py-3 bg-light">
             <div class="row">
                 <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
-                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.CutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
                 <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
             </div>
         </footer>
@@ -149,7 +149,7 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         // Lingua
-        window.Parsley.setLocale('<%=Session["lingua"]%>');
+        window.Parsley.setLocale('<%=CurrentSession.Language%>');
 
         $('.pickColor').click(function () {
             $('#BackgroundColor').val($(this).css('background-color')); // colore da passare al backend con il post
