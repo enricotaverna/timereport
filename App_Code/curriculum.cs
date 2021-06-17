@@ -227,7 +227,7 @@ public class Curriculum
         // https://xceed.com/documentation-center/
 
         // costruisce il nome del file "template" + "-" + EN/IT + ".docx"
-        string WordTemplate = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["FolderPath"]) + templateFile + "-" + CVLanguage + ".docx";
+        string WordTemplate = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["CURRICULA_PATH"]) + templateFile + "-" + CVLanguage + ".docx";
         using (var document = DocX.Load(WordTemplate))
         {
             document.ReplaceText("<Name>", Name);
@@ -337,7 +337,7 @@ public class Curriculum
             }
 
             // Save this document to disk.
-            string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["FolderPath"]) + targetFile;
+            string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["CURRICULA_PATH"]) + targetFile;
             document.SaveAs(UrlWordSaved);
             return true;
         }
@@ -346,7 +346,7 @@ public class Curriculum
 
     public bool DownloadFile() {
 
-        string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["FolderPath"]) + WordSaved;
+        string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["CURRICULA_PATH"]) + WordSaved;
 
         using (WebClient wc = new WebClient())
         {
@@ -354,7 +354,7 @@ public class Curriculum
 
             wc.DownloadFileAsync(
                 // Param1 = Link of file
-                new System.Uri("http://localhost/" + ConfigurationManager.AppSettings["FolderPath"] + WordSaved),
+                new System.Uri("http://localhost/" + ConfigurationManager.AppSettings["CURRICULA_PATH"] + WordSaved),
                 // Param2 = Path to save
                 desktop + WordSaved
             );

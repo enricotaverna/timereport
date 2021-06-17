@@ -17,5 +17,10 @@ public partial class mobile_menu : System.Web.UI.Page
         CurrentSession = (TRSession)Session["CurrentSession"];
 
         Utilities.CheckAutMobile(CurrentSession.UserLevel, MyConstants.AUTH_EXTERNAL);
+        
+        
+              
+        
     }
+
 }

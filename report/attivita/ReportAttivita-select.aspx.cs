@@ -25,12 +25,13 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
-        if (!IsPostBack) {
-            /* Popola dropdown con i valori        */  
+        if (!IsPostBack)
+        {
+            /* Popola dropdown con i valori        */
             ASPcompatility.SelectYears(ref DDLFromYear);
             ASPcompatility.SelectYears(ref DDLToYear);
             ASPcompatility.SelectMonths(ref DDLFromMonth);
-            ASPcompatility.SelectMonths(ref DDLToMonth);        
+            ASPcompatility.SelectMonths(ref DDLToMonth);
 
             Bind_DDLProgetti();
             Bind_DDLFasi();
@@ -38,52 +39,44 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         }
     }
 
-    protected string addclause(string strInput , string toAdd)  
+    protected string addclause(string strInput, string toAdd)
     {
         if (strInput != "")
             strInput = strInput + " AND ";
 
         return (strInput + toAdd);
 
-   }
-
-    protected void sottometti_Click(object sender , System.EventArgs e ) {
-        
-        Button bt = (Button) sender;
-       
-        if ( bt.CommandName == "download")  {
-
-                 switch (RBTipoReport.SelectedIndex)
-                {
-                 case 0:
-                        Utilities.EsportaDataSetExcel(EstraiDSAttivitaTotale("SPattivitaTotale"));                     
-                        break;                    
-                case 1:
-                        Utilities.EsportaDataSetExcel(EstraiDSAttivitaTotale("SPattivitaPersone"));                     
-                        break;       
-               }
-
-         } else
-        {
-                switch (RBTipoReport.SelectedIndex)
-                    {
-                     case 0:
-                            LanciaReport(EstraiDSAttivitaTotale("SPattivitaTotale"));  
-                            break; 
-                     case 1:
-                            LanciaReport(EstraiDSAttivitaTotale("SPattivitaPersone"));  
-                            break; 
-                    }
-         }
     }
 
-    DataSet EstraiDSAttivitaTotale(string strStoredProcedure) {
+    protected void sottometti_Click(object sender, System.EventArgs e)
+    {
+
+        Button bt = (Button)sender;
+
+        if (bt.CommandName == "report")
+        {
+            {
+                switch (RBTipoReport.SelectedIndex)
+                {
+                    case 0:
+                        LanciaReport(EstraiDSAttivitaTotale("SPattivitaTotale"));
+                        break;
+                    case 1:
+                        LanciaReport(EstraiDSAttivitaTotale("SPattivitaPersone"));
+                        break;
+                }
+            }
+        }
+    }
+
+    DataSet EstraiDSAttivitaTotale(string strStoredProcedure)
+    {
 
         /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
 
         DataSet ds = new DataSet("Export");
         DateTime DateFrom = new DateTime(Convert.ToInt16(DDLFromYear.SelectedValue), Convert.ToInt16(DDLFromMonth.SelectedValue), 1);
-        DateTime DateTo = new DateTime(Convert.ToInt16(DDLToYear.SelectedValue), Convert.ToInt16(DDLToMonth.SelectedValue), ASPcompatility.DaysInMonth(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)) );
+        DateTime DateTo = new DateTime(Convert.ToInt16(DDLToYear.SelectedValue), Convert.ToInt16(DDLToMonth.SelectedValue), ASPcompatility.DaysInMonth(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)));
 
         conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
@@ -111,14 +104,15 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         return (ds);
     }
 
-    protected void LanciaReport( DataSet ds) {
+    protected void LanciaReport(DataSet ds)
+    {
 
         /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
 
         Cache.Insert("export", ds);
         Response.Redirect("ReportAttivita-list.aspx");
 
-    }     
+    }
 
     protected void Bind_DDLProgetti()
     {
@@ -126,10 +120,10 @@ public partial class report_esportaAttivita : System.Web.UI.Page
         conn.Open();
 
         SqlCommand cmd;
-        
+
         // imposta selezione progetti in base all'utente
 
-        if ( !CurrentSession.ForcedAccount )
+        if (!CurrentSession.ForcedAccount)
             cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects WHERE active = 'true' AND activityOn = 'true' ORDER BY ProjectCode", conn);
         else
             cmd = new SqlCommand("SELECT Projects.Projects_Id, Projects.ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects " +
@@ -152,7 +146,7 @@ public partial class report_esportaAttivita : System.Web.UI.Page
     public void Bind_DDLAttivita()
     {
         conn.Open();
-         SqlCommand cmd;
+        SqlCommand cmd;
 
         if (DDLFasi.SelectedValue != "")
             cmd = new SqlCommand("select Activity_id, ActivityCode + '  ' + left(Name,20) AS Descrizione FROM Activity where Phase_id='" + DDLFasi.SelectedValue + "' AND active = 'true' ORDER BY ActivityCode", conn);
@@ -197,4 +191,5 @@ public partial class report_esportaAttivita : System.Web.UI.Page
     {
         Bind_DDLAttivita();
     }
+
 }

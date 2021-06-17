@@ -286,19 +286,25 @@ $(document).ready(function () {
         // messaggio di ritorno
         function () { return ErrMsg });
 
+    $.validator.addMethod("numberRegex", function (value, element) {
+
+        return /^[0-9,]+$/i.test(value);
+
+    }, "campo deve essere numerico");
+
     // *** spese validate ***
     var speseValidator = $("#SpeseForm").validate({
         ignore: ".ignore",
         rules: {
             Tbdate: { required: true, date: false },
-            TbExpenseAmount: { required: true, number: true },
+            TbExpenseAmount: { required: true, numberRegex: true },
             //fileToUpload: {required: false, extension: "gif|jpg|png|jpeg"  }
             comment: { CampoNoteObbligatorio: true },  // validatore custom obbligatorietà campo note
             Projects_Id: { BloccoCaricoSpese: true }
         },
         messages: {
             Tbdate: { required: "Inserire un valore!" },
-            TbExpenseAmount: { required: "Inserire un valore!", number: "Campo numerico!" }
+            TbExpenseAmount: { required: "Inserire un valore!", numberRegex: "Campo numerico!" }
             //fileToUpload: {extension: "Selezionare un formato file valido" }
         },
         submitHandler: function () {
@@ -330,7 +336,7 @@ $(document).ready(function () {
             TbdateForHours: { required: true, date: false },
             TbHours: { required: true, number: true },
             ore_comment: { CampoNoteObbligatorioFormOre: true },  // validatore custom obbligatorietà campo note
-            TBLocation: { CheckLocation: true },
+            TBLocation: { CheckLocation: true }
         },
         messages: {
             TbdateForHours: { required: "Inserire un valore!" },
@@ -494,7 +500,7 @@ $(document).ready(function () {
             " , 'LocationDescription': '" + LocationDescription + "'" +
             "}";
 
-        $.mobile.showPageLoadingMsg("a", "Aggiornamento", true);
+        $.mobile.showPageLoadingMsg("c", "Aggiornamento", true);
 
         $.ajax({
             type: "POST",

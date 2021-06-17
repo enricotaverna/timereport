@@ -241,7 +241,7 @@ public class Aggiorna : System.Web.Services.WebService
         try
         {
             conn.Open();
-            SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM Hours", conn);
+            SqlDataAdapter adapter = new SqlDataAdapter("SELECT top 1 * FROM Hours", conn);
             SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
 
             // Create a dataset object
@@ -311,7 +311,7 @@ public class Aggiorna : System.Web.Services.WebService
         try
         {
             conn.Open();
-            SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM Expenses", conn);
+            SqlDataAdapter adapter = new SqlDataAdapter("SELECT top 1 * FROM Expenses", conn);
             SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
 
             // recupera nome 

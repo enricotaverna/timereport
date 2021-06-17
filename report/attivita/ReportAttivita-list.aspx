@@ -92,7 +92,7 @@
                 <div  class="StandardForm col-11">
 
                     <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True" CssClass="GridView"
-                        AllowSorting="True" PageSize="15">
+                        AllowSorting="True" PageSize="15" OnPageIndexChanging="GVAttivita_PageIndexChanging">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <PagerStyle CssClass="GV_footer" />
@@ -101,6 +101,7 @@
                     </asp:GridView>
 
                     <div class="buttons">
+                        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                     </div>
 

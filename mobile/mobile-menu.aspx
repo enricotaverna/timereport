@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="ui-block-b">
-                        <input type="number" name="TbExpenseAmount" id="TbExpenseAmount" placeholder="Importo spesa">
+                        <input type="text" runat="server"  name="TbExpenseAmount" id="TbExpenseAmount" placeholder="Importo spesa">
                     </div>
 
                 </div>

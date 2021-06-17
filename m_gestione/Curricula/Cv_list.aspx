@@ -211,7 +211,7 @@
                     // chiude dialogo
                     if (msg.d.Result) {
                         // crea link
-                        var html = "<a id='clicklink' href='<%=ConfigurationManager.AppSettings["FolderPath"]%>" + msg.d.Filename + "'></a >"; // link vuoto che viene cliccato subito dopo
+                        var html = "<a id='clicklink' href='<%=ConfigurationManager.AppSettings["CURRICULA_PATH"]%>" + msg.d.Filename + "'></a >"; // link vuoto che viene cliccato subito dopo
                         $('#Wordlink').empty();
                         $('#Wordlink').append(html);
                         $('#clicklink')[0].click();

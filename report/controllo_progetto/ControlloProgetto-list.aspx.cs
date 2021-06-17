@@ -63,20 +63,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     {
         DataSet ds = (DataSet)Cache.Get("Export");
 
-        Response.ClearContent();
-        Response.Buffer = true;
-        Response.AddHeader("content-disposition", string.Format("attachment; filename={0}", "TRexport.xls"));
-        Response.ContentType = "application/ms-excel";
-        StringWriter sw = new StringWriter();
-        HtmlTextWriter htw = new HtmlTextWriter(sw);
-
-        GVAttivita.AllowPaging = false;
-        GVAttivita.DataSource = ds;
-        GVAttivita.DataBind();
-
-        GVAttivita.RenderControl(htw);
-        Response.Write(sw.ToString());
-        Response.End();
+        Utilities.EsportaDataSetExcel(ds);
     }
 
     // gestisce click su codice progetto per vedere dettaglio  
