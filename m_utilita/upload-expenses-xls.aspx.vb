@@ -255,7 +255,7 @@ Partial Class m_utilita_upload_expenses_xls1
                     End If
 
                     newrow("Comment") = dr(NOTA)
-                    newrow("CreatedBy") = CurrentSession.UserName
+                    newrow("CreatedBy") = CurrentSession.UserId
                     newrow("CreationDate") = DateTime.Now()
                     newrow("TipoBonus_id") = iTipoBonus_id
                     newrow("AdditionalCharges") = drExpenseType("AdditionalCharges")

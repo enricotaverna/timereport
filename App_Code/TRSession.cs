@@ -30,6 +30,7 @@ public class TRSession
     public int Company_id;
     public int ContractHours;
     public string UserName;
+    public string UserId;
     public string Language; // it or en
     public int UserLevel;
     public string sCutoffDate;
@@ -119,6 +120,7 @@ public class TRSession
         ContractHours = Convert.ToInt16(rdr["ContractHours"].ToString());
         Company_id = Convert.ToInt16(rdr["Company_id"].ToString());
         UserName = rdr["Name"].ToString();
+        UserId = rdr["UserId"].ToString();
         UserLevel = Convert.ToInt16(rdr["UserLevel_ID"].ToString());
         ForcedAccount = rdr["ForcedAccount"].ToString() == "True" ? true : false;
         Language = rdr["Lingua"].ToString();

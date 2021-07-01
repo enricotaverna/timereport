@@ -96,7 +96,7 @@
             DSExpenses.InsertParameters("AccountManager_id").DefaultValue = result.Item2
 
             ' Log
-            DSExpenses.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserName
+            DSExpenses.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserId
             DSExpenses.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
 
             ' Valorizza tipo Bonus e AdditionalCharges se il tipo spesa è di tipo bonus
@@ -182,7 +182,7 @@
         e.Command.Parameters("@AdditionalCharges").Value = drExpenseType("AdditionalCharges")
 
         ' Audit    
-        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserName
+        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserId
         e.Command.Parameters("@LastModificationDate").Value = DateTime.Now()
 
     End Sub

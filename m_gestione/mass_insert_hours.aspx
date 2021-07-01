@@ -97,7 +97,7 @@
             End If
 
             ' Log
-            DShours.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserName
+            DShours.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserId
             DShours.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
 
             DShours.Insert()
@@ -158,7 +158,7 @@
         End If
 
         ' Audit    
-        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserName
+        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserId
         e.Command.Parameters("@LastModificationDate").Value = DateTime.Now()
     End Sub
 

@@ -38,7 +38,7 @@
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
-        <form id="formProgetto" runat="server">
+        <form id="formPersone" runat="server">
 
             <div class="row justify-content-center" >
 

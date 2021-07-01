@@ -87,6 +87,7 @@ public class Card
         string SQLfilterApprovalRequest = "";
         DateTime DateFrom = (DateTime)DateTime.Today; // sottrae i giorni del parametro
         DateTime DateTo = (DateTime)DateTime.Today.AddDays(30); // sottrae i giorni del parametro
+        string MonthStartDate = ASPcompatility.FormatDateDb("1/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
         KPISet kpi;
 
         if (DateTime.Now < lastUpdateTime.AddSeconds(updateRateSec)) // non necessario lettura DB
@@ -198,7 +199,7 @@ public class Card
 
             case "ListaLocation":
                 DataTable data = Database.GetData("SELECT TOP(3) LocationDescription, CAST( SUM(Hours) AS INT) as TotalHours FROM Hours " +
-                                             " WHERE Date > " + ASPcompatility.FormatDateDb(cutoffDate) +
+                                             " WHERE Date >= " + MonthStartDate +
                                              " AND Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) +
                                              " AND ( LocationDescription <> '' AND LocationDescription IS NOT NULL )  " +
                                              " GROUP BY LocationDescription " +
@@ -235,14 +236,13 @@ public class Card
                 break;
 
             case "SpeseNelMese":
-                string sFromDate = ASPcompatility.FormatDateDb("1/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
                 string sToDate = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month).ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
 
                 // spese totali
                 sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
                 "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
                 "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
-                "WHERE Expenses.Date >=" + sFromDate + " And Expenses.Date <=" + sToDate + " AND " +
+                "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
 
                 result = Database.ExecuteScalar(sql, null);
@@ -256,7 +256,7 @@ public class Card
                 sql = "SELECT Round(Sum(Expenses.Amount),2) AS TotalAmount " +
                 "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
                 "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
-                "WHERE Expenses.Date >=" + sFromDate + " And Expenses.Date <=" + sToDate + " AND " +
+                "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
                 "ExpenseType.UnitOfMeasure = 'km' AND " +
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
 
@@ -271,7 +271,7 @@ public class Card
                 sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
                 "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
                 "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
-                "WHERE Expenses.Date >=" + sFromDate + " And Expenses.Date <=" + sToDate + " AND " +
+                "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND Expenses.CreditCardPayed = 0 AND Expenses.CompanyPayed = 0 ";
 
                 result = Database.ExecuteScalar(sql, null);

@@ -182,7 +182,7 @@ public class WStimereport : System.Web.Services.WebService {
                   "'false' ," +
                   "'false' ," +
                   "'false' ," +
-                  "'" + personsId + "' ," +
+                  "'" + CurrentSession.UserId + "' ," +
                   ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
                   "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TKTREST"] + "', " +
                   ASPcompatility.FormatNumberDB(result.Item1) + " , " +
@@ -297,7 +297,7 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationKey"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationType"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["LocationDescription"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(CurrentSession.UserName) + " , " +
+                                     ASPcompatility.FormatStringDb(CurrentSession.UserId) + " , " +
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
@@ -344,7 +344,7 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["TipoBonus_id"].ToString()) + " , " +
                                      strAccountingDate + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["comment"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(CurrentSession.UserName) + " , " +
+                                     ASPcompatility.FormatStringDb(CurrentSession.UserId) + " , " +
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +

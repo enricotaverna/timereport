@@ -340,7 +340,7 @@ public partial class input_spese : System.Web.UI.Page
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
             e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
             // Audit
-            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserName;
+            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
             // valori manager e società
             e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
@@ -353,7 +353,7 @@ public partial class input_spese : System.Web.UI.Page
         if (FVSpese.CurrentMode == FormViewMode.Edit)
         {
             // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserName;
+            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
             e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         }
     }

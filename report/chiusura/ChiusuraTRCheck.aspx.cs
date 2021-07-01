@@ -114,7 +114,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
         if (Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND mese=" + Session["month"] + " AND anno=" + Session["year"]))
         {
             // update record x chiusura TR    
-            cmd = "UPDATE LogTr SET stato='1', LastModifiedBy = '" + CurrentSession.UserName +
+            cmd = "UPDATE LogTr SET stato='1', LastModifiedBy = '" + CurrentSession.UserId +
                   "', LastModificationDate=" + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) +
                   " WHERE persons_id=" +
                   CurrentSession.Persons_id + " AND mese=" + Session["month"] + " AND anno=" + Session["year"];
@@ -128,7 +128,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                     Session["month"] + "' , '" +
                     Session["year"] + "' ," +
                     "'1'" + " , '" +
-                    CurrentSession.UserName + "' , " +
+                    CurrentSession.UserId + "' , " +
                     ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + " )";
         }
 
