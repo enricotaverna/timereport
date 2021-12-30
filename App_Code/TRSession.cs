@@ -64,19 +64,19 @@ public class TRSession
             //** A.2 Carica spese possibili				
             //** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
             // carica spese forzate per persona                
-            dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ForcedExpensesPers.Persons_id = " + ASPcompatility.FormatNumberDB(Persons_id) + " ORDER BY ExpenseType.ExpenseCode", null);
+            dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ForcedExpensesPers.Persons_id = " + ASPcompatility.FormatNumberDB(Persons_id) + " ORDER BY ExpenseType.ExpenseCode", null);
         }
         else
         {
             //** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
             dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 ORDER BY ProjectCode", null);
             //** B.2 tutte le spese attive 							
-            dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", null);
+            dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", null);
         }
 
         //  tutti i progetti, anche inattivi
         dtProgettiTutti = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects ORDER BY ProjectCode", null);
-        dtSpeseTutte = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges FROM ExpenseType ORDER BY ExpenseCode", null);
+        dtSpeseTutte = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType ORDER BY ExpenseCode", null);
     }
 
     public void LoadLocationList()

@@ -262,9 +262,17 @@ Partial Class m_utilita_upload_expenses_xls1
 
                     Dim result = Utilities.GetManagerAndAccountId(idProgetto)
 
+                    ' recupera conversion rate associata al tipo spesa
+                    Dim dtTipoSpesa As DataTable = CurrentSession.dtSpeseTutte
+                    Dim dr1 As DataRow() = dtTipoSpesa.Select("ExpenseType_id =  " + ASPcompatility.FormatNumberDB(idSpesa))
+                    If dr1.Count() <> 1 Then  ' non dovrebbe mai succedere! 
+                    End If
+
                     newrow("Company_id") = CurrentSession.Company_id
                     newrow("ClientManager_id") = result.Item1
                     newrow("AccountManager_id") = result.Item2
+
+                    newrow("AmountInCurrency") = newrow("Amount") * Convert.ToDouble(dr1(0)("ConversionRate"))
 
                     dsExpenses.Tables(0).Rows.Add(newrow)
                     Adapter.Update(dsExpenses)

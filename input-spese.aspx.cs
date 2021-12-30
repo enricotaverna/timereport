@@ -321,10 +321,12 @@ public partial class input_spese : System.Web.UI.Page
         {  // dovrebbe essere sempre così
             e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32(dr[0]["TipoBonus_id"].ToString());
             e.Command.Parameters["@AdditionalCharges"].Value = dr[0]["AdditionalCharges"];
+            e.Command.Parameters["@AmountInCurrency"].Value = Convert.ToDouble(dr[0]["ConversionRate"].ToString()) * Convert.ToDouble(e.Command.Parameters["@Amount"].Value);
         }
         else { 
-            e.Command.Parameters["@TipoBonus_id"].Value = 0;
+            e.Command.Parameters["@TipoBonus_id"].Value = 0; 
             e.Command.Parameters["@AdditionalCharges"].Value = 0;
+            e.Command.Parameters["@AmountInCurrency"].Value = 0;
         }
 
         // salva default per select list

@@ -558,8 +558,14 @@ WFIcon = "";
         // trova progetto per recuperare dati manager ed account
         var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(Request.Form["DDLProgetto"]));
 
+        // recupera conversion rate associata al tipo spesa
+        DataTable dtTipoSpesa = CurrentSession.dtSpeseTutte;
+        DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + Request.Form["DDLBonus"]);
+        if (dr.Count() != 1) { // non dovrebbe mai succedere! 
+        }
+
         // inserisce record x trasferta
-        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges) " +
+        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges, AmountInCurrency) " +
                 "values (" +
                 ASPcompatility.FormatDateDb(Request.Form["refDate"], false) + " ," +
                 "'" + Request.Form["DDLProgetto"] + "' ," +    // da dropdown
@@ -577,7 +583,8 @@ WFIcon = "";
                 "'" + result.Item1 + "' ," +
                 "'" + result.Item2 + "' ," +
                 "'" + CurrentSession.Company_id + "' ," +
-                "'false' " +
+                "'false' , " +
+                 ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) +
                 " )";
 
         Database.ExecuteSQL(cmd, this.Page);

@@ -46,6 +46,10 @@ public partial class Esporta : System.Web.UI.Page
         Session["bPersoneAll"] = true;
         Session["bChargeableAndOthers"] = true;
 
+        //mantiene valore DDL
+        //if ( Session["CBLProgettiSelectedValue"] != null ) 
+        //    CBLProgetti.SelectedValue = Session["CBLProgettiSelectedValue"].ToString();
+
         // stile bottoni
         btPrjAll.CssClass = "btn btn-primary";
         btPrjAttivi.CssClass = "btn btn-outline-secondary";
@@ -225,11 +229,11 @@ public partial class Esporta : System.Web.UI.Page
         {
             case "1":
                 Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription from v_ore where " + sWhereClause);
-                Response.Redirect("/timereport/esporta.aspx");
+                //Response.Redirect("/timereport/esporta.aspx");
                 break;
             case "2":
                 Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges from v_spese where " + sWhereClause);
-                Response.Redirect("/timereport/esporta.aspx");
+                //Response.Redirect("/timereport/esporta.aspx");
                 break;
                 //case "3":
                 //    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
@@ -298,12 +302,13 @@ public partial class Esporta : System.Web.UI.Page
                                        " WHERE b.persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
                                        ((bool)Session["bProgettiAll"] == false ? " AND a.Active = 1 " : "") +
                                        ((bool)Session["bChargeableAndOthers"] == false ? " AND a.ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] : "") +
+
+                                       " UNION " +
+                                       " SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a " +
+                                       " WHERE ( a.clientmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR a.Accountmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ") " +
+                                       ((bool)Session["bProgettiAll"] == false ? " AND a.Active = 1 " : "") +
                                         " ORDER BY ProjectCode";
-        // " UNION " +
-        // " SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a " +
-        // " WHERE ( a.clientmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR a.Accountmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ")" +
-        //(bProgettiDisattivi == false ? " AND a.Active = 1 " : "") +
-    }
+    }        
 
     protected override void InitializeCulture()
     {
@@ -315,4 +320,10 @@ public partial class Esporta : System.Web.UI.Page
     {
         Response.Redirect("/timereport/menu.aspx");
     }
+
+    // mantiene valore DDL
+    //protected void CBLProgetti_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+    //    Session["CBLProgettiSelectedValue"] = CBLProgetti.SelectedValue;
+    //}
 }

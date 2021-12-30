@@ -78,6 +78,12 @@
             ' trova la società legata all'utente
             Dim dr As DataRow = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " & ASPcompatility.FormatNumberDB(NewPersonaId.SelectedValue), Nothing)
 
+            ' recupera conversion rate associata al tipo spesa
+            Dim dtTipoSpesa As DataTable = CurrentSession.dtSpeseTutte
+            Dim dr1 As DataRow() = dtTipoSpesa.Select("ExpenseType_id =  " + NewTipoSpese.SelectedValue)
+            If dr1.Count() <> 1 Then  ' non dovrebbe mai succedere! 
+            End If
+
             DSExpenses.InsertParameters("Projects_Id").DefaultValue = NewProjectsId.SelectedValue
             DSExpenses.InsertParameters("Persons_id").DefaultValue = NewPersonaId.SelectedValue
             DSExpenses.InsertParameters("Date").DefaultValue = NewData.Text
@@ -94,6 +100,8 @@
             Dim result = Utilities.GetManagerAndAccountId(NewProjectsId.SelectedValue)
             DSExpenses.InsertParameters("ClientManager_id").DefaultValue = result.Item1
             DSExpenses.InsertParameters("AccountManager_id").DefaultValue = result.Item2
+
+            DSExpenses.InsertParameters("AmountInCurrency").DefaultValue = NewAmount.Text * Convert.ToDouble(dr1(0)("ConversionRate"))
 
             ' Log
             DSExpenses.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserId
@@ -171,10 +179,18 @@
 
     Protected Sub DSExpenses_Updating(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.SqlDataSourceCommandEventArgs)
 
+        ' recupera conversion rate associata al tipo spesa
+        Dim dtTipoSpesa As DataTable = CurrentSession.dtSpeseTutte
+        Dim dr1 As DataRow() = dtTipoSpesa.Select("ExpenseType_id =  " + e.Command.Parameters("@ExpenseType_id").Value)
+        If dr1.Count() <> 1 Then  ' non dovrebbe mai succedere! 
+        End If
+
         ' gestisce storno
         If e.Command.Parameters("@cancelflag").Value Then
             e.Command.Parameters("@amount").Value = e.Command.Parameters("@amount").Value * -1
         End If
+
+        e.Command.Parameters("@AmountInCurrency").Value = e.Command.Parameters("@amount").Value * Convert.ToDouble(dr1(0)("ConversionRate"))
 
         ' Valorizza tipo Bonus se il tipo spesa è di tipo bonus
         Dim drExpenseType = Database.GetRow("Select TipoBonus_id, AdditionalCharges from ExpenseType where ExpenseType_id=" + e.Command.Parameters("@ExpenseType_id").Value, Me.Page)
@@ -581,8 +597,8 @@
     <asp:SqlDataSource ID="DSExpenses" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT expenses.expenses_Id, expenses.Projects_Id, expenses.Persons_id, expenses.Date, expenses.Amount, expenses.ExpenseType_Id, expenses.CancelFlag, expenses.creditcardpayed, expenses.CompanyPayed, expenses.invoiceflag,expenses.Comment, expenses.AccountingDate, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, ExpenseType.ExpenseCode + ' ' + ExpenseType.Name AS TipoSpesa, AdditionalCharges FROM Expenses INNER JOIN Projects ON Expenses.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id INNER JOIN ExpenseType ON Expenses.ExpenseType_Id = ExpenseType.ExpenseType_Id ORDER BY Expenses.Date, Expenses.Projects_Id, Expenses.Persons_id"
         DeleteCommand="DELETE FROM [Expenses] WHERE [Expenses_Id] = @Expenses_Id"
-        InsertCommand="INSERT INTO [Expenses] ([Projects_Id], [Persons_id], [Date], [Amount], [ExpenseType_Id], [CancelFlag],[InvoiceFlag],[CreditCardPayed], [CompanyPayed] ,[Comment], [CreatedBy], [CreationDate], [AccountingDate], [TipoBonus_id], Company_id, ClientManager_id, AccountManager_id, AdditionalCharges) VALUES (@Projects_Id, @Persons_id, @Date, @amount, @ExpenseType_Id, @CancelFlag,@InvoiceFlag,@CreditCardPayed, @CompanyPayed, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @Company_id, @ClientManager_id, @AccountManager_id, @AdditionalCharges)"
-        UpdateCommand="UPDATE [Expenses] SET [Projects_Id] = @Projects_Id, [Persons_id] = @Persons_id, [Date] = @Date, [amount] = @amount, [ExpenseType_Id] = @ExpenseType_Id, [CancelFlag] = @CancelFlag, [CreditCardPayed] = @CreditCardPayed, [CompanyPayed] = @CompanyPayed, [InvoiceFlag] = @InvoiceFlag, [Comment] = @Comment, [LastModifiedBy] = @LastModifiedBy, [LastModificationDate] = @LastModificationDate, [AccountingDate] = @AccountingDate, [TipoBonus_id] = @TipoBonus_id, [AdditionalCharges] = @AdditionalCharges WHERE [Expenses_Id] = @Expenses_Id"
+        InsertCommand="INSERT INTO [Expenses] ([Projects_Id], [Persons_id], [Date], [Amount], [ExpenseType_Id], [CancelFlag],[InvoiceFlag],[CreditCardPayed], [CompanyPayed] ,[Comment], [CreatedBy], [CreationDate], [AccountingDate], [TipoBonus_id], Company_id, ClientManager_id, AccountManager_id, AdditionalCharges, AmountInCurrency) VALUES (@Projects_Id, @Persons_id, @Date, @amount, @ExpenseType_Id, @CancelFlag,@InvoiceFlag,@CreditCardPayed, @CompanyPayed, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @Company_id, @ClientManager_id, @AccountManager_id, @AdditionalCharges, @AmountInCurrency)"
+        UpdateCommand="UPDATE [Expenses] SET [Projects_Id] = @Projects_Id, [Persons_id] = @Persons_id, [Date] = @Date, [amount] = @amount, [ExpenseType_Id] = @ExpenseType_Id, [CancelFlag] = @CancelFlag, [CreditCardPayed] = @CreditCardPayed, [CompanyPayed] = @CompanyPayed, [InvoiceFlag] = @InvoiceFlag, [Comment] = @Comment, [LastModifiedBy] = @LastModifiedBy, [LastModificationDate] = @LastModificationDate, [AccountingDate] = @AccountingDate, [TipoBonus_id] = @TipoBonus_id, [AdditionalCharges] = @AdditionalCharges, [AmountInCurrency] = @AmountInCurrency WHERE [Expenses_Id] = @Expenses_Id"
         OnUpdating="DSExpenses_Updating">
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel" PropertyName="SelectedValue"
@@ -615,6 +631,7 @@
             <asp:Parameter Name="LastModificationDate" Type="DateTime" />
             <asp:Parameter Name="TipoBonus_id" Type="Int32" />
             <asp:Parameter Name="AdditionalCharges" Type="Boolean" />
+            <asp:Parameter Name="AmountInCurrency" Type="Decimal" />
         </UpdateParameters>
         <InsertParameters>
             <asp:Parameter Name="Projects_Id" Type="Int32" />
@@ -635,6 +652,7 @@
             <asp:Parameter Name="AccountManager_id" />
             <asp:Parameter Name="Company_id" />
             <asp:Parameter Name="AdditionalCharges" Type="Boolean" />
+            <asp:Parameter Name="AmountInCurrency" Type="Decimal" />
         </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="dsProjects" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"

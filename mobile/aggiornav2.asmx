@@ -328,7 +328,7 @@ public class Aggiorna : System.Web.Services.WebService
             TbExpenseAmount = TbExpenseAmount.Replace('.', ',');
 
             // recupera flag AdditionalCharges
-            DataRow dr = Database.GetRow("SELECT AdditionalCharges FROM ExpenseType WHERE ExpenseType_id  = " + ASPcompatility.FormatNumberDB(ExpenseType_Id), null);
+            DataRow dr = Database.GetRow("SELECT AdditionalCharges, ConversionRate FROM ExpenseType WHERE ExpenseType_id  = " + ASPcompatility.FormatNumberDB(ExpenseType_Id), null);
             DataRow dr1 = Database.GetRow("SELECT ClientManager_id, AccountManager_id FROM Projects WHERE Projects_id  = " + ASPcompatility.FormatNumberDB(Projects_Id), null);
             DataRow dr2 = Database.GetRow("SELECT Company_id FROM Persons WHERE Persons_id  = " + ASPcompatility.FormatNumberDB(Person_id), null);
 
@@ -349,6 +349,7 @@ public class Aggiorna : System.Web.Services.WebService
             row["Company_id"] = dr2["Company_id"];
             row["CreationDate"] = DateTime.Now;
             row["CreatedBy"] = get_userid(Person_id);
+            row["AmountInCurrency"] = Convert.ToDouble(row["amount"].ToString()) * Convert.ToDouble(dr["ConversionRate"].ToString()) ;
 
             ExpensesTable.Rows.Add(row);
 
