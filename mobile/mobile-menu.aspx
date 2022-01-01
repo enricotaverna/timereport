@@ -35,7 +35,7 @@
 <body>
     <div data-role="page" data-dom-cache="true" id="mainmenu">
         <div data-role="header" data-position="fixed">
-            <a href='./login.aspx' class='ui-btn-left' data-icon='back' rel="external">Logoff</a>
+            <a href='./mobile-logout.aspx' class='ui-btn-left' data-icon='back' rel="external">Logoff</a>
             <h1>Menu</h1>
         </div>
         <!-- /header -->
