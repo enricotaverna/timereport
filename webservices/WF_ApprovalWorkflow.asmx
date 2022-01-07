@@ -172,6 +172,34 @@ public class Card
 
                 break;
 
+            case "ContrattiSubco":
+
+                DateTime SubcoDateToCheck = (DateTime)DateTime.Today.AddDays(MyConstants.SUBCOCONTRACT_DAYS_TO_EVALUATE * -1); // sottrae i giorni del parametro
+                String sToday = ASPcompatility.FormatDateDb(DateTime.Today.ToString("dd/MM/yyyy"));
+                String sQuery;
+
+                sQuery = "SELECT COUNT(*) FROM ( SELECT B.name FROM hours AS A INNER JOIN persons as B ON b.persons_id = a.persons_id ";
+
+                // se manager aggiunge filtro
+                if ( !Auth.ReturnPermission("WORKFLOW", "TOTALE") )
+                    sQuery = sQuery + "WHERE A.ClientManager_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND ";
+                else
+                    sQuery = sQuery + "WHERE ";
+
+                sQuery = sQuery + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + " AND " +
+                                                "( NOT( Contratto_da <= " + sToday + " AND Contratto_a >= " + sToday + ") OR Contratto_da IS NULL ) " +
+                                                "GROUP BY B.NAME ) AS R";
+
+                result = Database.ExecuteScalar(sQuery, null);
+
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (result == null) ? "0" : result.ToString();
+                kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning"; ;
+                KPIList.Add(kpi);
+
+                break;
+
             case "CVdaConfermare":
 
                 CurriculumList list = new CurriculumList();
@@ -192,7 +220,7 @@ public class Card
 
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
-                kpi.KPIValue = count.ToString();;
+                kpi.KPIValue = count.ToString(); ;
                 kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning";
                 KPIList.Add(kpi);
                 break;
@@ -205,7 +233,8 @@ public class Card
                                              " GROUP BY LocationDescription " +
                                              " ORDER BY TotalHours DESC", null);
                 // popola la lista di ritorno
-                foreach (DataRow dr in data.Rows) {
+                foreach (DataRow dr in data.Rows)
+                {
                     kpi = new KPISet();
                     kpi.KPIDescription = dr["LocationDescription"].ToString();
                     kpi.KPIValue = dr["TotalHours"].ToString();
@@ -305,6 +334,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
     Card SpeseNelMese;
     Card CVdaConfermare;
     Card ListaLocation;
+    Card ContrattiSubco;
 
     List<Card> listaCard = new List<Card>(); // lista oggetti
 
@@ -321,6 +351,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         SpeseNelMese = Session["SpeseNelMese"] == null ? new Card("SpeseNelMese", 10) : (Card)Session["SpeseNelMese"];
         CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
         ListaLocation = Session["ListaLocation"] == null ? new Card("ListaLocation", 10) : (Card)Session["ListaLocation"];
+        ContrattiSubco = Session["ContrattiSubco"] == null ? new Card("ContrattiSubco", 10) : (Card)Session["ContrattiSubco"];
 
         // carica lista oggetti
         listaCard.Add(RichiesteAperte);
@@ -331,6 +362,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(SpeseNelMese);
         listaCard.Add(CVdaConfermare);
         listaCard.Add(ListaLocation);
+        listaCard.Add(ContrattiSubco);
     }
 
     // UpdateCardKPI()
@@ -400,6 +432,39 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
                 return sRet;
             }
         }
+    }
+
+    // GetContrattiSubco(bool soloContrattiScaduti)
+    [WebMethod(EnableSession = true)]
+    public string GetContrattiSubco(bool soloSenzaContratto, string persons_id)
+    {
+
+        DataTable dt = new DataTable();
+
+        DateTime SubcoDateToCheck = (DateTime)DateTime.Today.AddDays(MyConstants.SUBCOCONTRACT_DAYS_TO_EVALUATE * -1); // sottrae i giorni del parametro
+        String sToday = ASPcompatility.FormatDateDb(DateTime.Today.ToString("dd/MM/yyyy"));
+
+        // recupera oggetto sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+
+        String query = "SELECT B.name AS SubcoName, D.Name as CompanyName, C.name AS ManagerName, B.Contratto_da, B.Contratto_a, SUM(A.hours/8) as Days, IIF( NOT( B.Contratto_da <= '1-7-2022' AND B.Contratto_a >= '1-7-2022') OR B.Contratto_da IS NULL , 'false' , 'true' ) AS ContractStatus FROM hours AS A " +
+                "INNER JOIN persons as B ON B.persons_id = A.persons_id " +
+                "LEFT JOIN persons as C ON C.persons_id = A.ClientManager_id " +
+                "LEFT JOIN Company as D ON D.Company_id = A.Company_id ";
+
+        // se manager aggiunge filtro
+        if (CurrentSession.UserLevel != MyConstants.AUTH_ADMIN)
+            query = query + "WHERE A.clientManager_id = " + ASPcompatility.FormatStringDb(persons_id) + " AND ";
+        else
+            query = query + "WHERE ";
+
+        query = query + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + " AND " +
+        "( NOT( B.Contratto_da <= " + sToday + " AND B.Contratto_a >= " + sToday + ") OR B.Contratto_da IS NULL ) " +
+        "GROUP BY B.NAME, C.name, B.Contratto_da,  B.Contratto_a, D.Name";
+
+        // esegue select e costruisce la stringa JSON
+        return BuildJSONReturn(query);
+
     }
 
     // GetHouraListTable(string persons_id, string tipoOre, int giorniInAvanti)
@@ -586,7 +651,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         ApprovalRequest appr = js.Deserialize<ApprovalRequest>(approvalRequest);
 
         // recupera oggetto sessione
-        TRSession CurrentSession  = (TRSession)Session["CurrentSession"];
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
         var result = Utilities.GetManagerAndAccountId(appr.projects_id);
 
         // ** 1 ** Crea la richiesta
@@ -621,7 +686,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
             nDays = 1;
 
         if (appr.requestType == "RG") // più date, default le ore ad ore contratto
-            appr.hours = CurrentSession.ContractHours; 
+            appr.hours = CurrentSession.ContractHours;
 
         DateTime currDate = Convert.ToDateTime(appr.fromDate);
         for (int i = 0; i <= nDays; i++)
@@ -731,6 +796,38 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
 
         return rc;
 
+    }
+
+    // Utility per formattare ritorno della SELECT sui dati
+    private string BuildJSONReturn(string query)
+    {
+
+        DataTable dt = new DataTable();
+        string sRet;
+
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+        {
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+                Dictionary<string, object> row;
+                foreach (DataRow dr in dt.Rows)
+                {
+                    row = new Dictionary<string, object>();
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        row.Add(col.ColumnName, dr[col]);
+                    }
+                    rows.Add(row);
+                }
+                sRet = serializer.Serialize(rows);
+                return sRet;
+            }
+        }
     }
 
 }

@@ -222,6 +222,17 @@
                                             data-parsley-errors-container="#valMsg" required="" data-parsley-type="integer" data-parsley-min="1" />
                                     </div>
 
+                                    <!-- *** CONTRATTO DA A  ***  -->
+                                    <div class="input nobottomborder">
+                                        <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Contratto da:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBContratto_da" runat="server" Text='<%# Bind("Contratto_da","{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+
+                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBContratto_a" runat="server" Width="100px" Text='<%# Bind("Contratto_a","{0:d}") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                                    </div>
+
                                     <!-- *** Escludi da controllo economics  ***  -->
                                     <div class="input nobottomborder">
                                         <asp:Label ID="Label18" CssClass="inputtext" runat="server" Text=""></asp:Label>
@@ -433,6 +444,17 @@
                                             data-parsley-errors-container="#valMsg" data-parsley-type="integer" data-parsley-min="1" required="" />
                                     </div>
 
+                                 <!-- *** CONTRATTO DA A  ***  -->
+                                    <div class="input nobottomborder">
+                                        <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Contratto da:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBContratto_da" runat="server" Text='<%# Bind("Contratto_da","{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+
+                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBContratto_a" runat="server" Width="100px" Text='<%# Bind("Contratto_a","{0:d}") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                                    </div>
+
                                     <!-- *** Escludi da controllo economics  ***  -->
                                     <div class="input nobottomborder">
                                         <asp:Label ID="Label18" CssClass="inputtext" runat="server" Text=""></asp:Label>
@@ -488,8 +510,8 @@
     <asp:SqlDataSource ID="DSPersone" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [Persons] WHERE ([Persons_id] = @Persons_id)"
-        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id]) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id)"
-        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id WHERE [Persons_id] = @Persons_id">
+        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a]) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a)"
+        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a WHERE [Persons_id] = @Persons_id" OnInserted="DSPersone_Inserted">
         <InsertParameters>
             <asp:Parameter Name="Name" Type="String" />
             <asp:Parameter Name="Roles_Id" Type="Int32" />
@@ -515,6 +537,8 @@
             <asp:Parameter Name="Manager_id" Type="Int32" />
             <asp:Parameter Name="AnniNonAeonvis" Type="Decimal" />
             <asp:Parameter Name="ConsultantType_id" Type="Int32" />
+            <asp:Parameter Name="Contratto_da" Type="DateTime" />
+            <asp:Parameter Name="Contratto_a" Type="DateTime" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="Persons_id" QueryStringField="persons_id"
@@ -546,6 +570,8 @@
             <asp:Parameter Name="Manager_id" Type="Int32" />
             <asp:Parameter Name="AnniNonAeonvis" Type="Decimal" />
             <asp:Parameter Name="ConsultantType_id" Type="Int32" />
+            <asp:Parameter Name="Contratto_da" Type="DateTime" />
+            <asp:Parameter Name="Contratto_a" Type="DateTime" />
         </UpdateParameters>
     </asp:SqlDataSource>
 
@@ -593,6 +619,8 @@
 
             $("#FVPersone_TBAttivoDa").datepicker($.datepicker.regional['it']);
             $("#FVPersone_TBAttivoFino").datepicker($.datepicker.regional['it']);
+            $("#FVPersone_TBContratto_a").datepicker($.datepicker.regional['it']);
+            $("#FVPersone_TBContratto_da").datepicker($.datepicker.regional['it']);
         });
 
         Parsley.addMessages('it', {

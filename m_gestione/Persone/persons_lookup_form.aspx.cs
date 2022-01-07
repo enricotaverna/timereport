@@ -44,4 +44,9 @@ public partial class persons_lookup_form : System.Web.UI.Page
         Response.Redirect("Persons_lookup_list.aspx?messaggio=yes");
     }
 
+
+    protected void DSPersone_Inserted(object sender, SqlDataSourceStatusEventArgs e)
+    {
+
+    }
 }
