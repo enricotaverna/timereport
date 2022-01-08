@@ -187,7 +187,7 @@ public class Card
                     sQuery = sQuery + "WHERE ";
 
                 sQuery = sQuery + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + " AND " +
-                                                "( NOT( Contratto_da <= " + sToday + " AND Contratto_a >= " + sToday + ") OR Contratto_da IS NULL ) " +
+                                                "( NOT( Contratto_da <= " + sToday + " AND Contratto_a >= " + sToday + ") OR Contratto_da IS NULL OR B.Contratto_a IS NULL) " +
                                                 "GROUP BY B.NAME ) AS R";
 
                 result = Database.ExecuteScalar(sQuery, null);
@@ -447,7 +447,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         // recupera oggetto sessione
         TRSession CurrentSession = (TRSession)Session["CurrentSession"];
 
-        String query = "SELECT B.name AS SubcoName, D.Name as CompanyName, C.name AS ManagerName, B.Contratto_da, B.Contratto_a, SUM(A.hours/8) as Days, IIF( NOT( B.Contratto_da <= '1-7-2022' AND B.Contratto_a >= '1-7-2022') OR B.Contratto_da IS NULL , 'false' , 'true' ) AS ContractStatus FROM hours AS A " +
+        String query = "SELECT A.persons_id, B.name AS SubcoName, D.Name as CompanyName, C.name AS ManagerName, CONVERT(VARCHAR(10),B.Contratto_da, 103) AS Contratto_da, CONVERT(VARCHAR(10),B.Contratto_a, 103) AS Contratto_a, SUM(A.hours/8) as Days, IIF( NOT( B.Contratto_da <= '1-7-2022' AND B.Contratto_a >= '1-7-2022') OR B.Contratto_da IS NULL OR B.Contratto_a IS NULL , 'false' , 'true' ) AS ContractStatus FROM hours AS A " +
                 "INNER JOIN persons as B ON B.persons_id = A.persons_id " +
                 "LEFT JOIN persons as C ON C.persons_id = A.ClientManager_id " +
                 "LEFT JOIN Company as D ON D.Company_id = A.Company_id ";
@@ -458,9 +458,9 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         else
             query = query + "WHERE ";
 
-        query = query + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + " AND " +
-        "( NOT( B.Contratto_da <= " + sToday + " AND B.Contratto_a >= " + sToday + ") OR B.Contratto_da IS NULL ) " +
-        "GROUP BY B.NAME, C.name, B.Contratto_da,  B.Contratto_a, D.Name";
+        query = query + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + 
+//        " AND ( NOT( B.Contratto_da <= " + sToday + " AND B.Contratto_a >= " + sToday + ") OR B.Contratto_da IS NULL ) " +
+        "GROUP BY B.NAME, C.name, B.Contratto_da,  B.Contratto_a, D.Name, A.persons_id";
 
         // esegue select e costruisce la stringa JSON
         return BuildJSONReturn(query);

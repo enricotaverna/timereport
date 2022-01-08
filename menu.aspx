@@ -124,8 +124,19 @@
                     </div>
                 </div>
 
-                <!--  *** Box vuoto ***    -->
-                <div class="col-md-4" id="Div2" runat="server">
+                <!--  *** Box Controllo contratti Subco ***    -->
+                <div class="col-md-4" id="ContrattiSubco" runat="server">
+                    <div class="card my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Subco senza contratto</div>
+                                <div class="widget-subheading">con carichi entro 30gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="ContrattiSubco-KPIValue0">0</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!--  *** Box ASSENZE ***    -->
@@ -310,6 +321,10 @@
 
             $("#CVdaConfermare").click(function () {
                 location.href = "/timereport/m_gestione/curricula/CV_list.aspx";
+            });
+
+            $("#ContrattiSubco").click(function () {
+                location.href = "/timereport/m_gestione/ContrattiSubco/ContrattiSubco.aspx";
             });
 
             // Richiama Web Service per aggiornamento KPI

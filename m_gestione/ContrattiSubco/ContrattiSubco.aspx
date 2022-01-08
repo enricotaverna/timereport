@@ -135,17 +135,27 @@
         return JSON.parse(response.d); //return the d property of a response json object
     },
     columns: [
+        { title: "persons_id", field: "persons_id", sorter: "number", visible: false  },
         { title: "Consulente", field: "SubcoName", sorter: "string", headerFilter: true },
         { title: "Società", field: "CompanyName", sorter: "string", headerFilter: true },
         { title: "Manager", field: "ManagerName", sorter: "string", headerFilter: true },
-        { title: "Valido da", field: "Contratto_da", sorter: "string", headerFilter: true },
-        { title: "Valido a", field: "Contratto_a", sorter: "string", headerFilter: true },
+        { title: "Valido da", field: "Contratto_da", sorter: "date", headerFilter: true },
+        { title: "Valido a", field: "Contratto_a", sorter: "date", headerFilter: true },
         { title: "Contratto ok", field: "ContractStatus", sorter: "string", width: 120, headerFilter: "select", headerFilterParams: { values: { "true": "true", "false": "false", "": "all" } } },      
         { title: "Ultimi carichi", field: "Days", sorter: "number", hozAlign: "center", visible: true },
+          <% if (Auth.ReturnPermission("MASTERDATA", "PERSONE")) 
+             Response.Write("{ formatter: editIcon, width: 40, align: \"center\", cellClick: function (e, cell) { T_leggiRecord(cell.getRow().getData(), cell.getRow()) } },");
+          %>
         ],
     }); // Tabella principale
 
     // ** FUNZIONI **
+
+    function T_leggiRecord(dati, riga) {
+
+        window.location.href = "/timereport/m_gestione/persone/persons_lookup_form.aspx?Persons_Id=" + dati.persons_id;
+
+    }  
 
 </script>
 

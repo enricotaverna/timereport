@@ -40,6 +40,9 @@ public partial class menu : System.Web.UI.Page
         if (!Auth.ReturnPermission("TRAINING", "RATE"))
             TrainingDaValutare.Visible = false;
 
+        if (CurrentSession.UserLevel != MyConstants.AUTH_ADMIN)
+            ContrattiSubco.Visible = false;
+
         // spegne box Assenze da approvare in assenza di autorizzazioni
         //if (!Auth.ReturnPermission("DATI", "ASSENZE"))
         //row1.Visible = false;
