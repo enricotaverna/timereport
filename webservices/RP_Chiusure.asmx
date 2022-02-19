@@ -22,7 +22,7 @@ public class RP_Chiusure : System.Web.Services.WebService
     {
         public string persons_id;
         public int giorno;
-        public int ore;
+        public double ore;
     }
 
     // Lista che contiene le giornate caricate da DB
@@ -159,7 +159,7 @@ public class RP_Chiusure : System.Web.Services.WebService
                 CheckGiorni curr = new CheckGiorni();
                 curr.persons_id = rdr["persons_id"].ToString();
                 curr.giorno = Convert.ToDateTime(rdr["date"]).Day;
-                curr.ore = Convert.ToInt16(rdr["hours"]);
+                curr.ore = Convert.ToDouble(rdr["hours"]);
 
                 // carica lista
                 lCheckGiorni.Add(curr);
@@ -169,17 +169,17 @@ public class RP_Chiusure : System.Web.Services.WebService
     } // CaricaOreMese
 
     // Calcola i giorni mancanti nel mese
-    protected int CalcolaGiorni(string sPersons_id, int iContractHours, string sMese, string sAnno)
+    protected double CalcolaGiorni(string sPersons_id, int iContractHours, string sMese, string sAnno)
     {
 
         // Calcolo giornate caricate
         // cicla sui giorni del mese selezionato		
-        int iMissingDays = 0;
+        double iMissingDays = 0;
 
         for (int f = 1; f < System.DateTime.DaysInMonth(Convert.ToInt16(sAnno), Convert.ToInt16(sMese)); f++)
         {
 
-            int iHoursCounted = 0;
+            double iHoursCounted = 0;
 
             // Data di riferimento in formato stringa			
             string sDate = f.ToString() + "/" + sMese + "/" + sAnno;
