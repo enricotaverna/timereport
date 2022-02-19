@@ -163,7 +163,7 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
                             iRec++;
 
                             // trova la società legata all'utente
-                            DataRow dr = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " + ASPcompatility.FormatStringDb(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]), null);
+                            DataRow dr = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " + ASPcompatility.FormatStringDb(itPersona.Value.ToString()), null);
                             var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ConfigurationManager.AppSettings["FESTIVI_PROJECT"]));
 
                             using (SqlCommand cmdsql = new SqlCommand("INSERT INTO Hours (persons_id, projects_id, HourType_Id, date, hours,createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id) " + 
