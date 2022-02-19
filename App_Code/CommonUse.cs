@@ -382,7 +382,13 @@ public class Utilities
         var tuple = new Tuple<int, int>(0, 0);
 
         if (rows.Count() == 1)
-            tuple = new Tuple<int, int>( Convert.ToInt32(rows[0]["ClientManager_id"]), Convert.ToInt32(rows[0]["AccountManager_id"]));
+            tuple = new Tuple<int, int>(Convert.ToInt32(rows[0]["ClientManager_id"]), Convert.ToInt32(rows[0]["AccountManager_id"]));
+        else  // il manager non è bufferizzato, va cercato sul db
+        {
+            DataRow dr = Database.GetRow("select * from Projects where projects_id = " + ASPcompatility.FormatNumberDB(Projects_id) , null);
+            if (dr != null)
+                tuple = new Tuple<int, int>(Convert.ToInt32(dr["ClientManager_id"]), Convert.ToInt32(dr["AccountManager_id"])); 
+        }
 
         return tuple;
     }
