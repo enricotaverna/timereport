@@ -69,10 +69,8 @@
                     </div>
 
                     <div class="input nobottomborder">
-                        <p>
-                            Dopo l'avvio aspettare qualche minuto prima di provare il logon a SAP.
-                            <br />
-                            Lo shutdown della macchina è schedulato automaticamente per le ore 18:00</>
+                        <asp:Label ID="lbStartupMessage" runat="server">Dopo l'avvio aspettare qualche minuto prima di provare il logon a SAP.<br /></asp:Label>
+                        Lo shutdown della macchina è schedulato automaticamente per le ore 18:00</>
                     </div>
 
                     <!-- *** BOTTONI ***  -->

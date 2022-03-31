@@ -9,18 +9,20 @@ using Amazon.EC2.Model;
 using Amazon;
 using Amazon.Runtime;
 using System.Configuration;
+using Amazon.Runtime.CredentialManagement;
 
 public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
 {
 
     public TRSession CurrentSession;
+    public AmazonEC2Client ec2Client; // creato da InitAWSClient
 
-    public class AWSInstance
+    public class MyAWSInstance
     {
         public int StatusCode { get; set; }
         public string StatusDescription { get; set; }
-        public string ButtonState { get; set; }
-        public string DivClass { get; set; }
+        public Boolean ButtonVisible { get; set; }
+        public string ForeColor { get; set; }
     }
 
     protected void Page_Load(object sender, EventArgs e)
@@ -31,50 +33,75 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
-        //SetPageData();
+        InitAWSClient(); // se fallisce ec2Client è null
+
+        SetPageData();
+    }
+
+    // true se autenticazione è riuscita
+    protected bool InitAWSClient() {    
+
+        // parametri di autenticazione
+        var myRegion = RegionEndpoint.GetBySystemName(ConfigurationManager.AppSettings["AWS_REGION"]); // non funziona in appsettings.json... 
+        var chain = new CredentialProfileStoreChain();
+        AWSCredentials awsCredentials;
+
+        // recupera credenziali da file nel folder timereport, vedi web.config
+        if (chain.TryGetAWSCredentials("production", out awsCredentials)) { 
+            // crea istanza cliente
+            ec2Client = new AmazonEC2Client(awsCredentials, myRegion);
+            return true;
+        }
+        else { 
+        ec2Client = null;
+        return false;
+        }
     }
 
     // chiama API e valorizza stato dell'istanza
     protected  void SetPageData() {
 
-        // Crea i parametri di lancio
-        var myRegion = RegionEndpoint.GetBySystemName(ConfigurationManager.AppSettings["AWS_REGION"]); // non funziona in appsettings.json... 
-        var ec2Client = new AmazonEC2Client(new BasicAWSCredentials(ConfigurationManager.AppSettings["AWS_ACCESSKEY"], ConfigurationManager.AppSettings["AWS_SECRETKEY"]), myRegion);
-        var rq2 = new DescribeInstancesRequest { InstanceIds = { ConfigurationManager.AppSettings["AWS_INSTANCEID"] } };
+        // oggetto custom per memorizzare lo stato dell'istanza
+        MyAWSInstance AWSInstanceStatus = new MyAWSInstance();
 
-        // Recupera lo stato dell'instanza
-        DescribeInstancesResponse r2 = ec2Client.DescribeInstances(rq2);
-
-        // Status
-        //0 : pending
-        //16 : running
-        //32 : shutting - down
-        //48 : terminated
-        //64 : stopping
-        //80 : stopped
-
-        AWSInstance ModelData = SetViewData(r2.Reservations[0].Instances[0].State);
-
-        lbStato.Text = ModelData.StatusDescription;
-
-        switch (ModelData.StatusCode)
-        {
-
-            case 16: // running
-                lbStato.ForeColor = System.Drawing.ColorTranslator.FromHtml("#008000"); // green
-                InsertButton.Visible = false;
-                break;
-
-            case 80: // stopperd
-                lbStato.ForeColor = System.Drawing.ColorTranslator.FromHtml("#FF0000"); // red
-                InsertButton.Visible = true;
-                break;
-
-            default:
-                lbStato.ForeColor = System.Drawing.ColorTranslator.FromHtml("#FFA500"); // orange
-                InsertButton.Visible = false;
-                break;
+        // se ec2Client == null msg di errore altrimenti cerca di recuperare lo stato dell'istanza
+        if (ec2Client == null) {
+            AWSInstanceStatus.StatusCode = 99;
+            AWSInstanceStatus.StatusDescription = "Errore in determinazione credenziali";
+            AWSInstanceStatus.ForeColor = "#FF0000"; // red
+            AWSInstanceStatus.ButtonVisible = false;
         }
+        else
+        {
+            try {
+                // Recupera lo stato dell'instanza
+                var rq2 = new DescribeInstancesRequest { InstanceIds = { ConfigurationManager.AppSettings["AWS_INSTANCEID"] } };
+                DescribeInstancesResponse r2 = ec2Client.DescribeInstances(rq2); 
+                // Status
+                //0 : pending
+                //16 : running
+                //32 : shutting - down
+                //48 : terminated
+                //64 : stopping
+                //80 : stopped
+                AWSInstanceStatus = SetViewData(r2.Reservations[0].Instances[0].State);
+            }
+            catch
+            {
+                // autenticazione fallita
+                AWSInstanceStatus.StatusCode = 99;
+                AWSInstanceStatus.StatusDescription = "Errore di autenticazione";
+                AWSInstanceStatus.ForeColor = "#FF0000"; // red
+                AWSInstanceStatus.ButtonVisible = false;
+            }
+
+        }
+
+        // setta colore messaggio e stato del bottone di avvio istanza
+        lbStato.ForeColor = System.Drawing.ColorTranslator.FromHtml(AWSInstanceStatus.ForeColor);
+        InsertButton.Visible = AWSInstanceStatus.ButtonVisible;
+        lbStartupMessage.Visible = AWSInstanceStatus.ButtonVisible;
+        lbStato.Text = AWSInstanceStatus.StatusDescription;
 
         // se mancano le autorizzazioni spegne comunque il tasto
         if (!Auth.ReturnPermission("STARTAWS", "START"))
@@ -83,33 +110,33 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
     }
 
     // mappa risultati della API
-    private static AWSInstance SetViewData(InstanceState instanceStatus)
+    private static MyAWSInstance SetViewData(InstanceState instanceStatus)
     {
 
-        AWSInstance ret = new AWSInstance();
+        MyAWSInstance ret = new MyAWSInstance();
 
         ret.StatusCode = instanceStatus.Code;
 
         switch (ret.StatusCode)
         {
             case 16:
-                ret.DivClass = "alert alert-success";
-                ret.ButtonState = "disabled";
+                ret.ForeColor = "#008000"; // green
+                ret.ButtonVisible = false;
                 break;
 
             case 0:
-                ret.DivClass = "alert alert-warning";
-                ret.ButtonState = "disabled";
+                ret.ForeColor = "#FFA500"; // orange
+                ret.ButtonVisible = false;
                 break;
 
             case 80:
-                ret.DivClass = "alert alert-danger";
-                ret.ButtonState = "enabled";
+                ret.ForeColor = "#FF0000"; // red
+                ret.ButtonVisible = true;
                 break;
 
             default:
-                ret.DivClass = "alert alert-danger";
-                ret.ButtonState = "disabled";
+                ret.ForeColor = "#FF0000"; // red
+                ret.ButtonVisible = false;
                 break;
         }
 
@@ -123,12 +150,8 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
 
         Auth.CheckPermission("STARTAWS", "START");
 
-        // Crea i parametri di lancio
-        var myRegion = RegionEndpoint.GetBySystemName(ConfigurationManager.AppSettings["AWS_REGION"]); // non funziona in appsettings.json... 
-        var ec2Client = new AmazonEC2Client(new BasicAWSCredentials(ConfigurationManager.AppSettings["AWS_ACCESSKEY"], ConfigurationManager.AppSettings["AWS_SECRETKEY"]), myRegion);
-        var req = new DescribeInstancesRequest { InstanceIds = { ConfigurationManager.AppSettings["AWS_INSTANCEID"] } };
-
         // Recupera lo stato dell'instanza
+        var req = new DescribeInstancesRequest { InstanceIds = { ConfigurationManager.AppSettings["AWS_INSTANCEID"] } };
         DescribeInstancesResponse res = ec2Client.DescribeInstances(req);
 
         if (res.Reservations[0].Instances[0].State.Code != 80)
@@ -137,7 +160,20 @@ public partial class m_utilita_AWSClient_AWSClient : System.Web.UI.Page
         }
 
         StartInstancesRequest launchRequest = new StartInstancesRequest { InstanceIds = { ConfigurationManager.AppSettings["AWS_INSTANCEID"] } };
-        StartInstancesResponse launchResponse = ec2Client.StartInstances(launchRequest);
+
+        try
+        {
+            // avvia l'istanza      
+            StartInstancesResponse launchResponse = ec2Client.StartInstances(launchRequest);
+        }
+        catch (Exception err)
+        {
+            var thisPage = this.Page;
+            Utilities.CreateMessageAlert(ref thisPage, "Errore in avvio istanza Demo", "null");
+        }
+
+        // wait 1 sec   
+        System.Threading.Thread.Sleep(1000);
 
         SetPageData(); // refresh pagina
 
