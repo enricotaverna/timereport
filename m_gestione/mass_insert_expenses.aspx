@@ -101,7 +101,11 @@
             DSExpenses.InsertParameters("ClientManager_id").DefaultValue = result.Item1
             DSExpenses.InsertParameters("AccountManager_id").DefaultValue = result.Item2
 
-            DSExpenses.InsertParameters("AmountInCurrency").DefaultValue = NewAmount.Text * Convert.ToDouble(dr1(0)("ConversionRate"))
+            If Not (NewStorno.Checked) Then
+                DSExpenses.InsertParameters("AmountInCurrency").DefaultValue = NewAmount.Text * Convert.ToDouble(dr1(0)("ConversionRate"))
+            Else
+                DSExpenses.InsertParameters("AmountInCurrency").DefaultValue = -1 * NewAmount.Text * Convert.ToDouble(dr1(0)("ConversionRate"))
+            End If
 
             ' Log
             DSExpenses.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserId
