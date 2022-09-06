@@ -66,28 +66,25 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
         for (int i = 0; i < 12; i++)
         {
                        
-            HtmlTableRow row = new HtmlTableRow();
-            HtmlTableCell cell1 = new HtmlTableCell();
-
+            var urlBottone = "" ;
             if (!EsisteFile(sAnno, mese.ToString("MM"), mode))
             {
                 // se non esistono aggiunge cella con nome mese
-                cell1.InnerHtml = mfi.GetMonthName(i+1);
-                cell1.Align = "center";
-                row.Cells.Add(cell1);
+                ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a class='bottone-mese disabled' href = '#'>" + mfi.GetAbbreviatedMonthName(i + 1) + " </a>";
             }
             else  {
                 // se esistono file aggiunge cella con nome mese e link alla pagina
-                if (mode == "admin")
-                    cell1.InnerHtml = "<input type='button' class='bottone_lista grande' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "&mode=admin') />";
-                else
-                    cell1.InnerHtml = "<input type='button' class='bottone_lista grande' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "') />";
-
-                cell1.Align = "center";
-                row.Cells.Add(cell1);
+                if (mode == "admin") { 
+                    urlBottone = "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'";
+                    ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a href = " + urlBottone + "  class='bottone-mese'" + mfi.GetAbbreviatedMonthName(i + 1) + "</a>";
+                }
+                //cell1.InnerHtml = "<input type='button' class='bottone_lista grande' value=" + mfi.GetMonthName(i+1) + " onclick=window.open(" + "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "&mode=admin') />";
+                else {
+                    urlBottone = "'/timereport/report/ricevute/ricevute_list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'"; 
+                    ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a  class='bottone-mese'  href = " + urlBottone + ">" + mfi.GetAbbreviatedMonthName(i + 1) + "</a>";
+                }
             }
 
-            TabellaMesi.Rows.Add(row);
             mese = mese.AddMonths(1);
 
         } // for (int i = 0; i < 12; i++)

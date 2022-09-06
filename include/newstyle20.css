@@ -708,10 +708,38 @@ select {
     background-color: lightgray;
     padding: 2px;
 }
+/*#endregion */
 
 /*#region controlli form custom*/
 
 /**************** CSS Check Box ****************/
+
+.bottone-mese {
+    display: flex;
+    background-color: #e1e1e1;
+    color: black;
+    padding: 2px;
+    margin: 2px;
+    border: 1px solid white;
+    border-radius: 5px;
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+    align-items: center;
+}
+
+    .bottone-mese.disabled, .bottone-mese.disabled:hover {
+        background-color: white;
+        color: black;
+        cursor: default;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+    }
+
+    .bottone-mese:hover {
+        background-color: dodgerblue;
+        color: white;
+    }
 
 .css-checkbox {
     position: absolute;
@@ -910,10 +938,20 @@ select.parsley-error {
 
 /* ============ desktop view ============ */
 @media all and (min-width: 992px) {
-    .navbar .nav-item .dropdown-menu {display: none;}
-    .navbar .nav-item:hover .nav-link {    }
-    .navbar .nav-item:hover .dropdown-menu { display: block;}
-    .navbar .nav-item .dropdown-menu {margin-top: 0px;}
+    .navbar .nav-item .dropdown-menu {
+        display: none;
+    }
+
+    .navbar .nav-item:hover .nav-link {
+    }
+
+    .navbar .nav-item:hover .dropdown-menu {
+        display: block;
+    }
+
+    .navbar .nav-item .dropdown-menu {
+        margin-top: 0px;
+    }
 }
 /* ============ desktop view .end// ============ */
 
@@ -1004,7 +1042,7 @@ select.parsley-error {
     background-color: #fff;
     background-clip: border-box;
     border: 1px solid rgba(26,54,126,0.125);
-    border-radius: .25rem; 
+    border-radius: .25rem;
 }
 
 .card-body {

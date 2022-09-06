@@ -114,7 +114,7 @@
                         <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
 
                         <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/report/checkInput/Straordinari-select.aspx"/>
                     </div>
                     <!--End buttons-->
 

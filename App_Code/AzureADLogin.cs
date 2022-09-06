@@ -6,6 +6,7 @@ using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -35,6 +36,12 @@ public class AzureADAuth
     /// <param name="app"></param>
     public void Configuration(IAppBuilder app)
     {
+        ServicePointManager.Expect100Continue = true;
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                                               | SecurityProtocolType.Tls11
+                                               | SecurityProtocolType.Tls12
+                                               | SecurityProtocolType.Ssl3;
+
         app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
         app.UseCookieAuthentication(new CookieAuthenticationOptions());
@@ -43,11 +50,11 @@ public class AzureADAuth
         {
                 // Sets the ClientId, authority, RedirectUri as obtained from web.config
                 ClientId = clientId,
-            Authority = authority,
-            RedirectUri = redirectUri,
+                Authority = authority,
+                RedirectUri = redirectUri,
                 // PostLogoutRedirectUri is the page that users will be redirected to after sign-out. In this case, it is using the home page
                 PostLogoutRedirectUri = redirectUri,
-            Scope = OpenIdConnectScope.OpenIdProfile,
+                Scope = OpenIdConnectScope.OpenIdProfile,
                 // ResponseType is set to request the code id_token - which contains basic information about the signed-in user
                 ResponseType = OpenIdConnectResponseType.CodeIdToken,
                 // OpenIdConnectAuthenticationNotifications configures OWIN to send notification of failed authentications to OnAuthenticationFailed method

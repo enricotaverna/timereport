@@ -48,21 +48,21 @@
                         <table>
                             <tr>
                                 <td>
-                                    <asp:HyperLink ID="btPrev" Style="text-align: center" class='bottone_lista piccolo' runat="server"><<</asp:HyperLink></td>
+                                    <asp:HyperLink ID="btPrev" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-left'></i></asp:HyperLink></td>
                                 <td style="text-align: center; width:100%">
                                     <asp:Label ID="AnnoCorrente" runat="server"></asp:Label></td>
                                 <td>
-                                    <asp:HyperLink ID="btNext" Style="text-align: center" class='bottone_lista piccolo' runat="server">>></asp:HyperLink></td>
+                                    <asp:HyperLink ID="btNext" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-right'></i></asp:HyperLink></td>
                             </tr>
 
                         </table>
 
                     </div>
 
+                     <!-- *** SELEZIONE PER MESI ***  -->
                     <br />
-
-                    <table runat="server" id="TabellaMesi" style="margin: 0 auto;">
-                    </table>
+                    <div class="d-flex flex-wrap justify-content-center" runat="server" id="ListaMesi">
+                    </div>
 
                     <br />
 

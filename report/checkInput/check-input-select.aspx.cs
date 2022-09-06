@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Configuration;
 using System.IO;
+using System.Globalization;
 
 public partial class report_ricevute_ricevute_select : System.Web.UI.Page
 {
@@ -52,32 +53,17 @@ public partial class report_ricevute_ricevute_select : System.Web.UI.Page
 
         // init
         DateTime mese = new DateTime(2014, 1, 1);
- 
+        var urlBottone = "";
+
+        CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
+        DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
+
         // cicla per dodici mesi
         for (int i = 0; i < 12; i++)
         {
-                       
-            HtmlTableRow row = new HtmlTableRow();
-            HtmlTableCell cell1 = new HtmlTableCell();
 
-            // Commentato per rendere sempre attivi i link
-            //if ((DateTime.Now.Month - 1 > mese.Month & DateTime.Now.Year == Convert.ToInt16(sAnno) ) || DateTime.Now.Year > Convert.ToInt16(sAnno))
-            //{    
-            //    // > mese attuale
-            //    cell1.InnerHtml = mese.ToString("MMMM");
-            //    cell1.Align = "center";
-            //    cell1.Attributes.Add("class", "cella");
-            //    row.Cells.Add(cell1);
-            //}
-            //else  {
-                // se esistono file aggiunge cella con nome mese e link alla pagina
-                cell1.InnerHtml = "<a href='/timereport/report/checkInput/check-input-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "' ><input type='button' class='bottone_lista grande' value=" + mese.ToString("MMMM") + " /></a>";
-
-                cell1.Align = "center";
-                row.Cells.Add(cell1);
-            //}
-
-            TabellaMesi.Rows.Add(row);
+            urlBottone = "'/timereport/report/checkInput/check-input-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'";
+            ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a  class='bottone-mese'  href = " + urlBottone + ">" + mfi.GetAbbreviatedMonthName(i + 1) + "</a>";
             mese = mese.AddMonths(1);
 
         } // for (int i = 0; i < 12; i++)

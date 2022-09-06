@@ -18,7 +18,7 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -48,20 +48,20 @@
                         <table>
                             <tr>
                                 <td>
-                                    <asp:HyperLink ID="btPrev" Style="text-align: center" class='bottone_lista piccolo' runat="server" meta:resourcekey="btPrevResource1" Text="&lt;&lt;"></asp:HyperLink></td>
+                                    <asp:HyperLink ID="btPrev" Style="text-align: center" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-left'></i></asp:HyperLink></td>
                                 <td style="text-align: center; width: 100%">
                                     <asp:Label ID="AnnoCorrente" runat="server" meta:resourcekey="AnnoCorrenteResource1"></asp:Label></td>
                                 <td>
-                                    <asp:HyperLink ID="btNext" Style="text-align: center" class='bottone_lista piccolo' runat="server" meta:resourcekey="btNextResource1" Text="&gt;&gt;"></asp:HyperLink></td>
+                                    <asp:HyperLink ID="btNext" Style="text-align: center" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-right'></i></asp:HyperLink></td>
                             </tr>
 
                         </table>
                     </div>
 
+                     <!-- *** SELEZIONE PER MESI ***  -->
                     <br />
-
-                    <table runat="server" id="TabellaMesi">
-                    </table>
+                    <div class="d-flex flex-wrap justify-content-center" runat="server" id="ListaMesi">
+                    </div>
 
                     <br />
 

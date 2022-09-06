@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Configuration;
 using System.IO;
+using System.Globalization;
 
 public partial class straordinari_select : System.Web.UI.Page
 {
@@ -52,30 +53,26 @@ public partial class straordinari_select : System.Web.UI.Page
 
         // init
         DateTime mese = new DateTime(2014, 1, 1);
- 
+
+        CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
+        DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
+
         // cicla per dodici mesi
         for (int i = 0; i < 12; i++)
         {
-                       
-            HtmlTableRow row = new HtmlTableRow();
-            HtmlTableCell cell1 = new HtmlTableCell();
 
+            var urlBottone = "";
             if ((DateTime.Now.Month - 1 < mese.Month & DateTime.Now.Year == Convert.ToInt16(sAnno) ) || DateTime.Now.Year < Convert.ToInt16(sAnno) )
-            {    
+            {
                 // > mese attuale
-                cell1.InnerHtml = mese.ToString("MMMM");
-                cell1.Align = "center";
-                row.Cells.Add(cell1);
+                ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a class='bottone-mese disabled' href = '#'>" + mfi.GetAbbreviatedMonthName(i + 1) + " </a>";
             }
             else  {
                 // se esistono file aggiunge cella con nome mese e link alla pagina
-                cell1.InnerHtml = "<input type='button' onClick=\"location.href = '/timereport/report/Straordinari/Straordinari-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'\" class='bottone_lista grande' value=" + mese.ToString("MMMM") + " />";
-
-                cell1.Align = "center";
-                row.Cells.Add(cell1);
+                urlBottone = "'/timereport/report/Straordinari/Straordinari-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") +"'";
+                ListaMesi.InnerHtml = ListaMesi.InnerHtml + "<a  class='bottone-mese'  href = " + urlBottone + ">" + mfi.GetAbbreviatedMonthName(i + 1) + "</a>"; 
             }
 
-            TabellaMesi.Rows.Add(row);
             mese = mese.AddMonths(1);
 
         } // for (int i = 0; i < 12; i++)
