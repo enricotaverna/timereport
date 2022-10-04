@@ -25,17 +25,12 @@ public partial class Esporta : System.Web.UI.Page
 
         // inizializza bottoni toggle e DDL Persone e Progetti
         if (!IsPostBack)
-            InitPage();
-
-        if (!IsPostBack)
         {
-            // Popola dropdown con i valori          
-            ASPcompatility.SelectYears(ref DDLFromYear);
-            ASPcompatility.SelectYears(ref DDLToYear);
-            ASPcompatility.SelectMonths(ref DDLFromMonth, CurrentSession.Language );
-            ASPcompatility.SelectMonths(ref DDLToMonth, CurrentSession.Language);
-
+            InitPage();
+            // Recupera Default
+            FetchSelectionsValue();
         }
+
     }
 
     // inizializza
@@ -60,6 +55,12 @@ public partial class Esporta : System.Web.UI.Page
 
         CBLProgetti_Load();
         CBLPersone_Load();
+
+        // Popola dropdown con i valori          
+        ASPcompatility.SelectYears(ref DDLFromYear);
+        ASPcompatility.SelectYears(ref DDLToYear);
+        ASPcompatility.SelectMonths(ref DDLFromMonth, CurrentSession.Language);
+        ASPcompatility.SelectMonths(ref DDLToMonth, CurrentSession.Language);
 
         // default RadioButton
         if (RBTipoExport.SelectedValue == "" && RBTipoReport.SelectedValue == "")
@@ -91,7 +92,7 @@ public partial class Esporta : System.Web.UI.Page
         // *** ADMIN
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
-            if (bProgettiSelezionati && RBTipoExport.SelectedValue != "3") // sono stati selezionati dei progetti e non è il tipo export Not Chargable
+            if (bProgettiSelezionati) // sono stati selezionati dei progetti e non è il tipo export Not Chargable
                 sWhereClause = Addclause(sWhereClause, "Projects_id IN (" + sListaProgettiSel + " )");
 
             if (bPersoneSelezionate)
@@ -136,7 +137,8 @@ public partial class Esporta : System.Web.UI.Page
 
                 if ((bool)Session["bChargeableAndOthers"])
                     sWhereClause += " OR  ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
-                    " AND ( Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR ClientManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ")" +
+                    " AND ( Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + 
+                    " OR Manager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ")" +
                     " ) ) ";
                 else
                     sWhereClause += " ) ";
@@ -154,7 +156,9 @@ public partial class Esporta : System.Web.UI.Page
             sWhereClause = Addclause(sWhereClause, "company_id = " + ASPcompatility.FormatStringDb(DDLsocieta.SelectedValue));
 
         if (DDLManager.SelectedValue != "")
-            sWhereClause = Addclause(sWhereClause, "( ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) + " OR (ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + ") )" ) ;
+            sWhereClause = Addclause(sWhereClause, "( ClientManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
+                                                   " OR AccountManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
+                                                   " OR ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + " )" ) ;
 
         if (!string.IsNullOrEmpty(sWhereClause))
             sWhereClause = sWhereClause + " AND ";
@@ -218,17 +222,47 @@ public partial class Esporta : System.Web.UI.Page
         return;
     }
 
+    // salva i valori delle selezioni
+    protected void SaveSelectionsValue() {
+        Session["DDLManagerValue"] = DDLManager.SelectedValue;
+        Session["DDLFromMonthValue"] = DDLFromMonth.SelectedValue;
+        Session["DDLToMonthValue"] = DDLToMonth.SelectedValue;
+        Session["DDLFromYearValue"] = DDLFromYear.SelectedValue;
+        Session["DDLToYearValue"] = DDLToYear.SelectedValue;
+        Session["DDLClientiValue"] = DDLClienti.SelectedValue;
+        Session["DDLsocietaValue"] = DDLsocieta.SelectedValue;
+        Session["RBTipoExportValue"] = RBTipoExport.SelectedValue;
+       
+
+    }
+
+    // receuperai valori delle selezioni
+    protected void FetchSelectionsValue()
+    {
+        DDLManager.SelectedValue = Session["DDLManagerValue"] != null ? Session["DDLManagerValue"].ToString() : "";
+        DDLFromMonth.SelectedValue = Session["DDLFromMonthValue"] != null ? Session["DDLFromMonthValue"].ToString() : ""; 
+        DDLToMonth.SelectedValue = Session["DDLToMonthValue"] != null ? Session["DDLToMonthValue"].ToString() : ""; 
+        DDLFromYear.SelectedValue = Session["DDLFromYearValue"] != null ? Session["DDLFromYearValue"].ToString() : ""; 
+        DDLToYear.SelectedValue = Session["DDLToYearValue"] != null ? Session["DDLToYearValue"].ToString() : "";
+        DDLClienti.SelectedValue = Session["DDLClientiValue"] != null ? Session["DDLClientiValue"].ToString() : "";
+        DDLsocieta.SelectedValue = Session["DDLsocietaValue"] != null ? Session["DDLsocietaValue"].ToString() : "";
+        RBTipoExport.SelectedValue = Session["RBTipoExportValue"] != null ? Session["RBTipoExportValue"].ToString() : "";
+    }
+
     // Lancia report
     protected void Sottometti_Click(object sender, System.EventArgs e)
     {
         string sWhereClause = "";
+
+        // salva i valori in variabili di sessione per non doverli reinserire
+        SaveSelectionsValue();
 
         sWhereClause = Build_where();
 
         switch (RBTipoExport.SelectedValue)
         {
             case "1":
-                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription from v_ore where " + sWhereClause);
+                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager from v_ore where " + sWhereClause);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
             case "2":
@@ -291,9 +325,20 @@ public partial class Esporta : System.Web.UI.Page
     // Carica DDL progetti - Chiamato da evento OnLoad del DDL
     protected void CBLProgetti_Load()
     {
+        string whereClause = "";
 
-        if (Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-            DSProgetti.SelectCommand = "SELECT Projects_id, ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " + ((bool)Session["bProgettiAll"] == false ? " WHERE Active = 1 " : "") + " ORDER BY ProjectCode";
+        if (Auth.ReturnPermission("REPORT", "PROJECT_ALL")) {
+            
+            if ((bool) Session["bProgettiAll"] == false)
+                whereClause = Addclause(whereClause,  "Active = 1");
+
+            if ((bool)Session["bChargeableAndOthers"] == false)
+                whereClause = Addclause(whereClause, "ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] );
+
+            DSProgetti.SelectCommand = "SELECT Projects_id, ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " +
+                                        ( whereClause != "" ? ( "WHERE " + whereClause ) : "" ) +
+                                        " ORDER BY ProjectCode";
+        }
 
         // i progetti assegnati + quelli di cui è manager
         if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
