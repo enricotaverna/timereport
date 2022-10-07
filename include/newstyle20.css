@@ -896,20 +896,30 @@ select.parsley-error {
     color: #212529 !important;
     background-color: #eee;
 }
-
-    .btn-light:hover {
+   .btn-light:hover {
         color: #212529;
         background-color: #dbdbdb;
         border-color: #d5d5d5
     }
-/* Bottone grigio: End */
 
+.btn-primary {
+    background-color: #FFC339 !important;
+    border-color: #FFC339 !important;
+}
+
+.btn-outline-secondary {
+    border-color: #C7C7C7 !important;
+}
+
+
+/* Bottone grigio: End */
 .btn-warning {
     color: #FFF;
 }
 
 .btn {
     font-size: .8rem !important;
+   /* border-color: #C7C7C7 !important;*/
 }
 
 /* Footer */
