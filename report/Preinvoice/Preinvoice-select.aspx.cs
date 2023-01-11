@@ -1,0 +1,148 @@
+﻿using System;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class report_ricevute_select : System.Web.UI.Page
+{
+
+    // recupera oggetto sessione
+    public TRSession CurrentSession;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        Auth.CheckPermission("REPORT", "ECONOMICS");
+
+        // recupera oggetto con variabili di sessione
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
+        // Popola Drop Down con lista progetti
+        if (IsPostBack && Page.Request.Form["btnReport"] == null) { // Postback non triggerato da pulsante report
+            // Popola dropdown con i valori          
+            Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
+            Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
+            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
+            // recupera valori controlli
+            RipristinaControlli();
+        }
+
+    }
+
+    // Lancia Pagina con GridView per visualizzazione report
+    protected void sottometti_Click(object sender , System.EventArgs e ) {        
+        Button bt = (Button) sender;
+
+        if (bt.CommandName == "report") 
+            {
+                // salva valori controlli 
+                SalvaControlli();
+
+                //Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue +  "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue +
+                //                  "&persona=" + DDLPersone.SelectedValue + "&project=" + DDLProject.SelectedValue  + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
+            }
+        }
+
+    // salva valori dei controlli
+    protected void SalvaControlli()
+    {
+
+        foreach (Control control in FVForm.Controls)
+        {
+            if (control is DropDownList)
+            {
+                DropDownList ddl = (DropDownList)control;
+                // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
+               if (ddl.SelectedIndex != 0) 
+                Session[ddl.ID] = ddl.SelectedIndex;
+            }
+
+        }
+    }
+        // salva valori dei controlli
+        protected void RipristinaControlli()
+    {
+
+        foreach (Control control in FVForm.Controls)
+        {
+            if (control is DropDownList)
+            {
+                DropDownList ddl = (DropDownList)control;
+                // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
+                if (Session[ddl.ID] != null) 
+                    ddl.SelectedIndex = (int)Session[ddl.ID];
+            }
+
+        }
+    }
+
+
+    // Popola controllo in base ai carichi ore da data a data
+    protected void Bind_DDLSocietà(string DataDa, string DataA)
+    {
+        DDLSocieta.Items.Clear();
+        DDLSocieta.Visible = true;
+
+        DataTable dtSocieta = Database.GetData("SELECT DISTINCT hours.company_id, B.Name as companyName FROM Hours " + 
+                                               "INNER JOIN Company as B ON B.company_id = hours.company_id " + 
+                                               "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY companyName DESC", this.Page);
+
+        foreach (DataRow dtRow in dtSocieta.Rows) {
+            DDLSocieta.Items.Insert(0, new ListItem(dtRow["companyName"].ToString(), dtRow["company_id"].ToString()));
+        }
+
+        //DDLSocieta.Items.Insert(0, new ListItem("--- Tutte le società ---", "")); 
+    }
+
+    // Popola controllo in base ai carichi ore da data a data
+    protected void Bind_LBProgetti(string DataDa, string DataA)
+    {
+        LBProgetti.Items.Clear();
+        LBProgetti.Visible = true;
+
+        DataTable dtProgetti = Database.GetData("SELECT DISTINCT hours.projects_id, B.ProjectCode + ' ' + SUBSTRING(B.Name, 1, 20) as projectName FROM Hours " +
+                                               "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
+                                               "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
+
+        foreach (DataRow dtRow in dtProgetti.Rows)
+        {
+            LBProgetti.Items.Insert(0, new ListItem(dtRow["projectName"].ToString(), dtRow["projects_id"].ToString()));
+        }
+
+        //LBProgetti.Items.Insert(0, new ListItem("--- Tutti progetti ---", ""));
+
+    }
+
+    // Popola controllo in base ai carichi ore da data a data
+    protected void Bind_LBPersone(string DataDa, string DataA)
+    {
+        LBPersone.Items.Clear();
+        LBPersone.Visible = true;
+
+        DataTable dtPersone = Database.GetData("SELECT DISTINCT hours.persons_id, B.Name as Name FROM Hours " +
+                                               "INNER JOIN Persons as B ON B.persons_id = hours.persons_id " +
+                                               "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY B.Name DESC", this.Page);
+
+        foreach (DataRow dtRow in dtPersone.Rows)
+        {
+            LBPersone.Items.Insert(0, new ListItem(dtRow["Name"].ToString(), dtRow["persons_id"].ToString()));
+        }
+
+        //LBProgetti.Items.Insert(0, new ListItem("--- Tutti progetti ---", ""));
+
+    }
+
+    protected void report_Click(object sender, EventArgs e)
+    {
+
+        // salva variabili di sessioni
+        Session["PreinvDataA"] = TBDataA.Text;
+        Session["PreinvDataDa"] = TBDataDa.Text;
+        Session["PreinvSocieta"] = DDLSocieta.SelectedValue;
+        Session["PreinvProjectsId"] = Utilities.ListSelections(LBProgetti);
+        Session["PreinvPersonsId"] = Utilities.ListSelections(LBPersone);
+
+        // imposta il messaggio che verrò dato sulla pagina di menu
+        Response.Redirect("/timereport/report/preinvoice/preinvoice-form.aspx");
+    }
+}

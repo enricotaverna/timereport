@@ -34,6 +34,18 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         }
     }
 
+    protected void DSprojects_Insert(object sender, SqlDataSourceCommandEventArgs e)
+    {
+        e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
+        e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+    }
+
+    protected void DSprojects_Update(object sender, SqlDataSourceCommandEventArgs e)
+    {
+        e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
+        e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+    }
+
     protected void FVProgetto_ItemUpdated(Object sender, System.Web.UI.WebControls.FormViewUpdatedEventArgs e)
     {
         Response.Redirect("projects_lookup_list.aspx");

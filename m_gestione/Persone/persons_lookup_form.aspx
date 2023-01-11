@@ -593,7 +593,7 @@
 
     <asp:SqlDataSource runat="server" ID="DSSocieta"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT * FROM [Company]"></asp:SqlDataSource>
+        SelectCommand="SELECT * FROM [Company] ORDER BY Name"></asp:SqlDataSource>
 
     <asp:SqlDataSource ID="DSmanager" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"

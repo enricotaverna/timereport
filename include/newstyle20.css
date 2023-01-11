@@ -267,7 +267,14 @@ select {
     margin: 10px 30px 10px 10px;
     padding-bottom: 0px;
 }
-
+ 
+:
+.logTexText A {
+    float: left;
+    width: 2wi
+}
+ 
+ 
 .input2col {
     width: 98px;
     float: left;
@@ -391,6 +398,28 @@ select {
 
 .greybutton {
     width: 85px;
+    background-color: #e1e1e1;
+    border: 1px solid #e1e1e1;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    line-height: 20px;
+    font-size: 14px;
+    padding: 6px 6px;
+    color: dimgrey;
+    /*text-shadow: -1px -1px #BABABA;*/
+    float: right;
+    margin-left: 10px;
+    cursor: pointer;
+    outline: none;
+}
+
+.ui-dialog-titlebar-close {
+    background-image: url("/timereport/images/icons/16x16/cancel.png");
+    border-color: gray;
+}
+
+.ui-dialog-buttonset button {
     background-color: #e1e1e1;
     border: 1px solid #e1e1e1;
     -webkit-border-radius: 6px;

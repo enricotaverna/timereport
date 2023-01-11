@@ -268,8 +268,8 @@ public class Card
                 string sToDate = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month).ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
 
                 // spese totali
-                sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
-                "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
+                sql = "SELECT Round(Sum(AmountInCurrency),2) AS TotalAmount " +
+                "FROM  Expenses " +
                 "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
                 "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
@@ -278,7 +278,7 @@ public class Card
 
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
-                kpi.KPIValue = (result == DBNull.Value) ? "0€" : result.ToString() + "€";
+                kpi.KPIValue = (result == DBNull.Value) ? "0€" : Convert.ToDouble(result).ToString("#,0.00") + "€";
                 KPIList.Add(kpi);
 
                 // chilometri     
@@ -297,8 +297,8 @@ public class Card
                 KPIList.Add(kpi);
 
                 // spese da rimborsare
-                sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
-                "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
+                sql = "SELECT Round(Sum(AmountInCurrency),2) AS TotalAmount " +
+                "FROM  Expenses " +
                 "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
                 "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
                 "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND Expenses.CreditCardPayed = 0 AND Expenses.CompanyPayed = 0 ";
@@ -362,7 +362,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(SpeseNelMese);
         listaCard.Add(CVdaConfermare);
         listaCard.Add(ListaLocation);
-        listaCard.Add(ContrattiSubco);
+        //listaCard.Add(ContrattiSubco);
     }
 
     // UpdateCardKPI()
@@ -458,8 +458,8 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         else
             query = query + "WHERE ";
 
-        query = query + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) + 
-//        " AND ( NOT( B.Contratto_da <= " + sToday + " AND B.Contratto_a >= " + sToday + ") OR B.Contratto_da IS NULL ) " +
+        query = query + "B.userLevel_id = 1 AND A.DATE > " + ASPcompatility.FormatDateDb(SubcoDateToCheck.ToString("dd/MM/yyyy")) +
+        //        " AND ( NOT( B.Contratto_da <= " + sToday + " AND B.Contratto_a >= " + sToday + ") OR B.Contratto_da IS NULL ) " +
         "GROUP BY B.NAME, C.name, B.Contratto_da,  B.Contratto_a, D.Name, A.persons_id";
 
         // esegue select e costruisce la stringa JSON

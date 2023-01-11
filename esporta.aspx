@@ -99,7 +99,7 @@
 
                                     <span>
                                         <asp:ListBox ID="CBLProgetti" runat="server" SelectionMode="Multiple" DataSourceID="DSProgetti" DataTextField="txtcodes"
-                                            DataValueField="Projects_id"  data-placeholder="<%$ Resources:selprogetti%>" ></asp:ListBox> <%--OnSelectedIndexChanged="CBLProgetti_SelectedIndexChanged"--%>
+                                            DataValueField="Projects_id"  data-placeholder="<%$ Resources:selprogetti%>" ></asp:ListBox> 
                                     </span>
 
                                 </div>

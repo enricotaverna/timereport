@@ -47,75 +47,26 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
     public string GetPersonsCostRateTable(string sAnno)
     {
 
-        DataTable dt = new DataTable();
-
         String query =  "SELECT A.PersonsCostRate_id, A.Persons_id, A.CostRate, A.Comment, CONVERT(VARCHAR(10),A.DataDa, 103) as DataDa, CONVERT(VARCHAR(10),A.DataA, 103) as DataA, B.Name as PersonName, C.Name as CompanyName FROM PersonsCostRate as A " +
                         " JOIN Persons as B ON B.Persons_id = A.Persons_id " +
                         " JOIN Company as C ON C.Company_id = B.Company_id " +
                         " WHERE active = 'true' ORDER BY A.DataDa DESC, PersonName";
-        string sRet;
 
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-        {
-            using (SqlCommand cmd = new SqlCommand(query, con))
-            {
-                con.Open();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-                Dictionary<string, object> row;
-                foreach (DataRow dr in dt.Rows)
-                {
-                    row = new Dictionary<string, object>();
-                    foreach (DataColumn col in dt.Columns)
-                    {
-                        row.Add(col.ColumnName, dr[col]);
-                    }
-                    rows.Add(row);
-                }
-                sRet = serializer.Serialize(rows);
-                return sRet;
-            }
-        }
+        return Database.FromSQLSelectToJson(query);
+
     }
 
     [WebMethod(EnableSession = true)]
     public string GetProjectCostRateTable(string sAnno)
     {
 
-        DataTable dt = new DataTable();
-
         String query =  "SELECT A.ProjectCostRate_id, A.Persons_id, A.CostRate, A.Comment, A.BillRate, CONVERT(VARCHAR(10),A.DataDa, 103) as DataDa, CONVERT(VARCHAR(10),A.DataA, 103) as DataA, B.Name as PersonName, C.Name as CompanyName, D.ProjectCode, D.Name as ProjectName, D.Projects_id FROM ProjectCostRate as A " +
                         " JOIN Persons as B ON B.Persons_id = A.Persons_id " +
                         " JOIN Company as C ON C.Company_id = B.Company_id " +
                         " JOIN Projects as D ON D.Projects_id = A.Projects_id " +
                         " WHERE B.active = 'true' AND D.active = 'true' ORDER BY A.DataDa DESC, PersonName, D.Name";
-        string sRet;
 
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-        {
-            using (SqlCommand cmd = new SqlCommand(query, con))
-            {
-                con.Open();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-                Dictionary<string, object> row;
-                foreach (DataRow dr in dt.Rows)
-                {
-                    row = new Dictionary<string, object>();
-                    foreach (DataColumn col in dt.Columns)
-                    {
-                        row.Add(col.ColumnName, dr[col]);
-                    }
-                    rows.Add(row);
-                }
-                sRet = serializer.Serialize(rows);
-                return sRet;
-            }
-        }
+        return Database.FromSQLSelectToJson(query);
     }
 
     [WebMethod(EnableSession = true)]

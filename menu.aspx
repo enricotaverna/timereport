@@ -126,7 +126,7 @@
 
                 <!--  *** Box Controllo contratti Subco ***    -->
                 <div class="col-md-4" id="ContrattiSubco" runat="server">
-                    <div class="card my-2 widget-content hoverOn">
+<%--                    <div class="card my-2 widget-content hoverOn">
                         <div class="widget-content-wrapper">
                             <div class="widget-content-left">
                                 <div class="widget-heading">Subco senza contratto</div>
@@ -136,7 +136,7 @@
                                 <div class="widget-numbers"><span id="ContrattiSubco-KPIValue0">0</span></div>
                             </div>
                         </div>
-                    </div>
+                    </div>--%>
                 </div>
 
                 <!--  *** Box ASSENZE ***    -->
@@ -293,6 +293,10 @@
     <!-- *** JAVASCRIPT ***-->
     <script type="text/javascript">
 
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
         $(document).ready(function () {
 
             $("#RichiesteAperte").click(function () {
@@ -323,9 +327,9 @@
                 location.href = "/timereport/m_gestione/curricula/CV_list.aspx";
             });
 
-            $("#ContrattiSubco").click(function () {
-                location.href = "/timereport/m_gestione/ContrattiSubco/ContrattiSubco.aspx";
-            });
+            //$("#ContrattiSubco").click(function () {
+            //    location.href = "/timereport/m_gestione/ContrattiSubco/ContrattiSubco.aspx";
+            //});
 
             // Richiama Web Service per aggiornamento KPI
             var values = "{ iPersons_id : '<%= CurrentSession.Persons_id.ToString()  %>', cutoffDate :  '<%= CurrentSession.sCutoffDate  %>'  }";
@@ -333,7 +337,7 @@
                 type: "POST",
                 url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateCardKPI",
                 data: values,
-                async: false,
+                async: true,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
 
@@ -364,10 +368,6 @@
                 }
             }); // ajax
         });
-
-        // include di snippet html per menu and background color mgt
-        includeHTML();
-        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
     </script>
 

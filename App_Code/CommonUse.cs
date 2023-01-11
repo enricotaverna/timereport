@@ -8,10 +8,8 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
-using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.UI;
@@ -683,10 +681,16 @@ public class CheckChiusura
                                              " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"]  + "  AND " +
                                              " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
 
-        DataTable dtHomeOffice = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
-                                             " FROM Hours AS a " +
-                                             " WHERE LocationDescription LIKE '%" + ConfigurationManager.AppSettings["HOME_OFFICE"] + "%'  AND " +
-                                             " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
+        DataTable dtHomeOffice = new DataTable();
+        if (ConfigurationManager.AppSettings["CHECK_HOMEOFFICE"] == "true")
+            dtHomeOffice = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
+                                                 " FROM Hours AS a " +
+                                                 " WHERE LocationDescription LIKE '%" + ConfigurationManager.AppSettings["HOME_OFFICE"] + "%'  AND " +
+                                                 " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
+        else
+            dtHomeOffice = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
+                                                 " FROM Hours AS a " +
+                                                 " WHERE date = '01-01-9999'", null); // per riempire lo schema della tabella
 
         //dtFerie.PrimaryKey = new DataColumn[] { dtFerie.Columns["hours_id"] };
 
@@ -739,6 +743,9 @@ public class CheckChiusura
 
         int iRet = 0;
         ListaAnomalie.Clear();
+
+        if (ConfigurationManager.AppSettings["CHECK_HOMEOFFICE"] == "false")
+            return 2;
 
         string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
         string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
@@ -871,198 +878,6 @@ public class CheckChiusura
     }
 }
 
-public class Database
-{
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static object ExecuteScalar(string cmdText, Page mypage)
-    {
-        string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-        object oRet;
-
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            DataTable dtRecord = new DataTable();
-            using (SqlCommand cmd = new SqlCommand(cmdText, connection))
-            {
-                try
-                {
-                    connection.Open(); // Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
-                    oRet = cmd.ExecuteScalar();
-                }
-                catch (Exception ex)
-                {
-                    if (!(mypage == null))
-                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteScalar: " + ex.Message + "');", true);
-                    oRet = 0;
-                }
-            }
-        }
-
-        return oRet;
-    }
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static bool ExecuteSQL(string cmdText, Page mypage)
-    {
-        string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            using (SqlCommand cmd = new SqlCommand(cmdText, connection))
-            {
-                try
-                {
-                    connection.Open(); // Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
-                    cmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    if (!(mypage == null))
-                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteSQL: " + ex.Message + "');", true);
-                    return false; 
-                }
-            }
-        }
-        return true;
-    }
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static bool RecordEsiste(string cmdText)
-    {
-        return RecordEsiste(cmdText, null/* TODO Change to default(_) if this is not a reference type */);
-    }
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static bool RecordEsiste(string cmdText, Page mypage)
-    {
-        // 02-09-2018 FUNZIONE MIGRATA
-        bool result = false;
-
-        var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            DataTable dtRecord = new DataTable();
-            using (SqlDataAdapter da = new SqlDataAdapter(cmdText, connection))
-            {
-                try
-                {
-                    connection.Open(); // Not necessarily needed In this Case because DataAdapter.Fill does it otherwise 
-                    da.Fill(dtRecord);
-
-                    if (dtRecord.Rows.Count >= 1)
-                        result = true;
-                    else
-                        result = false;
-                }
-                catch (Exception ex)
-                {
-                    if (!(mypage == null))
-                        mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE RecordEsiste: " + ex.Message + "');", true);
-                    result = false;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static DataTable GetData(string cmdText, Page mypage)
-    {
-        DataTable dt = new DataTable();
-
-        using (SqlConnection lCon = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-        {
-            using (SqlCommand cmd = lCon.CreateCommand())
-            {
-                lCon.Open();
-                using (var sda = new SqlDataAdapter(cmd))
-                {
-                    try
-                    {
-                        cmd.CommandText = cmdText;
-                        cmd.CommandType = CommandType.Text;
-                        sda.Fill(dt);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (!(mypage == null))
-                            mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE GetData: " + ex.Message + "');", true);
-                    }
-                }
-            }
-        }
-
-        return dt;
-    }
-
-    // 02-09-2018 FUNZIONE MIGRATA
-    public static DataRow GetRow(string cmdText, Page mypage)
-    {
-        DataTable dtTable = Database.GetData(cmdText, mypage);
-        DataRow drRet;
-
-        if ((dtTable.Rows.Count > 0))
-            drRet = dtTable.Rows[0];
-        else
-            drRet = null/* TODO Change to default(_) if this is not a reference type */;
-
-        return drRet;
-    }
-
-    // 30-10-2018: Ritorna ultimo Id Creato
-    public static int GetLastIdInserted(string cmd)
-    {
-        string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-        int iNewId = 0;
-
-        try
-        {
-   
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                // recupera nuovo inserimento
-                using (SqlCommand cmdId = new SqlCommand(cmd, connection))
-                {
-                    connection.Open();
-                    iNewId = (int)cmdId.ExecuteScalar(); // ultimo id inserito
-                }
-            }
-        }
-        catch (Exception e)
-        {
-        }
-
-        return iNewId;
-
-    }
-
-    // 04.2020 : converte datatable a Json
-    public static string FromDatatableToJson(DataTable dt) {
-
-        string sret;
-
-        System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
-        Dictionary<string, object> row;
-        foreach (DataRow dr in dt.Rows)
-        {
-            row = new Dictionary<string, object>();
-            foreach (DataColumn col in dt.Columns)
-            {
-                row.Add(col.ColumnName, dr[col]);
-            }
-            rows.Add(row);
-        }
-        sret = serializer.Serialize(rows);
-
-        return sret;
-   
-    }
-
-}
-
 public class ASPcompatility
 {
     public static string FormatNumberDB(double InputNumber)
@@ -1151,7 +966,15 @@ public class ASPcompatility
 
     public static string LastDay(int Month, int Year)
     {
-        string sRet = DateTime.DaysInMonth(Convert.ToInt32(Year), Convert.ToInt32(Month)).ToString();
+        /* refactoring 2/1/22 */
+        string sRet; 
+        string sDay = DateTime.DaysInMonth(Convert.ToInt32(Year), Convert.ToInt32(Month)).ToString();
+
+        if (Month > 9)
+            sRet = sDay + "/" + Month + "/" + Year;
+        else
+            sRet = sDay + "/" + "0" + Month + "/" + Year;
+
         return sRet;
     }
 

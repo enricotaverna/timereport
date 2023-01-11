@@ -289,6 +289,7 @@
                 { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
                 { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
                 { title: "Cost Rate", field: "CostRate", sorter: "number", width: 80, headerFilter: true },
+                { title: "Nota", field: "Comment", sorter: "string", width: 200, headerFilter: true },
             <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE"))
         {
             Response.Write("{ formatter: trashIcon, width: 40, align: \"center\", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },");

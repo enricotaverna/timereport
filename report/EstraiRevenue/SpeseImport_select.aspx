@@ -54,7 +54,7 @@
                     <div class="input nobottomborder">
                         <div class="inputtext">File (.xls)</div>
                         <asp:FileUpload ID="FileUpload" runat="server" class="jfilestyle" data-text="seleziona" data-inputSize="160px" accept=".xlsx"
-                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-obbligofile="true" />
+                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="" data-parsley-obbligofile="true"  />
                     </div>
 
                     <div class="input nobottomborder">
