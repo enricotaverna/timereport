@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Globalization;
 
 // Dati ricevuti da chiamate ajax
 public class ProjectInput // 
@@ -40,6 +41,8 @@ public class ProjectInput //
     public string MargineProposta { get; set; }
     public string DataInizio { get; set; }
     public string DataFine { get; set; }
+    public string BloccoCaricoSpese { get; set; }
+    public string ActivityOn { get; set; }
     public string ProcessingMessage { get; set; }
 }
 
@@ -111,11 +114,11 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("Active", "boolean", "true" ),
                                            new Record("NoOvertime", "boolean", "false" ),
                                            new Record("TestoObbligatorio", "boolean", "false" ),
-                                           new Record("BloccoCaricoSpese", "boolean", "false" ),
-                                           new Record("ActivityOn", "boolean", "false" ),
+                                           new Record("BloccoCaricoSpese", "boolean", null ),
+                                           new Record("ActivityOn", "boolean", null ),
                                            new Record("Always_available", "boolean", "false" ),
-                                           new Record("CreationDate", "date", null ), // gestite automaticamente
-                                           new Record("CreatedBy", "string", null ) // gestite automaticamente
+                                           new Record("CreationDate", "timestamp", "CreationDate" ), // gestite automaticamente
+                                           new Record("CreatedBy", "author", "CreatedBy" ) // gestite automaticamente
                         };
 
     /* nome campo da aggiornare, tipo, default */
@@ -125,8 +128,8 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("DataDa", "date", null ),
                                            new Record("DataA", "date", null ),
                                            new Record("Comment", "string", null ),
-                                           new Record("CreationDate", "date", null ), // gestite automaticamente
-                                           new Record("CreatedBy", "string", null ) // gestite automaticamente
+                                           new Record("CreationDate", "timestamp", "CreationDate" ), // gestite automaticamente
+                                           new Record("CreatedBy", "author", "CreatedBy" ) // gestite automaticamente
                         };
 
     /* nome campo da aggiornare, tipo, default */
@@ -138,8 +141,8 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("DataDa", "date", null ),
                                            new Record("DataA", "date", null ),
                                            new Record("Comment", "string", null ),
-                                           new Record("CreationDate", "date", null ), // gestite automaticamente
-                                           new Record("CreatedBy", "string", null ) // gestite automaticamente
+                                           new Record("CreationDate", "timestamp", "CreationDate" ), // gestite automaticamente
+                                           new Record("CreatedBy", "author", "CreatedBy" ) // gestite automaticamente
                         };
 
     public WS_Caricatore()
@@ -235,19 +238,26 @@ public class WS_Caricatore : System.Web.Services.WebService
                 object valore;
 
                 if (rec.Default == null) // valore di default
-                    if (rec.Campo == "CreationDate")
-                        valore = DateTime.Now.ToString("dd/MM/yyyy");
-                    else if (rec.Campo == "CreatedBy")
-                        valore = CurrentSession.UserName;
-                    else
                     valore = prop.GetValue(r);
                 else
                     valore = rec.Default ;
 
                 switch (rec.Tipo) {
 
+                    case "author":
+                        SQLInsert += ASPcompatility.FormatStringDb(CurrentSession.UserId) + ",";
+                        break;
+
+                    case "timestamp":
+                        SQLInsert += ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + ",";
+                        break;
+
                     case "date":
                         SQLInsert += ASPcompatility.FormatDateDb(valore.ToString()) + ",";
+                        break;
+
+                    case "boolean":
+                        SQLInsert += ASPcompatility.FormatStringDb(valore.ToString()) + ",";
                         break;
 
                     case "percent":

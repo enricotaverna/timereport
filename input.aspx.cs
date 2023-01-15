@@ -578,7 +578,7 @@ WFIcon = "";
                 "'false' ," +
                 "'false' ," +
                 "'" + CurrentSession.UserId  + "' ," +
-                ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
+                ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " ," +
                 "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
                 "'" + result.Item1 + "' ," +
                 "'" + result.Item2 + "' ," +

@@ -16,7 +16,10 @@ public class PersonsCostRate
     public string DataDa { get; set; }
     public string DataA{ get; set; }
     public string Comment { get; set; }
-
+    public string CreationDate { get; set; }
+    public string CreatedBy { get; set; }
+    public string LastModificationDate { get; set; }
+    public string LastModifiedBy { get; set; }
 }
 
 // Estende la classe aggiungendo le chiavi per gestire il progetto
@@ -77,6 +80,7 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
 
         int newIdentity = 0;
         string sSQL = "";
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
         // formatta campi numerici
         if (CostRate == null)
@@ -88,15 +92,19 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
                   "Comment = " + ASPcompatility.FormatStringDb(Comment) + " , " +
                   "CostRate = " + ASPcompatility.FormatStringDb(CostRate) + " , " +
                   "DataDa = " + ASPcompatility.FormatDateDb(DataDa) + " , " +
-                  "DataA = " + ASPcompatility.FormatDateDb(DataA) +
+                  "DataA = " + ASPcompatility.FormatDateDb(DataA) + " , " +
+                  "LastModificationDate = " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " , " +
+                  "LastModifiedBy = " + ASPcompatility.FormatStringDb(CurrentSession.UserId) +
                   " WHERE PersonsCostRate_id = " + ASPcompatility.FormatNumberDB(PersonsCostRate_id);
         else
-            sSQL = "INSERT INTO PersonsCostRate (Persons_id, CostRate, Comment, DataDa, DataA ) " +
+            sSQL = "INSERT INTO PersonsCostRate (Persons_id, CostRate, Comment, DataDa, DataA, CreatedBy, CreationDate ) " +
                             " VALUES (" + ASPcompatility.FormatStringDb(Persons_id) + ", " +
                                           ASPcompatility.FormatStringDb(CostRate) + ", " +
                                           ASPcompatility.FormatStringDb(Comment) + ", " +
                                           ASPcompatility.FormatDateDb(DataDa) + ", " +
-                                          ASPcompatility.FormatDateDb(DataA) + " )";
+                                          ASPcompatility.FormatDateDb(DataA) + ", " +
+                                          ASPcompatility.FormatStringDb(CurrentSession.UserId) + ", " +
+                                          ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " )";
 
         bool bResult = Database.ExecuteSQL(sSQL, null);
 
@@ -118,6 +126,7 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
 
         int newIdentity = 0;
         string sSQL = "";
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
         // formatta campi numerici
         if (CostRate == null)
@@ -131,17 +140,21 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
                   "CostRate = " + ASPcompatility.FormatStringDb(CostRate) + " , " +
                   "BillRate = " + ASPcompatility.FormatStringDb(BillRate) + " , " +
                   "DataDa = " + ASPcompatility.FormatDateDb(DataDa) + " , " +
-                  "DataA = " + ASPcompatility.FormatDateDb(DataA) +
+                  "DataA = " + ASPcompatility.FormatDateDb(DataA) +  " , " +
+                  "LastModificationDate = " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " , " +
+                  "LastModifiedBy = " + ASPcompatility.FormatStringDb(CurrentSession.UserId) +
                   " WHERE ProjectCostRate_id = " + ASPcompatility.FormatNumberDB(ProjectCostRate_id);
         else
-            sSQL = "INSERT INTO ProjectCostRate (Persons_id, Projects_id, CostRate, BillRate, Comment, DataDa, DataA ) " +
+            sSQL = "INSERT INTO ProjectCostRate (Persons_id, Projects_id, CostRate, BillRate, Comment, DataDa, DataA, CreatedBy, CreationDate ) " +
                             " VALUES (" + ASPcompatility.FormatStringDb(Persons_id) + ", " +
                                           ASPcompatility.FormatStringDb(Projects_id) + ", " +
                                           ASPcompatility.FormatStringDb(CostRate) + ", " +
                                           ASPcompatility.FormatStringDb(BillRate) + ", " +
                                           ASPcompatility.FormatStringDb(Comment) + ", " +
                                           ASPcompatility.FormatDateDb(DataDa) + ", " +
-                                          ASPcompatility.FormatDateDb(DataA) + " )";
+                                          ASPcompatility.FormatDateDb(DataA)  + ", " +
+                                          ASPcompatility.FormatStringDb(CurrentSession.UserId) + ", " +
+                                          ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " )";
 
         bool bResult = Database.ExecuteSQL(sSQL, null);
 
@@ -212,7 +225,10 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
             rc.DataDa = dt.Rows[0]["DataDa"].ToString().Substring(0, 10);
             rc.DataDa = rc.DataDa == "01/01/1900" ? "" : rc.DataDa;
             rc.Comment = dt.Rows[0]["Comment"].ToString();
-
+            rc.CreationDate = dt.Rows[0]["CreationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["CreationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.LastModificationDate = dt.Rows[0]["LastModificationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["LastModificationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.CreatedBy = dt.Rows[0]["CreatedBy"].ToString();
+            rc.LastModifiedBy = dt.Rows[0]["LastModifiedBy"].ToString();
         }
         return rc;
     }
@@ -242,6 +258,11 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
             rc.DataDa = dt.Rows[0]["DataDa"].ToString().Substring(0, 10);
             rc.DataDa = rc.DataDa == "01/01/1900" ? "" : rc.DataDa;
             rc.Comment = dt.Rows[0]["Comment"].ToString();
+            rc.CreationDate = dt.Rows[0]["CreationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["CreationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.LastModificationDate = dt.Rows[0]["LastModificationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["LastModificationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.CreatedBy = dt.Rows[0]["CreatedBy"].ToString();
+            rc.LastModifiedBy = dt.Rows[0]["LastModifiedBy"].ToString();
+
         }
         return rc;
     }

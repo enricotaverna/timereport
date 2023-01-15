@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -39,6 +40,7 @@ public class TRSession
     public string BackgroundColor;
     public string BackgroundImage;
     public int Calendar_id;
+    public CultureInfo defaultCulture;
 
     public TRSession(int inputPersons_id) {
         Persons_id = inputPersons_id;
@@ -149,6 +151,9 @@ public class TRSession
             BackgroundColor = "";
             BackgroundImage = BkgImg;
         }
+
+        // culture
+        defaultCulture= CultureInfo.GetCultureInfo("it-IT");
 
     }
 

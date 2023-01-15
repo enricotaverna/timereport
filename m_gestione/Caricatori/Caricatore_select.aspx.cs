@@ -49,6 +49,7 @@ public partial class SFimport_select : System.Web.UI.Page
         new Colonna() { valore = "DataInizio", tipo = "date" },
         new Colonna() { valore = "DataFine", tipo = "date"},
         new Colonna() { valore = "BloccoCaricoSpese", tipo = "boolean" },
+        new Colonna() { valore = "ActivityOn", tipo = "boolean" },
     };
 
     private static List<Colonna> ColonneFLC = new List<Colonna>() {
@@ -247,7 +248,7 @@ public partial class SFimport_select : System.Web.UI.Page
                             drCheck["ProcessingMessage"] = "Il valore " + valoreCellaStr + " di " + nomeColonna.valore + " non è un flag.";
                             continue;
                         }
-                        drCheck[nomeColonna.valore] = valoreCellaStr;
+                        drCheck[nomeColonna.valore] = valoreCellaStr == "" ? "false" : "true";
                         break;
 
                     case "string":

@@ -120,6 +120,19 @@
                                         </label>
                                     </div>
 
+                                    <!-- *** data creazione/modifica ***  -->
+                                    <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 30px; position: relative">
+                                        <span style="width:50px;display:inline-block">Creazione: </span>
+                                        <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <br />
+                                        <span style="width:50px;display:inline-block">Modifica:</span>
+                                        <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label6" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                    </div>
+
                                 </div>
                                 <!-- *** TAB 1 ***  -->
 
@@ -413,7 +426,7 @@
                                         <asp:Label ID="Label16" CssClass="inputtext" runat="server" Text="Società:"></asp:Label>
                                         <label class="dropdown" style="width: 190px">
                                             <asp:DropDownList ID="DDLSocieta" runat="server" DataSourceID="DSSocieta"
-                                                DataTextField="Name" DataValueField="Company_id"
+                                                DataTextField="Name" DataValueField="Company_id" data-parsley-errors-container="#valMsg" required
                                                 SelectedValue='<%# Bind("company_id") %>' AppendDataBoundItems="True">
                                                 <asp:ListItem Value="" Text="Seleziona un valore" />
                                             </asp:DropDownList>
@@ -510,8 +523,9 @@
     <asp:SqlDataSource ID="DSPersone" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [Persons] WHERE ([Persons_id] = @Persons_id)"
-        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a]) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a)"
-        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a WHERE [Persons_id] = @Persons_id" OnInserted="DSPersone_Inserted">
+        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a], [CreationDate], [CreatedBy] ) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a, @CreationDate, @CreatedBy)"
+        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy WHERE [Persons_id] = @Persons_id"  
+        OnInserting="DSpersons_Insert" OnUpdating="DSpersons_Update">
         <InsertParameters>
             <asp:Parameter Name="Name" Type="String" />
             <asp:Parameter Name="Roles_Id" Type="Int32" />
@@ -539,6 +553,8 @@
             <asp:Parameter Name="ConsultantType_id" Type="Int32" />
             <asp:Parameter Name="Contratto_da" Type="DateTime" />
             <asp:Parameter Name="Contratto_a" Type="DateTime" />
+            <asp:Parameter Name="CreatedBy" Type="String"/>
+            <asp:Parameter Name="CreationDate" Type="DateTime" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="Persons_id" QueryStringField="persons_id"
@@ -572,6 +588,8 @@
             <asp:Parameter Name="ConsultantType_id" Type="Int32" />
             <asp:Parameter Name="Contratto_da" Type="DateTime" />
             <asp:Parameter Name="Contratto_a" Type="DateTime" />
+            <asp:Parameter Name="LastModifiedBy" Type="String"/>
+            <asp:Parameter Name="LastModificationDate" Type="DateTime"/>
         </UpdateParameters>
     </asp:SqlDataSource>
 

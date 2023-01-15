@@ -18,7 +18,7 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -27,7 +27,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title><asp:Literal runat="server" Text="Anagrafica progetto" /></title>
+    <title>
+        <asp:Literal runat="server" Text="Anagrafica progetto" /></title>
 </head>
 
 <body>
@@ -39,7 +40,7 @@
     <div class="container MainWindowBackground">
         <form id="formProgetto" runat="server">
 
-            <div class="row justify-content-center" >
+            <div class="row justify-content-center">
 
                 <div id="FormWrap" class="StandardForm col-5">
 
@@ -83,69 +84,81 @@
                                     <!-- *** CODICE CLIENTE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Cliente:</div>
-                                            <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente"
-                                                DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("CodiceCliente") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente"
+                                            DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("CodiceCliente") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CODICE MANAGER ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Manager:</div>
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ClientManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ClientManager_id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Account:</div>
-                                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("AccountManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("AccountManager_id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** TIPO PROGETTO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo progetto:</div>
-                                            <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
-                                                DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ProjectType_Id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
+                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
-                                            <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
-                                                DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Channels_Id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
+                                            DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Channels_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** SOCIETA ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Società:</div>
-                                            <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa"
-                                                DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Company_id") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa"
+                                            DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Company_id") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
-
+                                    <!-- *** data creazione/modifica ***  -->
+                                    <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 30px; position: relative">
+                                        <span style="width:50px;display:inline-block">[C]</span>
+                                        <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <br />
+                                        <span style="width:50px;display:inline-block">[M]</span>
+                                        <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label12" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                    </div>
                                 </div>
+
                                 <!-- *** TAB 1 ***  -->
 
                                 <div id="tabs-2" style="height: 460px; width: 100%">
@@ -153,13 +166,13 @@
                                     <!-- *** TIPO CONTRATTO ***  -->
                                     <div class="input ">
                                         <div class="inputtext">Contratto: </div>
-                                            <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TipoContratto" DataTextField="Descrizione"
-                                                DataValueField="TipoContratto_id"
-                                                SelectedValue='<%# Bind("TipoContratto_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="TipoContratto" DataTextField="Descrizione"
+                                            DataValueField="TipoContratto_id"
+                                            SelectedValue='<%# Bind("TipoContratto_id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="SeparatoreForm">Budget</div>
@@ -241,22 +254,22 @@
                                     <!-- *** Metodo di pagamento ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Metodo di pag: </div>
-                                            <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="MetodoPagamento" DataTextField="Descrizione"
-                                                DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="MetodoPagamento" DataTextField="Descrizione"
+                                            DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** Termini di pagamento ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Termini di pag: </div>
-                                            <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TerminiPagamento" DataTextField="Descrizione"
-                                                DataValueField="TerminiPagamento"
-                                                SelectedValue='<%# Bind("TerminiPagamento") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="TerminiPagamento" DataTextField="Descrizione"
+                                            DataValueField="TerminiPagamento"
+                                            SelectedValue='<%# Bind("TerminiPagamento") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="SeparatoreForm">Actual</div>
@@ -324,11 +337,11 @@
                                     <!-- *** Tipo Workflow ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo Workflow</div>
-                                            <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
-                                                DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
+                                            DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="input nobottomborder">
@@ -383,65 +396,65 @@
                                     <!-- *** CODICE CLIENTE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Cliente:</div>
-                                            <asp:DropDownList ID="DropDownList10" runat="server" DataSourceID="cliente"
-                                                DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("CodiceCliente") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList10" runat="server" DataSourceID="cliente"
+                                            DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("CodiceCliente") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CODICE MANAGER ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Manager:</div>
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ClientManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ClientManager_id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Account:</div>
-                                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("AccountManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("AccountManager_id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** TIPO PROGETTO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo progetto:</div>
-                                            <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
-                                                DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ProjectType_Id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
+                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
-                                            <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
-                                                DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Channels_Id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
+                                            DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Channels_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** SOCIETA ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Società:</div>
-                                            <asp:DropDownList ID="DropDownList14" runat="server" DataSourceID="societa"
-                                                DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Company_id") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList14" runat="server" DataSourceID="societa"
+                                            DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Company_id") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
 
@@ -543,22 +556,22 @@
                                     <!-- *** Metodo di pagamento ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Metodo di pag:</div>
-                                            <asp:DropDownList ID="DropDownList15" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="MetodoPagamento" DataTextField="Descrizione"
-                                                DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <asp:DropDownList ID="DropDownList15" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="MetodoPagamento" DataTextField="Descrizione"
+                                            DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** Termini di pagamento ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Termini di pag:</div>                                       
-                                            <asp:DropDownList ID="DropDownList16" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TerminiPagamento" DataTextField="Descrizione"
-                                                DataValueField="TerminiPagamento"
-                                                SelectedValue='<%# Bind("TerminiPagamento") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
+                                        <div class="inputtext">Termini di pag:</div>
+                                        <asp:DropDownList ID="DropDownList16" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="TerminiPagamento" DataTextField="Descrizione"
+                                            DataValueField="TerminiPagamento"
+                                            SelectedValue='<%# Bind("TerminiPagamento") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="SeparatoreForm">Actual</div>
@@ -624,12 +637,12 @@
 
                                     <!-- *** Tipo Workflow ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Tipo Workflow</div>                                     
-                                            <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
-                                                DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>                                        
+                                        <div class="inputtext">Tipo Workflow</div>
+                                        <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
+                                            DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** NOTE ***  -->
@@ -685,74 +698,88 @@
                                     <!-- *** CODICE CLIENTE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Cliente:</div>
-                                        
-                                            <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente"
-                                                DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("CodiceCliente") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente"
+                                            DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("CodiceCliente") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** CODICE MANAGER ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Manager:</div>
-                                        
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ClientManager_id") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ClientManager_id") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Account:</div>
-                                        
-                                            <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("AccountManager_id") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
+                                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("AccountManager_id") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** TIPO PROGETTO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo progetto:</div>
-                                        
-                                            <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
-                                                DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ProjectType_Id") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
+                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
-                                        
-                                            <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
-                                                DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Channels_Id") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
+                                            DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Channels_Id") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** SOCIETA ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Società:</div>
-                                        
-                                            <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa"
-                                                DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("Company_id") %>' EnableTheming="True" Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="societa"
+                                            DataTextField="Name" DataValueField="Company_id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("Company_id") %>' EnableTheming="True" Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
+
+                                    <!-- *** data creazione/modifica ***  -->
+                                    <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 30px; position: relative">
+                                        <span>[C]</span>
+                                        <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <br />
+                                        <span>[M]</span>
+                                        <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
+                                        <span>il </span>
+                                        <asp:Label ID="Label12" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                    </div>
+
 
                                 </div>
                                 <!-- *** TAB 1 ***  -->
@@ -762,14 +789,14 @@
                                     <!-- *** TIPO CONTRATTO ***  -->
                                     <div class="input ">
                                         <div class="inputtext">Contratto: </div>
-                                        
-                                            <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TipoContratto" DataTextField="Descrizione"
-                                                DataValueField="TipoContratto_id"
-                                                SelectedValue='<%# Bind("TipoContratto_id") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="TipoContratto" DataTextField="Descrizione"
+                                            DataValueField="TipoContratto_id"
+                                            SelectedValue='<%# Bind("TipoContratto_id") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <div class="SeparatoreForm">Budget</div>
@@ -837,26 +864,26 @@
                                     <!-- *** Metodo di pagamento ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Metodo di pag: </div>
-                                        
-                                            <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="MetodoPagamento" DataTextField="Descrizione"
-                                                DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                            <
+
+                                        <asp:DropDownList ID="DropDownList8" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="MetodoPagamento" DataTextField="Descrizione"
+                                            DataValueField="MetodoPagamento" SelectedValue='<%# Bind("MetodoPagamento") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                        <
                                     </div>
 
                                     <!-- *** Termini di pagamento ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Termini di pag: </div>
-                                        
-                                            <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TerminiPagamento" DataTextField="Descrizione"
-                                                DataValueField="TerminiPagamento"
-                                                SelectedValue='<%# Bind("TerminiPagamento") %>' Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DropDownList9" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="TerminiPagamento" DataTextField="Descrizione"
+                                            DataValueField="TerminiPagamento"
+                                            SelectedValue='<%# Bind("TerminiPagamento") %>' Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <div class="SeparatoreForm">Actual</div>
@@ -918,13 +945,13 @@
                                     <!-- *** Tipo Workflow ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo Workflow</div>
-                                        
-                                            <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
-                                                DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        
+
+                                        <asp:DropDownList ID="DDLWorkflowType" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="WF_WorkflowType" DataTextField="WFDescription"
+                                            DataValueField="WorkflowType" SelectedValue='<%# Bind("WorkflowType") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+
                                     </div>
 
                                     <!-- *** NOTE ***  -->
@@ -1055,7 +1082,7 @@
             <asp:Parameter Name="WorkflowType" Type="String" />
             <asp:Parameter Name="CreatedBy" />
             <asp:Parameter Name="CreationDate" />
-        </InsertParameters>        
+        </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="cliente" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"

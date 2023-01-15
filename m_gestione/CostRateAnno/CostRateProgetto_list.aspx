@@ -126,7 +126,12 @@
                             <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" Width="260px" />
                         </div>
 
-                        <asp:TextBox runat="server" ID="TBProjectCostRate_id" Style="visibility: hidden" />
+                        <div class="" style="font-size: 10px; line-height: 14px;margin: 20px 0px -10px 10px;color:dimgrey">
+                                        <p style="margin:0px"><span style="width:200px">[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
+                                        <p style="margin:0px"><span style="width:200px">[M]</span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>                
+                        </div> 
+
+                        <asp:TextBox runat="server" ID="TBProjectCostRate_id"  Style="visibility: hidden; height:0px; margin:0px"/>
 
                         <div class="buttons">
                             <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
@@ -340,6 +345,10 @@
             $('#TBBillRate').val('');
             $('#TBDataDa').val('');
             $('#TBDataA').val('');
+            $('#LBCreatedBy').text('');
+            $('#LBCreationDate').text('');
+            $('#LBLastModifiedBy').text('');
+            $('#LBLastModificationDate').text('');
 
         } // inizilizza form in creazione
 
@@ -369,6 +378,10 @@
                     $('#TBDataDa').val(objProjectCostRate.DataDa);
                     $('#TBDataA').val(objProjectCostRate.DataA);
                     $('#TBComment').val(objProjectCostRate.Comment);
+                    $('#LBCreatedBy').text(objProjectCostRate.CreatedBy + " il ");
+                    $('#LBCreationDate').text(objProjectCostRate.CreationDate);
+                    $('#LBLastModifiedBy').text(objProjectCostRate.LastModifiedBy + " il ");
+                    $('#LBLastModificationDate').text(objProjectCostRate.LastModificationDate);
 
                     openDialogForm("#dialog");
                 },

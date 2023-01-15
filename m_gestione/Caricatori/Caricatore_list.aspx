@@ -112,6 +112,9 @@
             ["MargineProposta", "number", "input", 80, '', true],
             ["DataInizio", "string", "input", 80, '', true],
             ["DataFine", "string", "input", 80, '', true],
+            ["DataFine", "string", "input", 80, '', true],
+            ["BloccoCaricoSpese", "string", "input", 20, '', true],
+            ["ActivityOn", "string", "input", 20, '', true],
             ["ProcessingMessage", "string", "input", 800, '', true],
         ];
 

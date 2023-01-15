@@ -103,8 +103,13 @@
                                 <div class="inputtext">Nota</div>
                                 <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" Width="260px" />
                             </div>
+                           
+                            <div class="" style="font-size: 10px; line-height: 14px;margin: 20px 0px -10px 10px;color:dimgrey">
+                                        <p style="margin:0px"><span style="width:200px">[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
+                                        <p style="margin:0px"><span style="width:200px">[M]</span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>                
+                            </div>                            
 
-                            <asp:TextBox runat="server" ID="TBPersonsCostRate_id" Style="visibility: hidden" />
+                            <asp:TextBox runat="server" ID="TBPersonsCostRate_id" Style="visibility: hidden; height:0px; margin:0px" />
 
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
@@ -310,6 +315,10 @@
             $('#TBCostRate').val('');
             $('#TBDataDa').val('');
             $('#TBDataA').val('');
+            $('#LBCreatedBy').text('');
+            $('#LBCreationDate').text('');
+            $('#LBLastModifiedBy').text('');
+            $('#LBLastModificationDate').text('');
 
         } // inizilizza form in creazione
 
@@ -331,12 +340,16 @@
                     var objPersonsCostRate = msg.d;
 
                     if (objPersonsCostRate.PersonsCostRate_id > 0)
-                        $('#TBPersonsCostRate_id').val(objPersonsCostRate.PersonsCostRate_id);
+                    $('#TBPersonsCostRate_id').val(objPersonsCostRate.PersonsCostRate_id);
                     $('#DDLPersons').val(objPersonsCostRate.Persons_id);
                     $('#TBCostRate').val(objPersonsCostRate.CostRate);
                     $('#TBDataDa').val(objPersonsCostRate.DataDa);
                     $('#TBDataA').val(objPersonsCostRate.DataA);
                     $('#TBComment').val(objPersonsCostRate.Comment);
+                    $('#LBCreatedBy').text(objPersonsCostRate.CreatedBy + " il ");
+                    $('#LBCreationDate').text(objPersonsCostRate.CreationDate);
+                    $('#LBLastModifiedBy').text(objPersonsCostRate.LastModifiedBy + " il ");
+                    $('#LBLastModificationDate').text(objPersonsCostRate.LastModificationDate);
 
                     openDialogForm("#dialog");
                 },

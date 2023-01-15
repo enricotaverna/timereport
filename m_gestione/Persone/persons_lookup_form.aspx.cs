@@ -48,8 +48,15 @@ public partial class persons_lookup_form : System.Web.UI.Page
     }
 
 
-    protected void DSPersone_Inserted(object sender, SqlDataSourceStatusEventArgs e)
+    protected void DSpersons_Insert(object sender, SqlDataSourceCommandEventArgs e)
     {
+        e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
+        e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+    }
 
+    protected void DSpersons_Update(object sender, SqlDataSourceCommandEventArgs e)
+    {
+        e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
+        e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
     }
 }
