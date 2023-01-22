@@ -47,12 +47,12 @@
 
             <div class="row justify-content-center">
 
-                <div class="StandardForm col-9">
+                <div class="StandardForm col-10">
 
                     <div id="ListTable"></div>
 
                     <div class="buttons">
-                        <asp:Button ID="btn_create" runat="server" Text="<%$ appSettings: CREATE_PREINVOICE %>" CssClass="orangebutton" Width="120px" PostBackUrl="/timereport/report/Preinvoice/Preinvoice-select.aspx" />
+                        <asp:Button ID="btn_create" runat="server" Text="<%$ appSettings: CREATE_PREINVOICE %>" CssClass="orangebutton" Width="120px" OnClick="btn_create_Click"/>
                         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
@@ -87,8 +87,14 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+      
+        $("document").ready(() => {
 
- 
+            // nasconde la DIV con il testo visuaizzato nel dialog box di conferma
+            $("#dialog-confirm").hide();
+
+        });
+
         // *** attiva validazione campi form
         //$('#formPersone').parsley({
         //    excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
@@ -136,13 +142,13 @@
                 { title: "Società", field: "CompanyName", sorter: "string", headerFilter: true },
                 { title: "Da", field: "DataDa", sorter: "string", headerFilter: true },
                 { title: "A", field: "DataA", sorter: "string", headerFilter: true },
-                { title: "Creato da", field: "CreatedBy", sorter: "string", headerFilter: true },
+                { title: "Director(s)", field: "DirectorsName", sorter: "string", headerFilter: true },
                 { title: "Giorni", field: "NumberOfDays", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Spese", field: "TotalExpenses", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Importo", field: "TotalAmount", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Descrizione", field: "Description", width: 150, sorter: "string", headerFilter: false },
-                { formatter: trashIcon, width: 30, headerSort: false, align: "center", cellClick: function (e, cell) { confermaCancellazione(cell.getRow().getData(), cell.getRow()) } },
-                { formatter: editIcon, width: 30, headerSort: false, align: "center", cellClick: function (e, cell) { OpenPreinvoiceForm(cell.getRow().getData()) } }
+                { formatter: trashIcon, width: 20, headerSort: false, align: "center", cellClick: function (e, cell) { confermaCancellazione(cell.getRow().getData(), cell.getRow()) } },
+                { formatter: editIcon, width: 20, headerSort: false, align: "center", cellClick: function (e, cell) { OpenPreinvoiceForm(cell.getRow().getData()) } }
             ],
         }); // Tabella principale
 
@@ -204,10 +210,10 @@
 
     </script>
 
-</body>
+    <div id="dialog-confirm" title="Conferma la cancellazione">
+          <p>Vuoi cancellare la prefattura?</p>
+    </div>
 
-<div id="dialog-confirm" title="Conferma la cancellazione">
-  <p>Vuoi cancellare la prefattura?</p>
-</div>
+</body>
 
 </html>

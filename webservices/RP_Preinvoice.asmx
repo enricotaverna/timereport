@@ -2,6 +2,7 @@
 
 using System;
 using System.Web.Services;
+using System.Data;
 
 /// <summary>
 /// Summary description for WStimereport
@@ -27,7 +28,7 @@ public class RP_Preinvoice : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string GetPreinvoiceList()
     {
-        String query =  "SELECT Preinvoice_id, Description, CONVERT(VARCHAR(10), DataDa, 103) as DataDa, CONVERT(VARCHAR(10), DataA, 103) as DataA, CreatedBy, CONVERT(VARCHAR(10), CreationDate, 103) as CreationDate, NumberOfDays, TotalAmount, TotalExpenses, B.Name as CompanyName " +
+        String query =  "SELECT Preinvoice_id, Description, CONVERT(VARCHAR(10), DataDa, 103) as DataDa, CONVERT(VARCHAR(10), DataA, 103) as DataA, CreatedBy, CONVERT(VARCHAR(10), CreationDate, 103) as CreationDate, NumberOfDays, TotalAmount, TotalExpenses, B.Name as CompanyName, DirectorsName " +
                         "FROM Preinvoice " +
                         "INNER JOIN Company as B ON B.Company_id = Preinvoice.Company_id " +
                         "ORDER BY CreationDate DESC, CreatedBy";
@@ -46,6 +47,27 @@ public class RP_Preinvoice : System.Web.Services.WebService
         //    return false;
 
         bool bResult = Database.ExecuteSQL(sDelete, null);
+
+        return bResult;
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string CheckFLC(string company_id, string dataDa, string dataA)
+    {
+
+        string bResult = "  ";
+        string query = "SELECT DISTINCT B.Name " +
+                        "FROM hours as T " +
+                        "INNER JOIN Persons as B on B.Persons_id = T.Persons_id " +
+                        "WHERE t.Company_id = " + ASPcompatility.FormatStringDb(company_id) + " AND date >= " + ASPcompatility.FormatDateDb(dataDa) + " AND date <= " + ASPcompatility.FormatDateDb(dataA) + " AND  [MSSql12155].FCT_DeterminaCostRate(t.persons_id, t.projects_id, t.date) = 0";
+
+        DataTable dt = Database.GetData(query, null);
+
+        foreach (DataRow dr in dt.Rows) {
+            bResult += dr[0].ToString() + ", ";
+        }
+        bResult = bResult.Substring(0, bResult.Length - 2);
 
         return bResult;
 

@@ -19,12 +19,23 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         // Popola Drop Down con lista progetti
         if (IsPostBack && Page.Request.Form["btnReport"] == null) { // Postback non triggerato da pulsante report
-            // Popola dropdown con i valori          
-            Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
-            Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
-            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
-            // recupera valori controlli
-            RipristinaControlli();
+
+            // triggerato da cambio data
+            if (TBDataA.Text != (string)Session["PrefatturaDataA"] | TBDataDa.Text != (string)Session["PrefatturaDataDa"])
+            {
+                Session["PrefatturaDataA"] = TBDataA.Text;
+                Session["PrefatturaDataDa"] = TBDataDa.Text;
+                // Popola dropdown con i valori          
+                Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
+                Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
+                Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
+                // recupera valori controlli
+                RipristinaControlli();
+            }
+            else {
+                Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
+                Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
+            }
         }
 
     }
@@ -102,7 +113,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         DataTable dtProgetti = Database.GetData("SELECT DISTINCT hours.projects_id, B.ProjectCode + ' ' + SUBSTRING(B.Name, 1, 20) as projectName FROM Hours " +
                                                "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
-                                               "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
+                                               "WHERE hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) +  " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
 
         foreach (DataRow dtRow in dtProgetti.Rows)
         {
@@ -121,7 +132,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         DataTable dtPersone = Database.GetData("SELECT DISTINCT hours.persons_id, B.Name as Name FROM Hours " +
                                                "INNER JOIN Persons as B ON B.persons_id = hours.persons_id " +
-                                               "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY B.Name DESC", this.Page);
+                                               "WHERE hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) + " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY B.Name DESC", this.Page);
 
         foreach (DataRow dtRow in dtPersone.Rows)
         {

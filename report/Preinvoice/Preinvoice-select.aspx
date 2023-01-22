@@ -68,7 +68,7 @@
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Società</div>
                             <asp:DropDownList ID="DDLSocieta" runat="server" CssClass="SumoDLL"
-                                AppendDataBoundItems="True" AutoPostBack="false" Visible="false">
+                                AppendDataBoundItems="True" AutoPostBack="true" Visible="false">
                                 <asp:ListItem Value="" Text="--- Tutte le società ---" />
                             </asp:DropDownList>
                         </div>
@@ -161,6 +161,10 @@
                 $("#btnSubmit").click();
             }
 
+        });
+        
+        $("#DDLSocieta").change(function (e) {
+            MaskScreen(true); // cursore e finestra modale
         });
 
         $("#TBDataA").change(function () {

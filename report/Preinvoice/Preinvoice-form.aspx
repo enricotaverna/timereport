@@ -49,11 +49,6 @@
                         <asp:Label ID="LBPreinvoiceNum" runat="server"></asp:Label>
                     </div>
 
-<%--                    <div class="input nobottomborder">
-                        <asp:Label CssClass="inputtext" runat="server" Text="Prefattura"></asp:Label>
-                        <asp:Label ID="LBPreinvoiceNum" runat="server"></asp:Label>
-                    </div>--%>
-
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Periodo"></asp:Label>
                         <asp:Label ID="LBPeriodo" runat="server"></asp:Label>
@@ -62,6 +57,11 @@
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Società"></asp:Label>
                         <asp:Label ID="LBCompany" runat="server"></asp:Label>
+                    </div>
+
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Director(s)"></asp:Label>
+                        <asp:Label ID="LBDirector" runat="server"></asp:Label>
                     </div>
 
                     <div class="input nobottomborder">
@@ -96,6 +96,12 @@
                         <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings:    CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" formnovalidate />
                     </div>
 
+                    <!-- *** campi nascosti usati da Javascript ***  -->
+                    <asp:TextBox ID="TBcompanyId" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBPreinvoiceNumber" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBDataDa" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBDataA" CssClass="toHide" runat="server"  />
+
                 </div>
                 <!-- END FormWrap  -->
             </div>
@@ -126,9 +132,44 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
         UnMaskScreen(); // cursore e finestra modale
 
-        //$("#LinkButton1").click(function (e) {
-        //    MaskScreen(true); // cursore e finestra modale
-        //});
+        $("document").ready(() => {
+
+            // nasconde i campi che hanno passato i valori dal server per fare la chiamata ajax
+            $(".toHide").hide();
+            $("#BTSave").hide();
+
+            if ($("#TBPreinvoiceNumber").val() == 'nr') // in creazione, serve controllo FLC
+                CheckFLC();
+        }
+        );
+
+        function CheckFLC() {
+
+            // controllo FLC
+            var values = "{'company_id': '" + $("#TBcompanyId").val() + "', 'dataDa' : '" + $("#TBDataDa").val() + "', 'dataA' : '" + $("#TBDataA").val() + "'  }";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/RP_Preinvoice.asmx/CheckFLC",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d == "")
+                        $("#BTSave").show();
+                    else
+                        ShowPopup("<b>Controllare FLC per : </b><br>" + msg.d);
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    return false;
+                }
+
+            }); // ajax
+        };
 
     </script>
 
