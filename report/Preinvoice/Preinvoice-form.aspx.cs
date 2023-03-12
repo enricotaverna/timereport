@@ -37,6 +37,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
     // per i dati necessari al display ed elaborazioni
     static PreInvoiceData preInv = new PreInvoiceData();
+    public PreInvoiceData emptyPreInv = new PreInvoiceData();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -52,6 +53,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
         if (!IsPostBack && Request.Form.Count == 0)
         {
+            preInv = emptyPreInv;
             if (Request.QueryString["Preinvoice_id"] != null)
                 LoadFromDB(preInv, Request.QueryString["Preinvoice_id"]);
             else
@@ -87,7 +89,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             // Importo 
             var HoursTable = document.Tables[HoursTableIndex];
 
-            DataTable dt = Database.GetData(preInv.SubtotalAmountQuery, null);
+            DataTable dt = Database.GetData(preInv.SubtotalAmountQuery + " ORDER BY NomeConsulente, Progetto", null);
 
             loopIndex = 1;
             for (int i = 1; i < dt.Rows.Count; i++) // compia la prima riga per N-1 volte
@@ -108,7 +110,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             // Spese 
             var ExpensesTable = document.Tables[ExpensesTableIndex];
 
-            dt = Database.GetData(preInv.SubtotalExpensesQuery, null);
+            dt = Database.GetData(preInv.SubtotalExpensesQuery + " ORDER BY NomeConsulente, Progetto" , null);
 
             loopIndex = 1;
             for (int i = 1; i < dt.Rows.Count; i++) // compia la prima riga per N-1 volte
@@ -135,18 +137,6 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
     protected void CalculateTotalsFromDB(PreInvoiceData preInv)
     {
-
-        //if (preInv.PersonsIdList != "")
-        //{
-        //    preInv.SubtotalAmountQuery += " AND T.Persons_id IN(" + preInv.PersonsIdList + ") ";
-        //    preInv.AllDaysQuery += " AND T.Persons_id IN(" + preInv.PersonsIdList + ") ";
-        //}
-
-        //if (preInv.ProjectsIdList != "")
-        //{
-        //    preInv.SubtotalAmountQuery += " AND T.Projects_id IN(" + preInv.ProjectsIdList + ") ";
-        //    preInv.SubtotalAmountQuery += " AND T.Persons_id IN(" + preInv.PersonsIdList + ") ";
-        //}
 
         // totale importi
         DataRow dr = Database.GetRow("SELECT SUM(Days), SUM(TotalCost) FROM (" + preInv.SubtotalAmountQuery + ") AS TAB", null);
@@ -186,7 +176,8 @@ public partial class Preinvoice_form : System.Web.UI.Page
             }
         }
 
-        preInv.DirectorsName = preInv.DirectorsName.Substring(0, preInv.DirectorsName.Length - 1);
+        if (preInv.DirectorsName != "")
+            preInv.DirectorsName = preInv.DirectorsName.Substring(0, preInv.DirectorsName.Length - 1);
 
         return;
     }
@@ -194,7 +185,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void LoadFromDB(PreInvoiceData preInv, string preinvoiceId)
     {
 
-        DataRow dr = Database.GetRow("SELECT Preinvoice_id, Date, DataDa, DataA, Company_id, ProjectsSelection, PersonsSelection, NumberOfDays, TotalAmount, Description, DirectorsName FROM Preinvoice " +
+        DataRow dr = Database.GetRow("SELECT Preinvoice_id, Date, DataDa, DataA, Company_id, ProjectsSelection, PersonsSelection, NumberOfDays, TotalAmount, TotalRates, TotalExpenses, Description, DirectorsName FROM Preinvoice " +
                                      "WHERE Preinvoice_id=" + ASPcompatility.FormatStringDb(preinvoiceId), null);
 
         preInv.Number = dr[0].ToString();
@@ -206,8 +197,10 @@ public partial class Preinvoice_form : System.Web.UI.Page
         preInv.PersonsIdList = dr[6].ToString();
         preInv.TotalDays = (float)Convert.ToDouble(dr[7].ToString());
         preInv.TotalPreinvoiceAmount = (float)Convert.ToDouble(dr[8].ToString());
-        preInv.Description = dr[9].ToString();
-        preInv.DirectorsName = dr[10].ToString();
+        preInv.TotalRates = (float)Convert.ToDouble(dr[9].ToString());
+        preInv.TotalExpenses = (float)Convert.ToDouble(dr[10].ToString());
+        preInv.Description = dr[11].ToString();
+        preInv.DirectorsName = dr[12].ToString();
         SetQueryCommands(preInv);
 
     }
@@ -228,13 +221,13 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
     protected void SetQueryCommands(PreInvoiceData preInv)
     {
-        preInv.SubtotalAmountQuery = "SELECT b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', Days, t.FLC 'FLC', Days* FLC as 'TotalCost' " +
-                                   "FROM( SELECT SUM(Hours) / 8 as 'Days', company_id, persons_id, projects_id, [MSSql12155].FCT_DeterminaCostRate(persons_id, projects_id, " + ASPcompatility.FormatDateDb(preInv.DataDa) + ") as 'FLC' FROM hours " +
-                                   "WHERE date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA) + " group by persons_Id, projects_id, company_id ) AS T " +
+        preInv.SubtotalAmountQuery = "SELECT b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', Days, t.FLC 'FLC', Days* FLC as 'TotalCost', t.Preinvoice_id " +
+                                   "FROM( SELECT SUM(Hours) / 8 as 'Days', company_id, persons_id, projects_id, Preinvoice_id, [MSSql12155].FCT_DeterminaCostRate(persons_id, projects_id, " + ASPcompatility.FormatDateDb(preInv.DataDa) + ") as 'FLC' FROM hours " +
+                                   "WHERE date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA) + " group by persons_Id, projects_id, company_id, Preinvoice_id ) AS T " +
                                    "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                    "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
                                    "INNER JOIN persons as D ON D.persons_id = t.persons_id " +
-                                   "WHERE t.Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId);
+                                   "WHERE t.Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId);                                  
 
         if (preInv.ProjectsIdList != "")
             preInv.SubtotalAmountQuery += " AND T.projects_id IN ( " + preInv.ProjectsIdList + " )";
@@ -242,7 +235,12 @@ public partial class Preinvoice_form : System.Web.UI.Page
         if (preInv.PersonsIdList != "")
             preInv.SubtotalAmountQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
-        preInv.AllDaysQuery = "SELECT '" + preInv.Number + "' as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', locationdescription  " +
+        if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
+            preInv.SubtotalAmountQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+        else
+            preInv.SubtotalAmountQuery += " AND t.Preinvoice_id = " + preInv.Number;
+
+        preInv.AllDaysQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', locationdescription  " +
                                      "FROM hours as T " +
                                      "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                      "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
@@ -257,7 +255,12 @@ public partial class Preinvoice_form : System.Web.UI.Page
         if (preInv.PersonsIdList != "")
             preInv.AllDaysQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
-        preInv.AllExpenseQuery = "SELECT '" + preInv.Number + "' as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + " b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', F.name as 'Director', E.name as 'TipoSpesa' , CONVERT(VARCHAR(10),Date, 103) as Data , AmountInCurrency as Importo " +
+        if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
+            preInv.AllDaysQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+        else
+            preInv.AllDaysQuery += " AND t.Preinvoice_id = " + preInv.Number;
+
+        preInv.AllExpenseQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + " b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', F.name as 'Director', E.name as 'TipoSpesa' , CONVERT(VARCHAR(10),Date, 103) as Data , AmountInCurrency as Importo " +
                                    "FROM expenses as T " +
                                    "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                    "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
@@ -272,6 +275,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
         if (preInv.PersonsIdList != "")
             preInv.AllExpenseQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
+
+        if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
+            preInv.AllExpenseQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+        else
+            preInv.AllExpenseQuery += " AND T.Preinvoice_id = " + preInv.Number;
 
         preInv.SubtotalExpensesQuery = "SELECT Societa, NomeConsulente, Progetto, TipoSpesa, SUM(Importo) as 'Importo' FROM (" +
                                        preInv.AllExpenseQuery +
@@ -319,6 +327,8 @@ public partial class Preinvoice_form : System.Web.UI.Page
         LBCompany.Text = preInv.CompanyName;
         LBDirector.Text = preInv.DirectorsName;
         LBDays.Text = preInv.TotalDays.ToString("#,0.00");
+        LBTotalRates.Text = preInv.TotalRates.ToString("#,0.00") + " €";
+        LBTotalExpenses.Text = preInv.TotalExpenses.ToString("#,0.00") + " €";
         LBTotalAmount.Text = preInv.TotalPreinvoiceAmount.ToString("#,0.00") + " €";
         TBDescription.Text = preInv.Description;
         TBcompanyId.Text = preInv.CompanyId;
@@ -339,12 +349,12 @@ public partial class Preinvoice_form : System.Web.UI.Page
     // Bottoni
     protected void Download_AllRatesQuery(object sender, EventArgs e)
     {
-        Utilities.ExportXls(preInv.AllDaysQuery);
+        Utilities.ExportXls(preInv.AllDaysQuery + " ORDER BY NomeConsulente, Data");
     }
 
     protected void Download_AllExpenseQuery(object sender, EventArgs e)
     {
-        Utilities.ExportXls(preInv.AllExpenseQuery);
+        Utilities.ExportXls(preInv.AllExpenseQuery  + " ORDER BY NomeConsulente, Data");
     }
 
     protected void UpdateCancelButton_Click(object sender, EventArgs e)
@@ -355,7 +365,10 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void InsertButton_Click(object sender, EventArgs e)
     {
 
-        Database.ExecuteSQL("INSERT INTO Preinvoice (company_id, Date, DataDa, DataA, CreatedBy, CreationDate, NumberOfDays, TotalRates, TotalExpenses, TotalAmount, ProjectsSelection, PersonsSelection, Description, DirectorsName ) VALUES ( " +
+        int Preinvoice_id = 0;
+        string queryToUpdate = "";
+
+        Boolean insertOk = Database.ExecuteSQL("INSERT INTO Preinvoice (company_id, Date, DataDa, DataA, CreatedBy, CreationDate, NumberOfDays, TotalRates, TotalExpenses, TotalAmount, ProjectsSelection, PersonsSelection, Description, DirectorsName ) VALUES ( " +
                              ASPcompatility.FormatStringDb(preInv.CompanyId) + " , " +
                              ASPcompatility.FormatDateDb(preInv.Date) + " , " +
                              ASPcompatility.FormatDateDb(preInv.DataDa) + " , " +
@@ -371,6 +384,35 @@ public partial class Preinvoice_form : System.Web.UI.Page
                              ASPcompatility.FormatStringDb(TBDescription.Text) + " , " +
                              ASPcompatility.FormatStringDb(preInv.DirectorsName) + " )"
                 , null); ;
+
+        if (insertOk) { 
+            Preinvoice_id = Database.GetLastIdInserted("SELECT MAX(Preinvoice_id) from Preinvoice");
+
+            queryToUpdate = "UPDATE hours SET Preinvoice_id = '" + Preinvoice_id.ToString()  + "' " + 
+                             "WHERE Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId) + " AND " +
+                             "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
+
+            if (preInv.ProjectsIdList != "")
+                queryToUpdate += " AND T.projects_id IN ( " + preInv.ProjectsIdList + " )";
+
+            if (preInv.PersonsIdList != "")
+                queryToUpdate += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
+
+            Database.ExecuteSQL(queryToUpdate, null); // aggiorna ore
+
+            queryToUpdate = "UPDATE Expenses SET Preinvoice_id = '" + Preinvoice_id.ToString() + "' " +
+                             "WHERE Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId) + " AND " +
+                             "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
+
+            if (preInv.ProjectsIdList != "")
+                queryToUpdate += " AND T.projects_id IN ( " + preInv.ProjectsIdList + " )";
+
+            if (preInv.PersonsIdList != "")
+                queryToUpdate += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
+
+            Database.ExecuteSQL(queryToUpdate, null); // aggiorna spese
+
+        }
 
         Response.Redirect("/timereport/report/preinvoice/preinvoice-list.aspx");
     }

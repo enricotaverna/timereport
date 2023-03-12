@@ -143,9 +143,11 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         // Calcola indicatori di stato
         ds = CalcolaColonne(ds);
 
+        Utilities.EsportaDataSetExcel(ds);
+
         /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
-        Cache.Insert("ExportRevenue", ds);
-        Response.Redirect("/timereport/report/EstraiRevenue/EstraiRevenue-list.aspx");
+        //Cache.Insert("ExportRevenue", ds);
+        //Response.Redirect("/timereport/report/EstraiRevenue/EstraiRevenue-list.aspx");
     }
 
     // Calcola colonne aggiuntive report non valorizzate dalla storage procedure

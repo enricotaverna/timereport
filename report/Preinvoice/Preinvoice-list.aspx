@@ -144,6 +144,7 @@
                 { title: "A", field: "DataA", sorter: "string", headerFilter: true },
                 { title: "Director(s)", field: "DirectorsName", sorter: "string", headerFilter: true },
                 { title: "Giorni", field: "NumberOfDays", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
+                { title: "Fee", field: "TotalRates", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Spese", field: "TotalExpenses", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Importo", field: "TotalAmount", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Descrizione", field: "Description", width: 150, sorter: "string", headerFilter: false },
@@ -194,6 +195,7 @@
                 success: function (msg) {
                     // se call OK inserisce una riga sotto l'elemento 
                     if (msg.d == true) {
+                        ShowPopup("La prefattura è stata cancellata");
                         riga.delete();
                     } else
                         ShowPopup("Impossibile cancellare il record");

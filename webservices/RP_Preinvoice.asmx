@@ -28,7 +28,7 @@ public class RP_Preinvoice : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string GetPreinvoiceList()
     {
-        String query =  "SELECT Preinvoice_id, Description, CONVERT(VARCHAR(10), DataDa, 103) as DataDa, CONVERT(VARCHAR(10), DataA, 103) as DataA, CreatedBy, CONVERT(VARCHAR(10), CreationDate, 103) as CreationDate, NumberOfDays, TotalAmount, TotalExpenses, B.Name as CompanyName, DirectorsName " +
+        String query =  "SELECT Preinvoice_id, Description, CONVERT(VARCHAR(10), DataDa, 103) as DataDa, CONVERT(VARCHAR(10), DataA, 103) as DataA, CreatedBy, CONVERT(VARCHAR(10), CreationDate, 103) as CreationDate, NumberOfDays, TotalAmount, TotalExpenses, TotalRates, B.Name as CompanyName, DirectorsName " +
                         "FROM Preinvoice " +
                         "INNER JOIN Company as B ON B.Company_id = Preinvoice.Company_id " +
                         "ORDER BY CreationDate DESC, CreatedBy";
@@ -39,16 +39,22 @@ public class RP_Preinvoice : System.Web.Services.WebService
     public bool DeletePreinvoice(string PreInvoice_id)
     {
 
+        // cancella riferimenti da tabella ore e spese
+        Boolean result = Database.ExecuteSQL("UPDATE Hours SET Preinvoice_id = NULL WHERE Preinvoice_id = " + PreInvoice_id, null);
+
+        if (!result)
+            return false;
+
+        result = Database.ExecuteSQL("UPDATE Expenses SET Preinvoice_id = NULL WHERE Preinvoice_id = " + PreInvoice_id, null);
+        if (!result)
+            return false;
+
         string sDelete = "DELETE Preinvoice " +
-                         " WHERE Preinvoice_id = '" + PreInvoice_id + "'";
+                         " WHERE Preinvoice_id = " + PreInvoice_id;
 
+        result = Database.ExecuteSQL(sDelete, null);
 
-        //  if ( *** Controllo per evitare cancellazione ***)
-        //    return false;
-
-        bool bResult = Database.ExecuteSQL(sDelete, null);
-
-        return bResult;
+        return result;
 
     }
 

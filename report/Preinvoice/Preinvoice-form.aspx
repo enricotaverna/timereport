@@ -70,6 +70,16 @@
                     </div>
 
                     <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Importo fees"></asp:Label>
+                        <asp:Label ID="LBTotalRates" runat="server"></asp:Label>
+                    </div>
+
+                    <div class="input nobottomborder">
+                        <asp:Label CssClass="inputtext" runat="server" Text="Importo spese"></asp:Label>
+                        <asp:Label ID="LBTotalExpenses" runat="server"></asp:Label>
+                    </div>
+
+                    <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Importo totale"></asp:Label>
                         <asp:Label ID="LBTotalAmount" runat="server"></asp:Label>
                     </div>
@@ -132,6 +142,14 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
         UnMaskScreen(); // cursore e finestra modale
 
+        // se non seleziona record o FLC mancanti
+        const disableButtons = () => {
+            $("#LinkButton1").hide();
+            $("#LinkButton2").hide();
+            $("#LinkButton3").hide();
+            $("#BTSave").hide();
+        }
+
         $("document").ready(() => {
 
             // nasconde i campi che hanno passato i valori dal server per fare la chiamata ajax
@@ -139,7 +157,7 @@
             $("#BTSave").hide();
 
             if ($("#TBPreinvoiceNumber").val() == 'nr') // in creazione, serve controllo FLC
-                CheckFLC();
+                CheckFLC();              
         }
         );
 
@@ -157,11 +175,21 @@
                 dataType: "json",
 
                 success: function (msg) {
+
                     // se call OK inserisce una riga sotto l'elemento 
-                    if (msg.d == "")
+                    if (msg.d == "") {
+
+                        if ($("#LBTotalAmount").text() == '0,00 €') {
+                            ShowPopup("Non è stato selezionato nessun record!");
+                            disableButtons();
+                            return;
+                        }
                         $("#BTSave").show();
-                    else
+                    }
+                    else {
                         ShowPopup("<b>Controllare FLC per : </b><br>" + msg.d);
+                        disableButtons();
+                    }
                 },
 
                 error: function (xhr, textStatus, errorThrown) {
