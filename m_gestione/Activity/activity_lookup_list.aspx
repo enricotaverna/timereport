@@ -81,7 +81,7 @@
                     <div class="row mt-2">
                         <!-- margine per separare le righe -->
                         <div class="col-1">
-                            <label class="inputtext">Manager</label>
+                            <label class="inputtext">Director</label>
                         </div>
                         <div class="col-5">
                             <asp:DropDownList ID="DDLManager" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
@@ -122,9 +122,9 @@
                             <asp:BoundField DataField="Name" HeaderText="Descrizione" SortExpression="Name" />
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
-                            <asp:BoundField DataField="NomeManager" HeaderText="Manager" SortExpression="NomeManager" />
-                            <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="RevenueBudget" DataFormatString="{0:n0}" />
-                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine" ReadOnly="True" SortExpression="MargineProposta" DataFormatString="{0:P1}" />
+                            <asp:BoundField DataField="NomeManager" HeaderText="Director" SortExpression="NomeManager" />
+                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget(€)" ReadOnly="True" SortExpression="RevenueBudget" DataFormatString="{0:n0}" />
+<%--                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine" ReadOnly="True" SortExpression="MargineProposta" DataFormatString="{0:P1}" />--%>
                             <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image"
                                 DeleteImageUrl="/timereport/images/icons/16x16/trash.gif" SelectImageUrl="/timereport/images/icons/16x16/modifica.gif" />
                             <asp:CommandField />

@@ -46,7 +46,7 @@
                 <div  class="StandardForm col-11">
 
                     <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True" CssClass="GridView"
-                        AllowSorting="false" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5" OnPageIndexChanging="GVAttivita_PageIndexChanging" OnRowDataBound="GVAttivita_RowDataBound">
+                        AllowSorting="false" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5" OnPageIndexChanging="GVAttivita_PageIndexChanging" >
 
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
@@ -62,18 +62,19 @@
                             </asp:TemplateField>
                             <asp:BoundField DataField="status" HeaderText="status" SortExpression="status" Visible="false" />
                             <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" />
-                            <asp:BoundField DataField="WriteUp" HeaderText="Write Up/Off" SortExpression="WriteUp" DataFormatString="{0:###,###.00}" />
-                            <asp:BoundField DataField="GiorniActual" HeaderText="Giorni Actual" SortExpression="OreActual" DataFormatString="{0:###,###.00}" />
+                            <asp:BoundField DataField="WriteUp" HeaderText="Write Up/Off" SortExpression="WriteUp" DataFormatString="{0:###,###.00;-###,###.00; }" />
+                            <asp:BoundField DataField="GiorniActual" HeaderText="Giorni Actual" SortExpression="OreActual" DataFormatString="{0:###,###.00;-; }" />
 
                             <%--<asp:BoundField DataField="RevenueActual" HeaderText="Revenue Actual" SortExpression="RevenueActual" DataFormatString="{0:###,###.00}" />--%>
                             <%-- Link report revenue --%>
-                            <asp:TemplateField HeaderText="Revenue Actual">
+    <%--                        <asp:TemplateField HeaderText="Revenue Actual">
                                 <ItemTemplate>
-                                    <asp:LinkButton ID="LkRevenue" OnClick="LkRevenue_Click" runat="server" CommandArgument='<%# Eval("Projects_Id") + ";"  + Eval("Activity_Id")  + ";" + Eval("PrimaDataCarico") %> ' CommandName="LkRevenue"><%#  Eval("RevenueActual", "{0:###,###.00}")  %></asp:LinkButton>
+                                    <asp:LinkButton ID="LkRevenue" OnClick="LkRevenue_Click" runat="server" CommandArgument='<%# Eval("Projects_Id") + ";" + Eval("PrimaDataCarico") %> ' CommandName="LkRevenue"><%#  Eval("RevenueActual", "{0:###,###.00}")  %></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>
+                            </asp:TemplateField>--%>
 
-                            <asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00}" />
+                            <asp:BoundField DataField="RevenueActual" HeaderText="Revenue Actual" SortExpression="RevenueActual" DataFormatString="{0:###,###.00;-; }" />
+                            <asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />
 
                             <%-- <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />--%>
                             <%-- Link anagrafica progetto --%>
@@ -85,13 +86,14 @@
 
                             <%--<asp:BoundField DataField="AName" HeaderText="Attività" SortExpression="AName" />--%>
                             <%-- Link anagrafica attività --%>
-                            <asp:TemplateField HeaderText="Attività">
+<%--                            <asp:TemplateField HeaderText="Attività">
                                 <ItemTemplate>
                                     <asp:LinkButton ID="LkAttivita" OnClick="LkAttivita_Click" runat="server" CommandArgument='<%# Eval("Activity_id")  + ";" + Eval("Phase_Id") + ";" + Eval("Projects_Id") %> ' CommandName="LkAttivita"><%#  Eval("AName")  %></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>
+                            </asp:TemplateField>--%>
 
-                            <asp:BoundField DataField="MName" HeaderText="Manager" SortExpression="MName" />
+                            <asp:BoundField DataField="Director" HeaderText="Director" SortExpression="Director" />
+                            <asp:BoundField DataField="TipoContratto" HeaderText="Tipo Contratto" SortExpression="TipoContratto"  />
                             <asp:BoundField DataField="PrimaDataCarico" HeaderText="Data Inizio" SortExpression="PrimaDataCarico" DataFormatString="{0:d}" />
                             <asp:TemplateField HeaderText="DataFine">
                                 <ItemTemplate>
@@ -99,12 +101,12 @@
                                     <%--                        <asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" dataformatstring="{0:d}"  ItemStyle-BackColor=<%# Eval("ColoreDataFine") %> />--%>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget Revenue" SortExpression="RevenueBudget" DataFormatString="{0:###,###.00}" />
-                            <asp:BoundField DataField="BudgetABAP" HeaderText="Budget ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###.00}" />
-                            <asp:BoundField DataField="BudgetNetto" HeaderText="Budget Netto" SortExpression="BudgetNetto" DataFormatString="{0:###,###.00}" />
-                            <asp:BoundField DataField="SpeseBudget" HeaderText="Budget Spese" SortExpression="SpeseBudget" DataFormatString="{0:###,###.00}" />
+                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget Revenue" SortExpression="RevenueBudget" DataFormatString="{0:###,###.00;-; }" />
+<%--                            <asp:BoundField DataField="BudgetABAP" HeaderText="Budget ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###.00}" />--%>
+                            <asp:BoundField DataField="BudgetNetto" HeaderText="Budget Netto" SortExpression="BudgetNetto" DataFormatString="{0:###,###.00;-; }" />
+<%--                            <asp:BoundField DataField="SpeseBudget" HeaderText="Budget Spese" SortExpression="SpeseBudget" DataFormatString="{0:###,###.00}" />--%>
                             <asp:BoundField DataField="MargineProposta" HeaderText="Margine proposta" SortExpression="MargineProposta" DataFormatString="{0:P1}" />
-                            <asp:BoundField DataField="BurnRate" HeaderText="Burn Rate" SortExpression="BurnRate" DataFormatString="{0:###,###.00}" />
+                            <asp:BoundField DataField="BurnRate" HeaderText="Burn Rate" SortExpression="BurnRate" DataFormatString="{0:###,###.00;(0:###,###.00); }" />
 
                         </Columns>
 
@@ -114,7 +116,8 @@
 
                         <%--Messaggio se nessun dato selezionato --%>
                         <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
-                        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
+                        <asp:Button ID="BtnExport" runat="server" CssClass="orangebutton" style="width:140px"  Text="Download Sintesi" OnClick="BtnExport_Click" />
+                        <asp:Button ID="Button1" runat="server" CssClass="orangebutton" style="width:140px" Text="Donwload Dettagli" OnClick="BtnExport_Detail_Click" />
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
 
                     </div>

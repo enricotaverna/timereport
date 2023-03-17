@@ -28,7 +28,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (!IsPostBack) {
             // Popola dropdown con i valori          
             Bind_DDLProgetti();
-            Bind_DDLAttivita();
+            //Bind_DDLAttivita();
             // recupera valori selezioni
             RipristinaControlli();
         }
@@ -89,14 +89,16 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         {
             float dRevenueActual = dr["RevenueActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueActual"]);
             float dRevenueBudget = dr["RevenueBudget"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBudget"]);
-           
+            float RecordWithoutCost = dr["RecordWithoutCost"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RecordWithoutCost"]);
+
             // netto budget ABAP
-            float dBudgetABAP = dr["BudgetABAP"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["BudgetABAP"]);
+            //float dBudgetABAP = dr["BudgetABAP"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["BudgetABAP"]);
 
 
-            float dRevenueBudgetNet = RBTipoCalcolo.SelectedValue == "1" ? (float)dRevenueBudget - (float)dBudgetABAP : (float)dRevenueBudget;
-            
-            
+            //float dRevenueBudgetNet = RBTipoCalcolo.SelectedValue == "1" ? (float)dRevenueBudget - (float)dBudgetABAP : (float)dRevenueBudget;
+            // eliminato il calcolo al netto del budget ABAP
+            float dRevenueBudgetNet = (float)dRevenueBudget;
+
             dr["BudgetNetto"] = dRevenueBudgetNet; // Budget revenue al netto del budget ABAP
 
             DateTime dtTBDataReport = Convert.ToDateTime(TBDataReport.Text);
@@ -114,22 +116,19 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
                 continue;
             }
 
-            // se manca qualche dato obbligatorio mette a warning la colonna e salta i conti
-            if (dRevenueActual == 0)
+            if (RecordWithoutCost != 0 )
             {
-                dr["Status"] = "O";
-                dr["ImgUrl"] = "/timereport/images/icons/other/warning_icon.png";
-                dr["ToolTip"] = "Impossibile valorizzare actual, controllare FLC e margine progetto";
-                continue;
-            }
+                // annulla valori calcolati perchè non tutti i dati sono presenti
+                dr["RevenueActual"] = 0; 
+                dr["BurnRate"] = 0; 
+                dr["MesiCopertura"] = 0; 
+                dr["WriteUp"] = 0;
+                dr["GiorniActual"] = 0;
+                dr["SpeseActual"] = 0;
 
-            // se le revenue sono > 10.000.000 la stored procedure ha forzato il valore in assenza di qualche dato di costo
-            if (dRevenueActual > 10000000 )
-            {
-                dr["RevenueActual"] = 9999999; // forzo 99999 se mancano degli FLC e la query mi risponde un actual fuori scala
                 dr["Status"] = "O";
                 dr["ImgUrl"] = "/timereport/images/icons/other/warning_icon.png";
-                dr["ToolTip"] = "Impossibile valorizzare actual, controllare FLC delle persone";
+                dr["ToolTip"] = "Impossibile valorizzare actual, controllare FLC delle persone e margine progetto";
                 continue;
             } 
 
@@ -197,12 +196,12 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
             // Se DDL non valorizzata passa NULL al parametro
             if (DDLProgetti.SelectedValue != "0")
                  sqlComm.Parameters.AddWithValue("@Project_id",  Convert.ToInt16(DDLProgetti.SelectedValue));
-            else
-                sqlComm.Parameters.AddWithValue("@Project_id", Utilities.ListDDL(DDLProgetti, true) );
+            //else
+            //    sqlComm.Parameters.AddWithValue("@Project_id", Utilities.ListDDL(DDLProgetti, true) );
 
             // Se DDL non valorizzata passa NULL al parametro
-            if (DDLAttivita.SelectedValue != "0")
-                 sqlComm.Parameters.AddWithValue("@Activity_id", Convert.ToInt16(DDLAttivita.SelectedValue));
+            //if (DDLAttivita.SelectedValue != "0")
+            //     sqlComm.Parameters.AddWithValue("@Activity_id", Convert.ToInt16(DDLAttivita.SelectedValue));
 
             // Se DDL non valorizzata passa NULL al parametro
             if (DDLManager.SelectedValue != "0")
@@ -231,6 +230,16 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         SalvaControlli();
 
         /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
+        Session["QueryDettaglioCosti"] = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + Convert.ToDateTime(TBDataReport.Text) ;
+
+        if (DDLProgetti.SelectedValue != "0") 
+            Session["QueryDettaglioCosti"] += " AND Projects_id = " + DDLProgetti.SelectedValue.ToString();
+
+        if (DDLManager.SelectedValue != "0")
+                Session["QueryDettaglioCosti"] += " AND ClientManager_id = " + DDLManager.SelectedValue.ToString();
+
+        Session["QueryDettaglioCosti"] += " ORDER BY Consulente, Data";
+
         Cache.Insert("Export", ds);
         Response.Redirect("ControlloProgetto-list.aspx");
 
@@ -240,7 +249,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     protected void SalvaControlli() 
     {
         Session["DDLCpProgetti"] = DDLProgetti.SelectedIndex;
-        Session["DDLCpAttivita"] = DDLAttivita.SelectedIndex;
+        //Session["DDLCpAttivita"] = DDLAttivita.SelectedIndex;
         Session["DDLCpManager"] = DDLManager.SelectedIndex;
         Session["TBCpDataReport"] = TBDataReport.Text;
         Session["RBCpTipoCalcolo"] = RBTipoCalcolo.SelectedIndex;    
@@ -250,7 +259,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     protected void RipristinaControlli()
     {
         if (Session["DDLCpProgetti"] != null) DDLProgetti.SelectedIndex = (int)Session["DDLCpProgetti"];
-        if (Session["DDLCpAttivita"] != null) DDLAttivita.SelectedIndex = (int)Session["DDLCpAttivita"];
+        //if (Session["DDLCpAttivita"] != null) DDLAttivita.SelectedIndex = (int)Session["DDLCpAttivita"];
         if (Session["DDLCpManager"] != null) DDLManager.SelectedIndex = (int)Session["DDLCpManager"];
         if (Session["TBCpDataReport"] != null) TBDataReport.Text = Session["TBCpDataReport"].ToString();
         if (Session["RBCpTipoCalcolo"] != null) RBTipoCalcolo.SelectedIndex = (int)Session["RBCpTipoCalcolo"];
@@ -267,13 +276,13 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (Auth.ReturnPermission("REPORT","PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
             cmd = new SqlCommand("SELECT a.Projects_Id, a.ProjectCode + ' ' + left(a.Name,20) AS Descrizione FROM Projects as a" +
                                  " INNER JOIN ForcedAccounts as b ON b.Projects_id = a.Projects_id " + 
-                                 " WHERE a.active = 'true' AND a.TipoContratto_id=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] +
+                                 " WHERE a.active = 'true' " +
                                  "  AND  b.Persons_id = " + CurrentSession.Persons_id + 
                                  " ORDER BY a.ProjectCode", conn);
 
         // Se ADMIN imposta tutti i progetti di tipo FIXED 
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-             cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects WHERE active = 'true' AND TipoContratto_id=" + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] + " ORDER BY ProjectCode", conn);
+             cmd = new SqlCommand("SELECT Projects_Id, ProjectCode + ' ' + left(Projects.Name,20) AS Descrizione FROM Projects WHERE active = 'true' ORDER BY ProjectCode", conn);
 
         SqlDataReader dr = cmd.ExecuteReader();
 
@@ -290,28 +299,28 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     protected void DDLProgetti_SelectedIndexChanged(object sender, EventArgs e)
     {
         // al cambio di valore del progetto fa il bind con le relative attività
-        Bind_DDLAttivita();
+        //Bind_DDLAttivita();
     }
 
-    // Estrae attività legate al progetto e fa il bind con la DDL
-    public void Bind_DDLAttivita()
-    {
-        conn.Open();
-        SqlCommand cmd;
+    //// Estrae attività legate al progetto e fa il bind con la DDL
+    //public void Bind_DDLAttivita()
+    //{
+    //    conn.Open();
+    //    SqlCommand cmd;
 
-        cmd = new SqlCommand("select Activity_id, ActivityCode + '  ' + left(Name,20) AS Descrizione FROM Activity where Projects_id='" + DDLProgetti.SelectedValue + "' AND active = 'true' ORDER BY ActivityCode", conn);
+    //    cmd = new SqlCommand("select Activity_id, ActivityCode + '  ' + left(Name,20) AS Descrizione FROM Activity where Projects_id='" + DDLProgetti.SelectedValue + "' AND active = 'true' ORDER BY ActivityCode", conn);
 
-        SqlDataReader dr = cmd.ExecuteReader();
+    //    SqlDataReader dr = cmd.ExecuteReader();
 
-        DDLAttivita.DataSource = dr;
-        DDLAttivita.Items.Clear();
-        DDLAttivita.Items.Add(new ListItem("--Tutte le attività--", "0"));
-        DDLAttivita.DataTextField = "Descrizione";
-        DDLAttivita.DataValueField = "Activity_id";
-        DDLAttivita.DataBind();
+    //    DDLAttivita.DataSource = dr;
+    //    DDLAttivita.Items.Clear();
+    //    DDLAttivita.Items.Add(new ListItem("--Tutte le attività--", "0"));
+    //    DDLAttivita.DataTextField = "Descrizione";
+    //    DDLAttivita.DataValueField = "Activity_id";
+    //    DDLAttivita.DataBind();
 
-        conn.Close();
-    }
+    //    conn.Close();
+    //}
     
     protected void DDLManager_DataBound(object sender, EventArgs e)
     {

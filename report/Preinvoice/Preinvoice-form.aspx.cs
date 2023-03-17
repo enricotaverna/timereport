@@ -236,7 +236,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.SubtotalAmountQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.SubtotalAmountQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+            preInv.SubtotalAmountQuery += " AND T.Preinvoice_id IS NULL";
         else
             preInv.SubtotalAmountQuery += " AND t.Preinvoice_id = " + preInv.Number;
 
@@ -256,7 +256,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.AllDaysQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.AllDaysQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+            preInv.AllDaysQuery += " AND T.Preinvoice_id IS NULL";
         else
             preInv.AllDaysQuery += " AND t.Preinvoice_id = " + preInv.Number;
 
@@ -277,7 +277,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.AllExpenseQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.AllExpenseQuery += " AND ( T.Preinvoice_id IS NULL OR T.Preinvoice_id = 0 )";
+            preInv.AllExpenseQuery += " AND T.Preinvoice_id IS NULL";
         else
             preInv.AllExpenseQuery += " AND T.Preinvoice_id = " + preInv.Number;
 
@@ -290,28 +290,6 @@ public partial class Preinvoice_form : System.Web.UI.Page
     {
         //DataTable dtb;
         DataRow dr;
-
-        // progetti
-        //if (preInv.ProjectsIdList != "")
-        //{
-        //    dtb = Database.GetData("SELECT ProjectCode + ' ' + SUBSTRING(Name, 1, 20) as projectName FROM Projects WHERE Projects_Id IN (" + preInv.ProjectsIdList + ")", null);
-        //    foreach (DataRow dtRow in dtb.Rows)
-        //    {
-        //        preInv.ProjectsNameList += dtRow["projectName"] + " , ";
-        //    }
-        //    preInv.ProjectsNameList = preInv.ProjectsNameList.Substring(0, preInv.ProjectsNameList.Length - 3); // toglie ultima virgola
-        //}
-
-        // persone
-        //if (preInv.PersonsIdList != "")
-        //{
-        //    dtb = Database.GetData("SELECT Name FROM Persons WHERE Persons_Id IN (" + preInv.PersonsIdList + ")", null);
-        //    foreach (DataRow dtRow in dtb.Rows)
-        //    {
-        //        preInv.PersonsNameList += dtRow["Name"] + " , ";
-        //    }
-        //    preInv.PersonsNameList = preInv.PersonsNameList.Substring(0, preInv.PersonsNameList.Length - 3); // toglie ultima virgola
-        //}
 
         // società
         dr = Database.GetRow("Select Name from Company where company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId), null);
