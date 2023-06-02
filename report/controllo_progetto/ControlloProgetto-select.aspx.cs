@@ -230,7 +230,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         SalvaControlli();
 
         /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
-        Session["QueryDettaglioCosti"] = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + Convert.ToDateTime(TBDataReport.Text) ;
+        Session["QueryDettaglioCosti"] = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + ASPcompatility.FormatDatetimeDb(Convert.ToDateTime(TBDataReport.Text)) ;
 
         if (DDLProgetti.SelectedValue != "0") 
             Session["QueryDettaglioCosti"] += " AND Projects_id = " + DDLProgetti.SelectedValue.ToString();

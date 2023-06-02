@@ -25,7 +25,7 @@
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
 <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
 <!-- Download excel da Tabulator -->
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -33,7 +33,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title><asp:Literal runat="server" Text="Cost Rate" /></title>
+    <title>
+        <asp:Literal runat="server" Text="Cost Rate" /></title>
 </head>
 
 <body>
@@ -44,6 +45,29 @@
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
         <form id="FVForm" runat="server">
+
+            <!--**** Riquadro navigazione ***-->
+            <div class="form-group row justify-content-center">
+                <div class="col-8 RoundedBox">
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="inputtext">Consulenti:</label>
+                        </div>
+                        <div class="col-2">
+                            <asp:DropDownList ID="DDLAttivi" runat="server" AutoPostBack="True" 
+                                CssClass="ASPInputcontent" OnSelectedIndexChanged="SelectChanged">
+                                <asp:ListItem Text="Attivi" Value="true"></asp:ListItem>
+                                <asp:ListItem Text="Disattivi" Value="false"></asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
+                    </div>
+                    <!-- Fine row -->
+                </div>
+                <!-- Fine RoundedBox -->
+            </div>
+            <!-- *** Fine riquadro navigazione *** -->
+
+            <br />
 
             <div class="row justify-content-center">
 
@@ -75,10 +99,10 @@
                                 <div class="inputtext">
                                     <asp:Literal runat="server" Text="Consulente" />
                                 </div>
-                                    <asp:DropDownList ID="DDLPersons" runat="server" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id"
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" AppendDataBoundItems="True">
-                                        <asp:ListItem Text="-- selezionare un valore --" Value=""></asp:ListItem>
-                                    </asp:DropDownList>
+                                <asp:DropDownList ID="DDLPersons" runat="server" DataSourceID="DSPersons" DataTextField="Name" DataValueField="Persons_id"
+                                    data-parsley-errors-container="#valMsg" data-parsley-required="true" AppendDataBoundItems="True">
+                                    <asp:ListItem Text="-- selezionare un valore --" Value=""></asp:ListItem>
+                                </asp:DropDownList>
                             </div>
 
                             <div class="input nobottomborder">
@@ -103,13 +127,13 @@
                                 <div class="inputtext">Nota</div>
                                 <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" Width="260px" />
                             </div>
-                           
-                            <div class="" style="font-size: 10px; line-height: 14px;margin: 20px 0px -10px 10px;color:dimgrey">
-                                        <p style="margin:0px"><span style="width:200px">[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
-                                        <p style="margin:0px"><span style="width:200px">[M]</span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>                
-                            </div>                            
 
-                            <asp:TextBox runat="server" ID="TBPersonsCostRate_id" Style="visibility: hidden; height:0px; margin:0px" />
+                            <div class="" style="font-size: 10px; line-height: 14px; margin: 20px 0px -10px 10px; color: dimgrey">
+                                <p style="margin: 0px"><span style="width: 200px">[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
+                                <p style="margin: 0px"><span style="width: 200px">[M]</span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>
+                            </div>
+
+                            <asp:TextBox runat="server" ID="TBPersonsCostRate_id" Style="visibility: hidden; height: 0px; margin: 0px" />
 
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
@@ -272,11 +296,11 @@
         };  // icona edit
 
         var PersonsCostRateTable = new Tabulator("#PersonsCostRateTable", {
-            paginationSize: 15, // this option can take any positive integer value (default = 10)
+            paginationSize: 12, // this option can take any positive integer value (default = 10)
             pagination: "local", //enable local pagination.
             headerFilterPlaceholder: "filtra i record...", //set column header placeholder text
             ajaxURL: "/timereport/webservices/WS_PersonsCostRate.asmx/GetPersonsCostRateTable", //ajax URL
-            ajaxParams: { sAnno: "" }, //ajax parameters
+            ajaxParams: { sAnno: "", active : <%= DDLAttivi.SelectedValue %> }, //ajax parameters
             ajaxConfig: "POST", //ajax HTTP request type
             ajaxContentType: "json", // send parameters to the server as a JSON encoded string
             layout: "fitColumns", //fit columns to width of table (optional)
@@ -294,7 +318,6 @@
                 { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
                 { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
                 { title: "Cost Rate", field: "CostRate", sorter: "number", width: 80, headerFilter: true },
-                { title: "Nota", field: "Comment", sorter: "string", width: 200, headerFilter: true },
             <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE"))
         {
             Response.Write("{ formatter: trashIcon, width: 40, align: \"center\", cellClick: function (e, cell) { T_cancellaRecord(cell.getRow().getData(), cell.getRow()) } },");
@@ -303,8 +326,8 @@
         }
             %>
 
-        ],
-    }); // Tabella principale
+            ],
+        }); // Tabella principale
 
         // ** FUNZIONI **
 
@@ -340,7 +363,7 @@
                     var objPersonsCostRate = msg.d;
 
                     if (objPersonsCostRate.PersonsCostRate_id > 0)
-                    $('#TBPersonsCostRate_id').val(objPersonsCostRate.PersonsCostRate_id);
+                        $('#TBPersonsCostRate_id').val(objPersonsCostRate.PersonsCostRate_id);
                     $('#DDLPersons').val(objPersonsCostRate.Persons_id);
                     $('#TBCostRate').val(objPersonsCostRate.CostRate);
                     $('#TBDataDa').val(objPersonsCostRate.DataDa);
@@ -431,7 +454,7 @@
 
     <asp:SqlDataSource runat="server" ID="DSPersons"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT * FROM [Persons] WHERE Active = 'true' ORDER BY Name"></asp:SqlDataSource>
+        SelectCommand="****"></asp:SqlDataSource>
 
 </body>
 

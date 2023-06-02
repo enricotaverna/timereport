@@ -42,7 +42,7 @@ public partial class input_spese : System.Web.UI.Page
         }
 
         // di default il box revicevute non è visibile
-        BoxRicevute.Visible = false;
+        BoxRicevute.Visible = false;        
 
         //      in caso di update recupera il valore del progetto e attività
         if (Request.QueryString["expenses_id"] != null)
@@ -52,8 +52,12 @@ public partial class input_spese : System.Web.UI.Page
 
             //              disabilita form in caso di cutoff
             Label LBdate = (Label)FVSpese.FindControl("LBdate");
+            DateTime dateRecord = Convert.ToDateTime(LBdate.Text);
 
-            if (Convert.ToDateTime(LBdate.Text) < CurrentSession.dCutoffDate || lTipoBonus_id > 0)
+            // verifica se TR della persona è chiuso
+            var trChiuso = Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND stato=1 AND mese=" + dateRecord.Month.ToString() + " AND anno=" + dateRecord.Year.ToString());
+
+            if (dateRecord < CurrentSession.dCutoffDate || trChiuso || lTipoBonus_id > 0)
                 FVSpese.ChangeMode(FormViewMode.ReadOnly);
             else
                 FVSpese.ChangeMode(FormViewMode.Edit);
@@ -191,7 +195,7 @@ public partial class input_spese : System.Web.UI.Page
 
     protected void Bind_DDLprogetto()
     {
-        DataTable dtProgettiForzati;
+        DataTable dtProgettiInDDL = null;
         DropDownList ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
         ddlProject.Items.Clear();
@@ -200,22 +204,36 @@ public partial class input_spese : System.Web.UI.Page
         {
             case FormViewMode.Insert:
             case FormViewMode.Edit:
-
-                dtProgettiForzati = CurrentSession.dtProgettiForzati;
-
-                foreach (DataRow drRow in dtProgettiForzati.Rows)
-                {
-                    ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
-                    if (drRow["BloccoCaricoSpese"].ToString() != "True") // solo se carico spese è ammesso
-                        ddlProject.Items.Add(liItem);
-                }
-
+                dtProgettiInDDL = CurrentSession.dtProgettiForzati.Copy();
                 break;
 
             case FormViewMode.ReadOnly:
-
-                ddlProject.DataSource = CurrentSession.dtProgettiTutti;
+                dtProgettiInDDL = CurrentSession.dtProgettiTutti.Copy();
                 break;
+        }
+
+        // cancella le righe soggette a Workflow
+        // in caso di display cancella tutti i progetto a parte quello non selezionato
+        foreach (DataRow row in dtProgettiInDDL.Rows)
+        {
+            if (row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
+                row.Delete();
+
+            if (FVSpese.CurrentMode == FormViewMode.ReadOnly && row["Projects_id"].ToString() != lProject_id)
+                row.Delete();
+        }
+        dtProgettiInDDL.AcceptChanges();
+
+        // Aggiunge gli attributi agli item della DDL per controllare l'input in funzione del progetto selezionato
+        foreach (DataRow drRow in dtProgettiInDDL.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+
+            if (drRow["ProjectType_Id"].ToString() == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"]) // Gestione opportunity su progetti BD
+                liItem.Attributes.Add("data-OpportunityIsRequired", "True");
+
+            if (drRow["BloccoCaricoSpese"].ToString() != "True") // solo se carico spese è ammesso
+                ddlProject.Items.Add(liItem);
         }
 
         ddlProject.DataTextField = "DescProgetto";
@@ -383,18 +401,8 @@ public partial class input_spese : System.Web.UI.Page
             TBSpese.Text = SpeseValue.ToString();
         }
 
-        if (Request.QueryString["expenses_id"] != null)
-        {
-            //              Valorizza progetto e attività
-            Bind_DDLprogetto();
-            Bind_DDLTipoSpesa();
-
-        }
-        else // insert
-        {
-            Bind_DDLprogetto();
-            Bind_DDLTipoSpesa();
-        }
+        Bind_DDLprogetto();
+        Bind_DDLTipoSpesa();
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
         if (!Auth.ReturnPermission("ADMIN", "CUTOFF"))
@@ -450,6 +458,8 @@ public partial class input_spese : System.Web.UI.Page
 
         DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
+        Session["ProjectCodeDefault"] = DDLprogetto.SelectedValue;
+
         if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
             // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
             if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
@@ -457,5 +467,9 @@ public partial class input_spese : System.Web.UI.Page
             else
                 ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
 
+        Bind_DDLprogetto();
+        Bind_DDLTipoSpesa();
+
     }
+
 }

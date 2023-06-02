@@ -119,6 +119,8 @@
                     <!-- riempito da query -->
                 </select>
 
+                <input id="SpeseOpportunityId" placeholder="Opportunità" name="SpeseOpportunityId" maxlength="10" />
+
                 <br />
 
                 <textarea id="comment" name="comment" rows="2" textmode="MultiLine" placeholder="inserisci un commento se necessario"></textarea>
@@ -207,6 +209,8 @@
                     </select>
                 </div>
 
+                <input id="OpportunityId" placeholder="Opportunità" name="OpportunityId" maxlength="10" />
+
                 <div id="DDLLocation" name="DDLLocation">
                     <select id="ore_Location_Id" name="ore_Location_Id">
                         <!-- riempito da query -->
@@ -214,8 +218,6 @@
                 </div>
 
                 <input id="TBLocation" placeholder="Location" name="TBLocation" />
-
-                <%--            <select id="ore_TipoOre_Id"> <!-- riempito da query --> </select>--%>
 
                 <br />
 

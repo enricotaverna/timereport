@@ -89,6 +89,14 @@
                                 </asp:DropDownList>
                             </div>
 
+                            <!-- *** OpportunityId ***  -->
+                            <div class="input nobottomborder" id="lbOpportunityId">
+                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
+                            </div>
+
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
                                 <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"  meta:resourcekey="Label2" ></asp:Label>
@@ -184,6 +192,14 @@
                                 </asp:DropDownList>
                             </div>
 
+                            <!-- *** OpportunityId ***  -->
+                            <div class="input nobottomborder" id="lbOpportunityId">
+                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
+                            </div>
+
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
                                 <asp:Label CssClass="inputtext" ID="Label2" runat="server"  Text="Luogo"  meta:resourcekey="Label2"></asp:Label>
@@ -269,8 +285,16 @@
                             <div class="input nobottomborder" id="lbDDLAttivita">
                                 <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="Attività" meta:resourcekey="Label8Resource1"></asp:Label>
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
-                                    Enabled="False" Width="240px" meta:resourcekey="DDLAttivitaResource3">
+                                    Enabled="False"  meta:resourcekey="DDLAttivitaResource3">
                                 </asp:DropDownList>
+                            </div>
+
+                            <!-- *** OpportunityId ***  -->
+                            <div class="input nobottomborder" id="lbOpportunityId">
+                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'  Enabled="False"
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -347,20 +371,11 @@
     </div>
 
     <!-- *** DATASOURCE *** -->
-    <asp:SqlDataSource ID="DSprogetti" runat="server"
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Projects_Id, ProjectCode + ' ' + left(Name,20) AS iProgetto FROM Projects where active = 'true' and activityON = 'true' order by ProjectCode"></asp:SqlDataSource>
-    <asp:SqlDataSource ID="DStipoore" runat="server"
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT HourType_Id, HourTypeCode + ' ' + Name AS iTipoOra FROM HourType"></asp:SqlDataSource>
-    <asp:SqlDataSource ID="DSattivita" runat="server"
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
     <asp:SqlDataSource ID="DSore" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy, Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id)"
-        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType WHERE (Hours_Id = @Hours_id)"
+        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy, Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id, hours.OpportunityId FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id, OpportunityId) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @OpportunityId)"
+        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType, OpportunityId=@OpportunityId WHERE (Hours_Id = @Hours_id)"
         OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
         <InsertParameters>
@@ -431,6 +446,7 @@
 
             BindActivity();
             BindLocation();
+            BindOpportunity();
 
         });
 
@@ -462,6 +478,7 @@
 
             BindActivity();
             BindLocation();
+            BindOpportunity();
 
         });
 
@@ -470,6 +487,7 @@
 
             var ActivityOn = $("#FVore_DDLprogetto").find("option:selected").attr("data-ActivityOn");
             $("#FVore_DDLAttivita").children().remove(); // pulisce tutti gli item della  DropDown attività
+
             if (ActivityOn != "True") {  // progetto non richiede le attività 
                 $("#FVore_DDLAttivita").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
                 $('#lbDDLAttivita').hide();
@@ -489,6 +507,21 @@
                 });
                 $('#lbDDLAttivita').show(); // visualizza DropDown
             }
+
+            //// se è valorizzato lo mostra comunqua
+            //$('#lbDDLAttivita').show(); // visualizza DropDown
+            //if ($("#FVore_DDLAttivita").find("option:selected").value != "")
+            //    $('#lbDDLAttivita').show(); // visualizza DropDown
+        }
+
+        function BindOpportunity() {
+            // gestione Opportunity Id
+            var OpportunityIsRequired = $("#FVore_DDLprogetto").find("option:selected").attr("data-OpportunityIsRequired");
+
+            if (OpportunityIsRequired == "True")
+                $('#lbOpportunityId').show(); // visualizza DropDown
+            else
+                $('#lbOpportunityId').hide(); // visualizza DropDown
         }
 
         // *** popola controllo delle Location *** 

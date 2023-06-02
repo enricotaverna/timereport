@@ -51,6 +51,8 @@ $(document).ready(function () {
 
             PopulateLocation($('#ore_Projects_Id').val());
             PopulateActivity($('#ore_Projects_Id').val());
+            ShowOpportunityId($('#ore_Projects_Id').val(), "ore");
+            ShowOpportunityId($('#Projects_Id').val(), "spese");
 
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -152,6 +154,43 @@ $(document).ready(function () {
         $('#DDLActivity').hide();
     }
 
+    // Legge il valore di ProjectType_Id, se è un progetto BD mostra(show) il campo OpportunityId
+    // altrimenti lo nasconde (hide)
+    // uso la stessa funziona sia per spese che per ore
+    function ShowOpportunityId(Projects_id, type) {
+
+        // recupera il campo ProjectType_Id
+        $.ajax({
+            type: "POST",
+            url: "aggiornav2.asmx/GetProjectTypeId",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: "{'Projects_id': '" + Projects_id + "'}",
+            success: function (msg) {
+
+                if (msg.d > 0) {
+                    if (msg.d == 2) {
+                        if (type == "ore")
+                            $('#OpportunityId').show();
+                        else
+                            $('#SpeseOpportunityId').show();
+                    }
+                    else {
+                        if (type == "ore")
+                            $('#OpportunityId').hide();
+                        else
+                            $('#SpeseOpportunityId').hide();
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText);
+            }
+        });
+
+        $('#DDLActivity').hide();
+    }
+    
     //#region *** VALIDAZIONI ***
     var ErrMsg = "";
     $.validator.addMethod(
@@ -287,10 +326,12 @@ $(document).ready(function () {
         function () { return ErrMsg });
 
     $.validator.addMethod("numberRegex", function (value, element) {
-
         return /^[0-9,]+$/i.test(value);
-
     }, "campo deve essere numerico");
+
+    $.validator.addMethod("opportunityRegex", function (value, element) {
+        return /^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$/.test(value);
+    }, "formato campo non valido");
 
     // *** spese validate ***
     var speseValidator = $("#SpeseForm").validate({
@@ -300,7 +341,8 @@ $(document).ready(function () {
             TbExpenseAmount: { required: true, numberRegex: true },
             //fileToUpload: {required: false, extension: "gif|jpg|png|jpeg"  }
             comment: { CampoNoteObbligatorio: true },  // validatore custom obbligatorietà campo note
-            Projects_Id: { BloccoCaricoSpese: true }
+            Projects_Id: { BloccoCaricoSpese: true },
+            SpeseOpportunityId: { required: true, opportunityRegex: true } 
         },
         messages: {
             Tbdate: { required: "Inserire un valore!" },
@@ -336,7 +378,8 @@ $(document).ready(function () {
             TbdateForHours: { required: true, date: false },
             TbHours: { required: true, number: true },
             ore_comment: { CampoNoteObbligatorioFormOre: true },  // validatore custom obbligatorietà campo note
-            TBLocation: { CheckLocation: true }
+            TBLocation: { required: true, CheckLocation: true },
+            OpportunityId: { required: true, opportunityRegex: true }, 
         },
         messages: {
             TbdateForHours: { required: "Inserire un valore!" },
@@ -376,6 +419,14 @@ $(document).ready(function () {
         if ($('#ore_Projects_Id').val() != "0") {
             PopulateActivity($('#ore_Projects_Id').val());
             PopulateLocation($('#ore_Projects_Id').val());
+            ShowOpportunityId($('#ore_Projects_Id').val(), "ore");            
+        }
+    });
+
+    $('#Projects_Id').change(function () {
+
+        if ($('#Projects_Id').val() != "0") {
+            ShowOpportunityId($('#Projects_Id').val(), "spese");
         }
     });
 
@@ -429,6 +480,7 @@ $(document).ready(function () {
             " , 'InvoiceFlag': '" + $('#InvoiceFlag').is(':checked') + "'" +
             " , 'strFileName': '" + strFileName + "'" +
             " , 'strFileData': '" + strFileData + "'" +
+            " , 'OpportunityId': '" + $('#SpeseOpportunityId').val() + "'" +
             "}";
 
         $.mobile.showPageLoadingMsg("a", "Caricamento... ", true);
@@ -476,10 +528,10 @@ $(document).ready(function () {
         var LocationDescription;
         var LocationType;
 
-        if ($('#ore_Activity_Id  ').val() == null)
+        if ($('#ore_Activity_Id').val() == null)
             Activity = "0";
         else
-            Activity = $('#ore_Activity_Id  ').val();
+            Activity = $('#ore_Activity_Id').val();
 
         // imposta tipo location in base al controllo valorizzato
         LocationKey = $('#ore_Location_Id').is(':hidden') ? "99999" : $('#ore_Location_Id').val();
@@ -498,6 +550,7 @@ $(document).ready(function () {
             " , 'LocationKey': '" + LocationKey + "'" +
             " , 'LocationType': '" + LocationType + "'" +
             " , 'LocationDescription': '" + LocationDescription + "'" +
+            " , 'OpportunityId': '" + $('#OpportunityId').val() + "'" +
             "}";
 
         $.mobile.showPageLoadingMsg("c", "Aggiornamento", true);
@@ -629,6 +682,7 @@ function init_ore() {
     // pulisci campi modulo
     $('#ore_TbHours').val("");
     $('#ore_comment').val("");
+    $('#OpportunityId').val("");
     $('#ore_CancelFlag').attr('checked', false);
     $('#ore_CancelFlag').checkboxradio("refresh");
 
