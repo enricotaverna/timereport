@@ -94,7 +94,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -197,7 +197,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -294,7 +294,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'  Enabled="False"
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->

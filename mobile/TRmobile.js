@@ -330,19 +330,18 @@ $(document).ready(function () {
     }, "campo deve essere numerico");
 
     $.validator.addMethod("opportunityRegex", function (value, element) {
-        return /^AV\d{2}[A-Z]\d{3}$|^AP\d{1,13}$/.test(value);
+        return /^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$/.test(value);
     }, "formato campo non valido");
 
     // *** spese validate ***
     var speseValidator = $("#SpeseForm").validate({
-        ignore: ".ignore",
         rules: {
             Tbdate: { required: true, date: false },
             TbExpenseAmount: { required: true, numberRegex: true },
             //fileToUpload: {required: false, extension: "gif|jpg|png|jpeg"  }
             comment: { CampoNoteObbligatorio: true },  // validatore custom obbligatorietà campo note
             Projects_Id: { BloccoCaricoSpese: true },
-            SpeseOpportunityId: { required: true, opportunityRegex: true } 
+            SpeseOpportunityId: { required: true, opportunityRegex: true },
         },
         messages: {
             Tbdate: { required: "Inserire un valore!" },
@@ -683,6 +682,7 @@ function init_ore() {
     $('#ore_TbHours').val("");
     $('#ore_comment').val("");
     $('#OpportunityId').val("");
+    $('#SpeseOpportunityId').val("");
     $('#ore_CancelFlag').attr('checked', false);
     $('#ore_CancelFlag').checkboxradio("refresh");
 
