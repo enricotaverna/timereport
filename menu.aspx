@@ -83,7 +83,7 @@
                         <div class="widget-content-wrapper">
                             <div class="widget-content-left">
                                 <div class="widget-heading">Giornate training team</div>
-                                <div class="widget-subheading">prossimi 30 gg</div>
+                                <div class="widget-subheading">prossimi 90 gg</div>
                             </div>
                             <div class="widget-content-right">
                                 <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
@@ -146,7 +146,7 @@
                         <div class="widget-content-wrapper">
                             <div class="widget-content-left">
                                 <div class="widget-heading">Giornate assenza team</div>
-                                <div class="widget-subheading">prossimi 30 gg</div>
+                                <div class="widget-subheading">prossimi 90 gg</div>
                             </div>
                             <div class="widget-content-right">
                                 <div class="widget-numbers text-success"><span id="GiorniAssenza-KPIValue0">-</span></div>

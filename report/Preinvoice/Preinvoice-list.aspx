@@ -138,7 +138,7 @@
             },
             columns: [
                 { title: "Numero", field: "Preinvoice_id", sorter: "number", headerFilter: true },
-                { title: "Data", field: "CreationDate", sorter: "string", headerFilter: true },
+                { title: "Data", field: "DocumentDate", sorter: "string", headerFilter: true },
                 { title: "Società", field: "CompanyName", sorter: "string", headerFilter: true },
                 { title: "Da", field: "DataDa", sorter: "string", headerFilter: true },
                 { title: "A", field: "DataA", sorter: "string", headerFilter: true },

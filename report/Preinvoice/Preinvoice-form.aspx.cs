@@ -64,6 +64,15 @@ public partial class Preinvoice_form : System.Web.UI.Page
         }
     }
 
+    public string GetStartDate() {
+        return preInv.DataDa;
+    }
+
+    public string GetEndDate()
+    {
+        return preInv.DataA;
+    }
+
     public void CreatePreinvoice(PreInvoiceData preInv)
     {
         int loopIndex = 0;
@@ -208,7 +217,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void LoadFromSessions(PreInvoiceData preInv)
     {
         preInv.Number = "nr";
-        preInv.Date = DateTime.Today.ToString("dd/MM/yyyy");
+        //preInv.Date = DateTime.Today.ToString("dd/MM/yyyy");
         preInv.DataDa = (string)Session["PreinvDataDa"];
         preInv.DataA = (string)Session["PreinvDataA"];
         preInv.CompanyId = (string)Session["PreinvSocieta"];
@@ -240,8 +249,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
         else
             preInv.SubtotalAmountQuery += " AND t.Preinvoice_id = " + preInv.Number;
 
-        preInv.AllDaysQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', locationdescription  " +
+        preInv.AllDaysQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', " +
+                                     "fn.Tariffa, fn.Tariffa * T.Hours / 8 as Importo, " +
+                                     "locationdescription as 'Location', Comment as 'Nota' " +
                                      "FROM hours as T " +
+                                     "CROSS APPLY ( SELECT [MSSql12155].FCT_DeterminaCostRate(T.persons_id, T.projects_id, " + ASPcompatility.FormatDateDb(preInv.DataDa) + ") as Tariffa  ) fn " +
                                      "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                      "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
                                      "INNER JOIN persons as D ON D.persons_id = t.persons_id " +
@@ -348,11 +360,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
         Boolean insertOk = Database.ExecuteSQL("INSERT INTO Preinvoice (company_id, Date, DataDa, DataA, CreatedBy, CreationDate, NumberOfDays, TotalRates, TotalExpenses, TotalAmount, ProjectsSelection, PersonsSelection, Description, DirectorsName ) VALUES ( " +
                              ASPcompatility.FormatStringDb(preInv.CompanyId) + " , " +
-                             ASPcompatility.FormatDateDb(preInv.Date) + " , " +
+                             ASPcompatility.FormatDateDb(TBDataPrefattura.Text) + " , " +
                              ASPcompatility.FormatDateDb(preInv.DataDa) + " , " +
                              ASPcompatility.FormatDateDb(preInv.DataA) + " , " +
                              ASPcompatility.FormatStringDb(CurrentSession.UserId) + " , " +
-                             ASPcompatility.FormatDateDb(preInv.Date) + " , " +
+                             ASPcompatility.FormatDateDb(DateTime.Today.ToString("dd/MM/yyyy")) + " , " +
                              ASPcompatility.FormatNumberDB(preInv.TotalDays) + " , " +
                              ASPcompatility.FormatNumberDB(preInv.TotalRates) + " , " +
                              ASPcompatility.FormatNumberDB(preInv.TotalExpenses) + " , " +

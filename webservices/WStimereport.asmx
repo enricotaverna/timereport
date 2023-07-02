@@ -276,7 +276,7 @@ public class WStimereport : System.Web.Services.WebService {
         switch (Session["type"].ToString()) {
 
             case "hours":
-                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.OpportunityId " +
                                                "FROM hours AS a " +
                                                "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                "WHERE hours_id=" + sId, null);
@@ -289,7 +289,7 @@ public class WStimereport : System.Web.Services.WebService {
                 strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                 // scrive il record copia!
-                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, WorkedInRemote, LocationKey, LocationType, LocationDescription, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id ) VALUES(" +
+                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, WorkedInRemote, LocationKey, LocationType, LocationDescription, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, OpportunityId ) VALUES(" +
                                      ASPcompatility.FormatDateDb(sInsDate, false) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -308,7 +308,8 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " )"
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["OpportunityId"].ToString())  + " )"
                                     , null);
 
                 // recupera record Id creato 
@@ -324,7 +325,7 @@ public class WStimereport : System.Web.Services.WebService {
             case "bonus":
 
                 // leggi record da copiare
-                dt = Database.GetData("SELECT a.projects_id, persons_id, Amount, a.ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, a.TipoBonus_id, AccountingDate, comment, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.AdditionalCharges, a.AmountInCurrency " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, Amount, a.ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, a.TipoBonus_id, AccountingDate, comment, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.AdditionalCharges, a.AmountInCurrency, a.OpportunityId " +
                                                 "FROM Expenses AS a " +
                                                 "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                 "INNER JOIN ExpenseType AS c ON  c.ExpenseType_id = a.ExpenseType_id " +
@@ -338,7 +339,7 @@ public class WStimereport : System.Web.Services.WebService {
                 strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                 // scrive il record copia!
-                Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency) VALUES(" +
+                Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency, OpportunityId) VALUES(" +
                                      ASPcompatility.FormatDateDb(sInsDate, false) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -357,7 +358,8 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString())  + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AdditionalCharges"].ToString())  + " , " +
-                                     ASPcompatility.FormatNumberDB(Convert.ToDouble(dt.Rows[0]["AmountInCurrency"].ToString()))  +
+                                     ASPcompatility.FormatNumberDB(Convert.ToDouble(dt.Rows[0]["AmountInCurrency"].ToString())) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["OpportunityId"].ToString())  + 
                                      " )" 
                                     , null);
                      

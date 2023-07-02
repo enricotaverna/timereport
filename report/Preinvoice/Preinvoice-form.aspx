@@ -54,6 +54,14 @@
                         <asp:Label ID="LBPeriodo" runat="server"></asp:Label>
                     </div>
 
+                    <div class="input nobottomborder DataPrefattura">
+                        <asp:Label CssClass="inputtext DataPrefattura" runat="server" Text="Data" ID="LbDataPrefattura" ></asp:Label>
+                        <asp:TextBox runat="server" CssClass="ASPInputcontent DataPrefattura" ID="TBDataPrefattura" MaxLength="10" Rows="8" Width="100px"
+                            data-parsley-errors-container="#valMsg" data-parsley-required="true" 
+                            data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" 
+                            data-parsley-rangedata />
+                    </div>
+
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Società"></asp:Label>
                         <asp:Label ID="LBCompany" runat="server"></asp:Label>
@@ -142,6 +150,39 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
         UnMaskScreen(); // cursore e finestra modale
 
+        // controllo sulle date
+        window.Parsley.addValidator('rangedata', {
+            validate: function (value, requirement) {
+
+                // controllo solo se ToDate è valorizzata
+                if ($("#TBDataPrefattura").val().length == 0)
+                    return true;
+
+                // converte in YYYYMMDD
+                var dataInput = $("#TBDataPrefattura").val().substring(6, 11) + $("#TBDataPrefattura").val().substring(3, 5) + $("#TBDataPrefattura").val().substring(0, 2);
+                var dataDa = '<%= GetStartDate() %>'.substring(6, 11) + '<%= GetStartDate() %>'.substring(3, 5) + '<%= GetStartDate() %>'.substring(0, 2);
+                var dataA = '<%= GetEndDate() %>'.substring(6, 11) + '<%= GetEndDate()  %>'.substring(3, 5) + '<%= GetEndDate()  %>'.substring(0, 2);               
+
+                if (dataInput < dataDa || dataInput > dataA )
+                    return false;
+                else
+                    return true;
+
+            },
+            messages: {
+                en: 'Check preinvoice date',
+                it: 'Data prefattura non ammessa'
+            }
+        });
+
+        // *** attiva validazione campi form
+        $('#FVMain').parsley({
+            excluded: "input[type=reset], [disabled]"
+        });
+
+        // datepicker
+        $("#TBDataPrefattura").datepicker($.datepicker.regional['it']);
+
         // se non seleziona record o FLC mancanti
         const disableButtons = () => {
             $("#LinkButton1").hide();
@@ -150,6 +191,8 @@
             $("#BTSave").hide();
         }
 
+
+
         $("document").ready(() => {
 
             // nasconde i campi che hanno passato i valori dal server per fare la chiamata ajax
@@ -157,7 +200,11 @@
             $("#BTSave").hide();
 
             if ($("#TBPreinvoiceNumber").val() == 'nr') // in creazione, serve controllo FLC
-                CheckFLC();              
+                CheckFLC();
+
+            if ($("#TBPreinvoiceNumber").val() != 'nr') {// in display nasconde il campo di input data
+                $(".DataPrefattura").hide();
+            }
         }
         );
 

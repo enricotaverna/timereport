@@ -458,7 +458,7 @@ public partial class input_spese : System.Web.UI.Page
 
         DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
-        Session["ProjectCodeDefault"] = DDLprogetto.SelectedValue;
+        //Session["ProjectCodeDefault"] = DDLprogetto.SelectedValue;
 
         if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
             // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
@@ -467,8 +467,8 @@ public partial class input_spese : System.Web.UI.Page
             else
                 ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
 
-        Bind_DDLprogetto();
-        Bind_DDLTipoSpesa();
+        //Bind_DDLprogetto();
+        //Bind_DDLTipoSpesa();
 
     }
 

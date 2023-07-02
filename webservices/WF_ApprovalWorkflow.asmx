@@ -86,7 +86,7 @@ public class Card
         string sql;
         string SQLfilterApprovalRequest = "";
         DateTime DateFrom = (DateTime)DateTime.Today; // sottrae i giorni del parametro
-        DateTime DateTo = (DateTime)DateTime.Today.AddDays(30); // sottrae i giorni del parametro
+        DateTime DateTo = (DateTime)DateTime.Today.AddDays(90); // sottrae i giorni del parametro
         string MonthStartDate = ASPcompatility.FormatDateDb("1/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
         KPISet kpi;
 
