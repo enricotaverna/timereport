@@ -217,7 +217,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void LoadFromSessions(PreInvoiceData preInv)
     {
         preInv.Number = "nr";
-        //preInv.Date = DateTime.Today.ToString("dd/MM/yyyy");
+        preInv.Date = (string)Session["PreinvDocDate"];
         preInv.DataDa = (string)Session["PreinvDataDa"];
         preInv.DataA = (string)Session["PreinvDataA"];
         preInv.CompanyId = (string)Session["PreinvSocieta"];
@@ -325,11 +325,18 @@ public partial class Preinvoice_form : System.Web.UI.Page
         TBDataA.Text = preInv.DataA;
         TBDataDa.Text = preInv.DataDa;
         TBPreinvoiceNumber.Text = preInv.Number;
+        TBDataPrefattura.Text = preInv.Date;
     }
 
     // Bottoni
     protected void Download_Preinvoice(object sender, EventArgs e)
     {
+        // aggiorna data se inserita direttamente nel form
+        if (TBDataPrefattura.Text != preInv.Date) { 
+            Session["PreinvDocDate"] = TBDataPrefattura.Text;
+            preInv.Date = TBDataPrefattura.Text;
+        }
+
         CalculateTotalsFromDB(preInv); // ri-calcola i totali
         CreatePreinvoice(preInv);
         // crea documento Word

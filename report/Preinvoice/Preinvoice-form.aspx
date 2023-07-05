@@ -59,7 +59,7 @@
                         <asp:TextBox runat="server" CssClass="ASPInputcontent DataPrefattura" ID="TBDataPrefattura" MaxLength="10" Rows="8" Width="100px"
                             data-parsley-errors-container="#valMsg" data-parsley-required="true" 
                             data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" 
-                            data-parsley-rangedata />
+                            data-parsley-rangedata  />
                     </div>
 
                     <div class="input nobottomborder">

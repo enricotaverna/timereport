@@ -360,7 +360,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(OreNelMese);
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);
-        listaCard.Add(CVdaConfermare);
+        //listaCard.Add(CVdaConfermare);
         listaCard.Add(ListaLocation);
         //listaCard.Add(ContrattiSubco);
     }

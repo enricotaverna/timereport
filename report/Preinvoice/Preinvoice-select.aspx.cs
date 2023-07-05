@@ -17,42 +17,67 @@ public partial class report_ricevute_select : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
+        // default data
+        if (!IsPostBack)
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(-1);
+            DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+            TBDataDa.Text = firstDayOfMonth.ToString("dd/MM/yyyy");
+            TBDataA.Text = lastDayOfMonth.ToString("dd/MM/yyyy");
+
+            init_controlli("full");
+        }
+
         // Popola Drop Down con lista progetti
-        if (IsPostBack && Page.Request.Form["btnReport"] == null) { // Postback non triggerato da pulsante report
+        if (IsPostBack && Page.Request.Form["btnReport"] == null)
+        { // Postback non triggerato da pulsante report
 
             // triggerato da cambio data
             if (TBDataA.Text != (string)Session["PrefatturaDataA"] | TBDataDa.Text != (string)Session["PrefatturaDataDa"])
-            {
-                Session["PrefatturaDataA"] = TBDataA.Text;
-                Session["PrefatturaDataDa"] = TBDataDa.Text;
-                // Popola dropdown con i valori          
-                Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
-                Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
-                Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
-                // recupera valori controlli
-                RipristinaControlli();
-            }
-            else {
-                Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
-                Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
-            }
+                init_controlli("full");
+            else
+                init_controlli("partial");
         }
 
     }
 
     // Lancia Pagina con GridView per visualizzazione report
-    protected void sottometti_Click(object sender , System.EventArgs e ) {        
-        Button bt = (Button) sender;
-
-        if (bt.CommandName == "report") 
-            {
-                // salva valori controlli 
-                SalvaControlli();
-
-                //Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue +  "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue +
-                //                  "&persona=" + DDLPersone.SelectedValue + "&project=" + DDLProject.SelectedValue  + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
-            }
+    protected void init_controlli(string mode)
+    {
+        if (mode == "full")
+        {
+            Session["PrefatturaDataA"] = TBDataA.Text;
+            Session["PrefatturaDataDa"] = TBDataDa.Text;
+            // Popola dropdown con i valori          
+            Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
+            Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
+            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
+            // recupera valori controlli
+            RipristinaControlli();
         }
+        else
+        {
+            Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
+            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
+        }
+    }
+
+    // Lancia Pagina con GridView per visualizzazione report
+    protected void sottometti_Click(object sender, System.EventArgs e)
+    {
+        Button bt = (Button)sender;
+
+        if (bt.CommandName == "report")
+        {
+            // salva valori controlli 
+            SalvaControlli();
+
+            //Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue +  "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue +
+            //                  "&persona=" + DDLPersone.SelectedValue + "&project=" + DDLProject.SelectedValue  + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
+        }
+    }
 
     // salva valori dei controlli
     protected void SalvaControlli()
@@ -64,14 +89,14 @@ public partial class report_ricevute_select : System.Web.UI.Page
             {
                 DropDownList ddl = (DropDownList)control;
                 // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
-               if (ddl.SelectedIndex != 0) 
-                Session[ddl.ID] = ddl.SelectedIndex;
+                if (ddl.SelectedIndex != 0)
+                    Session[ddl.ID] = ddl.SelectedIndex;
             }
 
         }
     }
-        // salva valori dei controlli
-        protected void RipristinaControlli()
+    // salva valori dei controlli
+    protected void RipristinaControlli()
     {
 
         foreach (Control control in FVForm.Controls)
@@ -80,7 +105,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
             {
                 DropDownList ddl = (DropDownList)control;
                 // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
-                if (Session[ddl.ID] != null) 
+                if (Session[ddl.ID] != null)
                     ddl.SelectedIndex = (int)Session[ddl.ID];
             }
 
@@ -94,11 +119,12 @@ public partial class report_ricevute_select : System.Web.UI.Page
         DDLSocieta.Items.Clear();
         DDLSocieta.Visible = true;
 
-        DataTable dtSocieta = Database.GetData("SELECT DISTINCT hours.company_id, B.Name as companyName FROM Hours " + 
-                                               "INNER JOIN Company as B ON B.company_id = hours.company_id " + 
+        DataTable dtSocieta = Database.GetData("SELECT DISTINCT hours.company_id, B.Name as companyName FROM Hours " +
+                                               "INNER JOIN Company as B ON B.company_id = hours.company_id " +
                                                "WHERE date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY companyName DESC", this.Page);
 
-        foreach (DataRow dtRow in dtSocieta.Rows) {
+        foreach (DataRow dtRow in dtSocieta.Rows)
+        {
             DDLSocieta.Items.Insert(0, new ListItem(dtRow["companyName"].ToString(), dtRow["company_id"].ToString()));
         }
 
@@ -113,7 +139,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         DataTable dtProgetti = Database.GetData("SELECT DISTINCT hours.projects_id, B.ProjectCode + ' ' + SUBSTRING(B.Name, 1, 20) as projectName FROM Hours " +
                                                "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
-                                               "WHERE hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) +  " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
+                                               "WHERE hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) + " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
 
         foreach (DataRow dtRow in dtProgetti.Rows)
         {
@@ -147,6 +173,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
     {
 
         // salva variabili di sessioni
+        Session["PreinvDocDate"] = TBDataA.Text;
         Session["PreinvDataA"] = TBDataA.Text;
         Session["PreinvDataDa"] = TBDataDa.Text;
         Session["PreinvSocieta"] = DDLSocieta.SelectedValue;

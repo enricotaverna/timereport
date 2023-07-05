@@ -31,7 +31,7 @@ public class RP_Preinvoice : System.Web.Services.WebService
         String query =  "SELECT Preinvoice_id, Description, CONVERT(VARCHAR(10), DataDa, 103) as DataDa, CONVERT(VARCHAR(10), DataA, 103) as DataA, CreatedBy, CONVERT(VARCHAR(10), Date, 103) as DocumentDate, NumberOfDays, TotalAmount, TotalExpenses, TotalRates, B.Name as CompanyName, DirectorsName " +
                         "FROM Preinvoice " +
                         "INNER JOIN Company as B ON B.Company_id = Preinvoice.Company_id " +
-                        "ORDER BY CreationDate DESC, CreatedBy";
+                        "ORDER BY Preinvoice_id DESC";
         return Database.FromSQLSelectToJson(query);
     }
 
