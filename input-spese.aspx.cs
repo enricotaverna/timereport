@@ -240,11 +240,11 @@ public partial class input_spese : System.Web.UI.Page
         ddlProject.DataValueField = "Projects_Id";
         ddlProject.DataBind();
 
-        if (lProject_id != "")
+        if (lProject_id != null)
             ddlProject.SelectedValue = lProject_id;
 
         // se in creazione imposta il default di progetto 
-        if (FVSpese.CurrentMode == FormViewMode.Insert)
+        if (FVSpese.CurrentMode == FormViewMode.Insert && lProject_id == null)
         {
             // prima cerca progetto sul giorno, se non lo trova mette ultimo default
             DataRow drRecord = Database.GetRow("SELECT Projects_id FROM Hours WHERE persons_id = " + CurrentSession.Persons_id + " AND date = " + ASPcompatility.FormatDateDb(Request["date"]), this.Page);
@@ -454,21 +454,21 @@ public partial class input_spese : System.Web.UI.Page
     protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
     {
 
-        Label LBdate = (Label)FVSpese.FindControl("LBdate");
+    //    Label LBdate = (Label)FVSpese.FindControl("LBdate");
 
-        DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
+     DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
-        //Session["ProjectCodeDefault"] = DDLprogetto.SelectedValue;
+    lProject_id = DDLprogetto.SelectedValue;
 
-        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-            // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
-            if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioNonEsisteProgetto") + "'); } );", true);
-            else
-                ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
+    //    if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+    //        // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
+    //        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
+    //            ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioNonEsisteProgetto") + "'); } );", true);
+    //        else
+    //            ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
 
-        //Bind_DDLprogetto();
-        //Bind_DDLTipoSpesa();
+    Bind_DDLprogetto(); // ripristina gli attributi sulla select
+    Bind_DDLTipoSpesa();
 
     }
 

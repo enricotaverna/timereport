@@ -81,8 +81,8 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
+                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged" >
                                     </asp:DropDownList>
                                 </div>
 
@@ -188,8 +188,8 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged"
-                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource1">
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
+                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource1" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
                                     </asp:DropDownList>
                                 </div>
 
@@ -418,7 +418,7 @@
     </div>
     <!-- container -->
 
-    <!-- Per output messaggio warning -->
+   <!-- Per output messaggio warning -->
     <div id="dialog" style="display: none"></div>
 
     <!-- *** FOOTER *** -->
@@ -530,6 +530,27 @@
 
             BindOpportunity();
 
+            // chiama Ajax per controllo carico spese sul giorni
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/CheckCaricoSpesa",
+                data: "{ 'projects_id' : '" + $('#FVSpese_DDLprogetto').val() + "', 'persons_id' : '<%=CurrentSession.Persons_id%>' , 'date' : '" + $('#FVSpese_LBdate').html() + "'  }",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
+                    if (msg.d != "") {
+                        MaskScreen(true);
+                        ShowPopup(msg.d);
+                        UnMaskScreen();
+                        //BindOpportunity();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+            }); // ajax
+
         });
 
         // *** Esclude i controlli nascosti *** 
@@ -538,7 +559,7 @@
         });
 
         $("#FVSpese_DDLprogetto").on("change", function () {
-            BindOpportunity();
+
         });
 
         function BindOpportunity() {
