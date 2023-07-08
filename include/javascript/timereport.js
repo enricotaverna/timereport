@@ -16,23 +16,26 @@ var displayAlert = function () {
 };
 
 // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
-function ShowPopup(message, url) {
+function ShowPopup(message, url, titleBox) {
     $(function () {
 
+        if (titleBox == null)
+            titleBox = "Messaggio";
+            
         // se non c'è la div mask la aggiunge
         if (document.getElementById("dialog") == null)
             $("body").append("<div id='dialog'></div>");
 
         $("#dialog").html(message);
         $("#dialog").dialog({
-            title: "Messaggio",
+            title: titleBox,
             classes: {
                 "ui-dialog": "dialogMessage"
             },
             buttons: {
                 Close: function () {
                     $(this).dialog('close');
-                    if (url != undefined)
+                    if (url != undefined && url != '' )
                         window.location.href = url;
                 }
             },

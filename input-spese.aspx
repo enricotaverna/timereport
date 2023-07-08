@@ -541,7 +541,7 @@
                     // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
                     if (msg.d != "") {
                         MaskScreen(true);
-                        ShowPopup(msg.d);
+                        ShowPopup(msg.d,'','Attenzione');
                         UnMaskScreen();
                         //BindOpportunity();
                     }
