@@ -248,3 +248,4 @@ ModelManifest.xml
 _public/
 
 web.config
+/App_Data/PublishProfiles/IISProfile.pubxml
