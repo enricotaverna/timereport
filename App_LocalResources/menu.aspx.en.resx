@@ -123,6 +123,9 @@
   <data name="da_inizio_mese_ad_oggi" xml:space="preserve">
     <value>Since month start to today</value>
   </data>
+  <data name="indennita_di_trasferte" xml:space="preserve">
+    <value>Travel Allowance</value>
+  </data>
   <data name="Luogo" xml:space="preserve">
     <value>Location</value>
   </data>
@@ -164,6 +167,9 @@
   </data>
   <data name="Spese_Mese" xml:space="preserve">
     <value>Month Expenses</value>
+  </data>
+  <data name="Ticket" xml:space="preserve">
+    <value>Ticket</value>
   </data>
   <data name="titolo" xml:space="preserve">
     <value>PROVA PROVA</value>
