@@ -195,37 +195,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="widget-content p-0">
-                                <div class="widget-content-outer">
-                                    <div class="widget-content-wrapper">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:Ticket %>" /></div>
-                                            <div class="widget-subheading"><asp:Literal runat="server" Text="<%$ Resources:mese_corrente %>" /></div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue3">-</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="widget-content p-0">
-                                <div class="widget-content-outer">
-                                    <div class="widget-content-wrapper">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:indennita_di_trasferte %>" /></div>
-                                            <div class="widget-subheading"><asp:Literal runat="server" Text="<%$ Resources:mese_corrente %>" /></div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue4">-</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                        </li> 
                     </ul>
                 </div>
 
