@@ -1,4 +1,4 @@
-﻿<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
+<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
 
 using System;
 using System.Web.Services;
@@ -267,18 +267,47 @@ public class Card
             case "SpeseNelMese":
                 string sToDate = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month).ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
 
-                // spese totali
-                sql = "SELECT Round(Sum(AmountInCurrency),2) AS TotalAmount " +
-                "FROM  Expenses " +
-                "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
-                "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
-                "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id);
+                //// spese totali
+                //sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount,TipoBonus.Descrizione " +
+                //"FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
+                //"LEFT JOIN TipoBonus ON Expenses.TipoBonus_Id = TipoBonus.TipoBonus_id "+
+                //"INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
+                //"WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
+                //"Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) +
+                //" GROUP BY Expenses.TipoBonus_Id,TipoBonus.Descrizione  order by Expenses.TipoBonus_Id Asc";
 
-                result = Database.ExecuteScalar(sql, null);
+                // spese totali
+                sql = "SELECT DISTINCT(Expenses.TipoBonus_Id),TotalAmount,TAB.Descrizione "+
+                      "FROM Expenses "+
+                      "LEFT JOIN  "+
+                      "( "+
+                            "SELECT  "+
+                            "Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount,TipoBonus.Descrizione,Expenses.TipoBonus_Id "+
+                            "FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) "+
+                            "LEFT JOIN TipoBonus ON Expenses.TipoBonus_Id = TipoBonus.TipoBonus_id "+
+                            "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id "+
+                            "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
+                            "Persons.Persons_id ="  + ASPcompatility.FormatNumberDB(persons_id) +
+                            "GROUP BY Expenses.TipoBonus_Id,TipoBonus.Descrizione "+
+                        ") AS TAB on TAB.TipoBonus_Id = Expenses.TipoBonus_Id "+
+                        "ORDER BY Expenses.TipoBonus_Id ASC";
+
+                //result = Database.ExecuteScalar(sql, null);
+                DataTable dtKpi = new DataTable();
+                dtKpi = Database.GetData(sql, null);
+
+                object sumObject;
+                sumObject = dtKpi.Compute("Sum(TotalAmount)","");
+
+                //kpi = new KPISet();
+                //kpi.KPIDescription = "";
+                //kpi.KPIValue = (result == DBNull.Value) ? "0€" : result.ToString() + "€";
+                //KPIList.Add(kpi);
+
 
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
-                kpi.KPIValue = (result == DBNull.Value) ? "0€" : Convert.ToDouble(result).ToString("#,0.00") + "€";
+                kpi.KPIValue = (sumObject == null) ? "0€" :sumObject + "€";
                 KPIList.Add(kpi);
 
                 // chilometri     
@@ -296,19 +325,38 @@ public class Card
                 kpi.KPIValue = (result == DBNull.Value) ? "0km" : Convert.ToUInt16(result).ToString() + "km";
                 KPIList.Add(kpi);
 
-                // spese da rimborsare
-                sql = "SELECT Round(Sum(AmountInCurrency),2) AS TotalAmount " +
-                "FROM  Expenses " +
-                "INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
-                "WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
-                "Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND Expenses.CreditCardPayed = 0 AND Expenses.CompanyPayed = 0 ";
+                //// spese da rimborsare
+                //sql = "SELECT Round(Sum(Expenses.Amount*ExpenseType.ConversionRate),2) AS TotalAmount " +
+                //"FROM   (Expenses INNER JOIN ExpenseType ON Expenses.ExpenseType_id = ExpenseType.ExpenseType_Id) " +
+                //"INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id " +
+                //"WHERE Expenses.Date >=" + MonthStartDate + " And Expenses.Date <=" + sToDate + " AND " +
+                //"Persons.Persons_id = " + ASPcompatility.FormatNumberDB(persons_id) + " AND Expenses.CreditCardPayed = 0 AND Expenses.CompanyPayed = 0 ";
 
-                result = Database.ExecuteScalar(sql, null);
+                //result = Database.ExecuteScalar(sql, null);
 
-                kpi = new KPISet();
-                kpi.KPIDescription = "";
-                kpi.KPIValue = (result == DBNull.Value) ? "-" : "rimborso: " + result.ToString() + "€";
-                KPIList.Add(kpi);
+                //kpi = new KPISet();
+                //kpi.KPIDescription = "";
+                //kpi.KPIValue = (result == DBNull.Value) ? "-" : "rimborso: " + result.ToString() + "€";
+                //KPIList.Add(kpi);
+
+                //aggiungo in coda i nuovi kpi richiesti cosi non sballo la numerazione per indici presente nel JAVSCRIPT
+                //ciclo solamente 2 perche sono sicuro che dalla select tornano sempre 3 valori, il primo è preso in testa per il rimborso
+                DataRowCollection rowsSpeseMese = dtKpi.Rows;
+                for (int i = 0; i < 3; i++)
+                {
+
+                    string DescRimborso = rowsSpeseMese[i]["Descrizione"].ToString() + ": ";
+
+                    if (rowsSpeseMese[i]["Descrizione"].ToString() =="")
+                    {
+                            DescRimborso = "Rimborso: ";
+                    }
+
+                    kpi = new KPISet();
+                    kpi.KPIDescription = rowsSpeseMese[i].ToString();
+                    kpi.KPIValue = (rowsSpeseMese[i]["TotalAmount"] == DBNull.Value) ? DescRimborso + "0€" : DescRimborso + rowsSpeseMese[i]["TotalAmount"].ToString() + "€";
+                    KPIList.Add(kpi);
+                }
 
                 break;
 

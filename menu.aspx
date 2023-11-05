@@ -171,6 +171,8 @@
                                         <div class="widget-content-left">
                                             <div class="widget-heading"><asp:Literal runat="server" Text="<%$ Resources:Spese_Mese %>" /></div>
                                             <div class="widget-subheading" id="SpeseNelMese-KPIValue2">-</div>
+                                            <div class="widget-subheading" id="SpeseNelMese-KPIValue3">-</div>
+                                            <div class="widget-subheading" id="SpeseNelMese-KPIValue4">-</div>
                                         </div>
                                         <div class="widget-content-right">
                                             <div class="widget-numbers text-primary" id="SpeseNelMese-KPIValue0">-</div>
@@ -193,7 +195,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </li>
+                        </li> 
                     </ul>
                 </div>
 
