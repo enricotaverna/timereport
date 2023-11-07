@@ -9,6 +9,8 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Globalization;
 using System.Threading;
+using System.Security.Cryptography;
+using System.Activities.Expressions;
 
 public partial class input_ore : System.Web.UI.Page
 {
@@ -20,6 +22,11 @@ public partial class input_ore : System.Web.UI.Page
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
+    string codProgetto = "";
+    string note = "";
+    string OreTime = "";
+    string IDSF = "";
+    bool fromSalesforce = false;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -50,6 +57,15 @@ public partial class input_ore : System.Web.UI.Page
         }
         else // insert
         {
+            if (Request.QueryString.AllKeys.Contains("SF"))
+            {
+                codProgetto = Request.QueryString["codProgetto"];
+                OreTime = Request.QueryString["OreTime"];
+                note = Request.QueryString["note"];
+                IDSF = Request.QueryString["IDSF"];
+                fromSalesforce = true;
+            }
+
             FVore.ChangeMode(FormViewMode.Insert);
 
             Label LBdate = (Label)FVore.FindControl("LBdate");
@@ -57,6 +73,16 @@ public partial class input_ore : System.Web.UI.Page
 
             Label LBperson = (Label)FVore.FindControl("LBperson");
             LBperson.Text = (string)CurrentSession.UserName;
+
+            //chek se url contiene parametri passati da Salesforce per preconpilazioni dati
+            if (fromSalesforce == true)
+            {
+                TextBox HoursTextBox = (TextBox)FVore.FindControl("HoursTextBox");
+                HoursTextBox.Text = OreTime;
+
+                TextBox TBComment = (TextBox)FVore.FindControl("TBComment");
+                TBComment.Text = HttpUtility.UrlDecode(note.ToString());
+            }
         }
 
     }
@@ -140,6 +166,17 @@ public partial class input_ore : System.Web.UI.Page
         // se in creazione imposta il default di progetto 
         if (FVore.CurrentMode == FormViewMode.Insert)
             ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
+
+        //se provengo da salesfrorce preimposto valore progetto
+        if (fromSalesforce == true)
+        {
+            DataRow[] dataRows = CurrentSession.dtProgettiTutti.Select(string.Format("ProjectCode='{0}'",codProgetto));
+
+            if (dataRows.Count() == 1)
+            {
+                ddlProject.SelectedValue = dataRows[0]["Projects_Id"].ToString();
+            }
+        }
 
     }
 
@@ -227,7 +264,6 @@ public partial class input_ore : System.Web.UI.Page
 
     protected void FVore_ItemInserted(object sender, FormViewInsertedEventArgs e)
     {
-
         Response.Redirect("input.aspx");
     }
 
