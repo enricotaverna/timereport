@@ -136,11 +136,23 @@ public partial class input_ore : System.Web.UI.Page
         ddlProject.DataTextField = "DescProgetto";
         ddlProject.DataValueField = "Projects_Id";
         ddlProject.DataBind();
+        if (lProject_id != "")
+            ddlProject.SelectedValue = lProject_id;
+
+        // se in creazione imposta il default di progetto 
+        if (FVore.CurrentMode == FormViewMode.Insert)
+            ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
+
     }
 
     //valorizzazione della DDL delle task di Salesforce
     protected void Bind_DDLTaskSF()
     {
+        if (CurrentSession.SalesforceAccount == "")
+        {
+            return;
+        }
+
         DataTable dtListaTask;
 
         //valorizzazione con valore default

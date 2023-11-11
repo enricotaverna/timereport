@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-ore.aspx.cs" Inherits="input_ore" EnableEventValidation="False" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-ore.aspx.cs" Inherits="input_ore" EnableEventValidation="False" %>
 
 <!DOCTYPE html>
 
@@ -439,12 +439,15 @@
             $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
 
             $('#FVore_DDLTaskName').hide();
-            $('#FVore_DDLTaskName').hide();
+            $('#FVore_lblTaskName').hide();
 
             //controllo se ci sono task attive cosi da riattivare il componente
             $('#FVore_DDLTaskName option').each(function () {
-                if (this.value != "") {
-                    $('#FVore_DDLTaskName').show();               
+                console.log($(this).val());
+                if ($(this).val() != "") {
+
+                    $('#FVore_DDLTaskName').show();  
+                    $('#FVore_lblTaskName').show();               
                     return false;
                 }
             });
