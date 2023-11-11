@@ -24,8 +24,6 @@ public partial class input_ore : System.Web.UI.Page
     string codProgetto = "";
     string note = "";
     string OreTime = "";
-    string IDSF = "";
-    bool fromSalesforce = false;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -56,15 +54,6 @@ public partial class input_ore : System.Web.UI.Page
         }
         else // insert
         {
-            if (Request.QueryString.AllKeys.Contains("SF"))
-            {
-                codProgetto = Request.QueryString["codProgetto"];
-                OreTime = Request.QueryString["OreTime"];
-                note = Request.QueryString["note"];
-                IDSF = Request.QueryString["IDSF"];
-                fromSalesforce = true;
-            }
-
             FVore.ChangeMode(FormViewMode.Insert);
 
             Label LBdate = (Label)FVore.FindControl("LBdate");
@@ -169,7 +158,7 @@ public partial class input_ore : System.Web.UI.Page
                 //raggruppo tutti codici commessa per poter eseguire la query sul DB
                 var ListaCommesseAE = ListaTaskTotale.GroupBy( u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c ).ToList();
 
-                //preparo la variabile per eseguire la select con IN
+                //preparo la variabile per eseguire la select con IN, in questo modo eseguo una sola select
                 string Commesse = "";
                 for (int i = 0; i < ListaCommesseAE.Count; i++)
                 {

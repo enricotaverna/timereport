@@ -133,7 +133,7 @@ public class TRSession
         ForcedAccount = rdr["ForcedAccount"].ToString() == "True" ? true : false;
         Language = rdr["Lingua"].ToString();
         Calendar_id = Convert.ToInt16(rdr["calendar_id"].ToString());
-        SalesforceAccount = "luca.clementi@artmaticapartners.it";
+        SalesforceAccount = rdr["SaleforceEmail"].ToString();
     }
 
     public void LoadOptions()
