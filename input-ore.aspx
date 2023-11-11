@@ -125,6 +125,15 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="350"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName1" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                            </div>
+
                             <!-- *** TB Comment ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource1"></asp:Label>
@@ -222,7 +231,7 @@
                                 <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
                                 <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="350"  AutoPostBack="false"
-                                    meta:resourcekey="DDLTaskName" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                    meta:resourcekey="DDLTaskName2" data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
                             </div>
 
@@ -313,6 +322,15 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="350"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName3" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                            </div>
+
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="CommentTextBox" runat="server" Text="Nota" meta:resourcekey="CommentTextBoxResource1"></asp:Label>
                                 <asp:TextBox ID="TextBox2" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" Enabled="False" meta:resourcekey="TextBox2Resource1" />
@@ -367,8 +385,8 @@
         SelectCommand="SELECT Activity_id, Name + ' ' + ActivityCode AS iAttivita FROM Activity WHERE active = 'true'"></asp:SqlDataSource>
     <asp:SqlDataSource ID="DSore" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id)"
+        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id, hours.SalesforceTimeID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,SalesforceTimeID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @SalesforceTimeID)"
         UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType WHERE (Hours_Id = @Hours_id)"
         OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
@@ -392,6 +410,7 @@
             <asp:Parameter Name="CreationDate" />
             <asp:Parameter Name="AccountingDate" Type="DateTime" />
             <asp:Parameter Name="WorkedInRemote" />
+            <asp:Parameter Name="SalesforceTimeID" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
@@ -437,17 +456,15 @@
             $('#FVore_DDLLocation').hide();
 
             $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
-
+            
             $('#FVore_DDLTaskName').hide();
             $('#FVore_lblTaskName').hide();
 
             //controllo se ci sono task attive cosi da riattivare il componente
             $('#FVore_DDLTaskName option').each(function () {
-                console.log($(this).val());
-                if ($(this).val() != "") {
-
+                if (this.value != "") {
                     $('#FVore_DDLTaskName').show();  
-                    $('#FVore_lblTaskName').show();               
+                    $('#FVore_lblTaskName').show();             
                     return false;
                 }
             });

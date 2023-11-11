@@ -1,12 +1,9 @@
-﻿using classiStandard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.ServiceModel.Web;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 
 public partial class input_ore : System.Web.UI.Page
@@ -17,7 +14,7 @@ public partial class input_ore : System.Web.UI.Page
     private List<TaskRay> ListaTaskTotale = new List<TaskRay>();
     //private DropDownList ddlActivity;
 
-    public string lProject_id, lActivity_id, lLocationKey;
+    public string lProject_id, lActivity_id, lLocationKey, SalesforceTimeID;
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -61,17 +58,22 @@ public partial class input_ore : System.Web.UI.Page
 
             Label LBperson = (Label)FVore.FindControl("LBperson");
             LBperson.Text = (string)CurrentSession.UserName;
-        }        
+        }
     }
 
     protected void Get_record(string strHours_Id)
     {
 
-        DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType FROM Hours LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
+        DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, "+"" +
+            "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTimeID "+
+            "FROM Hours "+"" +
+            "LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id "+
+            "INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
 
         lProject_id = drRecord["Projects_id"].ToString(); // projects_id
         lActivity_id = drRecord["Activity_id"].ToString(); // activity_id
         lLocationKey = drRecord["LocationType"].ToString() + ":" + drRecord["LocationKey"].ToString(); // LocationKey
+        SalesforceTimeID = drRecord["SalesforceTimeID"].ToString(); // activity_id
 
     }
 
@@ -148,11 +150,6 @@ public partial class input_ore : System.Web.UI.Page
     //valorizzazione della DDL delle task di Salesforce
     protected void Bind_DDLTaskSF()
     {
-        if (CurrentSession.SalesforceAccount == "")
-        {
-            return;
-        }
-
         DataTable dtListaTask;
 
         //valorizzazione con valore default
@@ -195,7 +192,7 @@ public partial class input_ore : System.Web.UI.Page
                         //se esiste aggiungo attrib
                         liItem.Attributes.Add("data-Projects_Name", ProjectCode);
                     }
-                                      
+
                     DDLTaskName.Items.Add(liItem);
                 }
 
@@ -211,12 +208,8 @@ public partial class input_ore : System.Web.UI.Page
         DDLTaskName.DataValueField = "id";
         DDLTaskName.DataBind();
 
-        if (lProject_id != "")
-            ddlProject.SelectedValue = lProject_id;
-
-        // se in creazione imposta il default di progetto 
-        if (FVore.CurrentMode == FormViewMode.Insert)
-            ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
+        if (SalesforceTimeID != "")
+            DDLTaskName.SelectedValue = SalesforceTimeID;
 
     }
 
@@ -359,6 +352,9 @@ public partial class input_ore : System.Web.UI.Page
             e.Command.Parameters["@LocationKey"].Value = "99999";
         }
 
+        DropDownList DDLTaskName = (DropDownList)FVore.FindControl("DDLTaskName");
+        e.Command.Parameters["@SalesforceTimeID"].Value = DDLTaskName.SelectedValue;
+
         // salva default per select list
         Session["ProjectCodeDefault"] = ddlList.SelectedValue;
         Session["ActivityDefault"] = ddlList1.SelectedValue;
@@ -431,5 +427,5 @@ public partial class input_ore : System.Web.UI.Page
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
-       
+
 }
