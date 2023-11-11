@@ -150,6 +150,10 @@ public partial class input_ore : System.Web.UI.Page
     //valorizzazione della DDL delle task di Salesforce
     protected void Bind_DDLTaskSF()
     {
+        if (CurrentSession.SalesforceAccount == "")
+        {
+            return;
+        }
         DataTable dtListaTask;
 
         //valorizzazione con valore default
