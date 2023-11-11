@@ -59,7 +59,10 @@ public class TRSession
 
         LoadPersonalSetting();
 
-        LoadSFTask();
+        if (SalesforceAccount != "")
+        {
+            LoadSFTask();
+        }
     }
 
     public void LoadProgettieSpese()
