@@ -217,6 +217,15 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="350"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                            </div>
+
                             <!-- *** TB Comment ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource2"></asp:Label>
@@ -545,6 +554,30 @@
                 $('#FVore_DDLLocation').val('');
                 BindLocation(); // ricarica la DDL
             }
+        });
+FVore_DDLprogetto
+        // Alla selezione di una task imposta automaticamente il valore del progetto
+        $("#FVore_DDLTaskName").change(function () {
+            console.log($(this).find("option:selected").attr("data-Projects_Id"));
+            if ($(this).find("option:selected").attr("data-Projects_Id") != '') // mostra Box Testo
+            {
+                var projID = $(this).find("option:selected").attr("data-Projects_Id");
+                var Projects_Name = $(this).find("option:selected").attr("data-Projects_Name");
+                //controllo per vedere se è un valore in DDL
+                var IsExists = false;
+                $('#FVore_DDLprogetto option').each(function () {
+                    if (this.value == projID) {
+                        IsExists = true;  
+                    }                                          
+                });
+
+                if (IsExists == false) {
+                    $("#FVore_DDLprogetto").val(0);
+                    alert("Progetto " + Projects_Name + " non presente");
+                } 
+                //imposto il valore e accendo evente change
+                $("#FVore_DDLprogetto").val($(this).find("option:selected").attr("data-Projects_Id")).change();
+            } 
         });
 
     </script>

@@ -1,6 +1,10 @@
-﻿using System;
+﻿using classiStandard;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.Web.Configuration;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -25,6 +29,7 @@ public class TRSession
     public DataTable dtSpeseForzate;
     public DataTable dtProgettiTutti;
     public DataTable dtSpeseTutte;
+    public List<TaskRay> ListaTask = new List<TaskRay>();
     // personal setting
     public int Persons_id;
     public int Company_id;
@@ -39,6 +44,7 @@ public class TRSession
     public string BackgroundColor;
     public string BackgroundImage;
     public int Calendar_id;
+    public string SalesforceAccount;
 
     public TRSession(int inputPersons_id) {
         Persons_id = inputPersons_id;
@@ -52,6 +58,8 @@ public class TRSession
         LoadOptions();
 
         LoadPersonalSetting();
+
+        LoadSFTask();
     }
 
     public void LoadProgettieSpese()
@@ -125,6 +133,7 @@ public class TRSession
         ForcedAccount = rdr["ForcedAccount"].ToString() == "True" ? true : false;
         Language = rdr["Lingua"].ToString();
         Calendar_id = Convert.ToInt16(rdr["calendar_id"].ToString());
+        SalesforceAccount = "luca.clementi@artmaticapartners.it";
     }
 
     public void LoadOptions()
@@ -152,4 +161,56 @@ public class TRSession
 
     }
 
+    public void LoadSFTask()
+    {
+        try
+        {
+            string serviceURL = "";
+
+            string SFconnect = WebConfigurationManager.AppSettings["SALESFORCE"];
+            string[] Splitted = SFconnect.ToString().Split(';');
+
+            clsParametri.Parametri.clientID = Splitted[0].ToString().Split('=')[1];
+            clsParametri.Parametri.ClientSecret = Splitted[1].ToString().Split('=')[1];
+            clsParametri.Parametri.refresh_token = Splitted[2].ToString().Replace("refresh_token=", "");
+            clsParametri.Parametri.EndpointSF = Splitted[3].ToString().Split('=')[1];
+            clsParametri.Parametri.SFVersione = Splitted[4].ToString().Split('=')[1];
+
+            string SFtoken = clsUtility.GetTokenSF();
+
+            //serviceURL += string.Format("SELECT id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email+"+
+            //    "FROM+TASKRAY__Project_Task__c+WHERE+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+TASKRAY__trCompleted__c=false+AND+Owner.Email='{0}'", SalesforceAccount);
+
+            serviceURL += string.Format("SELECT id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email+" +
+               "FROM+TASKRAY__Project_Task__c+WHERE+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+TASKRAY__trCompleted__c=false" +
+               "+AND+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null", SalesforceAccount);
+
+
+            string JSON_TOT = "";
+            clsStandard.GetAllRecord AllRecord = new clsStandard.GetAllRecord();
+            clsUtility.GetPagedData(serviceURL, ref JSON_TOT, ref AllRecord);
+
+            if (AllRecord.records != null)
+            {
+                //ciclo tutti i record di ritorno 
+                for (int i = 0; i <= AllRecord.records.Count - 1; i++)
+                {
+                    TaskRay Newrec = new TaskRay();
+                    Newrec = JsonConvert.DeserializeObject<TaskRay>(AllRecord.records[i].ToString());
+                    ListaTask.Add(Newrec);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            var st = new StackTrace(ex, true);
+            var sf = st.GetFrame(st.FrameCount-1);
+            string ErrorLine = clsUtility.NullToString(sf.GetFileLineNumber()).ToString();
+            string MethodName = clsUtility.NullToString(sf.GetMethod().Name).ToString();
+            string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
+            string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
+            clsLog.WriteErrLog("0", ex.Message, Description.ToString());
+        }
+        
+    }
 }

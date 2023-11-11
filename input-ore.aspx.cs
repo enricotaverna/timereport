@@ -1,21 +1,20 @@
-﻿using System;
+﻿using classiStandard;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Data;
-using System.Data.SqlClient;
 using System.Configuration;
-using System.Globalization;
+using System.Data;
+using System.Linq;
+using System.ServiceModel.Web;
 using System.Threading;
-using System.Security.Cryptography;
-using System.Activities.Expressions;
+using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 public partial class input_ore : System.Web.UI.Page
 {
 
     private DropDownList ddlProject;
+    private DropDownList DDLTaskName;
+    private List<TaskRay> ListaTaskTotale = new List<TaskRay>();
     //private DropDownList ddlActivity;
 
     public string lProject_id, lActivity_id, lLocationKey;
@@ -73,18 +72,7 @@ public partial class input_ore : System.Web.UI.Page
 
             Label LBperson = (Label)FVore.FindControl("LBperson");
             LBperson.Text = (string)CurrentSession.UserName;
-
-            //chek se url contiene parametri passati da Salesforce per preconpilazioni dati
-            if (fromSalesforce == true)
-            {
-                TextBox HoursTextBox = (TextBox)FVore.FindControl("HoursTextBox");
-                HoursTextBox.Text = OreTime;
-
-                TextBox TBComment = (TextBox)FVore.FindControl("TBComment");
-                TBComment.Text = HttpUtility.UrlDecode(note.ToString());
-            }
-        }
-
+        }        
     }
 
     protected void Get_record(string strHours_Id)
@@ -159,6 +147,68 @@ public partial class input_ore : System.Web.UI.Page
         ddlProject.DataTextField = "DescProgetto";
         ddlProject.DataValueField = "Projects_Id";
         ddlProject.DataBind();
+    }
+
+    //valorizzazione della DDL delle task di Salesforce
+    protected void Bind_DDLTaskSF()
+    {
+        DataTable dtListaTask;
+
+        //valorizzazione con valore default
+        DDLTaskName = (DropDownList)FVore.FindControl("DDLTaskName");
+        DDLTaskName.Items.Clear();
+        DDLTaskName.Items.Add(new ListItem(GetLocalResourceObject("DDLTaskName.testo").ToString(), ""));
+
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        switch (FVore.CurrentMode)
+        {
+            case FormViewMode.Insert:
+            case FormViewMode.Edit:
+                ListaTaskTotale = CurrentSession.ListaTask;
+                //raggruppo tutti codici commessa per poter eseguire la query sul DB
+                var ListaCommesseAE = ListaTaskTotale.GroupBy( u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c ).ToList();
+
+                //preparo la variabile per eseguire la select con IN
+                string Commesse = "";
+                for (int i = 0; i < ListaCommesseAE.Count; i++)
+                {
+                    Commesse += string.Format("'{0}'", ListaCommesseAE[i].Key).ToString() + ",";
+                }
+                //tolgo ultima virgola alla variabile
+                Commesse = Commesse.Substring(0, Commesse.Length - 1);
+
+                //selezioni dal database tutti i progetti contenutio nelle task di SF
+                DataTable dtAct = Database.GetData(string.Format("SELECT [Projects_Id],[ProjectCode] FROM [Projects] WHERE [ProjectCode] in ({0}) ", Commesse),null);
+
+                // aggiunge gli item con l'attributo project_id per valorizzare automaticamente la DDL dei preogetti
+                foreach (TaskRay Task in CurrentSession.ListaTask)
+                {
+                    ListItem liItem = new ListItem(Task.TASKRAY__Project__r.Name.ToString() + " - " + Task.Name.ToString(), Task.Id.ToString());
+                    string ProjectCode = Task.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c.ToString();
+                    //controllo se esiste dai progetti ricercati precedentemente
+                    if (dtAct.Select(string.Format("ProjectCode='{0}'", ProjectCode)).Count() == 1)
+                    {
+                        //se esiste aggiungo attrib
+                        liItem.Attributes.Add("data-Projects_Id", dtAct.Select(string.Format("ProjectCode='{0}'", ProjectCode))[0]["Projects_Id"].ToString());
+                        //se esiste aggiungo attrib
+                        liItem.Attributes.Add("data-Projects_Name", ProjectCode);
+                    }
+                                      
+                    DDLTaskName.Items.Add(liItem);
+                }
+
+                break;
+
+            case FormViewMode.ReadOnly:
+
+                DDLTaskName.DataSource = CurrentSession.ListaTask;
+                break;
+        }
+
+        DDLTaskName.DataTextField = "Name";
+        DDLTaskName.DataValueField = "id";
+        DDLTaskName.DataBind();
 
         if (lProject_id != "")
             ddlProject.SelectedValue = lProject_id;
@@ -166,17 +216,6 @@ public partial class input_ore : System.Web.UI.Page
         // se in creazione imposta il default di progetto 
         if (FVore.CurrentMode == FormViewMode.Insert)
             ddlProject.SelectedValue = (string)Session["ProjectCodeDefault"];
-
-        //se provengo da salesfrorce preimposto valore progetto
-        if (fromSalesforce == true)
-        {
-            DataRow[] dataRows = CurrentSession.dtProgettiTutti.Select(string.Format("ProjectCode='{0}'",codProgetto));
-
-            if (dataRows.Count() == 1)
-            {
-                ddlProject.SelectedValue = dataRows[0]["Projects_Id"].ToString();
-            }
-        }
 
     }
 
@@ -364,11 +403,13 @@ public partial class input_ore : System.Web.UI.Page
             //              Valorizza progetto e attività
             Bind_DDLprogetto();
             Bind_DDLAttivita();
+            Bind_DDLTaskSF();
         }
         else // insert
         {
             Bind_DDLprogetto();
             Bind_DDLAttivita();
+            Bind_DDLTaskSF();
         }
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
@@ -389,4 +430,5 @@ public partial class input_ore : System.Web.UI.Page
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
+       
 }
