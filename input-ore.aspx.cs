@@ -14,7 +14,7 @@ public partial class input_ore : System.Web.UI.Page
     private List<TaskRay> ListaTaskTotale = new List<TaskRay>();
     //private DropDownList ddlActivity;
 
-    public string lProject_id, lActivity_id, lLocationKey, SalesforceTimeID;
+    public string lProject_id, lActivity_id, lLocationKey, SalesforceTaskID;
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -65,7 +65,7 @@ public partial class input_ore : System.Web.UI.Page
     {
 
         DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, "+"" +
-            "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTimeID "+
+            "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTaskID "+
             "FROM Hours "+"" +
             "LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id "+
             "INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
@@ -73,7 +73,7 @@ public partial class input_ore : System.Web.UI.Page
         lProject_id = drRecord["Projects_id"].ToString(); // projects_id
         lActivity_id = drRecord["Activity_id"].ToString(); // activity_id
         lLocationKey = drRecord["LocationType"].ToString() + ":" + drRecord["LocationKey"].ToString(); // LocationKey
-        SalesforceTimeID = drRecord["SalesforceTimeID"].ToString(); // activity_id
+        SalesforceTaskID = drRecord["SalesforceTaskID"].ToString(); // activity_id
 
     }
 
@@ -211,9 +211,9 @@ public partial class input_ore : System.Web.UI.Page
         DDLTaskName.DataTextField = "Name";
         DDLTaskName.DataValueField = "id";
         DDLTaskName.DataBind();
-
-        if (SalesforceTimeID != "")
-            DDLTaskName.SelectedValue = SalesforceTimeID;
+        //se presente valore preso dal calendario valorizzo
+        if (SalesforceTaskID != "")
+            DDLTaskName.SelectedValue = SalesforceTaskID;
 
     }
 
@@ -357,7 +357,7 @@ public partial class input_ore : System.Web.UI.Page
         }
 
         DropDownList DDLTaskName = (DropDownList)FVore.FindControl("DDLTaskName");
-        e.Command.Parameters["@SalesforceTimeID"].Value = DDLTaskName.SelectedValue;
+        e.Command.Parameters["@SalesforceTaskID"].Value = DDLTaskName.SelectedValue;
 
         // salva default per select list
         Session["ProjectCodeDefault"] = ddlList.SelectedValue;
