@@ -1,9 +1,13 @@
-﻿using System;
+﻿using classiStandard;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Web.Configuration;
 using System.Web.UI.WebControls;
 
 public partial class input_ore : System.Web.UI.Page
@@ -18,9 +22,6 @@ public partial class input_ore : System.Web.UI.Page
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
-    string codProgetto = "";
-    string note = "";
-    string OreTime = "";
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -58,6 +59,7 @@ public partial class input_ore : System.Web.UI.Page
 
             Label LBperson = (Label)FVore.FindControl("LBperson");
             LBperson.Text = (string)CurrentSession.UserName;
+
         }
     }
 
@@ -431,5 +433,17 @@ public partial class input_ore : System.Web.UI.Page
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
-
+    /// <summary>
+    /// rfresh delle task di salesforce
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void btnRefresh_Click(object sender, EventArgs e)
+    {
+        DDLTaskName = (DropDownList)FVore.FindControl("DDLTaskName");
+        DDLTaskName.Items.Clear();
+        //DDLTaskName.Items.Add(new ListItem(GetLocalResourceObject("DDLTaskName.testo").ToString(), ""));
+        CurrentSession.LoadSFTask();
+        Bind_DDLTaskSF();
+    }
 }
