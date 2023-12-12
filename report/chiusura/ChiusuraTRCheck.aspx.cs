@@ -75,7 +75,8 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
                     CheckTicketHomeOfficeImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
                     break;
                 case 2:
-                    // non usato
+                    CheckTicketHomeOffice.Text = GetLocalResourceObject("ticket_msg3").ToString();  // "Ticket: Non rilevante";
+                    CheckTicketHomeOfficeImg.ImageUrl = "/timereport/images/icons/50x50/icon-ok.png";
                     break;
             }
 

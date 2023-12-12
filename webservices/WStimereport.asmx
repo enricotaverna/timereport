@@ -18,12 +18,14 @@ using System.Text;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 
-public class WStimereport : System.Web.Services.WebService {
+public class WStimereport : System.Web.Services.WebService
+{
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
 
-    public WStimereport () {
+    public WStimereport()
+    {
 
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
@@ -32,7 +34,8 @@ public class WStimereport : System.Web.Services.WebService {
     //  **** CANCELLA FILE ***** 
     // Riceve in input il nome file in format Web e cancella fisicamente il file dalla directory   
     [WebMethod(EnableSession = true)]
-    public string cancella_file(string sfilename) {
+    public string cancella_file(string sfilename)
+    {
 
         try
         {
@@ -57,12 +60,12 @@ public class WStimereport : System.Web.Services.WebService {
     // ret[1] = aaaammdd solo in caso di spese
     //
     [WebMethod(EnableSession = true)]
-    public string[]  CancellaId(string Id)
+    public string[] CancellaId(string Id)
     {
 
         CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-        string[] sRet= new string[2]; // parametri tornati dalla funzione
+        string[] sRet = new string[2]; // parametri tornati dalla funzione
 
         switch (Session["type"].ToString())
         {
@@ -71,7 +74,7 @@ public class WStimereport : System.Web.Services.WebService {
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM hours WHERE hours_id='" + Id +"'", connection))
+                    using (SqlCommand cmd = new SqlCommand("DELETE FROM hours WHERE hours_id='" + Id + "'", connection))
                     {
                         try
                         {
@@ -93,18 +96,19 @@ public class WStimereport : System.Web.Services.WebService {
             case "expenses":
             case "bonus":
 
-                DataRow drRec = Database.GetRow("SELECT date FROM expenses WHERE expenses_id='" + Id +"'", null);
+                DataRow drRec = Database.GetRow("SELECT date FROM expenses WHERE expenses_id='" + Id + "'", null);
                 string sDate = drRec["date"].ToString();
                 sDate = sDate.Substring(6, 4) + sDate.Substring(3, 2) + sDate.Substring(0, 2); // formato YYYYMMGG
 
                 // cancella record da DB
                 try
                 {
-                    Database.ExecuteSQL("DELETE FROM expenses WHERE expenses_id='" + Id +"'", null);
+                    Database.ExecuteSQL("DELETE FROM expenses WHERE expenses_id='" + Id + "'", null);
 
                     string[] filePaths = TrovaRicevuteLocale(Id, CurrentSession.UserName, sDate);
 
-                    if (filePaths != null) {
+                    if (filePaths != null)
+                    {
                         for (int i = 0; i < filePaths.Length; i++) // cancella file
                             File.Delete(filePaths[i]);
                     }
@@ -112,7 +116,7 @@ public class WStimereport : System.Web.Services.WebService {
                     sRet[0] = "true";
                     sRet[1] = "";
 
-                    if (Session["type"].ToString()=="bonus")
+                    if (Session["type"].ToString() == "bonus")
                         sRet[1] = sDate;
                 }
                 catch (IOException e)
@@ -147,8 +151,8 @@ public class WStimereport : System.Web.Services.WebService {
                   "values ( '" + sPersonsId + "' ," +
                             "'" + sAnno + "' ," +
                             "'" + fCostRate + "' ," +
-                            "'" + sComment +"' )";
-        Database.ExecuteSQL(cmdText,null);
+                            "'" + sComment + "' )";
+        Database.ExecuteSQL(cmdText, null);
 
         return;
     }
@@ -170,11 +174,12 @@ public class WStimereport : System.Web.Services.WebService {
         // recupera conversion rate associata al tipo spesa
         DataTable dtTipoSpesa = CurrentSession.dtSpeseTutte;
         DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + ConfigurationManager.AppSettings["TICKET_REST_EXPENSE"]);
-        if (dr.Count() != 1) { // non dovrebbe mai succedere! 
+        if (dr.Count() != 1)
+        { // non dovrebbe mai succedere! 
         }
 
         // insDate ha formato yyyymmdd
-        string convertDate = insDate.Substring(6,2) + "/" + insDate.Substring(4,2) + "/" + insDate.Substring(0,4);
+        string convertDate = insDate.Substring(6, 2) + "/" + insDate.Substring(4, 2) + "/" + insDate.Substring(0, 4);
 
         string cmdText = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency) " +
                   "values (" +
@@ -194,11 +199,11 @@ public class WStimereport : System.Web.Services.WebService {
                   ASPcompatility.FormatNumberDB(result.Item1) + " , " +
                   ASPcompatility.FormatNumberDB(result.Item2) + " , " +
                   ASPcompatility.FormatNumberDB(CurrentSession.Company_id) + " , " +
-                  "'false' , " +                  
+                  "'false' , " +
                  ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) +
                   " )";
 
-        Database.ExecuteSQL(cmdText,null);
+        Database.ExecuteSQL(cmdText, null);
 
         // recupera record Id creato 
         newIdentity = Database.GetLastIdInserted("SELECT MAX(Expenses_id) from Expenses where Persons_Id=" + personsId);
@@ -221,12 +226,32 @@ public class WStimereport : System.Web.Services.WebService {
         bool bRet = false;
         DataRow drRow = Database.GetRow("SELECT * FROM " + sTable + " WHERE " + sKey + "='" + sValkey + "'", null);
 
-        if ( drRow != null)
+        if (drRow != null)
             bRet = true;
         else
             bRet = false;
 
         return (bRet);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string CheckCaricoSpesa(int projects_id, int persons_id, string date)
+    {
+        string retMessage = "";
+        CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
+        // se torna una stringa diversa da "" emette un messaggio di avvertimento sul form inputspese.aspx
+        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + ASPcompatility.FormatNumberDB(projects_id) + 
+                                    " AND date = " + ASPcompatility.FormatDateDb(date) +
+                                    " AND persons_id = " + ASPcompatility.FormatNumberDB(persons_id)
+                                    ))
+            retMessage = CurrentSession.Language == "en" ? "Check: For the date no corresponding hours exists for this project" : "Attenzione: In questa data non è presente nessun carico ore per questo progetto";
+
+        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(date) + " AND persons_id = " + ASPcompatility.FormatNumberDB(persons_id) ) )
+            retMessage = CurrentSession.Language == "en" ? "Check: Hour record does not exist for this date" : "Non esiste un carico ore in questa data";
+
+        return retMessage;
+
     }
 
     // riceve in input id spesa, nome user, data spesa (YYYYMMGG) e restutuisce array con nome file
@@ -273,10 +298,11 @@ public class WStimereport : System.Web.Services.WebService {
         if (!Convert.ToBoolean(Session["InputScreenChangeMode"]))
             return aRet;
 
-        switch (Session["type"].ToString()) {
+        switch (Session["type"].ToString())
+        {
 
             case "hours":
-                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.OpportunityId " +
                                                "FROM hours AS a " +
                                                "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                "WHERE hours_id=" + sId, null);
@@ -289,7 +315,7 @@ public class WStimereport : System.Web.Services.WebService {
                 strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                 // scrive il record copia!
-                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, WorkedInRemote, LocationKey, LocationType, LocationDescription, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id ) VALUES(" +
+                Database.ExecuteSQL("INSERT INTO hours (date, projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, WorkedInRemote, LocationKey, LocationType, LocationDescription, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, OpportunityId ) VALUES(" +
                                      ASPcompatility.FormatDateDb(sInsDate, false) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -308,7 +334,8 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " )"
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["OpportunityId"].ToString()) + " )"
                                     , null);
 
                 // recupera record Id creato 
@@ -324,7 +351,7 @@ public class WStimereport : System.Web.Services.WebService {
             case "bonus":
 
                 // leggi record da copiare
-                dt = Database.GetData("SELECT a.projects_id, persons_id, Amount, a.ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, a.TipoBonus_id, AccountingDate, comment, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.AdditionalCharges, a.AmountInCurrency " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, Amount, a.ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, a.TipoBonus_id, AccountingDate, comment, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.AdditionalCharges, a.AmountInCurrency, a.OpportunityId " +
                                                 "FROM Expenses AS a " +
                                                 "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                 "INNER JOIN ExpenseType AS c ON  c.ExpenseType_id = a.ExpenseType_id " +
@@ -338,7 +365,7 @@ public class WStimereport : System.Web.Services.WebService {
                 strAccountingDate = dt.Rows[0]["AccountingDate"].ToString() == "" ? "null" : ASPcompatility.FormatDateDb(dt.Rows[0]["AccountingDate"].ToString(), false);
 
                 // scrive il record copia!
-                Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency) VALUES(" +
+                Database.ExecuteSQL("INSERT INTO Expenses (date, projects_id, persons_id, Amount, ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, TipoBonus_id,AccountingDate, comment, createdBy, creationDate, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency, OpportunityId) VALUES(" +
                                      ASPcompatility.FormatDateDb(sInsDate, false) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["projects_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()) + " , " +
@@ -355,19 +382,20 @@ public class WStimereport : System.Web.Services.WebService {
                                      ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["ClientManager_id"].ToString()) + " , " +
                                      ASPcompatility.FormatStringDb(dt.Rows[0]["AccountManager_id"].ToString()) + " , " +
-                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString())  + " , " +
-                                     ASPcompatility.FormatStringDb(dt.Rows[0]["AdditionalCharges"].ToString())  + " , " +
-                                     ASPcompatility.FormatNumberDB(Convert.ToDouble(dt.Rows[0]["AmountInCurrency"].ToString()))  +
-                                     " )" 
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["Company_id"].ToString()) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["AdditionalCharges"].ToString()) + " , " +
+                                     ASPcompatility.FormatNumberDB(Convert.ToDouble(dt.Rows[0]["AmountInCurrency"].ToString())) + " , " +
+                                     ASPcompatility.FormatStringDb(dt.Rows[0]["OpportunityId"].ToString()) +
+                                     " )"
                                     , null);
-                     
+
                 // recupera record Id creato 
                 newIdentity = Database.GetLastIdInserted("SELECT MAX(Expenses_id) from Expenses where Persons_Id=" + ASPcompatility.FormatStringDb(dt.Rows[0]["persons_id"].ToString()));
 
-                DataRow drRec = Database.GetRow("SELECT ExpenseCode, UnitOfMeasure FROM ExpenseType WHERE ExpenseType_id=" + ASPcompatility.FormatStringDb(dt.Rows[0]["ExpenseType_id"].ToString()),null);
+                DataRow drRec = Database.GetRow("SELECT ExpenseCode, UnitOfMeasure FROM ExpenseType WHERE ExpenseType_id=" + ASPcompatility.FormatStringDb(dt.Rows[0]["ExpenseType_id"].ToString()), null);
 
                 // valorizza parametri di ritorno
-                aRet[0] = dt.Rows[0]["ProjectCode"].ToString() + ":" +  drRec["ExpenseCode"] + " : " + iAmount.ToString() + " " + drRec["UnitOfMeasure"];
+                aRet[0] = dt.Rows[0]["ProjectCode"].ToString() + ":" + drRec["ExpenseCode"] + " : " + iAmount.ToString() + " " + drRec["UnitOfMeasure"];
                 aRet[1] = newIdentity.ToString();
 
                 break;

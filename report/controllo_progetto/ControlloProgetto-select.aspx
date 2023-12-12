@@ -13,12 +13,16 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -48,29 +52,33 @@
 
                     <!--  *** PROGETTO *** -->
                     <div class="input nobottomborder">
+                        <div style="position: absolute">
                         <div class="inputtext">Progetto</div>
                             <asp:DropDownList ID="DDLProgetti" runat="server"
                                 AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged">
                             </asp:DropDownList>
+                       </div>
                     </div>
-
-                    <!--  *** ATTIVITA' *** -->
+                    <br />
+<%--                    <!--  *** ATTIVITA' *** -->
                     <div class="input nobottomborder ">
                         <div class="inputtext">Attività</div>
                             <asp:DropDownList ID="DDLAttivita" runat="server"
                                 AppendDataBoundItems="True" AutoPostBack="True">
                             </asp:DropDownList>
-                    </div>
+                    </div>--%>
 
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
-                        <div class="inputtext">Manager</div>
+                        <div style="position: absolute">
+                        <div class="inputtext">Director</div>
                             <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
                                 AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone">
-                                <asp:ListItem Value="0">-- tutti i manager --</asp:ListItem>
+                                <asp:ListItem Value="0">-- tutti i director --</asp:ListItem>
                             </asp:DropDownList>
+                        </div>
                     </div>
-
+                    <br />
                     <!--  **** DATA REPORT ** -->
                     <div class="input">
                         <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data Report:"></asp:Label>
@@ -133,6 +141,11 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        $('.SumoDLL').SumoSelect({ search: true });
+        $('#DDLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
+        $('#DDLManager').SumoSelect({ placeholder: 'Director', search: true, searchText: 'Director' });
+        $('.SumoSelect').css('width', '270px');
 
         $(function () {
             // datepicker

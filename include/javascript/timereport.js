@@ -16,22 +16,27 @@ var displayAlert = function () {
 };
 
 // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
-function ShowPopup(message) {
+function ShowPopup(message, url, titleBox) {
     $(function () {
 
+        if (titleBox == null)
+            titleBox = "Messaggio";
+            
         // se non c'è la div mask la aggiunge
         if (document.getElementById("dialog") == null)
             $("body").append("<div id='dialog'></div>");
 
         $("#dialog").html(message);
         $("#dialog").dialog({
-            title: "Messaggio",
+            title: titleBox,
             classes: {
                 "ui-dialog": "dialogMessage"
             },
             buttons: {
                 Close: function () {
                     $(this).dialog('close');
+                    if (url != undefined && url != '' )
+                        window.location.href = url;
                 }
             },
             modal: true
@@ -108,6 +113,16 @@ function UnMaskScreen() {
     $("#mask").fadeTo("fast", 0);
 
     document.body.style.cursor = 'default';
+
+    //// Crea un evento del mouse "fake"
+    //let event = new MouseEvent('mousemove', {
+    //    'view': window,
+    //    'bubbles': true,
+    //    'cancelable': true
+    //});
+
+    //// Simula l'evento del mouse
+    //document.body.dispatchEvent(event);
 
 }
 

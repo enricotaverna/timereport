@@ -19,7 +19,7 @@
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="/timereport/include/uploader/uploader.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Jquery per Uploader  -->
@@ -32,85 +32,14 @@
 <script src="/timereport/include/uploader/jquery.fileupload-image.js"></script>
 <script src="/timereport/include/uploader/jquery.fileupload-validate.js"></script>
 
-<script type="text/javascript" >
-
-    // ***** CANCELLA RICEVUTA *****
-    function cancella_ricevuta(sFilename) {
-
-        // valori da passare al web service in formato { campo1 : valore1 ; campo2 : valore2 }
-        var values = "{'sfilename': '" + sFilename + "'" +
-            "}";
-        $.ajax({
-
-            type: "POST",
-            url: "/timereport/webservices/WStimereport.asmx/cancella_file",
-            data: values,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-
-            // se tutto va bene
-            success: function (msg) {
-                // cancella la riga della tabella corrispondente alla ricevuta
-                var elemtohide = document.getElementById(sFilename);
-                elemtohide.style.display = "none";
-            },
-
-            // in caso di errore
-            error: function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText);
-            }
-
-        }); // ajax
-
-    } // cancella_ricevuta
-
-
-    //  ***** CARICA RICEVUTA *****
-    $(function () {
-        var FormDate = $('#FVSpese_LBdate').html();
-
-        // Initialize the jQuery File Upload widget:  
-        $('#CaricaRicevuta').fileupload({
-            // i parametri addizionali vengono letti dal form e passati nella url
-            url: "/timereport/webservices/carica_file.ashx?expenses_id=<%=Request.QueryString["Expenses_Id"]%>&UserName=<%=CurrentSession.UserName%>&TbDate=" + FormDate,
-            dataType: 'json',
-            // caricamento parte alla selezione del file
-            autoUpload: true,
-            // Allowed file types and size
-            acceptFileTypes: /(jpg)|(jpeg)|(png)|(gif)|(pdf)|(bmp)$/i,
-            // Resize immagini
-            disableImageResize: /Android(?!.*Chrome)|Opera/
-                .test(window.navigator && navigator.userAgent),
-            imageMaxWidth: 1200,
-            imageMaxHeight: 1200,
-            imageCrop: false, // no cropped images
-            // progress bar (vedi elemento con classe bar nel form di upload)
-            progress: function (e, data) {
-                var bar = $('.bar');
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                var percentVal = progress + '%';
-                bar.width(percentVal);
-            },
-        })
-            .bind('fileuploaddone', function (e, data) {
-                // aggiunge la riga alla tabella dei file quando torna la chiamata
-                $('#TabellaRicevute').append(data.result);
-                $('.bar').width(0);
-            })
-            .bind('fileuploadfail', function (e, data) {
-                alert(data);
-            })
-    });
-
-</script>
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title><asp:Literal runat="server" Text="<%$ Resources:titolo%>" /></title>
+    <title>
+        <asp:Literal runat="server" Text="<%$ Resources:titolo%>" /></title>
 </head>
 
 <body>
@@ -121,9 +50,9 @@
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
 
-        <form id="FormOre" runat="server" data-parsley-validate>
+        <form id="FormSpese" runat="server" data-parsley-validate>
 
-            <div class="row justify-content-center" >
+            <div class="row justify-content-center">
 
                 <div class="col-5">
 
@@ -131,7 +60,7 @@
                         <asp:FormView ID="FVSpese" runat="server" DataKeyNames="Expenses_Id"
                             DataSourceID="DSspese" align="center" DefaultMode="Edit"
                             OnDataBound="FVSpese_DataBound" CellPadding="0"
-                            OnItemUpdated="FVSpese_ItemUpdated" OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1">
+                            OnItemUpdated="FVSpese_ItemUpdated" OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1" >
 
                             <%--  INSERT   --%>
                             <InsertItemTemplate>
@@ -152,9 +81,9 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                            AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
+                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged" >
+                                    </asp:DropDownList>
                                 </div>
 
                                 <!-- *** DDL Tipo Spesa ***  -->
@@ -162,9 +91,17 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:tipo%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
-                                            meta:resourcekey="DDLTipoSpesaResource2">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
+                                        meta:resourcekey="DDLTipoSpesaResource2">
+                                    </asp:DropDownList>
+                                </div>
+
+                                <!-- *** OpportunityId ***  -->
+                                <div class="input nobottomborder" id="lbOpportunityId">
+                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true"  data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15"/>
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -217,7 +154,7 @@
                                 <div class="input nobottomborder">
                                     <asp:Label CssClass="inputtext" ID="LBAccountingDate" runat="server" Text="Competenza" meta:resourcekey="LBAccountingDateResource2"></asp:Label>
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBAccountingDate" runat="server" Text='<%# Bind("AccountingDate","{0:d}") %>' Columns="8" meta:resourcekey="TBAccountingDateResource2"
-                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{3,4})$/" />
                                 </div>
 
                                 <!-- *** Bottoni ***  -->
@@ -225,7 +162,7 @@
                                     <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
                                     <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" />
                                     <asp:Button ID="RicevuteButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, TICKETS %>" />
-                                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate PostBackUrl="/timereport/input.aspx" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" />
                                 </div>
 
                             </InsertItemTemplate>
@@ -251,9 +188,9 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged"
-                                            AutoPostBack="True" meta:resourcekey="DDLprogettoResource1">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
+                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource1" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
+                                    </asp:DropDownList>
                                 </div>
 
                                 <!-- *** DDL Tipo Spesa ***  -->
@@ -261,9 +198,17 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:tipo%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
-                                            meta:resourcekey="DDLTipoSpesaResource1">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
+                                        meta:resourcekey="DDLTipoSpesaResource1">
+                                    </asp:DropDownList>
+                                </div>
+
+                                <!-- *** OpportunityId ***  -->
+                                <div class="input nobottomborder" id="lbOpportunityId">
+                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15"/>
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -321,7 +266,7 @@
                                 <div class="buttons">
                                     <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
                                     <asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
-                                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" formnovalidate />
+                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" />
                                 </div>
 
                             </EditItemTemplate>
@@ -348,9 +293,9 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                            AutoPostBack="True" Enabled="False" meta:resourcekey="DDLprogettoResource3">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
+                                        AutoPostBack="True" Enabled="False" meta:resourcekey="DDLprogettoResource3">
+                                    </asp:DropDownList>
                                 </div>
 
                                 <!-- *** DDL Tipo Spesa ***  -->
@@ -358,9 +303,17 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:tipo%>" />
                                     </div>
-                                        <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
-                                            AutoPostBack="True" Enabled="False" meta:resourcekey="DDLTipoSpesaResource3">
-                                        </asp:DropDownList>
+                                    <asp:DropDownList ID="DDLTipoSpesa" runat="server" AppendDataBoundItems="True"
+                                        AutoPostBack="True" Enabled="False" meta:resourcekey="DDLTipoSpesaResource3">
+                                    </asp:DropDownList>
+                                </div>
+
+                                <!-- *** OpportunityId ***  -->
+                                <div class="input nobottomborder" id="lbOpportunityId">
+                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <!-- per stile CSS -->
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' Enabled="False"
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -416,7 +369,7 @@
 
                                 <!-- *** Bottoni ***  -->
                                 <div class="buttons">
-                                    <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource3" />
+                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate PostBackUrl="/timereport/input.aspx" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>"  meta:resourcekey="UpdateCancelButtonResource3" />
                                 </div>
 
                             </ItemTemplate>
@@ -437,7 +390,7 @@
                         <asp:Literal runat="server" Text="<%$ Resources:giustificativi%>" />
                     </div>
                     <table id="TabellaRicevute" runat="server" style="border-collapse: collapse"></table>
-                    <div id ="pippo"></div>
+                    <div id="pippo"></div>
                     <br />
 
                     <div id="progress">
@@ -465,7 +418,7 @@
     </div>
     <!-- container -->
 
-    <!-- Per output messaggio warning -->
+   <!-- Per output messaggio warning -->
     <div id="dialog" style="display: none"></div>
 
     <!-- *** FOOTER *** -->
@@ -482,9 +435,9 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSSpese" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name, Expenses.ClientManager_id, Expenses.AccountManager_id, Expenses.Company_id, Expenses.AdditionalCharges FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id  WHERE (Expenses_Id = @Expenses_Id)"
-        InsertCommand="INSERT INTO Expenses(Projects_Id, Persons_id, Date, ExpenseType_Id, Amount, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, Comment, CreatedBy, CreationDate, AccountingDate, TipoBonus_id, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency) VALUES (@Projects_Id, @Persons_id, @Date, @ExpenseType_id, @Amount, @CancelFlag, @CreditCardPayed, @CompanyPayed, @InvoiceFlag, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @ClientManager_id, @AccountManager_id, @Company_id, @AdditionalCharges, @AmountInCurrency);"
-        UpdateCommand="UPDATE Expenses SET Amount = @Amount , ExpenseType_Id = @ExpenseType_Id, CancelFlag = @CancelFlag, Comment = @Comment, InvoiceFlag = @InvoiceFlag, CreditCardPayed = @CreditCardPayed, CompanyPayed = @CompanyPayed, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, TipoBonus_id = @TipoBonus_id, AdditionalCharges = @AdditionalCharges, AmountInCurrency = @AmountInCurrency WHERE (Expenses_Id = @Expenses_Id)"
+        SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, Expenses.CreatedBy, Expenses.CreationDate, Expenses.LastModifiedBy, Expenses.LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name, Expenses.ClientManager_id, Expenses.AccountManager_id, Expenses.Company_id, Expenses.AdditionalCharges, Expenses.OpportunityId FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id  WHERE (Expenses_Id = @Expenses_Id)"
+        InsertCommand="INSERT INTO Expenses(Projects_Id, Persons_id, Date, ExpenseType_Id, Amount, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, Comment, CreatedBy, CreationDate, AccountingDate, TipoBonus_id, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency, OpportunityId) VALUES (@Projects_Id, @Persons_id, @Date, @ExpenseType_id, @Amount, @CancelFlag, @CreditCardPayed, @CompanyPayed, @InvoiceFlag, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @ClientManager_id, @AccountManager_id, @Company_id, @AdditionalCharges, @AmountInCurrency, @OpportunityId);"
+        UpdateCommand="UPDATE Expenses SET Amount = @Amount , ExpenseType_Id = @ExpenseType_Id, CancelFlag = @CancelFlag, Comment = @Comment, InvoiceFlag = @InvoiceFlag, CreditCardPayed = @CreditCardPayed, CompanyPayed = @CompanyPayed, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, TipoBonus_id = @TipoBonus_id, AdditionalCharges = @AdditionalCharges, AmountInCurrency = @AmountInCurrency, OpportunityId=@OpportunityId WHERE (Expenses_Id = @Expenses_Id)"
         OnInserting="DSSpese_Insert_Update" OnUpdating="DSSpese_Insert_Update" OnInserted="DSSpese_Inserted">
 
         <SelectParameters>
@@ -575,9 +528,119 @@
             $("#FVSpese_disCBCreditCard").attr("disabled", true);
             $("#FVSpese_disCBCompanyPayed").attr("disabled", true);
 
+            BindOpportunity();
+
+            // chiama Ajax per controllo carico spese sul giorni
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/CheckCaricoSpesa",
+                data: "{ 'projects_id' : '" + $('#FVSpese_DDLprogetto').val() + "', 'persons_id' : '<%=CurrentSession.Persons_id%>' , 'date' : '" + $('#FVSpese_LBdate').html() + "'  }",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
+                    if (msg.d != "") {
+                        MaskScreen(true);
+                        ShowPopup(msg.d,'','Attenzione');
+                        UnMaskScreen();
+                        //BindOpportunity();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+            }); // ajax
+
         });
 
-</script>
+        // *** Esclude i controlli nascosti *** 
+        $('#FormSpese').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+        $("#FVSpese_DDLprogetto").on("change", function () {
+
+        });
+
+        function BindOpportunity() {
+            // gestione Opportunity Id
+            var OpportunityIsRequired = $("#FVSpese_DDLprogetto").find("option:selected").attr("data-OpportunityIsRequired");
+
+            if (OpportunityIsRequired == "True")
+                $('#lbOpportunityId').show(); // visualizza DropDown
+            else
+                $('#lbOpportunityId').hide(); // visualizza DropDown
+        }
+
+        // ***** CANCELLA RICEVUTA *****
+        function cancella_ricevuta(sFilename) {
+
+            // valori da passare al web service in formato { campo1 : valore1 ; campo2 : valore2 }
+            var values = "{'sfilename': '" + sFilename + "'" +
+                "}";
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WStimereport.asmx/cancella_file",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                // se tutto va bene
+                success: function (msg) {
+                    // cancella la riga della tabella corrispondente alla ricevuta
+                    var elemtohide = document.getElementById(sFilename);
+                    elemtohide.style.display = "none";
+                },
+
+                // in caso di errore
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(xhr.responseText);
+                }
+
+            }); // ajax
+
+        } // cancella_ricevuta
+
+
+        //  ***** CARICA RICEVUTA *****
+        $(function () {
+            var FormDate = $('#FVSpese_LBdate').html();
+
+            // Initialize the jQuery File Upload widget:  
+            $('#CaricaRicevuta').fileupload({
+                // i parametri addizionali vengono letti dal form e passati nella url
+                url: "/timereport/webservices/carica_file.ashx?expenses_id=<%=Request.QueryString["Expenses_Id"]%>&UserName=<%=CurrentSession.UserName%>&TbDate=" + FormDate,
+                dataType: 'json',
+                // caricamento parte alla selezione del file
+                autoUpload: true,
+                // Allowed file types and size
+                acceptFileTypes: /(jpg)|(jpeg)|(png)|(gif)|(pdf)|(bmp)$/i,
+                // Resize immagini
+                disableImageResize: /Android(?!.*Chrome)|Opera/
+                    .test(window.navigator && navigator.userAgent),
+                imageMaxWidth: 1200,
+                imageMaxHeight: 1200,
+                imageCrop: false, // no cropped images
+                // progress bar (vedi elemento con classe bar nel form di upload)
+                progress: function (e, data) {
+                    var bar = $('.bar');
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    var percentVal = progress + '%';
+                    bar.width(percentVal);
+                },
+            })
+                .bind('fileuploaddone', function (e, data) {
+                    // aggiunge la riga alla tabella dei file quando torna la chiamata
+                    $('#TabellaRicevute').append(data.result);
+                    $('.bar').width(0);
+                })
+                .bind('fileuploadfail', function (e, data) {
+                    alert(data);
+                })
+        });
+
+    </script>
 
 </body>
 

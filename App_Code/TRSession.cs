@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Web.Configuration;
+using System.Globalization;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -45,6 +46,7 @@ public class TRSession
     public string BackgroundImage;
     public int Calendar_id;
     public string SalesforceAccount;
+    public CultureInfo defaultCulture;
 
     public TRSession(int inputPersons_id) {
         Persons_id = inputPersons_id;
@@ -161,6 +163,9 @@ public class TRSession
             BackgroundColor = "";
             BackgroundImage = BkgImg;
         }
+
+        // culture
+        defaultCulture= CultureInfo.GetCultureInfo("it-IT");
 
     }
 

@@ -121,7 +121,8 @@
                             <asp:BoundField DataField="ProjectName" HeaderText="Nome" SortExpression="ProjectName" />
                             <asp:BoundField DataField="ManagerName" HeaderText="Manager" SortExpression="ManagerName" />
                             <asp:BoundField DataField="AccountName" HeaderText="Account" SortExpression="AccountName" />
-                            <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />
+                            <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />  
+                            <asp:BoundField DataField="TipoContrattoDesc" HeaderText="Contratto" SortExpression="TipoContrattoDesc" /> 
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget" DataFormatString="{0:###,###}" />
                             <asp:BoundField DataField="BudgetABAP" HeaderText="Bdg ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###}" />
                             <asp:BoundField DataField="SpeseBudget" HeaderText="Spese Bdg" SortExpression="SpeseBudget" DataFormatString="{0:###,###}" />

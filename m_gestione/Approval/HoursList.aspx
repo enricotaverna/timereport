@@ -124,7 +124,7 @@
     pagination:"local", //enable local pagination.
     headerFilterPlaceholder:"filtra i record...", //set column header placeholder text
     ajaxURL:"/timereport/webservices/WF_ApprovalWorkflow.asmx/GetHoursListTable", //ajax URL
-    ajaxParams: { persons_id: <%= CurrentSession.Persons_id  %> , tipoOre :  <%= Request["tipoOre"]  %>, giorniInAvanti : 30 }, //ajax parameters
+    ajaxParams: { persons_id: <%= CurrentSession.Persons_id  %> , tipoOre :  <%= Request["tipoOre"]  %>, giorniInAvanti : 90 }, //ajax parameters
     ajaxConfig: "POST", //ajax HTTP request type
     ajaxContentType:"json", // send parameters to the server as a JSON encoded string
     layout: "fitColumns", //fit columns to width of table (optional)

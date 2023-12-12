@@ -85,7 +85,7 @@ public partial class calendario_generaFestivi : System.Web.UI.Page
         if (DDLMese.SelectedValue != "")
         {
             dataDa = "01/" + DDLMese.SelectedValue + "/" + DDLAnno.SelectedValue;
-            dataA = ASPcompatility.LastDay(Convert.ToInt32(DDLMese.SelectedValue), Convert.ToInt32(DDLAnno.SelectedValue)) + "/" + DDLMese.SelectedValue + "/" + DDLAnno.SelectedValue;
+            dataA = ASPcompatility.LastDay(Convert.ToInt32(DDLMese.SelectedValue), Convert.ToInt32(DDLAnno.SelectedValue));
         }
         else
         {

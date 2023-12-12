@@ -33,7 +33,7 @@ public partial class input_ore : System.Web.UI.Page
 
         //      Modo di default è insert, se richiamata con id va in change / display
         if (IsPostBack)
-            return;
+            return;       
 
         //      in caso di update recupera il valore del progetto e attività
         if (Request.QueryString["hours_id"] != null)
@@ -41,10 +41,14 @@ public partial class input_ore : System.Web.UI.Page
 
             Get_record(Request.QueryString["hours_id"]);
 
-            //              disabilita form in caso di cutoff
+            // disabilita form in caso di cutoff
             Label LBdate = (Label)FVore.FindControl("LBdate");
+            DateTime dateRecord = Convert.ToDateTime(LBdate.Text);
 
-            if (Convert.ToDateTime(LBdate.Text) < CurrentSession.dCutoffDate)
+            // verifica se TR della persona è chiuso
+            var trChiuso = Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND stato=1 AND mese=" + dateRecord.Month.ToString() + " AND anno=" + dateRecord.Year.ToString());
+
+            if (dateRecord  < CurrentSession.dCutoffDate || trChiuso)
                 FVore.ChangeMode(FormViewMode.ReadOnly);
             else
                 FVore.ChangeMode(FormViewMode.Edit);
@@ -81,7 +85,7 @@ public partial class input_ore : System.Web.UI.Page
 
     protected void Bind_DDLprogetto()
     {
-        DataTable dtProgettiForzati;
+        DataTable dtProgettiInDDL = null;
 
         ddlProject = (DropDownList)FVore.FindControl("DDLprogetto");
         ddlProject.Items.Clear();
@@ -93,48 +97,51 @@ public partial class input_ore : System.Web.UI.Page
         {
             case FormViewMode.Insert:
             case FormViewMode.Edit:
-                dtProgettiForzati = CurrentSession.dtProgettiForzati;
-
-                // cancella le righe soggette a Workflow
-                //var rows = dtProgettiForzati.Select("WorkflowType != null");
-                foreach (DataRow row in dtProgettiForzati.Rows)
-                {
-                    if (row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
-                        row.Delete();
-                }
-                dtProgettiForzati.AcceptChanges();
-
-                // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
-                foreach (DataRow drRow in dtProgettiForzati.Rows)
-                {
-                    ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
-                    liItem.Attributes.Add("data-ActivityOn", drRow["ActivityOn"].ToString());
-                    liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
-
-                    // dati per messaggio di errore
-                    if (drRow["TestoObbligatorio"].ToString() == "True")
-                        liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
-                    else
-                        liItem.Attributes.Add("data-desc-message", "");
-
-                    // se chargable filtro per cliente, altrimenti per progetto
-                    string prjType = drRow["ProjectType_Id"].ToString();
-                    if (prjType == ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"])
-                        liItem.Attributes.Add("data-filterlocation", drRow["CodiceCliente"].ToString().TrimEnd());
-                    else if (prjType == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] ||
-                             prjType == ConfigurationManager.AppSettings["PROGETTO_INTERNAL_INVESTMENT"] ||
-                             prjType == ConfigurationManager.AppSettings["PROGETTO_INFRASTRUCTURE"])
-                        liItem.Attributes.Add("data-filterlocation", drRow["Projects_id"].ToString());
-
-                    ddlProject.Items.Add(liItem);
-                }
-
+                dtProgettiInDDL = CurrentSession.dtProgettiForzati.Copy();
                 break;
 
             case FormViewMode.ReadOnly:
-
-                ddlProject.DataSource = CurrentSession.dtProgettiTutti;
+                dtProgettiInDDL = CurrentSession.dtProgettiTutti.Copy();
                 break;
+        }
+
+        // cancella le righe soggette a Workflow
+        // in caso di display cancella tutti i progetto a parte quello non selezionato
+        foreach (DataRow row in dtProgettiInDDL.Rows)
+        {
+            if (row["WorkflowType"].ToString() != "") // gestito con WF -> cancella
+                row.Delete();
+
+            if (FVore.CurrentMode == FormViewMode.ReadOnly && row["Projects_id"].ToString() != lProject_id)
+                row.Delete();
+        }
+        dtProgettiInDDL.AcceptChanges();
+
+        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei commenti
+        foreach (DataRow drRow in dtProgettiInDDL.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+            liItem.Attributes.Add("data-ActivityOn", drRow["ActivityOn"].ToString());
+            if (drRow["ProjectType_Id"].ToString() == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"]) // Gestione opportunity su progetti BD
+                liItem.Attributes.Add("data-OpportunityIsRequired", "True");
+            liItem.Attributes.Add("data-desc-obbligatorio", drRow["TestoObbligatorio"].ToString());
+
+            // dati per messaggio di errore
+            if (drRow["TestoObbligatorio"].ToString() == "True")
+                liItem.Attributes.Add("data-desc-message", drRow["MessaggioDiErrore"].ToString());
+            else
+                liItem.Attributes.Add("data-desc-message", "");
+
+            // se chargable filtro per cliente, altrimenti per progetto
+            string prjType = drRow["ProjectType_Id"].ToString();
+            if (prjType == ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"])
+                liItem.Attributes.Add("data-filterlocation", drRow["CodiceCliente"].ToString().TrimEnd());
+            else if (prjType == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] ||
+                     prjType == ConfigurationManager.AppSettings["PROGETTO_INTERNAL_INVESTMENT"] ||
+                     prjType == ConfigurationManager.AppSettings["PROGETTO_INFRASTRUCTURE"])
+                liItem.Attributes.Add("data-filterlocation", drRow["Projects_id"].ToString());
+
+            ddlProject.Items.Add(liItem);
         }
 
         ddlProject.DataTextField = "DescProgetto";
