@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Web.Configuration;
+using System.Globalization;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -45,8 +46,9 @@ public class TRSession
     public string BackgroundImage;
     public int Calendar_id;
     public string SalesforceAccount;
+    public CultureInfo defaultCulture;
 
-    public TRSession(int inputPersons_id) {
+    public TRSession(int inputPersons_id){
         Persons_id = inputPersons_id;
 
         LoadLocationList();
@@ -157,10 +159,13 @@ public class TRSession
 
         // colore background
         string BkgImg = Utilities.GetCookie("background-image");
-        if (BkgImg != "") { 
+        if (BkgImg != ""){
             BackgroundColor = "";
             BackgroundImage = BkgImg;
         }
+
+        // culture
+        defaultCulture = CultureInfo.GetCultureInfo("it-IT");
 
     }
 
@@ -214,6 +219,6 @@ public class TRSession
             string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
             clsLog.WriteErrLog("0", ex.Message, Description.ToString());
         }
-        
+
     }
 }
