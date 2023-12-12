@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-ore.aspx.cs" Inherits="input_ore" EnableEventValidation="False" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input-ore.aspx.cs" Inherits="input_ore" EnableEventValidation="False" %>
 
 <!DOCTYPE html>
 
@@ -133,6 +133,16 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName1" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh"  OnClick="btnRefresh_Click"/>
+                            </div>
+
                             <!-- *** TB Comment ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource1"></asp:Label>
@@ -233,6 +243,16 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376px"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName2" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" OnClick="btnRefresh_Click"/>
+                            </div>
+
                             <!-- *** TB Comment ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource2"></asp:Label>
@@ -328,6 +348,16 @@
 
                             </div>
 
+                            <!-- *** DDL Task Name ***  -->
+                            <div class="input nobottomborder">
+                                <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
+                                <!-- per stile CSS -->
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376"  AutoPostBack="false"
+                                    meta:resourcekey="DDLTaskName3" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh"/>
+                            </div>
+
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="CommentTextBox" runat="server" Text="Nota" meta:resourcekey="CommentTextBoxResource1"></asp:Label>
                                 <asp:TextBox ID="TextBox2" runat="server" Rows="5" CssClass="textarea" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Columns="30" Enabled="False" meta:resourcekey="TextBox2Resource1" />
@@ -373,9 +403,9 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSore" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy, Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id, hours.OpportunityId FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id, OpportunityId) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @OpportunityId)"
-        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType, OpportunityId=@OpportunityId WHERE (Hours_Id = @Hours_id)"
+        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id, hours.SalesforceTaskID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
+        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,SalesforceTaskID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @SalesforceTaskID)"
+        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType,SalesforceTaskID=@SalesforceTaskID WHERE (Hours_Id = @Hours_id)"
         OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
         <InsertParameters>
@@ -398,6 +428,7 @@
             <asp:Parameter Name="CreationDate" />
             <asp:Parameter Name="AccountingDate" Type="DateTime" />
             <asp:Parameter Name="WorkedInRemote" />
+            <asp:Parameter Name="SalesforceTaskID" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
@@ -420,6 +451,7 @@
             <asp:Parameter Name="LastModificationDate" />
             <asp:Parameter Name="AccountingDate" Type="DateTime" />
             <asp:Parameter Name="WorkedInRemote" />
+            <asp:Parameter Name="SalesforceTaskID" />
         </UpdateParameters>
     </asp:SqlDataSource>
 
@@ -443,6 +475,20 @@
             $('#FVore_DDLLocation').hide();
 
             $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
+            
+            $('#FVore_DDLTaskName').hide();
+            $('#FVore_lblTaskName').hide();
+            $('#FVore_btnRefresh').hide();
+
+            //controllo se ci sono task attive cosi da riattivare il componente
+            $('#FVore_DDLTaskName option').each(function () {
+                if (this.value != "") {
+                    $('#FVore_DDLTaskName').show();  
+                    $('#FVore_lblTaskName').show();
+                    $('#FVore_btnRefresh').show();           
+                    return false;
+                }
+            });
 
             BindActivity();
             BindLocation();
@@ -452,7 +498,7 @@
 
         // *** Esclude i controlli nascosti *** 
         $('#FormOre').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+           excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
         });
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
@@ -578,6 +624,37 @@
                 $('#FVore_DDLLocation').val('');
                 BindLocation(); // ricarica la DDL
             }
+        });
+
+        // Alla selezione di una task imposta automaticamente il valore del progetto
+        $("#FVore_DDLTaskName").change(function () {
+            console.log($(this).find("option:selected").attr("data-Projects_Id"));
+            if ($(this).find("option:selected").attr("data-Projects_Id") != '') // mostra Box Testo
+            {
+                var projID = $(this).find("option:selected").attr("data-Projects_Id");
+                var Projects_Name = $(this).find("option:selected").attr("data-Projects_Name");
+                //controllo per vedere se è un valore in DDL
+                var IsExists = false;
+                $('#FVore_DDLprogetto option').each(function () {
+                    if (this.value == projID) {
+                        IsExists = true;  
+                    }                                          
+                });
+                //controllo se esiste progetto reset
+                //NON esiste resetto le selezioni
+                if (IsExists == false) {
+                    $("#FVore_DDLTaskName").val(0);
+                    alert("Progetto " + Projects_Name + " non presente");
+                } 
+                //imposto il valore e accendo event change
+                $("#FVore_DDLprogetto").val($(this).find("option:selected").attr("data-Projects_Id")).change();
+            } 
+        });
+
+        $("#FVore_btnRefresh").on("click", function () {
+            //alert("Handler for `click` called.");
+            $('#FormOre').off('submit.Parsley');
+            //$('#FormOre').off('form:validate');
         });
 
     </script>

@@ -205,7 +205,7 @@
     <value>--seleziona attività--</value>
   </data>
   <data name="ListItemResource3.Text" xml:space="preserve">
-    <value>-- seleziona un valore --</value>
+    <value>--seleziona attività--</value>
   </data>
   <data name="PageResource1.Title" xml:space="preserve">
     <value>Inserimento Ore</value>
@@ -251,5 +251,8 @@
   </data>
   <data name="Label2.Text" xml:space="preserve">
     <value>Luogo</value>
+  </data>
+  <data name="DDLTaskName.testo" xml:space="preserve">
+    <value>-- seleziona una task --</value>
   </data>
 </root>
