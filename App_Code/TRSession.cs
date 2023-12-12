@@ -159,7 +159,7 @@ public class TRSession
 
         // colore background
         string BkgImg = Utilities.GetCookie("background-image");
-        if (BkgImg != ""){
+        if (BkgImg != "") {
             BackgroundColor = "";
             BackgroundImage = BkgImg;
         }
