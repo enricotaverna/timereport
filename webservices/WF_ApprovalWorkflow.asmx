@@ -1,4 +1,4 @@
-﻿<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
+<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
 
 using System;
 using System.Web.Services;
@@ -86,7 +86,7 @@ public class Card
         string sql;
         string SQLfilterApprovalRequest = "";
         DateTime DateFrom = (DateTime)DateTime.Today; // sottrae i giorni del parametro
-        DateTime DateTo = (DateTime)DateTime.Today.AddDays(30); // sottrae i giorni del parametro
+        DateTime DateTo = (DateTime)DateTime.Today.AddDays(90); // sottrae i giorni del parametro
         string MonthStartDate = ASPcompatility.FormatDateDb("1/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
         KPISet kpi;
 
@@ -408,9 +408,9 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(OreNelMese);
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);
-        listaCard.Add(CVdaConfermare);
+        //listaCard.Add(CVdaConfermare);
         listaCard.Add(ListaLocation);
-        listaCard.Add(ContrattiSubco);
+        //listaCard.Add(ContrattiSubco);
     }
 
     // UpdateCardKPI()

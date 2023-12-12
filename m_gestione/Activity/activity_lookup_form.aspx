@@ -115,42 +115,42 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div class="inputtext">Budget: </div>
                                         <asp:TextBox ID="RevenueBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
                                     </div>
 
                                     <!-- *** IMPORTO BUDGET ABAP ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Budget ABAP: </div>
                                         <asp:TextBox ID="BudgetABAPTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** IMPORTO BUDGET GG ABAP ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Bdg GG ABAP: </div>
                                         <asp:TextBox ID="BudgetGGABAPTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** IMPORTO SPESE ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** MARGINE TARGET ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
                                         <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1' />
                                         <label>%</label>
-                                    </div>
+                                    </div>--%>
 
                                     <div class="SeparatoreForm">Durata</div>
 
@@ -243,42 +243,42 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div class="inputtext">Budget: </div>
                                         <asp:TextBox ID="RevenueBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
                                     </div>
 
                                     <!-- *** IMPORTO BUDGET ABAP ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Budget ABAP: </div>
                                         <asp:TextBox ID="BudgetABAPTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetABAP","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** IMPORTO BUDGET GG ABAP ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Bdg GG ABAP: </div>
                                         <asp:TextBox ID="BudgetGGABAPTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("BudgetGGABAP","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** IMPORTO SPESE ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget","{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
-                                    </div>
+                                    </div>--%>
 
                                     <!-- *** MARGINE TARGET ***  -->
-                                    <div class="input nobottomborder">
+<%--                                    <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
                                         <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type='integer' data-parsley-max='100' data-parsley-min='1' />
                                         <label>%</label>
-                                    </div>
+                                    </div>--%>
 
                                     <div class="SeparatoreForm">Durata</div>
 
@@ -398,11 +398,11 @@
             $("#FVattivita_TBAttivoA").datepicker($.datepicker.regional['it']);
 
             // formatta il campo percentuale
-            var percentDecimal = $("#FVattivita_TBMargine").val().toString().replace(",", ".");
-            if (percentDecimal != "") {
-                var percentCent = parseFloat(percentDecimal) * 100;
-                $("#FVattivita_TBMargine").val(percentCent);
-            }
+            //var percentDecimal = $("#FVattivita_TBMargine").val().toString().replace(",", ".");
+            //if (percentDecimal != "") {
+            //    var percentCent = parseFloat(percentDecimal) * 100;
+            //    $("#FVattivita_TBMargine").val(percentCent);
+            //}
 
         });
 

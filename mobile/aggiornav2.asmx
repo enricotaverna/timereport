@@ -1,9 +1,7 @@
 ﻿<%@ WebService Language="C#" Class="Aggiorna" %>
 
 using System;
-using System.Web;
 using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
@@ -62,14 +60,14 @@ public class VerificaBloccoSpese
 public class Aggiorna : System.Web.Services.WebService
 {
 
-    //public TRSession CurrentSession = new TRSession();
-
-    //// Validatore custom obbligatorietà campo note su form spese
-    //[WebMethod]
-    //public void InitSession(int Persons_id)
-    //{
-    //    CurrentSession.TRSessionInit(Persons_id);
-    //}
+    // recuperare il tipo progetto per attivare il campo opportunità
+    [WebMethod]
+    public int GetProjectTypeId(int Projects_id)
+    {
+        DataTable dt = Database.GetData("Select ProjectType_Id from Projects where Projects_id=" + Projects_id, null);
+        // ritorna un solo record
+        return Convert.ToInt16(dt.Rows[0]["ProjectType_Id"].ToString());
+    }
 
     // Validatore custom obbligatorietà campo note su form spese
     [WebMethod]
@@ -230,7 +228,7 @@ public class Aggiorna : System.Web.Services.WebService
 
     //  ***** Aggiorna Ore ****   
     [WebMethod(EnableSession = true)] // per avere variabili di sessione 
-    public string salvaore(string TbdateForHours, int TbHours, int Person_id, int Projects_Id, int Activity_Id, int HourType_Id, string comment, bool CancelFlag, string LocationKey, string LocationType, string LocationDescription)
+    public string salvaore(string TbdateForHours, int TbHours, int Person_id, int Projects_Id, int Activity_Id, int HourType_Id, string comment, bool CancelFlag, string LocationKey, string LocationType, string LocationDescription, string OpportunityId)
     {
         string sResult;
         // recupera oggetto con variabili di sessione
@@ -279,6 +277,8 @@ public class Aggiorna : System.Web.Services.WebService
             row["LocationType"] = LocationType;
             row["LocationDescription"] = LocationDescription;
             row["CreatedBy"] = get_userid(Person_id);
+            row["OpportunityId"] = OpportunityId;
+                
             HoursTable.Rows.Add(row);
 
             // Update data adapter
@@ -299,7 +299,9 @@ public class Aggiorna : System.Web.Services.WebService
 
     //  ***** Aggiorna Spese ****   
     [WebMethod]
-    public string salvaspese(string Tbdate, string TbExpenseAmount, int Person_id, string UserName, int Projects_Id, int ExpenseType_Id, string comment, bool CreditCardPayed, bool CompanyPayed, bool CancelFlag, bool InvoiceFlag, string strFileName, string strFileData)
+    public string salvaspese(string Tbdate, string TbExpenseAmount, int Person_id, string UserName, int Projects_Id, int ExpenseType_Id, 
+                             string comment, bool CreditCardPayed, bool CompanyPayed, bool CancelFlag, bool InvoiceFlag, string strFileName, 
+                             string strFileData, string OpportunityId)
     {
         string sResult;
         // inizializzazione
@@ -350,6 +352,7 @@ public class Aggiorna : System.Web.Services.WebService
             row["CreationDate"] = DateTime.Now;
             row["CreatedBy"] = get_userid(Person_id);
             row["AmountInCurrency"] = Convert.ToDouble(row["amount"].ToString()) * Convert.ToDouble(dr["ConversionRate"].ToString()) ;
+            row["OpportunityId"] = OpportunityId;
 
             ExpensesTable.Rows.Add(row);
 

@@ -51,7 +51,7 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
         string anno = Request.QueryString["anno"].ToString();
 
         string datada = "01/" + mese + "/" + anno;
-        string dataa = ASPcompatility.LastDay(Convert.ToInt16(mese), Convert.ToInt16(anno)) + "/" + mese + "/" + anno;
+        string dataa = ASPcompatility.LastDay(Convert.ToInt16(mese), Convert.ToInt16(anno));
 
         // valorizza parametri SQLdatasource      
         SQLDSricevute.SelectParameters["datada"].DefaultValue = datada;
@@ -63,6 +63,7 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
             SQLDSricevute.SelectParameters["persons_id"].DefaultValue = Request.QueryString["persona"].ToString(); // persone da DDL
             SQLDSricevute.SelectParameters["societa"].DefaultValue = Request.QueryString["societa"].ToString(); // società da DDL
             SQLDSricevute.SelectParameters["tipospesa"].DefaultValue = Request.QueryString["tipospesa"].ToString(); // tipospesa da DDL
+            SQLDSricevute.SelectParameters["projects_id"].DefaultValue = Request.QueryString["project"].ToString(); // tipospesa da DDL            
             }
         else         // se mode != admin forza con la variabile di sessione
             SQLDSricevute.SelectParameters["persons_id"].DefaultValue = CurrentSession.Persons_id.ToString(); // persona da variabile di sessione
@@ -237,5 +238,13 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
         } //  next 
 
     }
-    
+
+
+    protected void CancelButton_Click(object sender, EventArgs e)
+    {
+        if (Request.QueryString["mode"] == "admin")
+            Response.Redirect("/timereport/report/ricevute/ricevute_select.aspx");
+        else
+            Response.Redirect("/timereport/report/ricevute/ricevute_select_user.aspx");
+    }
 }

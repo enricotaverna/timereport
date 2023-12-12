@@ -17,12 +17,20 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         Auth.CheckPermission("MASTERDATA", "COSTRATE_DISPLAY");
 
         // recupera oggetto con variabili di sessione
+
         CurrentSession = (TRSession)Session["CurrentSession"];
+        if (!IsPostBack)
+            DSPersons.SelectCommand = "SELECT * FROM [Persons] WHERE Active = '" + DDLAttivi.SelectedValue + "' ORDER BY Name";
 
         if ( !Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE") ) {
             btn_crea.Visible = false;
         }
 
 
+    }
+
+    protected void SelectChanged(object sender, EventArgs e)
+    {
+        DSPersons.SelectCommand = "SELECT * FROM [Persons] WHERE Active = '" + DDLAttivi.SelectedValue + "' ORDER BY Name";
     }
 }

@@ -47,26 +47,45 @@ public partial class report_ricevute_select : System.Web.UI.Page
                 SalvaControlli();
 
                 Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue + "&invoiceflag=" + DDLInvoiceFlag.SelectedValue + "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue + "&tipospesa=" + DDLTipoSpesa.SelectedValue +
-                                  "&persona=" + DDLPersone.SelectedValue + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
+                                  "&persona=" + DDLPersone.SelectedValue + "&project=" + DDLProject.SelectedValue  + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
             }
         }
-    
+
     // salva valori dei controlli
     protected void SalvaControlli()
     {
-        Session["DDLPersone"] = DDLPersone.SelectedIndex;
-        Session["DDLAnni"] = DDLAnni.SelectedIndex;
-        Session["DDLMesi"] = DDLMesi.SelectedIndex;
+        //Session["DDLPersone"] = DDLPersone.SelectedIndex;
+        //Session["DDLAnni"] = DDLAnni.SelectedIndex;
+        //Session["DDLMesi"] = DDLMesi.SelectedIndex;
+        foreach (Control control in FVForm.Controls)
+        {
+            if (control is DropDownList)
+            {
+                DropDownList ddl = (DropDownList)control;
+                // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
+               if (ddl.SelectedIndex != 0) 
+                Session[ddl.ID] = ddl.SelectedIndex;
+            }
 
+        }
     }
-
-    // salva valori dei controlli
-    protected void RipristinaControlli()
+        // salva valori dei controlli
+        protected void RipristinaControlli()
     {
-        if (Session["DDLPersone"] != null) DDLPersone.SelectedIndex = (int)Session["DDLPersone"] - 1;
-        if (Session["DDLAnni"] != null) DDLAnni.SelectedIndex = (int)Session["DDLAnni"];
-        if (Session["DDLMesi"] != null) DDLMesi.SelectedIndex = (int)Session["DDLMesi"];
-        
+        //if (Session["DDLPersone"] != null) DDLPersone.SelectedIndex = (int)Session["DDLPersone"] - 1;
+        //if (Session["DDLAnni"] != null) DDLAnni.SelectedIndex = (int)Session["DDLAnni"];
+        //if (Session["DDLMesi"] != null) DDLMesi.SelectedIndex = (int)Session["DDLMesi"];
+        foreach (Control control in FVForm.Controls)
+        {
+            if (control is DropDownList)
+            {
+                DropDownList ddl = (DropDownList)control;
+                // fai qualcosa con il controllo DropDownList (ad esempio, leggi o modifica il valore selezionato)
+                if (Session[ddl.ID] != null) 
+                    ddl.SelectedIndex = (int)Session[ddl.ID];
+            }
+
+        }
     }
 
     // Popola controllo Mesi

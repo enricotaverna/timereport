@@ -22,7 +22,7 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 <link href="/timereport/include/jquery/tooltip/jquery.smallipop.css" rel="stylesheet" />
 
@@ -32,12 +32,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title> <asp:Literal runat="server" Text="<%$ Resources:titolo%>" /> </title>
+    <title>
+        <asp:Literal runat="server" Text="<%$ Resources:titolo%>" />
+    </title>
 </head>
 
 <body>
 
-    <!-- *** ModalWindow: Finestra richiesta spese / trasferte *** -->
+    <!-- *** Box dialogo per specifica rimborso trasferta Italia/Estero ***  -->
     <div id="ModalWindow">
 
         <form id="FVForm" action="input.aspx" method="post" class="StandardForm" runat="server">
@@ -49,34 +51,39 @@
                     <div class="formtitle">Specifica luogo trasferta</div>
 
                     <div class="input nobottomborder">
-                        <div class="inputtext">Luogo di trasferta: </div>
-                        <asp:TextBox class="ASPInputcontent" runat="server" name="SedeViaggio" ID="SedeViaggio" meta:resourcekey="SedeViaggioResource1" />
-                        <asp:RequiredFieldValidator ID="VAL_SedeViaggio" runat="server"
-                            ErrorMessage="RequiredFieldValidator" ControlToValidate="SedeViaggio"
-                            Display="Dynamic" meta:resourcekey="VAL_SedeViaggioResource1">inserire sede</asp:RequiredFieldValidator>
-                    </div>
-
-                    <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Rimborso" meta:resourcekey="Label7Resource1"></asp:Label>
-                            <asp:DropDownList ID="DDLBonus" runat="server" AppendDataBoundItems="True"
-                                DataSourceID="DSBonus" DataTextField="Descrizione"
-                                DataValueField="ExpenseType_Id" meta:resourcekey="DDLBonusResource1">
-                            </asp:DropDownList>
+                        <asp:DropDownList ID="DDLBonus" runat="server" AppendDataBoundItems="True"
+                            DataSourceID="DSBonus" DataTextField="Descrizione"
+                            DataValueField="ExpenseType_Id" meta:resourcekey="DDLBonusResource1">
+                        </asp:DropDownList>
                     </div>
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Progetto" meta:resourcekey="Label1Resource1"></asp:Label>
-                            <asp:DropDownList ID="DDLProgetto" runat="server" AppendDataBoundItems="True" meta:resourcekey="DDLProgettoResource1">
-                            </asp:DropDownList>
+                        <asp:DropDownList ID="DDLProgetto" runat="server" AppendDataBoundItems="True" meta:resourcekey="DDLProgettoResource1">
+                        </asp:DropDownList>
+                    </div>
+
+                    <!-- *** OpportunityId ***  -->
+                    <div class="input nobottomborder" id="lbOpportunityId">
+                        <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" 
+                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$"  MaxLength="15" />
+                    </div>
+
+                    <div class="input nobottomborder">
+                        <div class="inputtext">Luogo di trasferta</div>
+                        <asp:TextBox class="ASPInputcontent" runat="server" name="SedeViaggio" ID="SedeViaggio" meta:resourcekey="SedeViaggioResource1" data-parsley-errors-container="#valMsg" data-parsley-required="true"/>
                     </div>
 
                     <div class="buttons">
+                        <div id="valMsg" class="parsely-single-error"></div>
                         <asp:Button ID="InsertButton" runat="server"
                             CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>"
                             CssClass="orangebutton" OnClick="InsertButton_Click" meta:resourcekey="InsertButtonResource1" />
-                        <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False"
+                        <asp:Button ID="UpdateCancelButton" runat="server"  
                             CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>"
-                            CssClass="greybutton" meta:resourcekey="UpdateCancelButtonResource1" />
+                            CssClass="greybutton" meta:resourcekey="UpdateCancelButtonResource1" formnovalidate/>
                     </div>
 
                     <input type="hidden" id="refDate" name="refDate" value="" />
@@ -98,10 +105,10 @@
     <%-- *** ModalWindow *** --%>
 
     <!-- *** APPLICTION MENU *** -->
-    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>                        
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MainWindow *** -->
-    <div class="container MainWindowBackground" style="padding-top:20px" >
+    <div class="container MainWindowBackground" style="padding-top: 20px">
 
         <div class="row justify-content-center">
 
@@ -140,146 +147,151 @@
 
             <!--**** Secondo Box ***-->
             <div class="col-5 RoundedBox">
-                            <button type="submit" class="btn btn-outline-secondary float-end mx-1" onclick="window.location.href='input.aspx?month=<%=  DateTime.Now.Month %>&year=<%=DateTime.Now.Year%>'"><i class="px-2 fas fa-calendar-alt"></i><asp:Literal runat="server" Text="<%$ Resources:mese_corrente%>"/></button>
-                            <button id="btChiudiTR" type="submit" class="btn btn-outline-secondary float-end mx-1"   runat="server" onclick="window.location.href='./report/chiusura/ChiusuraTRCheck.aspx'"  ><i class="px-2 fas fa-lock"></i><asp:Literal runat="server" Text="<%$ Resources:chiudi_timereport%>"/></button>
+                <button type="submit" class="btn btn-outline-secondary float-end mx-1" onclick="window.location.href='input.aspx?month=<%=  DateTime.Now.Month %>&year=<%=DateTime.Now.Year%>'"><i class="px-2 fas fa-calendar-alt"></i>
+                    <asp:Literal runat="server" Text="<%$ Resources:mese_corrente%>" /></button>
+                <button id="btChiudiTR" type="submit" class="btn btn-outline-secondary float-end mx-1" runat="server" onclick="window.location.href='./report/chiusura/ChiusuraTRCheck.aspx'"><i class="px-2 fas fa-lock"></i>
+                    <asp:Literal runat="server" Text="<%$ Resources:chiudi_timereport%>" /></button>
             </div>
             <!--End roundedBox-->
 
         </div>
 
         <div class="row justify-content-center pt-3">
-            
+
             <div class="col-11 px-0">
 
-            <%
-                // *****
-                // ***** TAB TIPO CALENDARIO *****
-                // *****
-                string ch = "", ce = "", cs = "", ca = "";
+                <%
+                    // *****
+                    // ***** TAB TIPO CALENDARIO *****
+                    // *****
+                    string ch = "", ce = "", cs = "", ca = "";
 
-                switch ((string)Session["type"])
-                {
-                    case "hours":
-                        ch = "Tab-active";
-                        ce = cs = ca = "Tab-noactive";
-                        break;
-                    case "expenses":
-                        ce = "Tab-active";
-                        ch = cs = ca = "Tab-noactive";
-                        break;
-                    case "bonus":
-                        cs = "Tab-active";
-                        ch = ce = ca = "Tab-noactive";
-                        break;
-                    case "leave":
-                        ca = "Tab-active";
-                        ch = ce = cs = "Tab-noactive";
-                        break;
-                }
+                    switch ((string)Session["type"])
+                    {
+                        case "hours":
+                            ch = "Tab-active";
+                            ce = cs = ca = "Tab-noactive";
+                            break;
+                        case "expenses":
+                            ce = "Tab-active";
+                            ch = cs = ca = "Tab-noactive";
+                            break;
+                        case "bonus":
+                            cs = "Tab-active";
+                            ch = ce = ca = "Tab-noactive";
+                            break;
+                        case "leave":
+                            ca = "Tab-active";
+                            ch = ce = cs = "Tab-noactive";
+                            break;
+                    }
 
-                Response.Write("<a class=" + ch + " style='margin-left:0px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
+                    Response.Write("<a class=" + ch + " style='margin-left:0px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
 
-                // solo se ha spese
-                DataTable dtSpeseForzate = CurrentSession.dtSpeseForzate;
-                if (dtSpeseForzate.Rows.Count > 0)
-                    Response.Write("<a class=" + ce + " href=input.aspx?type=expenses>" + GetLocalResourceObject("SPESE") + "</a>");
+                    // solo se ha spese
+                    DataTable dtSpeseForzate = CurrentSession.dtSpeseForzate;
+                    if (dtSpeseForzate.Rows.Count > 0)
+                        Response.Write("<a class=" + ce + " href=input.aspx?type=expenses>" + GetLocalResourceObject("SPESE") + "</a>");
 
-                // solo se dipendente
-                if (Auth.ReturnPermission("DATI", "BUONI"))
-                    Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>" + GetLocalResourceObject("BUONI") + "</a>");
+                    // solo se dipendente
+                    if (Auth.ReturnPermission("DATI", "BUONI"))
+                        Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>" + GetLocalResourceObject("BUONI") + "</a>");
 
-                // solo se dipendente
-                if (Auth.ReturnPermission("DATI", "ASSENZE") && ConfigurationManager.AppSettings["LEAVE_ON"] == "true")
-                    Response.Write("<a class=" + ca + " href=input.aspx?type=leave>" + GetLocalResourceObject("ASSENZE") + "</a>");
+                    // solo se dipendente
+                    if (Auth.ReturnPermission("DATI", "ASSENZE") && ConfigurationManager.AppSettings["LEAVE_ON"] == "true")
+                        Response.Write("<a class=" + ca + " href=input.aspx?type=leave>" + GetLocalResourceObject("ASSENZE") + "</a>");
 
-            %>
-            <table align="center" style="width:100%;border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
-                <!--        lascia righa vuota-->
-<%--                <tr>
+                %>
+                <table align="center" style="width: 100%; border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
+                    <!--        lascia righa vuota-->
+                    <%--                <tr>
                     <td class="hours">&nbsp;</td>
                     <td class="hours">&nbsp;</td>
                     <td class="hours">&nbsp;</td>
                 </tr>--%>
-                <%          
+                    <%          
 
-                    for (cnt = 1; cnt <= 10; cnt++)
-                    {
-                        Response.Write("<tr>");
+                        for (cnt = 1; cnt <= 10; cnt++)
+                        {
+                            Response.Write("<tr>");
 
-                        // First columns ---------------
-                        OutputColumn(cnt);
+                            // First columns ---------------
+                            OutputColumn(cnt);
 
-                        // Second columns	-------------------
-                        OutputColumn(cnt + 10);
+                            // Second columns	-------------------
+                            OutputColumn(cnt + 10);
 
-                        // Third columns ----------------------------		
-                        OutputColumn(cnt + 20);
+                            // Third columns ----------------------------		
+                            OutputColumn(cnt + 20);
 
-                        Response.Write("</tr>");
-                %>
-                <tr>
-                    <%					
-                        // First columns --------------------------------------				
-                        if ((string)Session["type"] == "hours")
-                            FindHours(cnt);
-                        else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
-                            FindExpenses(cnt);
-                        else
-                            FindAssenze(cnt);
-
-                        // Second columns --------------------------------------
-                        if ((string)Session["type"] == "hours")
-                            FindHours(cnt + 10);
-                        else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
-                            FindExpenses(cnt + 10);
-                        else
-                            FindAssenze(cnt + 10);
-
-                        // Third columns --------------------------------------
-                        if ((string)Session["type"] == "hours")
-                            FindHours(cnt + 20);
-                        else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
-                            FindExpenses(cnt + 20);
-                        else
-                            FindAssenze(cnt + 20);
+                            Response.Write("</tr>");
                     %>
-                </tr>
+                    <tr>
+                        <%					
+                            // First columns --------------------------------------				
+                            if ((string)Session["type"] == "hours")
+                                FindHours(cnt);
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                                FindExpenses(cnt);
+                            else
+                                FindAssenze(cnt);
 
-                <!--        lascia righa vuota CANCELLATO -->
-<%--                 <tr>
+                            // Second columns --------------------------------------
+                            if ((string)Session["type"] == "hours")
+                                FindHours(cnt + 10);
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                                FindExpenses(cnt + 10);
+                            else
+                                FindAssenze(cnt + 10);
+
+                            // Third columns --------------------------------------
+                            if ((string)Session["type"] == "hours")
+                                FindHours(cnt + 20);
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                                FindExpenses(cnt + 20);
+                            else
+                                FindAssenze(cnt + 20);
+                        %>
+                    </tr>
+
+                    <!--        lascia righa vuota CANCELLATO -->
+                    <%--                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                 </tr>--%>
 
-                <%	
-                    }
+                    <%	
+                        }
 
-                    //	Print the last row for months with 	31 days
-                    if (ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])) == 31)
-                    {
-                        Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
-                        OutputColumn(31);
-                        Response.Write("</tr>");
-                        Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
-                        if ((string)Session["type"] == "hours")
-                            FindHours(31);
-                        else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
-                            FindExpenses(31);
-                        else
-                            FindAssenze(31);
-                        Response.Write("</tr>");
+                        //	Print the last row for months with 	31 days
+                        if (ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])) == 31)
+                        {
+                            Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
+                            OutputColumn(31);
+                            Response.Write("</tr>");
+                            Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
+                            if ((string)Session["type"] == "hours")
+                                FindHours(31);
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                                FindExpenses(31);
+                            else
+                                FindAssenze(31);
+                            Response.Write("</tr>");
 
-                    }
+                        }
 
-                %>
-            </table>
+                    %>
+                </table>
 
-        </div> <!-- *** END Col *** -->
-            
-        </div> <!-- *** END Row *** -->
+            </div>
+            <!-- *** END Col *** -->
 
-    </div> <!-- *** END Container *** -->
+        </div>
+        <!-- *** END Row *** -->
+
+    </div>
+    <!-- *** END Container *** -->
 
     <!-- *** FOOTER *** -->
     <div class="container bg-light">
@@ -301,6 +313,22 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        // *** Esclude i controlli nascosti *** 
+        $('#FVForm').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+
+        function BindOpportunity() {
+            // gestione Opportunity Id
+            var OpportunityIsRequired = $("#DDLProgetto").find("option:selected").attr("data-OpportunityIsRequired");
+
+            if (OpportunityIsRequired == "True")
+                $('#lbOpportunityId').show(); // visualizza DropDown
+            else
+                $('#lbOpportunityId').hide(); // visualizza DropDown
+        }
 
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB
         function CancellaId(Id) {
@@ -448,7 +476,6 @@
 
         }); //TICKETREST
 
-
         // cursore in attesa durante chiamata ajax
         $(document).ajaxStart(function () {
             $('body').addClass('ajaxLoading');
@@ -552,6 +579,11 @@
                 popupDelay: 0
             });
 
+            // Mostra box testo in caso della corrispondente selezione della DDL Location
+            $("#DDLProgetto").change(function () {
+                BindOpportunity();
+            });
+
             //select all the a tag with name equal to modal
             $('a[name=modal]').click(function (e) {
                 //Cancel the link behavior
@@ -567,6 +599,9 @@
 
                 // setta il progetto come default
                 $("#DDLProgetto").val(aData[1]);
+
+                // mostra o nasconde campo opportunità nella finestra modale quando si inserisce la diaria giornaliera
+                BindOpportunity();
 
                 //Get the screen height and width
                 var maskHeight = $(document).height();

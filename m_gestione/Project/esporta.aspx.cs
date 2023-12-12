@@ -108,7 +108,7 @@ public partial class Esporta : System.Web.UI.Page
             sWhereClause = sWhereClause + " AND ";
 
         string fd = ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(DDLFromMonth.SelectedValue), Convert.ToInt16(DDLFromYear.SelectedValue)));
-        string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)) +"/" + DDLToMonth.SelectedValue + "/" + DDLToYear.SelectedValue);                     
+        string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)));                     
 
         sWhereClause = sWhereClause + " date >= " + fd + " AND date <= " + ld ;
 

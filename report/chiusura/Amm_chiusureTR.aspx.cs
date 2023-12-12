@@ -20,7 +20,7 @@ public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
         CurrentSession = (TRSession)Session["CurrentSession"];
 
         // valorizza DDL e mette default
-        if (!IsPostBack) { 
+        if (!IsPostBack) {
             DDLAnno_DataBinding();
             DDLMese_DataBinding();
 
@@ -28,6 +28,30 @@ public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
             if (Session["DDLPersona"] != null)
                 DDLPersona.SelectedValue = Session["DDLPersona"].ToString();
         }
+
+        // Imposta query selezione
+        ImpostaQuery();
+    }
+
+    protected void ImpostaQuery() {
+
+        string primoDelMese = ASPcompatility.FormatDateDb( ASPcompatility.FirstDay(int.Parse(DDLMese.SelectedValue), int.Parse(DDLAnno.SelectedValue)) );
+        string ultimoDelMese = ASPcompatility.FormatDateDb( ASPcompatility.LastDay(int.Parse(DDLMese.SelectedValue), int.Parse(DDLAnno.SelectedValue)) );
+
+        // la SQL è una UNION dei record presenti sulla LOGTR + di quelli, per cui la persons_id non è già presente sulla prima query, che hanno 
+        // almeno un carico Hours nel mese
+        DSLogTR.SelectCommand = "SELECT LogTR.LogTR_id, LogTR.Persons_id as Persons_id, LogTR.Mese as Mese, LogTR.Anno as Anno, C.Name as Name, LogTR.Stato, LogTR.CreationDate, LogTR.CreatedBy, LogTR.LastModifiedBy, LogTR.LastModificationDate FROM LogTR " + 
+                                " INNER JOIN Persons as C ON LogTR.Persons_id = C.Persons_id " + 
+                                " WHERE LogTR.Mese =  @Mese AND (LogTR.Anno = @Anno) AND (LogTR.Persons_id = @persona OR @persona='0')" +
+                                " UNION " +
+                                " SELECT '', hours.persons_id as Persons_id, MONTH(date) as Mese, YEAR(date) as Anno, B.name as Name, '0' as 'Stato', '', '', '', '' FROM Hours " +
+                                " INNER JOIN Persons as B ON B.persons_id = hours.Persons_id" + 
+                                " WHERE date >= " + primoDelMese + " AND date <= " + ultimoDelMese + " AND " +
+                                " ( Hours.Persons_id = @persona OR @persona = '0' ) AND " +
+                                " ( hours.Persons_id NOT IN ( SELECT Persons_id FROM LogTR WHERE LogTR.Mese =  @Mese AND (LogTR.Anno = @Anno) ) )" +
+                                " GROUP BY hours.persons_id, date, Name" +
+                                " ORDER BY Anno, Mese, Name";
+
     }
 
     // al cambio di DDL salva il valore 
@@ -98,14 +122,27 @@ public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
             // Retrieve the row index stored in the 
             // CommandArgument property.
             int index = Convert.ToInt32(e.CommandArgument);
+            string Persons_id = GVLogTR.DataKeys[index].Value.ToString(); // persons_id in quanto dichiarato DataKeyName nella gridview
+
 
             // Retrieve the row that contains the button 
             // from the Rows collection.
-            GridViewRow row = GVLogTR.Rows[index]; 
+            GridViewRow row = GVLogTR.Rows[index];
 
             // controlli passati, cancella il record
-            if (e.CommandName == "lock" )
-                Database.ExecuteSQL("UPDATE LOGTR SET Stato ='1', LastModifiedBy = '" + CurrentSession.UserId + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
+            if (e.CommandName == "lock")
+                if (row.Cells[0].Text == "0") // record non esistente
+                    Database.ExecuteSQL("INSERT INTO LOGTR (persons_id, mese, anno, stato, CreatedBy, CreationDate) VALUES ( " +
+                        Persons_id + " , " + // 
+                        row.Cells[2].Text + " , " + // mese
+                        row.Cells[1].Text + " , " + // anno
+                        "'1' , " + // stato chgiuso
+                        ASPcompatility.FormatStringDb(CurrentSession.UserId) + " , " +
+                        ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) +   // creationDate
+                        " )"
+                        , lPage); 
+                else
+                    Database.ExecuteSQL("UPDATE LOGTR SET Stato ='1', LastModifiedBy = '" + CurrentSession.UserId + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
             else
                 Database.ExecuteSQL("UPDATE LOGTR SET Stato ='0', LastModifiedBy = '" + CurrentSession.UserId + "', LastModificationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToShortDateString(), false) + "  WHERE LOGTR_id=" + row.Cells[0].Text, lPage);
 
@@ -129,12 +166,12 @@ public partial class report_chiusura_Amm_chiusureTR : System.Web.UI.Page
         if (e.Row.Cells[4].Text == "0" ) 
         {
             e.Row.Cells[4].Text = "aperto";
-            e.Row.Cells[10].Visible = false;
+            e.Row.Cells[11].Visible = false;
         }
         else 
         {
             e.Row.Cells[4].Text = "chiuso";
-            e.Row.Cells[9].Visible = false;
+            e.Row.Cells[10].Visible = false;
         }
     }
 }

@@ -267,7 +267,14 @@ select {
     margin: 10px 30px 10px 10px;
     padding-bottom: 0px;
 }
-
+ 
+:
+.logTexText A {
+    float: left;
+    width: 2wi
+}
+ 
+ 
 .input2col {
     width: 98px;
     float: left;
@@ -406,6 +413,7 @@ select {
     cursor: pointer;
     outline: none;
 }
+
 
     .greybutton:hover {
         background: #BABABA;
@@ -674,11 +682,54 @@ select {
     padding: 10px 0px 10px 0px !important;
 }
 
+/* per dialog box messaggi START */
 .ui-widget-header {
     background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;
     /*  background: #ffbd27;
     background: linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%); */
 }
+
+.ui-widget-header {
+    background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;
+    /*  background: #ffbd27;
+    background: linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%); */
+}
+
+.ui-dialog {
+    background: lightyellow !important;
+}
+
+    .ui-dialog .ui-dialog-buttonpane {
+        background: lightyellow !important;
+        padding: 2px !important;
+    }
+
+    .ui-dialog .ui-dialog-content {
+        padding: 15px 10px 15px 10px !important;
+    }
+
+.ui-dialog-titlebar-close {
+    background-image: url("/timereport/images/icons/16x16/cancel.png");
+    border-color: gray;
+}
+
+.ui-dialog-buttonset button {
+    width: 70px;
+    background: lightslategray;
+    border: 1px solid lightslategray;
+    border-radius: 6px;
+    line-height: 20px;
+    font-size: 14px;
+    padding: 6px 6px;
+    color: #FFF;
+    /*text-shadow: -1px -1px #BABABA;*/
+    float: right;
+    margin-left: 10px;
+    cursor: pointer;
+    outline: none;
+}
+
+/* per dialog box messaggi END */
 
 .ui-state-active {
     background-color: #ededed;

@@ -166,7 +166,6 @@ public class TRSession
 
         // culture
         defaultCulture = CultureInfo.GetCultureInfo("it-IT");
-
     }
 
     public void LoadSFTask()
