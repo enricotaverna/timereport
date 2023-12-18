@@ -7,10 +7,9 @@ using System.Data;
 using System.IO;
 using System.Globalization;
 using System.Threading;
-using System.Web.UI.WebControls;
 
 public partial class input : System.Web.UI.Page
-{   
+{
     public bool bTRChiuso;
     public DataTable dtHours;
     public DataTable dtenses;
@@ -25,7 +24,7 @@ public partial class input : System.Web.UI.Page
         Auth.CheckPermission("DATI", "SPESE");
 
         // recupera oggetto con variabili di sessione
-        CurrentSession = (TRSession)Session["CurrentSession"]; 
+        CurrentSession = (TRSession)Session["CurrentSession"];
 
         // imposta session variables
         SetVariables();
@@ -42,26 +41,16 @@ public partial class input : System.Web.UI.Page
         if ((string)Session["type"] == "bonus")
             BindDDLProjects();
     }
-  
+
     //   ****************************************
     //   BindDDLProjects() 
     //   ****************************************
     protected void BindDDLProjects()
     {
 
-        DataTable dtProgettiInDDL = CurrentSession.dtProgettiForzati;
+        DataTable dtProgettiForzati = CurrentSession.dtProgettiForzati;
 
-        DDLProgetto.Items.Clear();
-
-        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei opporunità
-        foreach (DataRow drRow in dtProgettiInDDL.Rows)
-        {
-            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
-            if (drRow["ProjectType_Id"].ToString() == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"]) // Gestione opportunity su progetti BD
-                liItem.Attributes.Add("data-OpportunityIsRequired", "True");
-            DDLProgetto.Items.Add(liItem);
-        }
-
+        DDLProgetto.DataSource = dtProgettiForzati;
         DDLProgetto.DataTextField = "DescProgetto";
         DDLProgetto.DataValueField = "Projects_Id";
         DDLProgetto.DataBind();
@@ -80,11 +69,11 @@ public partial class input : System.Web.UI.Page
         // se TR chiuso spegne il bottone e mette la scrita
         if (bTRChiuso)
         {
-            btChiudiTR.Visible = false; 
+            btChiudiTR.Visible = false;
         }
         else
         {
-            btChiudiTR.Visible = true; 
+            btChiudiTR.Visible = true;
         }
 
     }
@@ -95,7 +84,7 @@ public partial class input : System.Web.UI.Page
     protected void SetVariables()
     {
 
-        
+
         // *** Imposta default dei form *****
         DSBonus.SelectParameters["TipoBonus_Id"].DefaultValue = ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"];
 
@@ -154,7 +143,7 @@ public partial class input : System.Web.UI.Page
 
         List<int> iList = new List<int>();
         int iStart;
- 
+
         // legge i file nel mese / utente
         string[] filePaths = TrovaRicevuteLocale(-1,  CurrentSession.UserName, Session["year"].ToString() + Session["month"].ToString() + "01");
 
@@ -225,15 +214,15 @@ public partial class input : System.Web.UI.Page
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
         else if ((string)Session["type"] == "bonus")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
-        if (sQuery!="") // chiamata da scheda spese
+        if (sQuery != "") // chiamata da scheda spese
             dtenses = Database.GetData(sQuery, this.Page);
 
     }
@@ -278,7 +267,7 @@ public partial class input : System.Web.UI.Page
             sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
             sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
 
-                Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
+            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
             //else
             //    Response.Write("<td id='TDitm" + sISODate + "'>");
 
@@ -292,7 +281,6 @@ public partial class input : System.Web.UI.Page
                 strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
                              "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
                              "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
-                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
                              "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
                              "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
                              "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
@@ -300,28 +288,30 @@ public partial class input : System.Web.UI.Page
                              "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
                              "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
 
-// imposta icona di workflow
-WFIcon = "";
+                // imposta icona di workflow
+                WFIcon = "";
 
                 if (rdr["ApprovalStatus"].ToString() == MyConstants.WF_REQUEST)
                     WFIcon = "<img align = left src ='/timereport/images/icons/16x16/warning.png' width = 14 height = 14 border = 0 >";
 
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
 
-                if (rdr["ApprovalStatus"].ToString().Length == 0) { 
+                if (rdr["ApprovalStatus"].ToString().Length == 0)
+                {
                     Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
-                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G")  + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
+                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
                 }
-                else { 
+                else
+                {
                     Response.Write("<div id=TRitm" + rdr["Hours_id"] + ">");
                     Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
                 }
 
                 // cancellazione solo in change e se la riga non è una richiesta assenza
-                if (Convert.ToBoolean(Session["InputScreenChangeMode"]) & (rdr["ApprovalStatus"].ToString().Length == 0)) 
-                            Response.Write("<a href=# onclick='CancellaId(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+                if (Convert.ToBoolean(Session["InputScreenChangeMode"]) & (rdr["ApprovalStatus"].ToString().Length == 0))
+                    Response.Write("<a href=# onclick='CancellaId(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
 
-                    Response.Write("</div>"); // TRore
+                Response.Write("</div>"); // TRore
             }
 
             if (drRow.Count() > 0)
@@ -348,7 +338,7 @@ WFIcon = "";
             sDate = intDayNumber.ToString().PadLeft(2, '0') + "/" + Session["month"] + "/" + Session["year"];
             sISODate = Session["year"].ToString() + Session["month"].ToString() + intDayNumber.ToString().PadLeft(2, '0'); // YYYYYMMDD
 
-            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");            
+            Response.Write("<td class=hours id='TDitm" + sISODate + "'>");
 
             DataRow[] drRow = dtenses.Select("[date] = '" + sDate + "'");
 
@@ -362,12 +352,12 @@ WFIcon = "";
                 sFlag = Convert.ToBoolean(rdr["CompanyPayed"]) ? sFlag + " PA " : sFlag;
                 sFlag = Convert.ToBoolean(rdr["InvoiceFlag"]) ? sFlag + " FAT " : sFlag;
 
-                strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                             "<br><b>Progetto:</b>&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
-                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
-                             "<br><b>Spesa:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
-                             "<br><b>Importo:</b>&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
-                             "<br><b>Flag:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sFlag +
+                strTooltip = "Data:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
+                             "<br>Progetto:&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
+                             "<br>Spesa:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
+                             "<br>Importo:&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
+                             "<br>Flag:&nbsp;&nbsp;&nbsp;" +
+                             sFlag +
                              "<br><br>" + HttpUtility.HtmlEncode(rdr["comment"].ToString());
 
                 // se la spesa ha una ricevuta stampa un icona, altrimenti lascia blank
@@ -379,9 +369,9 @@ WFIcon = "";
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
                 Response.Write("<div class=TRitem id=TRitm" + rdr["expenses_id"] + ">");
 
-                    Response.Write("<a id=" + rdr["expenses_id"] + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + rdr["expenses_id"] + " >" + strIconaRicevuta + rdr["ProjectCode"] + ":" + rdr["ExpenseCode"] + " : " + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] + "</a>");
-                    if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
-                        Response.Write("<a  align=right href=# onclick='CancellaId(" + rdr["expenses_id"] +")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+                Response.Write("<a id=" + rdr["expenses_id"] + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + rdr["expenses_id"] + " >" + strIconaRicevuta + rdr["ProjectCode"] + ":" + rdr["ExpenseCode"] + " : " + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] + "</a>");
+                if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
+                    Response.Write("<a  align=right href=# onclick='CancellaId(" + rdr["expenses_id"] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
 
                 Response.Write("</div>"); // TRexp
 
@@ -442,7 +432,7 @@ WFIcon = "";
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
                 Response.Write("<div id=TRitm" + rdr["ApprovalRequest_id"] + ">");
 
-                Response.Write(WFIcon + "<a id=" + rdr["ApprovalRequest_id"] + " title=' " + strTooltip + "' class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + rdr["ProjectName"] + "</a>" );
+                Response.Write(WFIcon + "<a id=" + rdr["ApprovalRequest_id"] + " title=' " + strTooltip + "' class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + rdr["ProjectName"] + "</a>");
 
                 if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
                     Response.Write("<a href=# onclick='CancellaAssenza(" + rdr["ApprovalRequest_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
@@ -537,7 +527,7 @@ WFIcon = "";
                                    // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
                         DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
 
-                        if ( !bHoliday) // giorno on è un festivo
+                        if (!bHoliday) // giorno on è un festivo
                         {
 
                             string sDisplay="";
@@ -573,11 +563,12 @@ WFIcon = "";
         // recupera conversion rate associata al tipo spesa
         DataTable dtTipoSpesa = CurrentSession.dtSpeseTutte;
         DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + Request.Form["DDLBonus"]);
-        if (dr.Count() != 1) { // non dovrebbe mai succedere! 
+        if (dr.Count() != 1)
+        { // non dovrebbe mai succedere! 
         }
 
         // inserisce record x trasferta
-        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges, AmountInCurrency, OpportunityId) " +
+        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges, AmountInCurrency) " +
                 "values (" +
                 ASPcompatility.FormatDateDb(Request.Form["refDate"], false) + " ," +
                 "'" + Request.Form["DDLProgetto"] + "' ," +    // da dropdown
@@ -589,15 +580,14 @@ WFIcon = "";
                 "'false' ," +
                 "'false' ," +
                 "'false' ," +
-                "'" + CurrentSession.UserId  + "' ," +
-                ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " ," +
+                "'" + CurrentSession.UserId + "' ," +
+                ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
                 "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
                 "'" + result.Item1 + "' ," +
                 "'" + result.Item2 + "' ," +
                 "'" + CurrentSession.Company_id + "' ," +
                 "'false' , " +
-                 ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) + " ," +
-                 ASPcompatility.FormatStringDb(TBOpportunityId.Text) +
+                 ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) +
                 " )";
 
         Database.ExecuteSQL(cmd, this.Page);
@@ -620,6 +610,5 @@ WFIcon = "";
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
-
 }
 
