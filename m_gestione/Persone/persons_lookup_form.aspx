@@ -159,6 +159,13 @@
                                             data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
                                     </div>
 
+                                    <!-- *** SF MAIL  ***  -->
+                                    <div class="input nobottomborder">
+                                        <asp:Label ID="Label17" CssClass="inputtext" runat="server" Text="SF Mail:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBSFMail" runat="server" Text='<%# Bind("SaleforceEmail") %>' Width="265px" Columns="50"
+                                            data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
+                                    </div>
+
                                 </div>
 
                                 <div id="tabs-3" style="height: 380px; width: 100%">
@@ -379,6 +386,12 @@
                                             data-parsley-errors-container="#valMsg" required data-parsley-type='email' />
                                     </div>
 
+                                    <!-- *** SF MAIL  ***  -->
+                                    <div class="input nobottomborder">
+                                        <asp:Label ID="Label17" CssClass="inputtext" runat="server" Text="SF Mail:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBSFMail" runat="server" Text='<%# Bind("SaleforceEmail") %>' Width="265px" Columns="50"
+                                            data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
+                                    </div>
 
                                 </div>
                                 <!-- *** TAB 3 ***  -->
