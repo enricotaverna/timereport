@@ -623,5 +623,4 @@ public partial class input : System.Web.UI.Page
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
-
 }
