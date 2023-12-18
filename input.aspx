@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input.aspx.cs" Inherits="input" %>
+﻿﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="input.aspx.cs" Inherits="input" %>
 
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="System.Data" %>
@@ -670,4 +670,3 @@
 </body>
 
 </html>
-
