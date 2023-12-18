@@ -611,4 +611,3 @@ public partial class input : System.Web.UI.Page
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
 }
-
