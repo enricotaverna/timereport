@@ -48,9 +48,19 @@ public partial class input : System.Web.UI.Page
     protected void BindDDLProjects()
     {
 
-        DataTable dtProgettiForzati = CurrentSession.dtProgettiForzati;
+        DataTable dtProgettiInDDL = CurrentSession.dtProgettiForzati;
 
-        DDLProgetto.DataSource = dtProgettiForzati;
+        DDLProgetto.Items.Clear();
+
+        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei opporunità
+        foreach (DataRow drRow in dtProgettiInDDL.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+            if (drRow["ProjectType_Id"].ToString() == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"]) // Gestione opportunity su progetti BD
+                liItem.Attributes.Add("data-OpportunityIsRequired", "True");
+            DDLProgetto.Items.Add(liItem);
+        }
+
         DDLProgetto.DataTextField = "DescProgetto";
         DDLProgetto.DataValueField = "Projects_Id";
         DDLProgetto.DataBind();
@@ -214,11 +224,11 @@ public partial class input : System.Web.UI.Page
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
         else if ((string)Session["type"] == "bonus")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
@@ -281,6 +291,7 @@ public partial class input : System.Web.UI.Page
                 strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
                              "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
                              "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
+                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
                              "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
                              "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
                              "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
@@ -611,4 +622,3 @@ public partial class input : System.Web.UI.Page
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
 }
-
