@@ -190,9 +190,6 @@ public class TRSession
                "+AND+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+Owner.Email='{0}'"+
                "+AND+Milestone_Senza_peso__c=False+AND+TASKRAY__trIsMilestone__c=False+order+by+TASKRAY__Project__r.Name", SalesforceAccount);
 
-            //serviceURL += string.Format("SELECT id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email+" +
-            //   "FROM+TASKRAY__Project_Task__c+WHERE+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+TASKRAY__trCompleted__c=false", SalesforceAccount);
-
 
             string JSON_TOT = "";
             clsStandard.GetAllRecord AllRecord = new clsStandard.GetAllRecord();
