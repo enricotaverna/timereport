@@ -82,6 +82,8 @@ public class WStimereport : System.Web.Services.WebService
                             cmd.ExecuteNonQuery();
                             sRet[0] = "true";
                             sRet[1] = "";
+                            // inserisce Id record cancellato nella tabella di log
+                            Database.ExecuteSQL("INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('HOUR', " + Id + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')" , null);
                         }
                         catch (Exception ex)
                         {
@@ -118,6 +120,9 @@ public class WStimereport : System.Web.Services.WebService
 
                     if (Session["type"].ToString() == "bonus")
                         sRet[1] = sDate;
+
+                // inserisce Id record cancellato nella tabella di log
+                Database.ExecuteSQL("INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('EXPENSE', " + Id + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')" , null);
                 }
                 catch (IOException e)
                 {
@@ -241,7 +246,7 @@ public class WStimereport : System.Web.Services.WebService
         CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
         // se torna una stringa diversa da "" emette un messaggio di avvertimento sul form inputspese.aspx
-        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + ASPcompatility.FormatNumberDB(projects_id) + 
+        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + ASPcompatility.FormatNumberDB(projects_id) +
                                     " AND date = " + ASPcompatility.FormatDateDb(date) +
                                     " AND persons_id = " + ASPcompatility.FormatNumberDB(persons_id)
                                     ))

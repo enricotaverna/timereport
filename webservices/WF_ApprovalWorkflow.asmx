@@ -1,4 +1,4 @@
-<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
+﻿<%@ WebService Language="C#" Class="WSWF_ApprovalWorkflow" %>
 
 using System;
 using System.Web.Services;
@@ -86,7 +86,7 @@ public class Card
         string sql;
         string SQLfilterApprovalRequest = "";
         DateTime DateFrom = (DateTime)DateTime.Today; // sottrae i giorni del parametro
-        DateTime DateTo = (DateTime)DateTime.Today.AddDays(90); // sottrae i giorni del parametro
+        DateTime DateTo = (DateTime)DateTime.Today.AddDays(30); // sottrae i giorni del parametro
         string MonthStartDate = ASPcompatility.FormatDateDb("1/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString());
         KPISet kpi;
 
@@ -391,18 +391,21 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
 
-        RichiesteAperte = Session["RichiesteAperte"] == null ? new Card("RichiesteAperte", 10) : (Card)Session["RichiesteAperte"];
+        //  27/12/23 commentato perchè non usato
+        //RichiesteAperte = Session["RichiesteAperte"] == null ? new Card("RichiesteAperte", 10) : (Card)Session["RichiesteAperte"];
         GiorniTraining = Session["GiorniTraining"] == null ? new Card("GiorniTraining", 10) : (Card)Session["GiorniTraining"];
         TrainingDaValutare = Session["TrainingDaValutare"] == null ? new Card("TrainingDaValutare", 10) : (Card)Session["TrainingDaValutare"];
         OreNelMese = Session["OreNelMese"] == null ? new Card("OreNelMese", 10) : (Card)Session["OreNelMese"];
         GiorniAssenza = Session["GiorniAssenza"] == null ? new Card("GiorniAssenza", 10) : (Card)Session["GiorniAssenza"];
         SpeseNelMese = Session["SpeseNelMese"] == null ? new Card("SpeseNelMese", 10) : (Card)Session["SpeseNelMese"];
-        CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
+        //  27/12/23 commentato perchè non usato e aumento performance
+        //CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
         ListaLocation = Session["ListaLocation"] == null ? new Card("ListaLocation", 10) : (Card)Session["ListaLocation"];
-        ContrattiSubco = Session["ContrattiSubco"] == null ? new Card("ContrattiSubco", 10) : (Card)Session["ContrattiSubco"];
+        //  27/12/23 commentato perchè non usato 
+        // ContrattiSubco = Session["ContrattiSubco"] == null ? new Card("ContrattiSubco", 10) : (Card)Session["ContrattiSubco"];
 
         // carica lista oggetti
-        listaCard.Add(RichiesteAperte);
+        //listaCard.Add(RichiesteAperte);
         listaCard.Add(GiorniTraining);
         listaCard.Add(TrainingDaValutare);
         listaCard.Add(OreNelMese);

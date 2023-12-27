@@ -150,6 +150,13 @@
         Session("TB_DataA") = sender.text
     End Sub
 
+    Protected Sub DShours_Updated(ByVal sender As Object, ByVal e As SqlDataSourceStatusEventArgs)
+
+        ' scrive log record cancellato
+        Database.ExecuteSQL("INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('HOUR', " + e.Command.Parameters(0).Value.ToString() + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')", Nothing)
+
+    End Sub
+
     Protected Sub DShours_Updating(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.SqlDataSourceCommandEventArgs)
 
         ' gestisce storno
@@ -632,7 +639,7 @@
         DeleteCommand="DELETE FROM [Hours] WHERE [Hours_Id] = @Hours_Id"
         InsertCommand="INSERT INTO [Hours] ([Projects_Id], [Persons_id], [Date], [Hours], [HourType_Id], [AccountingDate], [CancelFlag], [Comment], [CreatedBy], [CreationDate], [Activity_id], Company_id, ClientManager_id, AccountManager_id) VALUES (@Projects_Id, @Persons_id, @Date, @Hours, @HourType_Id, @AccountingDate, @CancelFlag, @Comment, @CreatedBy, @CreationDate, @activity_id, @Company_id, @ClientManager_id, @AccountManager_id)"
         UpdateCommand="UPDATE Hours SET Projects_Id = @Projects_Id, Persons_id = @Persons_id, Date = @Date, Hours = @Hours, AccountingDate = @AccountingDate, CancelFlag = @CancelFlag, Comment = @Comment, LastModifiedBy = @LastModifiedBy, LastModificationDate = @LastModificationDate, Activity_Id = @Activity_Id WHERE (Hours_Id = @Hours_Id)"
-        OnUpdating="DShours_Updating">
+        OnUpdating="DShours_Updating" OnDeleted="DShours_Updated">
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel"
                 PropertyName="SelectedValue" DefaultValue="%" />
