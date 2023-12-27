@@ -666,8 +666,5 @@
         });
 
     </script>
-
 </body>
-
 </html>
-
