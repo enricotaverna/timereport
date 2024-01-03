@@ -144,7 +144,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             }
 
             // Save this document to disk.
-            string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PREINVOICE_PATH"]) + "preinvoice-" + CurrentSession.UserId + ".docx";
+            string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PREINVOICE_PATH"]) + "consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/","") + ".docx";
             document.SaveAs(UrlWordSaved);
         }
         return;
@@ -402,7 +402,8 @@ public partial class Preinvoice_form : System.Web.UI.Page
         CalculateTotalsFromDB(preInv); // ri-calcola i totali
         CreatePreinvoice(preInv);
         // crea documento Word
-        Response.Redirect("/public/TR-PREINVOICE/preinvoice-" + CurrentSession.UserId + ".docx");
+        
+        Response.Redirect("/public/TR-PREINVOICE/consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/", "") + ".docx");
     }
 
     // Bottoni
@@ -459,7 +460,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
                              "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
 
             if (preInv.ProjectsIdList != "")
-                queryToUpdate += " AND T.projects_id IN ( " + preInv.ProjectsIdList + " )";
+                queryToUpdate += " AND B.projects_id IN ( " + preInv.ProjectsIdList + " )";
 
             Database.ExecuteSQL(queryToUpdate, null); // aggiorna ore
 
@@ -469,7 +470,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
                             "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
 
                 if (preInv.ProjectsIdList != "")
-                queryToUpdate += " AND T.projects_id IN ( " + preInv.ProjectsIdList + " )";
+                queryToUpdate += " AND B.projects_id IN ( " + preInv.ProjectsIdList + " )";
 
             Database.ExecuteSQL(queryToUpdate, null); // aggiorna spese
 

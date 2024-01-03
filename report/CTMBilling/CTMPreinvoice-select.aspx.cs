@@ -27,8 +27,8 @@ public partial class report_ricevute_select : System.Web.UI.Page
             TBDataDa.Text = firstDayOfMonth.ToString("dd/MM/yyyy");
             TBDataA.Text = lastDayOfMonth.ToString("dd/MM/yyyy");
 
-            TBDataDa.Text = "01/11/2022";
-            TBDataA.Text = "30/11/2022";
+            //TBDataDa.Text = "01/11/2022";
+            //TBDataA.Text = "30/11/2022";
 
             init_controlli("full");
         }
