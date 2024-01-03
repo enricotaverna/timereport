@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Preinvoice-form.aspx.cs" Inherits="Preinvoice_form" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CTMPreinvoice-form.aspx.cs" Inherits="Preinvoice_form" %>
 
 <!DOCTYPE html>
 
@@ -45,7 +45,7 @@
                 <div id="FormWrap" class="col-5 StandardForm">
 
                     <div class="formtitle">
-                        <asp:Literal runat="server" Text="Prefattura" />
+                        <asp:Literal runat="server" Text="Consuntivo" />
                         <asp:Label ID="LBPreinvoiceNum" runat="server"></asp:Label>
                     </div>
 
@@ -63,8 +63,8 @@
                     </div>
 
                     <div class="input nobottomborder">
-                        <asp:Label CssClass="inputtext" runat="server" Text="Società"></asp:Label>
-                        <asp:Label ID="LBCompany" runat="server"></asp:Label>
+                        <asp:Label CssClass="inputtext" runat="server" Text="Cliente"></asp:Label>
+                        <asp:Label ID="LBCliente" runat="server"></asp:Label>
                     </div>
 
                     <div class="input nobottomborder">
@@ -74,17 +74,17 @@
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Giorni"></asp:Label>
-                        <asp:Label ID="LBDays" runat="server"></asp:Label>
+                        <asp:Label ID="LBDays" runat="server"></asp:Label>&nbsp;(<asp:Label ID="LBDaysCost" runat="server"></asp:Label>)
                     </div>
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Importo fees"></asp:Label>
-                        <asp:Label ID="LBTotalRates" runat="server"></asp:Label>
+                        <asp:Label ID="LBTotalRates" runat="server"></asp:Label>&nbsp;(<asp:Label ID="LBTotalRatesCost" runat="server"></asp:Label>)
                     </div>
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Importo spese"></asp:Label>
-                        <asp:Label ID="LBTotalExpenses" runat="server"></asp:Label>
+                        <asp:Label ID="LBTotalExpenses" runat="server"></asp:Label> &nbsp;(<asp:Label ID="LBTotalExpensesCost" runat="server"></asp:Label>)
                     </div>
 
                     <div class="input nobottomborder">
@@ -100,11 +100,11 @@
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Allegati"></asp:Label>
-                        <asp:LinkButton ID="LinkButton1" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_Preinvoice">Prefattura</asp:LinkButton>
+                        <asp:LinkButton ID="LinkButton1" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_Preinvoice">Consuntivo</asp:LinkButton>
                         <span>&nbsp &nbsp </span>
-                        <asp:LinkButton ID="LinkButton2" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllRatesQuery">Consuntivi Ore</asp:LinkButton>
+                        <asp:LinkButton ID="LinkButton2" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllRatesQuery">Dettaglio Ore</asp:LinkButton>
                         <span>&nbsp &nbsp </span>
-                        <asp:LinkButton ID="LinkButton3" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllExpenseQuery">Consuntivi Spese</asp:LinkButton>
+                        <asp:LinkButton ID="LinkButton3" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllExpenseQuery">Dettaglio Spese</asp:LinkButton>
                     </div>
 
                     <!-- *** BOTTONI ***  -->
@@ -115,7 +115,7 @@
                     </div>
 
                     <!-- *** campi nascosti usati da Javascript ***  -->
-                    <asp:TextBox ID="TBcompanyId" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBCodiceCliente" CssClass="toHide" runat="server"  />
                     <asp:TextBox ID="TBPreinvoiceNumber" CssClass="toHide" runat="server"  />
                     <asp:TextBox ID="TBDataDa" CssClass="toHide" runat="server"  />
                     <asp:TextBox ID="TBDataA" CssClass="toHide" runat="server"  />
@@ -211,7 +211,7 @@
         function CheckFLC() {
 
             // controllo FLC
-            var values = "{'company_id': '" + $("#TBcompanyId").val() + "', 'CodiceCliente': '', 'dataDa' : '" + $("#TBDataDa").val() + "', 'dataA' : '" + $("#TBDataA").val() + "', 'TipoFattura' : 'FOR'  }";
+            var values = "{'company_id': '', 'CodiceCliente': '" + $("#TBCodiceCliente").val() + "', 'dataDa' : '" + $("#TBDataDa").val() + "', 'dataA' : '" + $("#TBDataA").val() + "', 'TipoFattura' : 'CLI'  }";
 
             $.ajax({
 
@@ -234,7 +234,7 @@
                         $("#BTSave").show();
                     }
                     else {
-                        ShowPopup("<b>Controllare FLC per : </b><br>" + msg.d);
+                        ShowPopup("<b>Controllare BillRate per : </b><br>" + msg.d);
                         disableButtons();
                     }
                 },

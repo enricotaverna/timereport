@@ -84,7 +84,7 @@
                                     <!-- *** CODICE CLIENTE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Cliente:</div>
-                                        <asp:DropDownList ID="DropDownList4" runat="server" DataSourceID="cliente"
+                                        <asp:DropDownList ID="DDLCliente" runat="server" DataSourceID="cliente" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true"
                                             DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
                                             SelectedValue='<%# Bind("CodiceCliente") %>'>
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
@@ -147,12 +147,12 @@
 
                                     <!-- *** data creazione/modifica ***  -->
                                     <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 30px; position: relative">
-                                        <span style="width:50px;display:inline-block">[C]</span>
+                                        <span style="width: 50px; display: inline-block">[C]</span>
                                         <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
                                         <span>il </span>
                                         <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
                                         <br />
-                                        <span style="width:50px;display:inline-block">[M]</span>
+                                        <span style="width: 50px; display: inline-block">[M]</span>
                                         <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
                                         <span>il </span>
                                         <asp:Label ID="Label12" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
@@ -214,7 +214,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
                                         <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>%</label>
                                     </div>
 
@@ -396,8 +396,8 @@
                                     <!-- *** CODICE CLIENTE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Cliente:</div>
-                                        <asp:DropDownList ID="DropDownList10" runat="server" DataSourceID="cliente"
-                                            DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
+                                        <asp:DropDownList ID="DropDownList10" runat="server" DataSourceID="cliente" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg"
+                                            DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True" data-parsley-validate-if-empty="true"
                                             SelectedValue='<%# Bind("CodiceCliente") %>'>
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
@@ -516,7 +516,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
                                         <asp:TextBox ID="TBMargine" Columns="5" class="ASPInputcontent" runat="server" Text='<%# Bind("MargineProposta") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="percent" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>%</label>
                                     </div>
 
@@ -1122,6 +1122,93 @@
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
+        // *** attiva validazione campi form
+        $('#formProgetto').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+        });
+
+        // *** messaggio di default
+        Parsley.addMessages('it', {
+            required: "Completare i campi obbligatori"
+        });
+
+        // *** se tipo progetto è Chargeable il cliente è obbligatorio
+        window.Parsley.addValidator("checkChargeable", {
+            validateString: function (value, requirement) {
+
+                if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
+                    return false;
+                }
+            }
+        })  .addMessage('en', 'checkChargeable', 'Please specify a customer code')
+            .addMessage('it', 'checkChargeable', 'Codice cliente obbligatorio');
+
+        // *** controllo che non esista lo stesso codice utente *** //
+        window.Parsley.addValidator('codiceunico', function (value, requirement) {
+
+            var response = false;
+            var dataAjax = "{ sKey: 'ProjectCode', " +
+                " sValkey: '" + value + "', " +
+                " sTable: 'Projects'  }";
+
+            $.ajax({
+                url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
+                data: dataAjax,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data) {
+                    if (data.d == true) // esiste, quindi errore
+                        response = false;
+                    else
+                        response = true;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+            return response;
+        })
+            .addMessage('en', 'codiceunico', 'Project code already exists')
+            .addMessage('it', 'codiceunico', 'Codice progetto già esistente');
+
+        // validazione campo revenue in caso il progetto sia FORFAIT
+        window.Parsley.addValidator("requiredIf", {
+            validateString: function (value, requirement) {
+
+                value = value.toString().replace(',', '.');
+
+                // se inserito deve essere un numero
+                if (isNaN(value) && !!value) {
+                    window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                    return false;
+                }
+
+                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>" ) {
+
+                    // se FIXED verifica obbligatorietà
+                    if (!value && requirement != "percent") {
+                        window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
+                        return false;
+                    }
+
+                    // se number verifica tipo
+                    if (requirement == "number")
+                        if (!isNaN(value)) //  compilato e numerico
+                            return true;
+                        else {
+                            window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                            return false;
+                        }
+                }
+
+                return true;
+            },
+            priority: 33
+        })
+
         $(function () {
 
             // abilitate tab view
@@ -1155,89 +1242,6 @@
                 percentCent = percentCent.toString().replace(".", ",");
                 $("#FVProgetto_TBMargine").val(percentCent);
             }
-
-            Parsley.addMessages('it', {
-                required: "Completare i campi obbligatori"
-            });
-
-            // *** controllo che non esista lo stesso codice utente *** //
-            window.Parsley.addValidator('codiceunico', function (value, requirement) {
-                var response = false;
-                var dataAjax = "{ sKey: 'ProjectCode', " +
-                    " sValkey: '" + value + "', " +
-                    " sTable: 'Projects'  }";
-
-                $.ajax({
-                    url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
-                    data: dataAjax,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    type: 'post',
-                    async: false,
-                    success: function (data) {
-                        if (data.d == true) // esiste, quindi errore
-                            response = false;
-                        else
-                            response = true;
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
-                return response;
-            }, 32)
-                .addMessage('en', 'codiceunico', 'Project code already exists')
-                .addMessage('it', 'codiceunico', 'Codice progetto già esistente');
-
-            // validazione campo revenue in caso il progetto sia FIXED
-            window.Parsley.addValidator("requiredIf", {
-                validateString: function (value, requirement) {
-
-                    value = value.toString().replace(',', '.');
-
-                    // se inserito deve essere un numero
-                    if (isNaN(value) && !!value) {
-                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                        return false;
-                    }
-
-                    if (jQuery("#FVProgetto_DDLTipoContratto option:selected").text() == "FIXED") {
-
-                        // se FIXED verifica obbligatorietà
-                        if (!value && requirement != "percent") {
-                            window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
-                            return false;
-                        }
-
-                        // se number verifica tipo
-                        if (requirement == "number")
-                            if (!isNaN(value)) //  compilato e numerico
-                                return true;
-                            else {
-                                window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                                return false;
-                            }
-
-                        // se percent
-                        //if (requirement == "percent")
-                        //    if ( !isNaN(value) && value >= 0 && value <= 100 ) //  compilato e numerico
-                        //        return true;
-                        //    else {
-                        //        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero tra 1 e 100");
-                        //        return false;
-                        //    }    
-                    }
-
-                    return true;
-                },
-                priority: 33
-            })
-
-            // *** attiva validazione campi form
-            $('#formProgetto').parsley({
-                excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
-            });
 
         });
     </script>

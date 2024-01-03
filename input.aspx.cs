@@ -161,6 +161,8 @@ public partial class input : System.Web.UI.Page
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
 
+        if (filePaths.Length != null) { 
+
         try
         {
             // carica il buffer estraendo l'ID della nome del file
@@ -173,6 +175,7 @@ public partial class input : System.Web.UI.Page
         catch
         {
 
+        }
         }
 
         // avedo caricato il buffer spese il flag di refresh

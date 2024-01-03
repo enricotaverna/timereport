@@ -31,6 +31,20 @@ public class ProjectCostRate : PersonsCostRate
 
 }
 
+public class ExpensesTM
+{
+    public int ExpensesTM_Id { get; set; }
+    public int Projects_Id { get; set; }
+    public int ExpenseType_Id { get; set; }
+    public float TMConversionRate { get; set; }
+    public bool ExcludeBilling { get; set; }
+    public string TMDescription { get; set; }
+    public string CreationDate { get; set; }
+    public string CreatedBy { get; set; }
+    public string LastModificationDate { get; set; }
+    public string LastModifiedBy { get; set; }
+}
+
 /// <summary>
 /// Summary description for WStimereport
 /// </summary>
@@ -69,6 +83,20 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
                         " JOIN Company as C ON C.Company_id = B.Company_id " +
                         " JOIN Projects as D ON D.Projects_id = A.Projects_id " +
                         " WHERE B.active = '" + active + "'" + " ORDER BY A.DataDa DESC, PersonName, D.Name";
+
+        return Database.FromSQLSelectToJson(query);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string GetExpenseTMTable()
+    {
+
+        String query =  "SELECT A.ExpensesTM_Id, A.Projects_id, A.ExpenseType_Id, REPLACE(A.TMConversionRate, '.', ',') as TMConversionRate, A.TMDescription, A.ExcludeBilling, B.ExpenseCode + ' ' + B.Name as ExpenseCode  , B.UnitOfMeasure, D.ProjectCode + ' ' + D.Name as ProjectName, E.Nome1 as NomeCliente " +
+                        " FROM ExpensesTM as A " +
+                        " JOIN ExpenseType as B ON B.ExpenseType_id = A.ExpenseType_id " +
+                        " JOIN Projects as D ON D.Projects_id = A.Projects_id " +
+                        " JOIN Customers as E ON E.CodiceCliente = D.CodiceCliente " +
+                        " WHERE B.active = '1'" + " ORDER BY D.ProjectCode DESC, B.ExpenseCode";
 
         return Database.FromSQLSelectToJson(query);
     }
@@ -170,6 +198,65 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
     }
 
     [WebMethod(EnableSession = true)]
+    public int CreateUpdateExpenseTM(int ExpensesTM_Id, string ExpenseType_Id, string Projects_Id,
+                           string TMConversionRate, string ExcludeBilling, string TMDescription)
+    {
+
+        int newIdentity = 0;
+        string sSQL = "";
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
+        // formatta campi numerici
+
+        if (ExpensesTM_Id > 0)
+            sSQL = "UPDATE ExpensesTM SET " +
+                  "ExpenseType_Id = " + ASPcompatility.FormatStringDb(ExpenseType_Id) + " , " +
+                  "Projects_id = " + ASPcompatility.FormatStringDb(Projects_Id) + " , " +
+                  "TMDescription = " + ASPcompatility.FormatStringDb(TMDescription) + " , " +
+                  "TMConversionRate = " + ASPcompatility.FormatNumberDB( Convert.ToDouble(TMConversionRate) ) + " , " +
+                  "ExcludeBilling = " + ASPcompatility.FormatStringDb(ExcludeBilling) + " , " +
+                  "LastModificationDate = " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " , " +
+                  "LastModifiedBy = " + ASPcompatility.FormatStringDb(CurrentSession.UserId) +
+                  " WHERE ExpensesTM_Id = " + ASPcompatility.FormatNumberDB(ExpensesTM_Id);
+        else
+            sSQL = "INSERT INTO ExpensesTM (ExpenseType_Id, Projects_id, TMConversionRate, ExcludeBilling, TMDescription, CreatedBy, CreationDate ) " +
+                            " VALUES (" + ASPcompatility.FormatStringDb(ExpenseType_Id) + ", " +
+                                          ASPcompatility.FormatStringDb(Projects_Id) + ", " +
+                                          ASPcompatility.FormatNumberDB( Convert.ToDouble(TMConversionRate) ) + ", " +
+                                          ASPcompatility.FormatStringDb(ExcludeBilling) + ", " +
+                                          ASPcompatility.FormatStringDb(TMDescription) + ", " +
+                                          ASPcompatility.FormatStringDb(CurrentSession.UserId) + ", " +
+                                          ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " )";
+
+        bool bResult = Database.ExecuteSQL(sSQL, null);
+
+        if (bResult)
+        {
+            // recupera record Id creato 
+            newIdentity = Database.GetLastIdInserted("SELECT MAX(ExpensesTM_Id) from ExpensesTM");
+        }
+
+        return newIdentity;
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public bool DeleteExpenseTM(string ExpensesTM_Id)
+    {
+
+        string sDelete = "DELETE ExpensesTM " +
+                         " WHERE ExpensesTM_Id = '" + ExpensesTM_Id + "'";
+
+        //  if ( *** Controllo per evitare cancellazione ***)
+        //    return false;
+
+        bool bResult = Database.ExecuteSQL(sDelete, null);
+
+        return bResult;
+
+    }
+
+    [WebMethod(EnableSession = true)]
     public bool DeletePersonsCostRate(string PersonsCostRate_id)
     {
 
@@ -266,6 +353,48 @@ public class WS_PersonsCostRate : System.Web.Services.WebService {
 
         }
         return rc;
+    }
+
+    [WebMethod(EnableSession = true)]
+    public ExpensesTM GetExpenseTM(string sExpensesTM_Id)
+    {
+
+        ExpensesTM rc = new ExpensesTM();
+
+        DataTable dt = Database.GetData("SELECT * FROM ExpensesTM where ExpensesTM_Id = " + sExpensesTM_Id, null);
+
+        // valorizza flag che dice se testo commento è obbligatorio
+        if (dt == null || dt.Rows.Count == 0)
+        {
+            rc.ExpensesTM_Id = 0;
+        }
+        else
+        {
+            rc.ExpensesTM_Id = Convert.ToInt32(dt.Rows[0]["ExpensesTM_Id"].ToString());
+            rc.Projects_Id = Convert.ToInt32(dt.Rows[0]["Projects_Id"].ToString());
+            rc.ExpenseType_Id = Convert.ToInt32(dt.Rows[0]["ExpenseType_Id"].ToString());
+            rc.TMConversionRate = (float)Convert.ToDouble(dt.Rows[0]["TMConversionRate"].ToString());
+            rc.ExcludeBilling = (bool)Convert.ToBoolean(dt.Rows[0]["ExcludeBilling"].ToString());
+            rc.TMDescription = dt.Rows[0]["TMDescription"].ToString();
+            rc.CreationDate = dt.Rows[0]["CreationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["CreationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.LastModificationDate = dt.Rows[0]["LastModificationDate"].ToString() == "" ? "" : ((DateTime)dt.Rows[0]["LastModificationDate"]).ToString("dd/MM/yyyy HH:mm:ss");
+            rc.CreatedBy = dt.Rows[0]["CreatedBy"].ToString();
+            rc.LastModifiedBy = dt.Rows[0]["LastModifiedBy"].ToString();
+
+        }
+        return rc;
+    }
+
+    [WebMethod(EnableSession = true)]
+    public bool CheckExpensesTMDouble(int ExpensesTM_id, int ExpenseType_id, int Projects_id)
+    {
+
+        // controllo solo in creazione
+        if (ExpensesTM_id == 0)
+            // Verifica che non esistano già record con la stessa chiave prima di inserirne uno nuovo
+            return (Database.RecordEsiste("SELECT * FROM ExpensesTM WHERE Projects_id =" + ASPcompatility.FormatNumberDB(Projects_id) + " AND ExpenseType_id = " + ASPcompatility.FormatNumberDB(ExpenseType_id)));
+        else
+            return false;
     }
 
 
