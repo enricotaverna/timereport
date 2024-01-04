@@ -3,6 +3,7 @@
 using System;
 using System.Web.Services;
 using System.Data;
+using System.Configuration;
 
 /// <summary>
 /// Summary description for WStimereport
@@ -70,7 +71,7 @@ public class RP_Preinvoice : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public string CheckConsuntivi(string company_id, string CodiceCliente, string dataDa, string dataA, string TipoFattura)
+    public string CheckConsuntivi(string company_id, string ProjectsIdList, string CodiceCliente, string dataDa, string dataA, string TipoFattura)
     {
         string query;
         string bResult = "  ";
@@ -79,22 +80,32 @@ public class RP_Preinvoice : System.Web.Services.WebService
             query = "SELECT DISTINCT B.Name " +
                             "FROM hours as T " +
                             "INNER JOIN Persons as B on B.Persons_id = T.Persons_id " +
-                            "WHERE t.Company_id = " + ASPcompatility.FormatStringDb(company_id) + " AND date >= " + ASPcompatility.FormatDateDb(dataDa) + " AND date <= " + ASPcompatility.FormatDateDb(dataA) + " AND  [MSSql12155].FCT_DeterminaCostRate(t.persons_id, t.projects_id, t.date) = 0";
+                            "WHERE t.Company_id = " + ASPcompatility.FormatStringDb(company_id) + 
+                            " AND date >= " + ASPcompatility.FormatDateDb(dataDa) + 
+                            " AND date <= " + ASPcompatility.FormatDateDb(dataA) + 
+                            " AND  [MSSql12155].FCT_DeterminaCostRate(t.persons_id, t.projects_id, t.date) = 0";
         else
             query = "SELECT DISTINCT B.Name " +
                             "FROM hours as T " +
                             "INNER JOIN Persons as B on B.Persons_id = T.Persons_id " +
                             "INNER JOIN Projects as C on C.Projects_id = T.Projects_id " +
-                            " WHERE C.CodiceCliente = "  + ASPcompatility.FormatStringDb(CodiceCliente) + " AND date >= " + ASPcompatility.FormatDateDb(dataDa) + " AND date <= " + ASPcompatility.FormatDateDb(dataA) + " AND  [MSSql12155].FCT_DeterminaBillRate(t.persons_id, t.projects_id, t.date) = 0";
+                            " WHERE C.CodiceCliente = "  + ASPcompatility.FormatStringDb(CodiceCliente) + 
+                            " AND date >= " + ASPcompatility.FormatDateDb(dataDa) + 
+                            " AND date <= " + ASPcompatility.FormatDateDb(dataA) + 
+                            " AND C.TipoContratto_id = '" + ConfigurationManager.AppSettings["CONTRATTO_TM"] + "' " +
+                            " AND  [MSSql12155].FCT_DeterminaBillRate(t.persons_id, t.projects_id, t.date) = 0";
 
+        if (ProjectsIdList != "") 
+            query+= " AND T.projects_id IN ( " + ProjectsIdList + " )";
+        
         DataTable dt = Database.GetData(query, null);
 
         foreach (DataRow dr in dt.Rows) {
             bResult += dr[0].ToString() + ", ";
         }
-        bResult = bResult.Substring(0, bResult.Length - 2);
+bResult = bResult.Substring(0, bResult.Length - 2);
 
-        return bResult;
+return bResult;
 
     }
 

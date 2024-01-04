@@ -2,6 +2,7 @@
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Configuration;
 
 public partial class report_ricevute_select : System.Web.UI.Page
 {
@@ -121,7 +122,10 @@ public partial class report_ricevute_select : System.Web.UI.Page
         DataTable dtCliente = Database.GetData("SELECT DISTINCT B.CodiceCliente AS CodiceCliente , C.Nome1 as NomeCliente FROM Hours " +
                                                "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
                                                "INNER JOIN Customers as C ON C.CodiceCliente = B.CodiceCliente " +
-                                               "WHERE CTMPreinvoiceNum is null AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY NomeCliente DESC", this.Page);
+                                               "WHERE CTMPreinvoiceNum is null AND date >= " + ASPcompatility.FormatDateDb(DataDa) + 
+                                               " AND date <= " + ASPcompatility.FormatDateDb(DataA) +
+                                               " AND B.TipoContratto_id = '" + ConfigurationManager.AppSettings["CONTRATTO_TM"] + "' " +
+                                               " ORDER BY NomeCliente DESC", this.Page);
 
         foreach (DataRow dtRow in dtCliente.Rows)
         {
@@ -138,7 +142,11 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         DataTable dtProgetti = Database.GetData("SELECT DISTINCT hours.projects_id, B.ProjectCode + ' ' + SUBSTRING(B.Name, 1, 20) as projectName FROM Hours " +
                                                "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
-                                               "WHERE CTMPreinvoiceNum is null AND B.CodiceCliente=" + ASPcompatility.FormatStringDb(DDLCliente.SelectedValue) + " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
+                                               "WHERE CTMPreinvoiceNum is null AND B.CodiceCliente=" + ASPcompatility.FormatStringDb(DDLCliente.SelectedValue) + 
+                                               " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + 
+                                               " AND date <= " + ASPcompatility.FormatDateDb(DataA) +
+                                               " AND B.TipoContratto_id = '" + ConfigurationManager.AppSettings["CONTRATTO_TM"] + "' " +
+                                               " ORDER BY projectName DESC", this.Page);
 
         foreach (DataRow dtRow in dtProgetti.Rows)
         {

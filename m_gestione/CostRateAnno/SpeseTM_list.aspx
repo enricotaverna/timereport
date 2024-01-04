@@ -181,7 +181,7 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource runat="server" ID="DSExpenseType"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT ExpenseType_Id, ExpenseCode + ' ' + Name as ExpenseDescription FROM ExpenseType WHERE active = 1"></asp:SqlDataSource>
+        SelectCommand="SELECT ExpenseType_Id, ExpenseCode + ' ' + Name as ExpenseDescription FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode"></asp:SqlDataSource>
     <asp:SqlDataSource runat="server" ID="DSProjects"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT Projects_id, ProjectCode + ' ' + LEFT(Name,25) as ProjectName FROM [Projects] WHERE Active = 'true' ORDER BY ProjectName"></asp:SqlDataSource>

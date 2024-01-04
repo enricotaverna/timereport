@@ -107,6 +107,10 @@
                         <asp:LinkButton ID="LinkButton3" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllExpenseQuery">Dettaglio Spese</asp:LinkButton>
                     </div>
 
+                   <div class="" style="font-size: 10px; line-height: 14px; margin: 20px 0px 10px 10px; color: dimgrey">
+                            <p style="margin: 0px"><span style="width: 200px">[C] </span><asp:Label runat="server" id="LBCreatedBy" />&nbsp;<asp:Label runat="server" id="LBCreationDate"/></p>
+                   </div>
+
                     <!-- *** BOTTONI ***  -->
                     <div class="buttons">
                         <div id="valMsg" class="col parsely-single-error"></div>
@@ -119,6 +123,7 @@
                     <asp:TextBox ID="TBPreinvoiceNumber" CssClass="toHide" runat="server"  />
                     <asp:TextBox ID="TBDataDa" CssClass="toHide" runat="server"  />
                     <asp:TextBox ID="TBDataA" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBProjectsIdList" CssClass="toHide" runat="server"  />
 
                 </div>
                 <!-- END FormWrap  -->
@@ -211,7 +216,11 @@
         function CheckFLC() {
 
             // controllo FLC
-            var values = "{'company_id': '', 'CodiceCliente': '" + $("#TBCodiceCliente").val() + "', 'dataDa' : '" + $("#TBDataDa").val() + "', 'dataA' : '" + $("#TBDataA").val() + "', 'TipoFattura' : 'CLI'  }";
+            var values = "{'company_id': '', 'CodiceCliente': '" + $("#TBCodiceCliente").val() +
+                         "', 'ProjectsIdList' : \"" + $("#TBProjectsIdList").val() +
+                         "\", 'dataDa' : '" + $("#TBDataDa").val() +
+                         "', 'dataA' : '" + $("#TBDataA").val() +
+                         "', 'TipoFattura' : 'CLI'  }";
 
             $.ajax({
 

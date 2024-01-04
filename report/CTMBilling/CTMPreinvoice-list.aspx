@@ -51,6 +51,10 @@
 
                     <div id="ListTable"></div>
 
+                    <!-- *** campi nascosti usati da Javascript ***  -->
+                    <asp:TextBox ID="TBUserName" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBUserLevel" CssClass="toHide" runat="server"  />
+
                     <div class="buttons">
                         <asp:Button ID="btn_create" runat="server" Text="<%$ appSettings: CREATE_CONSUNTIVO %>" CssClass="orangebutton" Width="120px" OnClick="btn_create_Click"/>
                         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
@@ -90,6 +94,9 @@
       
         $("document").ready(() => {
 
+            // nasconde i campi che hanno passato i valori dal server per fare la chiamata ajax
+            $(".toHide").hide();
+
             // nasconde la DIV con il testo visuaizzato nel dialog box di conferma
             $("#dialog-confirm").hide();
 
@@ -113,10 +120,22 @@
         var editIcon = function (cell, formatterParams, onRendered) { //plain text value
             var data = cell.getRow().getData();
 
-            if (data.StatoTR != 'chiuso')
-                return "<i class='fa fa-address-card'></i>";
-            else
+            //if (data.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5' )
+            //    return "<i class='fa fa-address-card'></i>";
+            //else
+            //    return "";
+            return "<i class='fa fa-address-card'></i>";
+
+        };  // icona edit
+
+        var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
+            var data = cell.getRow().getData();
+
+            if (data.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5')
+                return "<i class='fa fa-trash'></i>";
+            else { 
                 return "";
+            }   
 
         };  // icona edit
 
@@ -161,22 +180,27 @@
         }
 
         function confermaCancellazione(dati, riga) {
-            $('#dialog-confirm').dialog({
-                resizable: false,
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Cancella": function () {
-                        $(this).dialog("close");
-                        cancellaRecord(dati, riga);
-                    },
-                    "Annulla": function () {
-                        $(this).dialog("close");
-                        return;
+
+            // cancella solo se proprietario del record o amministratore
+            if (dati.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5') { 
+
+                $('#dialog-confirm').dialog({
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        "Cancella": function () {
+                            $(this).dialog("close");
+                            cancellaRecord(dati, riga);
+                        },
+                        "Annulla": function () {
+                            $(this).dialog("close");
+                            return;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         function cancellaRecord(dati, riga) {
