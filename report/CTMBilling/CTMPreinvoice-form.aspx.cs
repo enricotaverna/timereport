@@ -83,8 +83,9 @@ public partial class Preinvoice_form : System.Web.UI.Page
     public void CreatePreinvoice(PreInvoiceData preInv)
     {
         int loopIndex = 0;
-        const int HoursTableIndex = 0;
-        const int ExpensesTableIndex = 1;
+        const int ProjectsTableIndex = 0;
+        const int HoursTableIndex = 1;
+        const int ExpensesTableIndex = 2;
 
         // utilizzo pacchetto nuget DOCX - https://github.com/xceedsoftware/DocX
         // https://xceed.com/documentation-center/
@@ -104,10 +105,33 @@ public partial class Preinvoice_form : System.Web.UI.Page
             document.ReplaceText("<signed_by>", CurrentSession.UserName);
             document.ReplaceText("<mail>", CurrentSession.UserMail);
 
-            // Importo 
+            // Progetti
+            var ProjectsTable = document.Tables[ProjectsTableIndex];
+
+            DataTable dt = Database.GetData("SELECT Progetto, SUM(Importo) as importo FROM ( SELECT Progetto, SUM(Importo) as importo FROM ( " +
+                                            preInv.AllDaysQuery +
+                                            " ) AS T GROUP BY Progetto UNION SELECT Progetto, SUM(Importo) as importo FROM ( " +
+                                            preInv.AllExpenseQuery +
+                                            " )   AS T GROUP BY Progetto )   AS T GROUP BY Progetto " , null);
+
+            loopIndex = 1;
+            for (int i = 1; i < dt.Rows.Count; i++) // compia la prima riga per N-1 volte
+                ProjectsTable.InsertRow(ProjectsTable.Rows[1], loopIndex, true);
+
+            loopIndex = 1;
+            foreach (DataRow dr in dt.Rows)
+            {
+                // popola le celle della tabella, loopIndex = 0 è la prima riga
+                ProjectsTable.Rows[loopIndex].ReplaceText("<progetto>", dr[0].ToString());
+                ProjectsTable.Rows[loopIndex].ReplaceText("<Importo>", Convert.ToDouble(dr[1]).ToString("#,0.00"));
+                loopIndex++;
+            }
+
+
+            // Rates
             var HoursTable = document.Tables[HoursTableIndex];
 
-            DataTable dt = Database.GetData(preInv.SubtotalAmountQuery + " ORDER BY NomeConsulente, Progetto", null);
+            dt = Database.GetData(preInv.SubtotalAmountQuery + " ORDER BY NomeConsulente, Progetto", null);
 
             loopIndex = 1;
             for (int i = 1; i < dt.Rows.Count; i++) // compia la prima riga per N-1 volte
