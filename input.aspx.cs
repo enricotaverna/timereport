@@ -161,23 +161,23 @@ public partial class input : System.Web.UI.Page
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
 
-        if (filePaths.Length != null)
-        {
+         if (filePaths.Length != null)
+         {
 
-            try
-            {
-                // carica il buffer estraendo l'ID della nome del file
-                for (int i = 0; i < filePaths.Length; i++)
-                {
-                    iStart = filePaths[i].IndexOf("fid-") + 4;
-                    iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
-                }
-            }
-            catch
-            {
+             try
+             {
+                 // carica il buffer estraendo l'ID della nome del file
+                 for (int i = 0; i < filePaths.Length; i++)
+                 {
+                     iStart = filePaths[i].IndexOf("fid-") + 4;
+                     iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
+                 }
+             }
+             catch
+             {
 
-            }
-        }
+             }
+         }
 
         // avedo caricato il buffer spese il flag di refresh
         Session["RefreshRicevuteBuffer"] = "";

@@ -2,6 +2,7 @@
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Configuration;
 
 public partial class report_ricevute_select : System.Web.UI.Page
 {
@@ -27,6 +28,9 @@ public partial class report_ricevute_select : System.Web.UI.Page
             TBDataDa.Text = firstDayOfMonth.ToString("dd/MM/yyyy");
             TBDataA.Text = lastDayOfMonth.ToString("dd/MM/yyyy");
 
+            //TBDataDa.Text = "01/11/2022";
+            //TBDataA.Text = "30/11/2022";
+
             init_controlli("full");
         }
 
@@ -51,16 +55,14 @@ public partial class report_ricevute_select : System.Web.UI.Page
             Session["PrefatturaDataA"] = TBDataA.Text;
             Session["PrefatturaDataDa"] = TBDataDa.Text;
             // Popola dropdown con i valori          
-            Bind_DDLSocietà(TBDataDa.Text, TBDataA.Text);
+            Bind_DDLCliente(TBDataDa.Text, TBDataA.Text);
             Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
-            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
             // recupera valori controlli
             RipristinaControlli();
         }
         else
         {
             Bind_LBProgetti(TBDataDa.Text, TBDataA.Text);
-            Bind_LBPersone(TBDataDa.Text, TBDataA.Text);
         }
     }
 
@@ -74,8 +76,6 @@ public partial class report_ricevute_select : System.Web.UI.Page
             // salva valori controlli 
             SalvaControlli();
 
-            //Response.Redirect("ricevute_list.aspx?anno=" + DDLAnni.SelectedValue +  "&mese=" + DDLMesi.SelectedValue + "&societa=" + DDLSocieta.SelectedValue +
-            //                  "&persona=" + DDLPersone.SelectedValue + "&project=" + DDLProject.SelectedValue  + "&username=" + DDLPersone.SelectedItem + "&mode=admin");
         }
     }
 
@@ -114,21 +114,24 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
 
     // Popola controllo in base ai carichi ore da data a data
-    protected void Bind_DDLSocietà(string DataDa, string DataA)
+    protected void Bind_DDLCliente(string DataDa, string DataA)
     {
-        DDLSocieta.Items.Clear();
-        DDLSocieta.Visible = true;
+        DDLCliente.Items.Clear();
+        DDLCliente.Visible = true;
 
-        DataTable dtSocieta = Database.GetData("SELECT DISTINCT hours.company_id, B.Name as companyName FROM Hours " +
-                                               "INNER JOIN Company as B ON B.company_id = hours.company_id " +
-                                               "WHERE PreinvoiceNum is null AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY companyName DESC", this.Page);
+        DataTable dtCliente = Database.GetData("SELECT DISTINCT B.CodiceCliente AS CodiceCliente , C.Nome1 as NomeCliente FROM Hours " +
+                                               "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
+                                               "INNER JOIN Customers as C ON C.CodiceCliente = B.CodiceCliente " +
+                                               "WHERE CTMPreinvoiceNum is null AND date >= " + ASPcompatility.FormatDateDb(DataDa) + 
+                                               " AND date <= " + ASPcompatility.FormatDateDb(DataA) +
+                                               " AND B.TipoContratto_id = '" + ConfigurationManager.AppSettings["CONTRATTO_TM"] + "' " +
+                                               " ORDER BY NomeCliente DESC", this.Page);
 
-        foreach (DataRow dtRow in dtSocieta.Rows)
+        foreach (DataRow dtRow in dtCliente.Rows)
         {
-            DDLSocieta.Items.Insert(0, new ListItem(dtRow["companyName"].ToString(), dtRow["company_id"].ToString()));
+            DDLCliente.Items.Insert(0, new ListItem(dtRow["NomeCliente"].ToString(), dtRow["CodiceCliente"].ToString()));
         }
 
-        //DDLSocieta.Items.Insert(0, new ListItem("--- Tutte le società ---", "")); 
     }
 
     // Popola controllo in base ai carichi ore da data a data
@@ -139,30 +142,15 @@ public partial class report_ricevute_select : System.Web.UI.Page
 
         DataTable dtProgetti = Database.GetData("SELECT DISTINCT hours.projects_id, B.ProjectCode + ' ' + SUBSTRING(B.Name, 1, 20) as projectName FROM Hours " +
                                                "INNER JOIN Projects as B ON B.projects_id = hours.projects_id " +
-                                               "WHERE PreinvoiceNum is null AND hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) + " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY projectName DESC", this.Page);
+                                               "WHERE CTMPreinvoiceNum is null AND B.CodiceCliente=" + ASPcompatility.FormatStringDb(DDLCliente.SelectedValue) + 
+                                               " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + 
+                                               " AND date <= " + ASPcompatility.FormatDateDb(DataA) +
+                                               " AND B.TipoContratto_id = '" + ConfigurationManager.AppSettings["CONTRATTO_TM"] + "' " +
+                                               " ORDER BY projectName DESC", this.Page);
 
         foreach (DataRow dtRow in dtProgetti.Rows)
         {
             LBProgetti.Items.Insert(0, new ListItem(dtRow["projectName"].ToString(), dtRow["projects_id"].ToString()));
-        }
-
-        //LBProgetti.Items.Insert(0, new ListItem("--- Tutti progetti ---", ""));
-
-    }
-
-    // Popola controllo in base ai carichi ore da data a data
-    protected void Bind_LBPersone(string DataDa, string DataA)
-    {
-        LBPersone.Items.Clear();
-        LBPersone.Visible = true;
-
-        DataTable dtPersone = Database.GetData("SELECT DISTINCT hours.persons_id, B.Name as Name FROM Hours " +
-                                               "INNER JOIN Persons as B ON B.persons_id = hours.persons_id " +
-                                               "WHERE PreinvoiceNum is null AND hours.company_id=" + ASPcompatility.FormatStringDb(DDLSocieta.SelectedValue) + " AND date >= " + ASPcompatility.FormatDateDb(DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(DataA) + " ORDER BY B.Name DESC", this.Page);
-
-        foreach (DataRow dtRow in dtPersone.Rows)
-        {
-            LBPersone.Items.Insert(0, new ListItem(dtRow["Name"].ToString(), dtRow["persons_id"].ToString()));
         }
 
         //LBProgetti.Items.Insert(0, new ListItem("--- Tutti progetti ---", ""));
@@ -176,11 +164,10 @@ public partial class report_ricevute_select : System.Web.UI.Page
         Session["PreinvDocDate"] = TBDataA.Text;
         Session["PreinvDataA"] = TBDataA.Text;
         Session["PreinvDataDa"] = TBDataDa.Text;
-        Session["PreinvSocieta"] = DDLSocieta.SelectedValue;
+        Session["PreinvCodiceCliente"] = DDLCliente.SelectedValue;
         Session["PreinvProjectsId"] = Utilities.ListSelections(LBProgetti);
-        Session["PreinvPersonsId"] = Utilities.ListSelections(LBPersone);
 
         // imposta il messaggio che verrò dato sulla pagina di menu
-        Response.Redirect("/timereport/report/preinvoice/preinvoice-form.aspx");
+        Response.Redirect("/timereport/report/CTMBilling/CTMpreinvoice-form.aspx");
     }
 }

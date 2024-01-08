@@ -9,10 +9,14 @@ public partial class m_preinvoice_preinvoicelist : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        Auth.CheckPermission("ADMIN", "PREINVOICE");
+        Auth.CheckPermission("REPORT", "ECONOMICS");
 
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
+
+        // usati per disattivare cancellazione record consuntivi
+        TBUserName.Text = CurrentSession.UserName;
+        TBUserLevel.Text = CurrentSession.UserLevel.ToString();
 
     }
 
@@ -22,7 +26,7 @@ public partial class m_preinvoice_preinvoicelist : System.Web.UI.Page
         Session["PrefatturaDataDa"] = "";
         Session["PrefatturaDataA"] = "";
 
-        Response.Redirect("/timereport/report/Preinvoice/Preinvoice-select.aspx");
+        Response.Redirect("/timereport/report/CTMBilling/CTMPreinvoice-select.aspx");
 
     }
 }

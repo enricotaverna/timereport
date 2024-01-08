@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Preinvoice-list.aspx.cs" Inherits="m_preinvoice_preinvoicelist" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CTMPreinvoice-list.aspx.cs" Inherits="m_preinvoice_preinvoicelist" %>
 
 <!DOCTYPE html>
 
@@ -51,8 +51,12 @@
 
                     <div id="ListTable"></div>
 
+                    <!-- *** campi nascosti usati da Javascript ***  -->
+                    <asp:TextBox ID="TBUserName" CssClass="toHide" runat="server"  />
+                    <asp:TextBox ID="TBUserLevel" CssClass="toHide" runat="server"  />
+
                     <div class="buttons">
-                        <asp:Button ID="btn_create" runat="server" Text="<%$ appSettings: CREATE_PREINVOICE %>" CssClass="orangebutton" Width="120px" OnClick="btn_create_Click"/>
+                        <asp:Button ID="btn_create" runat="server" Text="<%$ appSettings: CREATE_CONSUNTIVO %>" CssClass="orangebutton" Width="120px" OnClick="btn_create_Click"/>
                         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
@@ -90,6 +94,9 @@
       
         $("document").ready(() => {
 
+            // nasconde i campi che hanno passato i valori dal server per fare la chiamata ajax
+            $(".toHide").hide();
+
             // nasconde la DIV con il testo visuaizzato nel dialog box di conferma
             $("#dialog-confirm").hide();
 
@@ -113,10 +120,22 @@
         var editIcon = function (cell, formatterParams, onRendered) { //plain text value
             var data = cell.getRow().getData();
 
-            if (data.StatoTR != 'chiuso')
-                return "<i class='fa fa-address-card'></i>";
-            else
+            //if (data.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5' )
+            //    return "<i class='fa fa-address-card'></i>";
+            //else
+            //    return "";
+            return "<i class='fa fa-address-card'></i>";
+
+        };  // icona edit
+
+        var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
+            var data = cell.getRow().getData();
+
+            if (data.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5')
+                return "<i class='fa fa-trash'></i>";
+            else { 
                 return "";
+            }   
 
         };  // icona edit
 
@@ -126,7 +145,7 @@
             pagination: "local", //enable local pagination.
             headerFilterPlaceholder: "filtra i record...", //set column header placeholder text
             ajaxURL: "/timereport/webservices/RP_Preinvoice.asmx/GetPreinvoiceList", //ajax URL
-            ajaxParams: {'tipoFattura': 'FOR' },
+            ajaxParams: { 'tipoFattura': 'CLI' },
             ajaxConfig: "POST", //ajax HTTP request type
             ajaxContentType: "json", // send parameters to the server as a JSON encoded string
             layout: "fitColumns", //fit columns to width of table (optional)
@@ -139,7 +158,7 @@
             columns: [
                 { title: "Numero", field: "PreinvoiceNum", sorter: "number", headerFilter: true },
                 { title: "Data", field: "DocumentDate", sorter: "string", headerFilter: true },
-                { title: "Società", field: "CompanyName", sorter: "string", headerFilter: true },
+                { title: "Cliente", field: "CustomerName", sorter: "string", headerFilter: true },
                 { title: "Da", field: "DataDa", sorter: "string", headerFilter: true },
                 { title: "A", field: "DataA", sorter: "string", headerFilter: true },
                 { title: "Director(s)", field: "DirectorsName", sorter: "string", headerFilter: true },
@@ -147,7 +166,7 @@
                 { title: "Fee", field: "TotalRates", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Spese", field: "TotalExpenses", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
                 { title: "Importo", field: "TotalAmount", width: 80, sorter: "number", formatter: "money", formatterParams: { decimal: ",", thousand: "." }, headerFilter: false },
-                { title: "Descrizione", field: "Description", width: 150, sorter: "string", headerFilter: false },
+                { title: "Descrizione", field: "TMDescription", width: 150, sorter: "string", headerFilter: false },
                 { formatter: trashIcon, width: 20, headerSort: false, align: "center", cellClick: function (e, cell) { confermaCancellazione(cell.getRow().getData(), cell.getRow()) } },
                 { formatter: editIcon, width: 20, headerSort: false, align: "center", cellClick: function (e, cell) { OpenPreinvoiceForm(cell.getRow().getData()) } }
             ],
@@ -155,34 +174,39 @@
 
         // ** FUNZIONI **
         function OpenPreinvoiceForm(dati) {
-            var url = "/timereport/report/preinvoice/Preinvoice-form.aspx?Preinvoice_id=" + dati.Preinvoice_id;
+            var url = "/timereport/report/CTMBilling/CTMPreinvoice-form.aspx?Preinvoice_id=" + dati.Preinvoice_id;
             window.open(url, '_self');
             return;
         }
 
         function confermaCancellazione(dati, riga) {
-            $('#dialog-confirm').dialog({
-                resizable: false,
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Cancella": function () {
-                        $(this).dialog("close");
-                        cancellaRecord(dati, riga);
-                    },
-                    "Annulla": function () {
-                        $(this).dialog("close");
-                        return;
+
+            // cancella solo se proprietario del record o amministratore
+            if (dati.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5') { 
+
+                $('#dialog-confirm').dialog({
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        "Cancella": function () {
+                            $(this).dialog("close");
+                            cancellaRecord(dati, riga);
+                        },
+                        "Annulla": function () {
+                            $(this).dialog("close");
+                            return;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         function cancellaRecord(dati, riga) {
 
             // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-            var values = "{'PreInvoiceNum': '" + dati.PreinvoiceNum + "', 'TipoFattura' : 'FOR' } ";
+            var values = "{'PreInvoiceNum': '" + dati.PreinvoiceNum + "' , 'TipoFattura' : 'CLI'    } ";
             MaskScreen(true);
 
             $.ajax({

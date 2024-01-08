@@ -26,27 +26,27 @@
         Auth.CheckPermission("ADMIN", "MASSCHANGE")
         CurrentSession = Session("CurrentSession")
 
-        If DDL_Persona_Sel.SelectedValue <> "all" Or _
+        If DDL_Persona_Sel.SelectedValue <> "all" Or
   (Session("DDL_Persona_Sel") <> Nothing And Not IsPostBack) Then
             sWhere = IIf(sWhere = "", " WHERE Expenses.Persons_id = (@DDL_Persona_Sel)", sWhere & " AND Expenses.Persons_id = (@DDL_Persona_Sel)")
         End If
 
-        If DDL_Progetti_Sel.SelectedValue <> "all" Or _
+        If DDL_Progetti_Sel.SelectedValue <> "all" Or
             (Session("DDL_Progetti_Sel") <> Nothing And Not IsPostBack) Then
             sWhere = IIf(sWhere = "", " WHERE Expenses.Projects_id = (@DDL_Progetti_Sel)", sWhere & " AND Expenses.Projects_id = (@DDL_Progetti_Sel)")
         End If
 
-        If DDL_Spesa_Sel.SelectedValue <> "all" Or _
+        If DDL_Spesa_Sel.SelectedValue <> "all" Or
             (Session("DDL_Spesa_Sel") <> Nothing And Not IsPostBack) Then
             sWhere = IIf(sWhere = "", " WHERE Expenses.ExpenseType_id = (@DDL_Spesa_Sel)", sWhere & " AND Expenses.ExpenseType_id = (@DDL_Spesa_Sel)")
         End If
 
-        If TB_Datada.Text <> Nothing Or _
+        If TB_Datada.Text <> Nothing Or
             (Session("TB_Datada") <> Nothing And Not IsPostBack) Then
             sWhere = IIf(sWhere = "", " WHERE Expenses.Date >= (@TB_Datada)", sWhere & " AND Expenses.Date >= (@TB_Datada)")
         End If
 
-        If TB_DataA.Text <> Nothing Or _
+        If TB_DataA.Text <> Nothing Or
             (Session("TB_DataA") <> Nothing And Not IsPostBack) Then
             sWhere = IIf(sWhere = "", " WHERE Expenses.Date <= (@TB_DataA)", sWhere & " AND Expenses.Date <= (@TB_DataA)")
         End If
@@ -181,7 +181,14 @@
         Session("TB_DataA") = sender.text
     End Sub
 
-    Protected Sub DSExpenses_Updating(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.SqlDataSourceCommandEventArgs)
+    Protected Sub DSExpenses_Updated(ByVal sender As Object, ByVal e As SqlDataSourceStatusEventArgs)
+
+        ' scrive log record cancellato
+        Database.ExecuteSQL("INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('EXPENSE', " + e.Command.Parameters(0).Value.ToString() + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')", Nothing)
+
+    End Sub
+
+    Protected Sub DSExpenses_Updating(ByVal sender As Object, ByVal e As SqlDataSourceCommandEventArgs)
 
         ' recupera conversion rate associata al tipo spesa
         Dim dtTipoSpesa As DataTable = CurrentSession.dtSpeseTutte
@@ -603,7 +610,7 @@
         DeleteCommand="DELETE FROM [Expenses] WHERE [Expenses_Id] = @Expenses_Id"
         InsertCommand="INSERT INTO [Expenses] ([Projects_Id], [Persons_id], [Date], [Amount], [ExpenseType_Id], [CancelFlag],[InvoiceFlag],[CreditCardPayed], [CompanyPayed] ,[Comment], [CreatedBy], [CreationDate], [AccountingDate], [TipoBonus_id], Company_id, ClientManager_id, AccountManager_id, AdditionalCharges, AmountInCurrency) VALUES (@Projects_Id, @Persons_id, @Date, @amount, @ExpenseType_Id, @CancelFlag,@InvoiceFlag,@CreditCardPayed, @CompanyPayed, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @Company_id, @ClientManager_id, @AccountManager_id, @AdditionalCharges, @AmountInCurrency)"
         UpdateCommand="UPDATE [Expenses] SET [Projects_Id] = @Projects_Id, [Persons_id] = @Persons_id, [Date] = @Date, [amount] = @amount, [ExpenseType_Id] = @ExpenseType_Id, [CancelFlag] = @CancelFlag, [CreditCardPayed] = @CreditCardPayed, [CompanyPayed] = @CompanyPayed, [InvoiceFlag] = @InvoiceFlag, [Comment] = @Comment, [LastModifiedBy] = @LastModifiedBy, [LastModificationDate] = @LastModificationDate, [AccountingDate] = @AccountingDate, [TipoBonus_id] = @TipoBonus_id, [AdditionalCharges] = @AdditionalCharges, [AmountInCurrency] = @AmountInCurrency WHERE [Expenses_Id] = @Expenses_Id"
-        OnUpdating="DSExpenses_Updating">
+        OnUpdating="DSExpenses_Updating" OnDeleted ="DSExpenses_Updated">
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel" PropertyName="SelectedValue"
                 DefaultValue="%" />

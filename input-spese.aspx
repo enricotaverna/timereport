@@ -530,26 +530,28 @@
 
             BindOpportunity();
 
-            // chiama Ajax per controllo carico spese sul giorni
-            $.ajax({
-                type: "POST",
-                url: "/timereport/webservices/WStimereport.asmx/CheckCaricoSpesa",
-                data: "{ 'projects_id' : '" + $('#FVSpese_DDLprogetto').val() + "', 'persons_id' : '<%=CurrentSession.Persons_id%>' , 'date' : '" + $('#FVSpese_LBdate').html() + "'  }",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
-                    if (msg.d != "") {
-                        MaskScreen(true);
-                        ShowPopup(msg.d,'','Attenzione');
-                        UnMaskScreen();
-                        //BindOpportunity();
+            // se in edit chiama Ajax per controllo carico spese sul giorni
+            if (!$('#FVSpese_DDLprogetto')[0].disabled) {
+                $.ajax({
+                    type: "POST",
+                    url: "/timereport/webservices/WStimereport.asmx/CheckCaricoSpesa",
+                    data: "{ 'projects_id' : '" + $('#FVSpese_DDLprogetto').val() + "', 'persons_id' : '<%=CurrentSession.Persons_id%>' , 'date' : '" + $('#FVSpese_LBdate').html() + "'  }",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (msg) {
+                        // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
+                        if (msg.d != "") {
+                            MaskScreen(true);
+                            ShowPopup(msg.d,'','Attenzione');
+                            UnMaskScreen();
+                            //BindOpportunity();
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(xhr.responseText);
                     }
-                },
-                error: function (xhr, textStatus, errorThrown) {
-                    alert(xhr.responseText);
-                }
-            }); // ajax
+                }); // ajax
+            }
 
         });
 

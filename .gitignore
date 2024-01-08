@@ -249,3 +249,7 @@ _public/
 
 web.config
 /App_Data/PublishProfiles/IISProfile.pubxml
+
+SqlServerTypes/readme.htm
+/vwd.webinfo
+/web-Stan.config

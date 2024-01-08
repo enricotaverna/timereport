@@ -8,6 +8,7 @@ using System.Configuration;
 
 public class PreInvoiceData
 {
+    public string Id { get; set; }
     public string Number { get; set; }
     public string Date { get; set; }
     public string DataDa { get; set; }
@@ -86,7 +87,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
         string WordTemplate = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PREINVOICE_PATH"]) + "TemplatePreinvoice-IT.docx";
         using (var document = DocX.Load(WordTemplate))
         {
-            document.ReplaceText("<societa>", preInv.CompanyName);
+            document.ReplaceText("<intestatario>", preInv.CompanyName);
             document.ReplaceText("<numero>", preInv.Number);
             document.ReplaceText("<data>", preInv.Date);
             document.ReplaceText("<dataDa>", preInv.DataDa);
@@ -194,10 +195,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void LoadFromDB(PreInvoiceData preInv, string preinvoiceId)
     {
 
-        DataRow dr = Database.GetRow("SELECT Preinvoice_id, Date, DataDa, DataA, Company_id, ProjectsSelection, PersonsSelection, NumberOfDays, TotalAmount, TotalRates, TotalExpenses, Description, DirectorsName FROM Preinvoice " +
+        DataRow dr = Database.GetRow("SELECT Preinvoice_id, Date, DataDa, DataA, Company_id, ProjectsSelection, PersonsSelection, NumberOfDays, TotalAmount, TotalRates, TotalExpenses, Description, DirectorsName, PreinvoiceNum FROM Preinvoice " +
                                      "WHERE Preinvoice_id=" + ASPcompatility.FormatStringDb(preinvoiceId), null);
 
-        preInv.Number = dr[0].ToString();
+        preInv.Number = dr[13].ToString();
+        preInv.Id = dr[0].ToString();
         preInv.Date = ((DateTime)dr[1]).ToString("dd/MM/yyyy");
         preInv.DataDa = ((DateTime)dr[2]).ToString("dd/MM/yyyy");
         preInv.DataA = ((DateTime)dr[3]).ToString("dd/MM/yyyy");
@@ -230,9 +232,9 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
     protected void SetQueryCommands(PreInvoiceData preInv)
     {
-        preInv.SubtotalAmountQuery = "SELECT b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', Days, t.FLC 'FLC', Days* FLC as 'TotalCost', t.Preinvoice_id " +
-                                   "FROM( SELECT SUM(Hours) / 8 as 'Days', company_id, persons_id, projects_id, Preinvoice_id, [MSSql12155].FCT_DeterminaCostRate(persons_id, projects_id, " + ASPcompatility.FormatDateDb(preInv.DataDa) + ") as 'FLC' FROM hours " +
-                                   "WHERE date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA) + " group by persons_Id, projects_id, company_id, Preinvoice_id ) AS T " +
+        preInv.SubtotalAmountQuery = "SELECT b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', Days, t.FLC 'FLC', Days* FLC as 'TotalCost', t.PreinvoiceNum " +
+                                   "FROM( SELECT SUM(Hours) / 8 as 'Days', company_id, persons_id, projects_id, PreinvoiceNum, [MSSql12155].FCT_DeterminaCostRate(persons_id, projects_id, " + ASPcompatility.FormatDateDb(preInv.DataDa) + ") as 'FLC' FROM hours " +
+                                   "WHERE date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA) + " group by persons_Id, projects_id, company_id, PreinvoiceNum ) AS T " +
                                    "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                    "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
                                    "INNER JOIN persons as D ON D.persons_id = t.persons_id " +
@@ -245,11 +247,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.SubtotalAmountQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.SubtotalAmountQuery += " AND T.Preinvoice_id IS NULL";
+            preInv.SubtotalAmountQuery += " AND T.PreinvoiceNum IS NULL";
         else
-            preInv.SubtotalAmountQuery += " AND t.Preinvoice_id = " + preInv.Number;
+            preInv.SubtotalAmountQuery += " AND t.PreinvoiceNum = " + preInv.Number;
 
-        preInv.AllDaysQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', " +
+        preInv.AllDaysQuery = "SELECT PreinvoiceNum as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + "b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', E.name as 'Director' ,CONVERT(VARCHAR(10),Date, 103) as Data , Hours as 'Ore', " +
                                      "fn.Tariffa, fn.Tariffa * T.Hours / 8 as Importo, " +
                                      "locationdescription as 'Location', Comment as 'Nota' " +
                                      "FROM hours as T " +
@@ -268,11 +270,11 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.AllDaysQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.AllDaysQuery += " AND T.Preinvoice_id IS NULL";
+            preInv.AllDaysQuery += " AND T.PreinvoiceNum IS NULL";
         else
-            preInv.AllDaysQuery += " AND t.Preinvoice_id = " + preInv.Number;
+            preInv.AllDaysQuery += " AND t.PreinvoiceNum = " + preInv.Number;
 
-        preInv.AllExpenseQuery = "SELECT Preinvoice_id as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + " b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', F.name as 'Director', E.name as 'TipoSpesa' , CONVERT(VARCHAR(10),Date, 103) as Data , AmountInCurrency as Importo " +
+        preInv.AllExpenseQuery = "SELECT PreinvoiceNum as Prefattura, '" + preInv.Date + "' as DataPrefattura, " + " b.Name as 'Societa', D.name as NomeConsulente, c.projectcode + ' ' + c.name as 'Progetto', F.name as 'Director', E.name as 'TipoSpesa' , CONVERT(VARCHAR(10),Date, 103) as Data , AmountInCurrency as Importo " +
                                    "FROM expenses as T " +
                                    "INNER JOIN company as B ON b.Company_id = t.Company_id " +
                                    "INNER JOIN projects as c ON c.projects_id = t.projects_id " +
@@ -289,9 +291,9 @@ public partial class Preinvoice_form : System.Web.UI.Page
             preInv.AllExpenseQuery += " AND T.persons_id IN ( " + preInv.PersonsIdList + " )";
 
         if (preInv.Number == "nr") // in creazione il campo prefattura non deve essere valorizzato
-            preInv.AllExpenseQuery += " AND T.Preinvoice_id IS NULL";
+            preInv.AllExpenseQuery += " AND T.PreinvoiceNum IS NULL";
         else
-            preInv.AllExpenseQuery += " AND T.Preinvoice_id = " + preInv.Number;
+            preInv.AllExpenseQuery += " AND T.PreinvoiceNum = " + preInv.Number;
 
         preInv.SubtotalExpensesQuery = "SELECT Societa, NomeConsulente, Progetto, TipoSpesa, SUM(Importo) as 'Importo' FROM (" +
                                        preInv.AllExpenseQuery +
@@ -362,10 +364,15 @@ public partial class Preinvoice_form : System.Web.UI.Page
     protected void InsertButton_Click(object sender, EventArgs e)
     {
 
-        int Preinvoice_id = 0;
+        int PreinvoiceNum = 0;
         string queryToUpdate = "";
 
-        Boolean insertOk = Database.ExecuteSQL("INSERT INTO Preinvoice (company_id, Date, DataDa, DataA, CreatedBy, CreationDate, NumberOfDays, TotalRates, TotalExpenses, TotalAmount, ProjectsSelection, PersonsSelection, Description, DirectorsName ) VALUES ( " +
+        PreinvoiceNum = Database.GetLastIdInserted("SELECT MAX(PreinvoiceNum) from Preinvoice WHERE Tipo ='FOR'");
+        PreinvoiceNum = PreinvoiceNum == 0 ? 1 : PreinvoiceNum + 1;
+
+        Boolean insertOk = Database.ExecuteSQL("INSERT INTO Preinvoice (PreinvoiceNum, Tipo, company_id, Date, DataDa, DataA, CreatedBy, CreationDate, NumberOfDays, TotalRates, TotalExpenses, TotalAmount, ProjectsSelection, PersonsSelection, Description, DirectorsName ) VALUES ( " +
+                             ASPcompatility.FormatNumberDB(PreinvoiceNum) + " , " +
+                             "'FOR' , " +
                              ASPcompatility.FormatStringDb(preInv.CompanyId) + " , " +
                              ASPcompatility.FormatDateDb(TBDataPrefattura.Text) + " , " +
                              ASPcompatility.FormatDateDb(preInv.DataDa) + " , " +
@@ -382,10 +389,9 @@ public partial class Preinvoice_form : System.Web.UI.Page
                              ASPcompatility.FormatStringDb(preInv.DirectorsName) + " )"
                 , null); ;
 
-        if (insertOk) { 
-            Preinvoice_id = Database.GetLastIdInserted("SELECT MAX(Preinvoice_id) from Preinvoice");
+        if (insertOk) {
 
-            queryToUpdate = "UPDATE hours SET Preinvoice_id = '" + Preinvoice_id.ToString()  + "' " + 
+            queryToUpdate = "UPDATE hours SET PreinvoiceNum = '" + PreinvoiceNum.ToString()  + "' " + 
                              "WHERE Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId) + " AND " +
                              "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
 
@@ -397,7 +403,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
 
             Database.ExecuteSQL(queryToUpdate, null); // aggiorna ore
 
-            queryToUpdate = "UPDATE Expenses SET Preinvoice_id = '" + Preinvoice_id.ToString() + "' " +
+            queryToUpdate = "UPDATE Expenses SET PreinvoiceNum = '" + PreinvoiceNum.ToString() + "' " +
                              "WHERE Company_id = " + ASPcompatility.FormatStringDb(preInv.CompanyId) + " AND " +
                              "date >= " + ASPcompatility.FormatDateDb(preInv.DataDa) + " AND date <= " + ASPcompatility.FormatDateDb(preInv.DataA);
 
