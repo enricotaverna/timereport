@@ -211,7 +211,11 @@
         function CheckFLC() {
 
             // controllo FLC
-            var values = "{'company_id': '" + $("#TBcompanyId").val() + "', 'CodiceCliente': '', 'dataDa' : '" + $("#TBDataDa").val() + "', 'dataA' : '" + $("#TBDataA").val() + "', 'TipoFattura' : 'FOR'  }";
+            var values = "{'company_id': '" + $("#TBcompanyId").val() +
+                         "', 'ProjectsIdList' : '', 'CodiceCliente': '', 'dataDa' : '" +
+                         $("#TBDataDa").val() + "', 'dataA' : '" +
+                         $("#TBDataA").val() +
+                         "', 'TipoFattura' : 'FOR'  }";
 
             $.ajax({
 
