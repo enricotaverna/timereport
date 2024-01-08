@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Globalization;
 using System.Threading;
+using System.Web.UI.WebControls;
 
 public partial class input : System.Web.UI.Page
 {
@@ -48,9 +49,19 @@ public partial class input : System.Web.UI.Page
     protected void BindDDLProjects()
     {
 
-        DataTable dtProgettiForzati = CurrentSession.dtProgettiForzati;
+        DataTable dtProgettiInDDL = CurrentSession.dtProgettiForzati;
 
-        DDLProgetto.DataSource = dtProgettiForzati;
+        DDLProgetto.Items.Clear();
+
+        // aggiunge gli item con l'attributo per il controllo sull'obligatorietà dei opporunità
+        foreach (DataRow drRow in dtProgettiInDDL.Rows)
+        {
+            ListItem liItem = new ListItem(drRow["DescProgetto"].ToString(), drRow["Projects_Id"].ToString());
+            if (drRow["ProjectType_Id"].ToString() == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"]) // Gestione opportunity su progetti BD
+                liItem.Attributes.Add("data-OpportunityIsRequired", "True");
+            DDLProgetto.Items.Add(liItem);
+        }
+
         DDLProgetto.DataTextField = "DescProgetto";
         DDLProgetto.DataValueField = "Projects_Id";
         DDLProgetto.DataBind();
@@ -150,18 +161,22 @@ public partial class input : System.Web.UI.Page
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
 
-        try
-        {
-            // carica il buffer estraendo l'ID della nome del file
-            for (int i = 0; i < filePaths.Length; i++)
-            {
-                iStart = filePaths[i].IndexOf("fid-") + 4;
-                iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
-            }
-        }
-        catch
+        if (filePaths.Length != null)
         {
 
+            try
+            {
+                // carica il buffer estraendo l'ID della nome del file
+                for (int i = 0; i < filePaths.Length; i++)
+                {
+                    iStart = filePaths[i].IndexOf("fid-") + 4;
+                    iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
+                }
+            }
+            catch
+            {
+
+            }
         }
 
         // avedo caricato il buffer spese il flag di refresh
@@ -178,7 +193,7 @@ public partial class input : System.Web.UI.Page
         string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
 
         // seleziona tutte le ore da primo a ultimo del mese
-        string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, Hours.CreatedBy, Hours.CreationDate, ApprovalStatus, ApprovalRequest_Id, LocationDescription " +
+        string sQuery = "SELECT hours.projects_id, Projects.ProjectCode, hours.hours, hours.Hours_id, Projects.name, hours.date, hours.comment, Activity.ActivityCode + ' ' + Activity.Name as ActivityName, Hours.CreatedBy, Hours.CreationDate, ApprovalStatus, ApprovalRequest_Id, LocationDescription, OpportunityId " +
                         " FROM Hours INNER JOIN projects ON hours.projects_id=projects.projects_id LEFT OUTER JOIN Activity ON Activity.Activity_id = Hours.Activity_id " +
                         " WHERE hours.Persons_id=" + CurrentSession.Persons_id +
                         " AND hours.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
@@ -214,11 +229,11 @@ public partial class input : System.Web.UI.Page
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
         else if ((string)Session["type"] == "bonus")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
 
@@ -281,6 +296,7 @@ public partial class input : System.Web.UI.Page
                 strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
                              "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
                              "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
+                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
                              "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
                              "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
                              "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
@@ -352,12 +368,12 @@ public partial class input : System.Web.UI.Page
                 sFlag = Convert.ToBoolean(rdr["CompanyPayed"]) ? sFlag + " PA " : sFlag;
                 sFlag = Convert.ToBoolean(rdr["InvoiceFlag"]) ? sFlag + " FAT " : sFlag;
 
-                strTooltip = "Data:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                             "<br>Progetto:&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
-                             "<br>Spesa:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
-                             "<br>Importo:&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
-                             "<br>Flag:&nbsp;&nbsp;&nbsp;" +
-                             sFlag +
+                strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
+                             "<br><b>Progetto:</b>&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
+                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
+                             "<br><b>Spesa:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
+                             "<br><b>Importo:</b>&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
+                             "<br><b>Flag:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sFlag +
                              "<br><br>" + HttpUtility.HtmlEncode(rdr["comment"].ToString());
 
                 // se la spesa ha una ricevuta stampa un icona, altrimenti lascia blank
@@ -568,7 +584,7 @@ public partial class input : System.Web.UI.Page
         }
 
         // inserisce record x trasferta
-        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges, AmountInCurrency) " +
+        cmd = "INSERT INTO expenses (Date, Projects_Id,Persons_Id,ExpenseType_Id,amount,comment,CreditCardPayed, CompanyPayed, CancelFlag,InvoiceFlag,CreatedBy,CreationDate,TipoBonus_id,ClientManager_id, AccountManager_id, Company_id, additionalCharges, AmountInCurrency, OpportunityId) " +
                 "values (" +
                 ASPcompatility.FormatDateDb(Request.Form["refDate"], false) + " ," +
                 "'" + Request.Form["DDLProgetto"] + "' ," +    // da dropdown
@@ -581,13 +597,14 @@ public partial class input : System.Web.UI.Page
                 "'false' ," +
                 "'false' ," +
                 "'" + CurrentSession.UserId + "' ," +
-                ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " ," +
+                ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " ," +
                 "'" + ConfigurationManager.AppSettings["TIPO_BONUS_TRAVEL"] + "' ," +
                 "'" + result.Item1 + "' ," +
                 "'" + result.Item2 + "' ," +
                 "'" + CurrentSession.Company_id + "' ," +
                 "'false' , " +
-                 ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) +
+                 ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) + " ," +
+                 ASPcompatility.FormatStringDb(TBOpportunityId.Text) +
                 " )";
 
         Database.ExecuteSQL(cmd, this.Page);
@@ -611,4 +628,3 @@ public partial class input : System.Web.UI.Page
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
 }
-
