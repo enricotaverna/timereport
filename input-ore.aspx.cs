@@ -187,7 +187,10 @@ public partial class input_ore : System.Web.UI.Page
                     Commesse += string.Format("'{0}'", ListaCommesseAE[i].Key).ToString() + ",";
                 }
                 //tolgo ultima virgola alla variabile
-                Commesse = Commesse.Substring(0, Commesse.Length - 1);
+                if (clsUtility.NullToString(Commesse) != "")
+                {
+                    Commesse = Commesse.Substring(0, Commesse.Length - 1);
+                }                
 
                 //selezioni dal database tutti i progetti contenutio nelle task di SF
                 DataTable dtAct = Database.GetData(string.Format("SELECT [Projects_Id],[ProjectCode] FROM [Projects] WHERE [ProjectCode] in ({0}) ", Commesse),null);

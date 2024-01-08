@@ -188,7 +188,8 @@ public class TRSession
             serviceURL += string.Format("SELECT+id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email+" +
                "FROM+TASKRAY__Project_Task__c+WHERE+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+TASKRAY__trCompleted__c=false" +
                "+AND+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+Owner.Email='{0}'"+
-               "+AND+Milestone_Senza_peso__c=False+AND+TASKRAY__trIsMilestone__c=False+order+by+TASKRAY__Project__r.Name", SalesforceAccount);
+               "+AND+Milestone_Senza_peso__c=False+AND+TASKRAY__trIsMilestone__c=False+AND+TASKRAY__List__c+!='Finished'+AND+TASKRAY__List__c+!='To Be Confirmed'"+
+               "+order+by+TASKRAY__Project__r.Name", SalesforceAccount);
 
 
             string JSON_TOT = "";
