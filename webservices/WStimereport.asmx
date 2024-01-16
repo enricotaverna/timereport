@@ -307,7 +307,7 @@ public class WStimereport : System.Web.Services.WebService
         {
 
             case "hours":
-                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.OpportunityId " +
+                dt = Database.GetData("SELECT a.projects_id, persons_id, hours, hourType_id, CancelFlag, TransferFlag, Activity_id, AccountingDate, comment, b.ProjectCode, a.WorkedInRemote, a.LocationKey, a.LocationType, a.LocationDescription, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.OpportunityId, a.SalesforceTaskId " +
                                                "FROM hours AS a " +
                                                "INNER JOIN Projects AS b ON  b.Projects_id = a.Projects_id " +
                                                "WHERE hours_id=" + sId, null);
