@@ -345,8 +345,11 @@
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
                             span.textContent = "Ore: " + sommaOre;
-                            //se minore di 8 segnalo in rosso
-                            if (sommaOre < 8) {
+                            span.style.color = '#666666';
+                            if (sommaOre == 0) {
+                                span.textContent = "";
+                            } else if (sommaOre < 8) {
+                                //se minore di 8 segnalo in rosso
                                 span.style.color = 'red';
                             }
                         }
