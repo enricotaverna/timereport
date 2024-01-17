@@ -313,6 +313,7 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+        
         CalcolaSommaOre();
 
         // *** Esclude i controlli nascosti *** 
@@ -323,6 +324,7 @@
         //calcolo delle ore inserite nel giorno
         //se inferiori ad 8 segnalate in rosso
         function CalcolaSommaOre() {
+
             //trovo la tabella delle ore tramite id
             var table = document.getElementById("TableOre");
             console.log('table -- ' + table);
