@@ -528,7 +528,7 @@ public partial class input : System.Web.UI.Page
                 switch ((string)Session["type"])
                 {
                     case "hours":  // CALENDARIO DATE
-                        Response.Write("<a  align=right href=input-ore.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
+                        Response.Write("<a  align=right href=input-ore.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a><span id='ore" + sISODate + "' style=\"float: right;padding: 0 20px 0 0;\"></span>");
                         break;
 
                     case "leave":  // CALENDARIO DATE
