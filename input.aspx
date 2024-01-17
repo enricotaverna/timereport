@@ -327,23 +327,28 @@
 
             //trovo la tabella delle ore tramite id
             var table = document.getElementById("TableOre");
-            console.log('table -- ' + table);
             //ciclo tutte le righe della tabella
-            for (var i = 0, row; row = table.rows[i]; i++) {
+            for (var i = 0, row; row = table.rows[i]; i++) {                
                 //ciclo tutte le colonne del record
                 for (var j = 0, col; col = row.cells[j]; j++) {
+
+                    if (col.id.includes("hdr")) {
+                        var span = document.getElementById("ore" + col.id.replace("hdr", ""));
+                        span.textContent = "";
+                    }
+
+                    //span.textContent = "";
+                    console.log(col.id);
                     //prendo solamente le celle dove è possibile inserire i time (escludo i titoli dei giorni)
                     if (col.id.includes("TDitm")) {
                         //controllo se nella cella dei time è contenuto almeno un time
                         if (col.getElementsByClassName('TRitem')[0] != null) {
                             let sommaOre = 0;
-                            console.log('ID Colonna -- ' + col.id);
                             //ciclo ogni time del giorno sommando le ore
                             Array.from(col.getElementsByClassName('TRitem')).forEach(function (element) {
-                                console.log(element.innerText.split(':')[1].replace("ore", "").trimEnd());
+                                //console.log(element.innerText.split(':')[1].replace("ore", "").trimEnd());
                                 sommaOre += parseInt(element.innerText.split(':')[1].replace("ore", "").trimEnd(), 10);
                             });
-                            console.log(sommaOre);
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
                             span.textContent = "Ore: " + sommaOre;
@@ -355,9 +360,9 @@
                                 span.style.color = 'red';
                             }
                         }
-                    }
+                    } 
                 }
-                console.log('Fine riga');
+                //console.log('Fine riga');
             }
         }
 
