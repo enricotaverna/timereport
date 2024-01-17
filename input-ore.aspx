@@ -644,7 +644,11 @@
                 //NON esiste resetto le selezioni
                 if (IsExists == false) {
                     $("#FVore_DDLTaskName").val(0);
-                    alert("Progetto " + Projects_Name + " non presente");
+                    if (Projects_Name == null) {
+                        alert("Il progetto della task selezionata non \u00E8 stato inviato al Timereport");
+                    } else {
+                        alert("Non si \u00E8 autorizzati alla commessa " + Projects_Name + " rivolgersi al proprio responsabile per l'autorizzazione");
+                    }
                 } 
                 //imposto il valore e accendo event change
                 $("#FVore_DDLprogetto").val($(this).find("option:selected").attr("data-Projects_Id")).change();

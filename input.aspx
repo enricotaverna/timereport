@@ -202,7 +202,7 @@
                         Response.Write("<a class=" + ca + " href=input.aspx?type=leave>" + GetLocalResourceObject("ASSENZE") + "</a>");
 
                 %>
-                <table align="center" style="width: 100%; border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
+                <table align="center" id="TableOre" style="width: 100%; border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
                     <!--        lascia righa vuota-->
                     <%--                <tr>
                     <td class="hours">&nbsp;</td>
@@ -313,12 +313,58 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+        
+        CalcolaSommaOre();
 
         // *** Esclude i controlli nascosti *** 
         $('#FVForm').parsley({
             excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
         });
 
+        //calcolo delle ore inserite nel giorno
+        //se inferiori ad 8 segnalate in rosso
+        function CalcolaSommaOre() {
+
+            //trovo la tabella delle ore tramite id
+            var table = document.getElementById("TableOre");
+            //ciclo tutte le righe della tabella
+            for (var i = 0, row; row = table.rows[i]; i++) {                
+                //ciclo tutte le colonne del record
+                for (var j = 0, col; col = row.cells[j]; j++) {
+
+                    if (col.id.includes("hdr")) {
+                        var span = document.getElementById("ore" + col.id.replace("hdr", ""));
+                        span.textContent = "";
+                    }
+
+                    //span.textContent = "";
+                    console.log(col.id);
+                    //prendo solamente le celle dove è possibile inserire i time (escludo i titoli dei giorni)
+                    if (col.id.includes("TDitm")) {
+                        //controllo se nella cella dei time è contenuto almeno un time
+                        if (col.getElementsByClassName('TRitem')[0] != null) {
+                            let sommaOre = 0;
+                            //ciclo ogni time del giorno sommando le ore
+                            Array.from(col.getElementsByClassName('TRitem')).forEach(function (element) {
+                                //console.log(element.innerText.split(':')[1].replace("ore", "").trimEnd());
+                                sommaOre += parseInt(element.innerText.split(':')[1].replace("ore", "").trimEnd(), 10);
+                            });
+                            //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
+                            let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
+                            span.textContent = "Ore: " + sommaOre;
+                            span.style.color = '#666666';
+                            if (sommaOre == 0) {
+                                span.textContent = "";
+                            } else if (sommaOre < 8) {
+                                //se minore di 8 segnalo in rosso
+                                span.style.color = 'red';
+                            }
+                        }
+                    } 
+                }
+                //console.log('Fine riga');
+            }
+        }
 
         function BindOpportunity() {
             // gestione Opportunity Id
@@ -328,6 +374,7 @@
                 $('#lbOpportunityId').show(); // visualizza DropDown
             else
                 $('#lbOpportunityId').hide(); // visualizza DropDown
+            CalcolaSommaOre();
         }
 
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB
@@ -353,7 +400,7 @@
 
                         var elemtohide = document.getElementById("TRitm" + Id);
                         elemtohide.remove();
-
+                        CalcolaSommaOre();
                         if (msg.d[1] != "") {
                             var hdrIcon = "#hdrIcon" + msg.d[1]; // yyyymmdd in caso di ticket                  
                             $(hdrIcon).show(); // accende icone travel
@@ -557,7 +604,7 @@
                                         $(ui.helper).addClass("ui-draggable-helper");
                                     }
                                 });
-
+                                CalcolaSommaOre();
                             }
                             else
                                 alert("Errore: dato non inserito");
