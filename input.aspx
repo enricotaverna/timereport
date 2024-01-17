@@ -337,8 +337,6 @@
                         span.textContent = "";
                     }
 
-                    //span.textContent = "";
-                    console.log(col.id);
                     //prendo solamente le celle dove è possibile inserire i time (escludo i titoli dei giorni)
                     if (col.id.includes("TDitm")) {
                         //controllo se nella cella dei time è contenuto almeno un time
@@ -347,7 +345,8 @@
                             //ciclo ogni time del giorno sommando le ore
                             Array.from(col.getElementsByClassName('TRitem')).forEach(function (element) {
                                 //console.log(element.innerText.split(':')[1].replace("ore", "").trimEnd());
-                                sommaOre += parseInt(element.innerText.split(':')[1].replace("ore", "").trimEnd(), 10);
+                                sommaOre += parseFloat(element.innerText.split(':')[1].replace("ore", "").trimEnd().replace(",", "."), 10);
+                                console.log(sommaOre);
                             });
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
