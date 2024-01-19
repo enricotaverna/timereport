@@ -355,7 +355,7 @@
                             });
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
-                            span.textContent = "Ore: " + sommaOre;
+                            span.textContent = "Ore: " + sommaOre.toFixed(2);
                             span.style.color = '#666666';
                             if (sommaOre == 0) {
                                 span.textContent = "";
