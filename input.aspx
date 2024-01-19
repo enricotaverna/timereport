@@ -186,20 +186,20 @@
                             break;
                     }
 
-                    Response.Write("<a class=" + ch + " style='margin-left:0px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
+                    Response.Write("<a class=" + ch + " id='ore' style='margin-left:0px' href=input.aspx?type=hours>" + GetLocalResourceObject("ORE") + "</a>");
 
                     // solo se ha spese
                     DataTable dtSpeseForzate = CurrentSession.dtSpeseForzate;
                     if (dtSpeseForzate.Rows.Count > 0)
-                        Response.Write("<a class=" + ce + " href=input.aspx?type=expenses>" + GetLocalResourceObject("SPESE") + "</a>");
+                        Response.Write("<a class=" + ce + " id='spese' href=input.aspx?type=expenses>" + GetLocalResourceObject("SPESE") + "</a>");
 
                     // solo se dipendente
                     if (Auth.ReturnPermission("DATI", "BUONI"))
-                        Response.Write("<a class=" + cs + " href=input.aspx?type=bonus>" + GetLocalResourceObject("BUONI") + "</a>");
+                        Response.Write("<a class=" + cs + " id='buoni' href=input.aspx?type=bonus>" + GetLocalResourceObject("BUONI") + "</a>");
 
                     // solo se dipendente
                     if (Auth.ReturnPermission("DATI", "ASSENZE") && ConfigurationManager.AppSettings["LEAVE_ON"] == "true")
-                        Response.Write("<a class=" + ca + " href=input.aspx?type=leave>" + GetLocalResourceObject("ASSENZE") + "</a>");
+                        Response.Write("<a class=" + ca + " id='assenze' href=input.aspx?type=leave>" + GetLocalResourceObject("ASSENZE") + "</a>");
 
                 %>
                 <table align="center" id="TableOre" style="width: 100%; border-collapse: separate; border-spacing: 10px 0px; -webkit-border-top-left-radius: 0px;" class="RoundedBox">
@@ -324,6 +324,11 @@
         //calcolo delle ore inserite nel giorno
         //se inferiori ad 8 segnalate in rosso
         function CalcolaSommaOre() {
+            //controllo se sono su TAB ORE
+            var ore = document.getElementsByClassName("Tab-active");
+            if (ore[0].id != "ore") {   
+                return;
+            }
 
             //trovo la tabella delle ore tramite id
             var table = document.getElementById("TableOre");
@@ -350,7 +355,7 @@
                             });
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
-                            span.textContent = "Ore: " + sommaOre;
+                            span.textContent = "Ore: " + sommaOre.toFixed(2);
                             span.style.color = '#666666';
                             if (sommaOre == 0) {
                                 span.textContent = "";
