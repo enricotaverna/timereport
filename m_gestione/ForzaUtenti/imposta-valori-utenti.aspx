@@ -66,8 +66,8 @@
 
                                 <asp:ListBox ID="LBProgetti" runat="server" SelectionMode="Multiple"
                                     data-placeholder="seleziona uno o più valori" DataSourceID="DSProgetti"
-                                    DataTextField="ProjectName" DataValueField="Projects_Id" Rows="30" OnDataBound="LBProgetti_DataBound">                                    
-                                </asp:ListBox>                                
+                                    DataTextField="ProjectName" DataValueField="Projects_Id" Rows="30" OnDataBound="LBProgetti_DataBound"></asp:ListBox>
+
                             </div>
 
                             <%--                            <asp:Button ID="aspese" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aspese_Click"  />                                --%>
@@ -84,6 +84,7 @@
                                 <asp:ListBox ID="LBSpese" runat="server" SelectionMode="Multiple"
                                     data-placeholder="seleziona uno o più valori" DataSourceID="DSExpenseType"
                                     DataTextField="ExpenseTypeName" DataValueField="ExpenseType_Id" Rows="20" OnDataBound="LBSpese_DataBound"></asp:ListBox>
+
                             </div>
 
                             <%--                            <asp:Button ID="aspese" runat="server"  CommandName="Insert" CssClass="SmallGreyButton" Text="<%$ appSettings: RESET_TXT %>" OnClick="aspese_Click"  />                                --%>
@@ -91,12 +92,10 @@
                         <%--tabs-2--%>
 
                         <!-- *** BOTTONI ***  -->
-                        <div class="buttons">                           
+                        <div class="buttons">
                             <asp:Button ID="BTSave" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClick="InsertButton_Click" />
                             <asp:Button ID="BTreset" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: RESET_TXT %>" />
-                            <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" />                                                        
-                            <asp:DropDownList ID="IdPersonaSelezionata" DataSourceID="DSPersone" runat="server" DataTextField="Name" DataValueField="Persons_id" class="input nobottomborder" Visible="true" style="float: left;margin: 6px; 5px 0 0"></asp:DropDownList>
-                            <asp:Button ID="BTCopyOn" runat="server" CommandName="Insert" CssClass="orangebutton" Text="Copia Su Utente" style="float:left; width:auto;" />
+                            <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" />
                         </div>
 
                     </div>
@@ -126,8 +125,7 @@
 
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="SELECT ProjectCode + ' ' + left(Name,20) AS ProjectName, Projects_Id FROM Projects WHERE (Active = 1) ORDER BY ProjectName" ID="DSProgetti"></asp:SqlDataSource>
-    <asp:SqlDataSource runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="SELECT ExpenseCode + ' ' + left(Name,20) AS ExpenseTypeName, ExpenseType_Id FROM ExpenseType WHERE (Active = 1) ORDER BY ExpenseTypeName" ID="DSExpenseType"></asp:SqlDataSource>    
-    <asp:SqlDataSource runat="server" ID="DSPersone" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) ORDER BY Name"></asp:SqlDataSource>
+    <asp:SqlDataSource runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="SELECT ExpenseCode + ' ' + left(Name,20) AS ExpenseTypeName, ExpenseType_Id FROM ExpenseType WHERE (Active = 1) ORDER BY ExpenseTypeName" ID="DSExpenseType"></asp:SqlDataSource>
 
     <!-- *** JAVASCRIPT *** -->
     <script>
@@ -173,12 +171,6 @@
                 $('#LBProgetti').multiSelect('deselect_all');
             else // spese
                 $('#LBSpese').multiSelect('deselect_all');
-            return false;
-        });
-
-        $("#BTCopyOn").click(function () {
-            console.log($('#LBProgetti'));
-            confirm("Sicuri di copiare le abilitazioni di su ");
             return false;
         });
 
