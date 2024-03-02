@@ -163,7 +163,7 @@
                                      <div class="input nobottomborder">
                                          <asp:Label ID="Label17" CssClass="inputtext" runat="server" Text="Salesforce Mail:"></asp:Label>
                                          <asp:TextBox CssClass="ASPInputcontent" ID="TBSFMail" runat="server" Text='<%# Bind("SaleforceEmail") %>' Width="265px" Columns="50"
-                                             data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
+                                             data-parsley-errors-container="#valMsg" required="false" data-parsley-excluded=true data-parsley-type='email' />
                                      </div>
 
                                 </div>
@@ -390,7 +390,7 @@
                                     <div class="input nobottomborder">
                                         <asp:Label ID="Label17" CssClass="inputtext" runat="server" Text="Salesforce Mail:"></asp:Label>
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBSFMail" runat="server" Text='<%# Bind("SaleforceEmail") %>' Width="265px" Columns="50"
-                                            data-parsley-errors-container="#valMsg" required="true" data-parsley-type='email' />
+                                            data-parsley-errors-container="#valMsg" required="false" data-parsley-excluded=true data-parsley-type='email' />
                                     </div>
 
                                 </div>
@@ -536,8 +536,8 @@
     <asp:SqlDataSource ID="DSPersone" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [Persons] WHERE ([Persons_id] = @Persons_id)"
-        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a], [CreationDate], [CreatedBy] ) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a, @CreationDate, @CreatedBy)"
-        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy WHERE [Persons_id] = @Persons_id"  
+        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a], [CreationDate], [CreatedBy], [SaleforceEmail] ) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a, @CreationDate, @CreatedBy, @SaleforceEmail)"
+        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, SaleforceEmail = @SaleforceEmail WHERE [Persons_id] = @Persons_id"  
         OnInserting="DSpersons_Insert" OnUpdating="DSpersons_Update">
         <InsertParameters>
             <asp:Parameter Name="Name" Type="String" />
@@ -568,6 +568,7 @@
             <asp:Parameter Name="Contratto_a" Type="DateTime" />
             <asp:Parameter Name="CreatedBy" Type="String"/>
             <asp:Parameter Name="CreationDate" Type="DateTime" />
+            <asp:Parameter Name="SaleforceEmail" Type="String" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="Persons_id" QueryStringField="persons_id"
@@ -603,6 +604,7 @@
             <asp:Parameter Name="Contratto_a" Type="DateTime" />
             <asp:Parameter Name="LastModifiedBy" Type="String"/>
             <asp:Parameter Name="LastModificationDate" Type="DateTime"/>
+            <asp:Parameter Name="SaleforceEmail" Type="String" />
         </UpdateParameters>
     </asp:SqlDataSource>
 

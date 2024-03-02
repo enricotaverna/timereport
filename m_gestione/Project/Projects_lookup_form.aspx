@@ -124,6 +124,17 @@
                                         </asp:DropDownList>
                                     </div>
 
+                                    <!-- *** LOB ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">LOB:</div>
+                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob" 
+                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("LOB_Id") %>'
+                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
+
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
@@ -436,6 +447,17 @@
                                         </asp:DropDownList>
                                     </div>
 
+                                    <!-- *** LOB ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">LOB:</div>
+                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
+                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("LOB_Id") %>'
+                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
+
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
@@ -734,25 +756,31 @@
                                     <!-- *** TIPO PROGETTO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Tipo progetto:</div>
-
                                         <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
                                             DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
                                             SelectedValue='<%# Bind("ProjectType_Id") %>' Enabled="False">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
+                                    </div>
 
+                                    <!-- *** LOB ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">LOB:</div>
+                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
+                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("LOB_Id") %>'  Enabled="False">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
-
                                         <asp:DropDownList ID="DDLCanale" runat="server" DataSourceID="canale"
                                             DataTextField="Name" DataValueField="Channels_Id" AppendDataBoundItems="True"
                                             SelectedValue='<%# Bind("Channels_Id") %>' Enabled="False">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
-
                                     </div>
 
                                     <!-- *** SOCIETA ***  -->
@@ -999,9 +1027,9 @@
     <asp:SqlDataSource ID="projects" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         DeleteCommand="DELETE FROM [Projects] WHERE [Projects_Id] = @Projects_Id"
-        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy )"
+        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, BudgetABAP, BudgetGGABAP, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy, LOB_Id ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @BudgetABAP, @BudgetGGABAP, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy, @LOB_Id )"
         SelectCommand="SELECT * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)"
-        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy  WHERE (Projects_Id = @Projects_Id)"
+        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget, BudgetABAP = @BudgetABAP, BudgetGGABAP = @BudgetGGABAP ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, LOB_Id = @LOB_Id  WHERE (Projects_Id = @Projects_Id)"
         OnInserting="DSprojects_Insert" OnUpdating="DSprojects_Update">
         <SelectParameters>
             <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
@@ -1046,6 +1074,7 @@
             <asp:Parameter Name="WorkflowType" Type="String" />
             <asp:Parameter Name="LastModifiedBy" />
             <asp:Parameter Name="LastModificationDate" />
+            <asp:Parameter Name="LOB_Id" />
         </UpdateParameters>
         <InsertParameters>
             <asp:Parameter Name="ProjectCode" Type="String" />
@@ -1082,6 +1111,7 @@
             <asp:Parameter Name="WorkflowType" Type="String" />
             <asp:Parameter Name="CreatedBy" />
             <asp:Parameter Name="CreationDate" />
+            <asp:Parameter Name="LOB_Id" />
         </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="cliente" runat="server"
@@ -1096,6 +1126,9 @@
     <asp:SqlDataSource ID="tipoprogetto" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [ProjectType]"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="lob" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [LOB]"></asp:SqlDataSource>
     <asp:SqlDataSource ID="canale" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [Channels]"></asp:SqlDataSource>
@@ -1134,14 +1167,15 @@
 
         // *** se tipo progetto è Chargeable il cliente è obbligatorio
         window.Parsley.addValidator("checkChargeable", {
-            validateString: function (value, requirement) {
+            validateString: function (value, requirement) {     
 
                 if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
                     return false;
-                }
+                }                
             }
-        })  .addMessage('en', 'checkChargeable', 'Please specify a customer code')
-            .addMessage('it', 'checkChargeable', 'Codice cliente obbligatorio');
+        })  .addMessage('en', 'checkChargeable', 'Please specify a lob and customer code')
+            .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
+
 
         // *** controllo che non esista lo stesso codice utente *** //
         window.Parsley.addValidator('codiceunico', function (value, requirement) {
@@ -1186,7 +1220,7 @@
                     return false;
                 }
 
-                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>" ) {
+                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
 
                     // se FIXED verifica obbligatorietà
                     if (!value && requirement != "percent") {
@@ -1207,7 +1241,7 @@
                 return true;
             },
             priority: 33
-        })
+        });
 
         $(function () {
 
@@ -1218,7 +1252,7 @@
             $(":checkbox").addClass("css-checkbox");
 
             // stile checkbox form in ReadOnly   
-            $("#FVProgetto_DisActivityOn").addClass("css-checkbox")
+            $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
             $("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
