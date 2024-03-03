@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amazon.EC2.Model.Internal.MarshallTransformations;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -227,4 +228,38 @@ public class Database
         }
 
     }
+
+    // 02.2024: Lancia stored procedure con parametri
+    public static DataSet ExecuteStoredProcedure(string storedProcedureName, SqlParameter[] parameters)
+    {
+        DataSet dataSet = new DataSet();
+
+        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+        {
+            using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                if (parameters != null)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                try
+                {
+                    connection.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataSet);
+                }
+                catch (Exception ex)
+                {
+                    // Gestione dell'eccezione
+                    // Console.WriteLine($"Errore durante l'esecuzione della stored procedure: {ex.Message}");
+                    return null; // errore
+                }
+            }
+        }
+
+        return dataSet;
+    }
+
 }

@@ -28,7 +28,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>
-        <asp:Literal runat="server" Text="Controllo progetto" /></title>
+        <asp:Literal runat="server" Text="Controllo progetto" />
+    </title>
 </head>
 
 <body>
@@ -43,7 +44,7 @@
 
             <div class="row justify-content-center">
 
-                <div  class="StandardForm col-11">
+                <div  class="StandardForm col-9">
 
                     <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True" CssClass="GridView"
                         AllowSorting="false" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5" OnPageIndexChanging="GVAttivita_PageIndexChanging" >
@@ -56,14 +57,29 @@
 
                         <Columns>
                             <asp:TemplateField HeaderText="Stato">
-                                <ItemTemplate>
-                                    <asp:Image ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="16px" ImageAlign="Middle" ToolTip='<%# Eval("ToolTip") %>' />
-                                </ItemTemplate>
+                                    <ItemTemplate>
+                                        <asp:Image ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="32px" ImageAlign="Middle" ToolTip='<%# Eval("ToolTip") %>' />
+                                    </ItemTemplate>
                             </asp:TemplateField>
+
                             <asp:BoundField DataField="status" HeaderText="status" SortExpression="status" Visible="false" />
-                            <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" />
-                            <asp:BoundField DataField="WriteUp" HeaderText="Write Up/Off" SortExpression="WriteUp" DataFormatString="{0:###,###.00;-###,###.00; }" />
-                            <asp:BoundField DataField="GiorniActual" HeaderText="Giorni Actual" SortExpression="OreActual" DataFormatString="{0:###,###.00;-; }" />
+
+                            <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />
+                            <asp:BoundField DataField="Director" HeaderText="Director" SortExpression="Director" />
+                            <asp:BoundField DataField="TipoContratto" HeaderText="Contratto" SortExpression="TipoContratto"  />
+
+                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget" SortExpression="RevenueBudget" DataFormatString="{0:###,###;-; }" />
+                            <asp:BoundField DataField="RevenueActual" HeaderText="Revenue Act" SortExpression="RevenueActual" DataFormatString="{0:###,###;-; }" />
+                            
+                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine Bdg" SortExpression="MargineProposta" DataFormatString="{0:P0}" />
+                            <asp:BoundField DataField="MargineActual" HeaderText="Margine Act" SortExpression="MargineActual" DataFormatString="{0:P0}" />
+
+                            <%--<asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />                          --%>
+                            
+                            <asp:BoundField DataField="WriteUp" HeaderText="Write Up/Off" SortExpression="WriteUp" DataFormatString="{0:###,###;-###,###; }" />
+                            <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" DataFormatString="{0:###,###.0;-###,###.0; }"/>
+
+<%--                            <asp:BoundField DataField="GiorniActual" HeaderText="Giorni Actual" SortExpression="OreActual" DataFormatString="{0:###,###.00;-; }" />--%>
 
                             <%--<asp:BoundField DataField="RevenueActual" HeaderText="Revenue Actual" SortExpression="RevenueActual" DataFormatString="{0:###,###.00}" />--%>
                             <%-- Link report revenue --%>
@@ -73,17 +89,6 @@
                                 </ItemTemplate>
                             </asp:TemplateField>--%>
 
-                            <asp:BoundField DataField="RevenueActual" HeaderText="Revenue Actual" SortExpression="RevenueActual" DataFormatString="{0:###,###.00;-; }" />
-                            <asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />
-
-                            <%-- <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />--%>
-                            <%-- Link anagrafica progetto --%>
-                            <asp:TemplateField HeaderText="Progetto">
-                                <ItemTemplate>
-                                    <asp:LinkButton ID="LkProgetto" OnClick="LkProgetto_Click" runat="server" CommandArgument='<%# Eval("ProjectCode") %> ' CommandName="LkProgetto"><%#  Eval("PName")  %></asp:LinkButton>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-
                             <%--<asp:BoundField DataField="AName" HeaderText="Attività" SortExpression="AName" />--%>
                             <%-- Link anagrafica attività --%>
 <%--                            <asp:TemplateField HeaderText="Attività">
@@ -92,21 +97,25 @@
                                 </ItemTemplate>
                             </asp:TemplateField>--%>
 
-                            <asp:BoundField DataField="Director" HeaderText="Director" SortExpression="Director" />
-                            <asp:BoundField DataField="TipoContratto" HeaderText="Tipo Contratto" SortExpression="TipoContratto"  />
-                            <asp:BoundField DataField="PrimaDataCarico" HeaderText="Data Inizio" SortExpression="PrimaDataCarico" DataFormatString="{0:d}" />
+<%--                            <asp:BoundField DataField="PrimaDataCarico" HeaderText="Data Inizio" SortExpression="PrimaDataCarico" DataFormatString="{0:d}" />
                             <asp:TemplateField HeaderText="DataFine">
                                 <ItemTemplate>
                                     <asp:Label ID="DataFine" runat="server" Text='<%# Eval("DataFine", "{0:d}") %>' ToolTip='<%# Eval("TooltipDataFine")%>' BackColor='<%# System.Drawing.Color.FromName(Eval("ColoreDataFine").ToString()) %>'> </asp:Label>
-                                    <%--                        <asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" dataformatstring="{0:d}"  ItemStyle-BackColor=<%# Eval("ColoreDataFine") %> />--%>
+                                </ItemTemplate>
+                            </asp:TemplateField>--%>
+<%--                            <asp:BoundField DataField="BudgetABAP" HeaderText="Budget ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###.00}" />--%>
+<%--                            <asp:BoundField DataField="BudgetNetto" HeaderText="Budget Netto" SortExpression="BudgetNetto" DataFormatString="{0:###,###.00;-; }" />--%>
+<%--                            <asp:BoundField DataField="SpeseBudget" HeaderText="Budget Spese" SortExpression="SpeseBudget" DataFormatString="{0:###,###.00}" />--%>
+<%--                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine proposta" SortExpression="MargineProposta" DataFormatString="{0:P1}" />--%>
+<%--                            <asp:BoundField DataField="BurnRate" HeaderText="Burn Rate" SortExpression="BurnRate" DataFormatString="{0:###,###.00;(0:###,###.00); }" />--%>
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:ImageButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "ControlloProgetto-form.aspx?ProjectCode={0}") %>'
+                                        CommandName="Edit" ImageUrl="/timereport/images/icons/16x16/modifica.gif"
+                                        Text="<%$ appSettings: EDIT_TXT %>" />
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget Revenue" SortExpression="RevenueBudget" DataFormatString="{0:###,###.00;-; }" />
-<%--                            <asp:BoundField DataField="BudgetABAP" HeaderText="Budget ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###.00}" />--%>
-                            <asp:BoundField DataField="BudgetNetto" HeaderText="Budget Netto" SortExpression="BudgetNetto" DataFormatString="{0:###,###.00;-; }" />
-<%--                            <asp:BoundField DataField="SpeseBudget" HeaderText="Budget Spese" SortExpression="SpeseBudget" DataFormatString="{0:###,###.00}" />--%>
-                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine proposta" SortExpression="MargineProposta" DataFormatString="{0:P1}" />
-                            <asp:BoundField DataField="BurnRate" HeaderText="Burn Rate" SortExpression="BurnRate" DataFormatString="{0:###,###.00;(0:###,###.00); }" />
+
 
                         </Columns>
 
@@ -150,6 +159,8 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+        UnMaskScreen();
+
     </script>
 
 </body>

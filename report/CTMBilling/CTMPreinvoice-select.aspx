@@ -78,12 +78,23 @@
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <!--  *** PROGETTO *** -->
-                    <div class="input nobottomborder absolute">
+                    <div class="input absolute nobottomborder">
                         <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Progetto</div>
                             <asp:ListBox ID="LBProgetti" runat="server" SelectionMode="Multiple" Visible="false" CssClass="SumoDLL" AppendDataBoundItems="True" DataTextField="projectname" DataValueField="Projects_id"></asp:ListBox>
                             </div>
+                    </div>
+
+                    <br />
+                    <!--  *** WBS *** -->
+                    <div class="input nobottomborder absolute">
+                        <div style="position: absolute">
+                            <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+                            <div class="inputtext">Dettaglio WBS</div>
+                            <asp:CheckBox ID="CBWBS" runat="server" />
+                            <asp:Label runat="server" AssociatedControlID="CBWBS" ></asp:Label>                            
+                        </div>
                     </div>
 
                     <br /><br />
