@@ -25,7 +25,7 @@ public class ValidationClass
 
         DataRow drRow = Database.GetRow("SELECT * FROM " + sTable + " WHERE " + sKey + "='" + sValkey + "'", null);
 
-        if ( drRow != null)
+        if (drRow != null)
             bRet = true;
         else
             bRet = false;
@@ -91,7 +91,7 @@ public class Auth
         // Carica le permissione dell'utente in una tabella e la memorizza in una variabile di sessione
         DataRowCollection AuthPermission;
 
-        AuthPermission = ASPcompatility.GetRows(" SELECT c.AuthTask, c.AuthActivity from Persons as a " + " INNER JOIN AuthPermission as b ON b.UserLevel_id = a.UserLevel_id " + " INNER JOIN AuthActivity as c ON c.AuthActivity_id = b.AuthActivity_id " + " WHERE a.persons_id = " + ASPcompatility.FormatNumberDB(persons_id) );
+        AuthPermission = ASPcompatility.GetRows(" SELECT c.AuthTask, c.AuthActivity from Persons as a " + " INNER JOIN AuthPermission as b ON b.UserLevel_id = a.UserLevel_id " + " INNER JOIN AuthActivity as c ON c.AuthActivity_id = b.AuthActivity_id " + " WHERE a.persons_id = " + ASPcompatility.FormatNumberDB(persons_id));
 
         HttpContext.Current.Session["AuthPermission"] = AuthPermission;
     }
@@ -105,7 +105,7 @@ public class Auth
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
 
         // sessione scaduta
-        if ( CurrentSession == null)
+        if (CurrentSession == null)
             HttpContext.Current.Response.Redirect(ConfigurationManager.AppSettings["LOGIN_PAGE"]);
 
         // carica da memoria
@@ -157,7 +157,7 @@ public class Utilities
 
     public static void CheckAutMobile(int UserLevel, int PageLevel)
     {
-     
+
         // Mancato auth                
         if (UserLevel < PageLevel)
             HttpContext.Current.Response.Redirect("/timereport/mobile/login.aspx");
@@ -243,7 +243,8 @@ public class Utilities
         HttpContext.Current.Response.End();
     }
 
-    public static DataTable ImportExcel(FileUpload FileUploadControl, ref string ErrorMessage) {
+    public static DataTable ImportExcel(FileUpload FileUploadControl, ref string ErrorMessage)
+    {
 
         DataTable dtResult = null;
         string FileName = Path.GetFileName(FileUploadControl.PostedFile.FileName);
@@ -272,7 +273,7 @@ public class Utilities
         }
         catch (Exception ex)
         {
-            ErrorMessage= ex.Message;
+            ErrorMessage = ex.Message;
         }
 
         return dtResult;
@@ -297,7 +298,7 @@ public class Utilities
             counter = counter + 1;
         }
 
-        return (sRet); 
+        return (sRet);
     }
 
     public static string ListSelections(ListBox list, bool all = false)
@@ -359,7 +360,7 @@ public class Utilities
         if (strPeriod == "1")
         {
             if (strType == "end")
-                ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 15);  
+                ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 15);
             else
                 ret = new DateTime(Convert.ToInt16(strYear), Convert.ToInt16(strMonth), 1);
         }
@@ -371,7 +372,8 @@ public class Utilities
         return ret;
     }
 
-    public static Tuple<int, int> GetManagerAndAccountId(int Projects_id) {
+    public static Tuple<int, int> GetManagerAndAccountId(int Projects_id)
+    {
 
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
 
@@ -385,13 +387,14 @@ public class Utilities
         {
             DataRow dr = Database.GetRow("select * from Projects where projects_id = " + ASPcompatility.FormatNumberDB(Projects_id) , null);
             if (dr != null)
-                tuple = new Tuple<int, int>(Convert.ToInt32(dr["ClientManager_id"]), Convert.ToInt32(dr["AccountManager_id"])); 
+                tuple = new Tuple<int, int>(Convert.ToInt32(dr["ClientManager_id"]), Convert.ToInt32(dr["AccountManager_id"]));
         }
 
         return tuple;
     }
 
-    public static void SetCookie(string key, string value) {
+    public static void SetCookie(string key, string value)
+    {
 
         HttpCookie myCookie = HttpContext.Current.Request.Cookies["TRdata"];
 
@@ -399,7 +402,7 @@ public class Utilities
             myCookie = new HttpCookie("TRdata");
 
         myCookie[key] = value;
-        
+
         myCookie.Expires = DateTime.Now.AddYears(100);
         HttpContext.Current.Response.Cookies.Add(myCookie);
 
@@ -413,8 +416,8 @@ public class Utilities
 
         if (myCookie == null || myCookie[key] == null)
             return "";
-       else                        
-            return  myCookie[key];
+        else
+            return myCookie[key];
     }
 
 }
@@ -470,11 +473,11 @@ public class CommonFunction
             iContaOre = Convert.ToInt32(obj);
         else
             iContaOre = 0;
-     
+
         for (int f = 1; f <= DateTime.DaysInMonth(iAnno, iMese); f++)
         {
             sDate = f + "/" + iMese + "/" + iAnno.ToString();
-            if ( (int)Convert.ToDateTime(sDate).DayOfWeek  != 0 & (int)Convert.ToDateTime(sDate).DayOfWeek != 6)
+            if ((int)Convert.ToDateTime(sDate).DayOfWeek != 0 & (int)Convert.ToDateTime(sDate).DayOfWeek != 6)
                 iOreLavorative = iOreLavorative + 1;
         }
 
@@ -511,8 +514,10 @@ public class CommonFunction
 
         double calcBusinessDays =  1 + ((enddate - startdate).TotalDays * 5 - (startdate.DayOfWeek - enddate.DayOfWeek) * 2) / 7;
 
-        if (enddate.DayOfWeek == DayOfWeek.Saturday) calcBusinessDays--;
-        if (startdate.DayOfWeek == DayOfWeek.Sunday) calcBusinessDays--;
+        if (enddate.DayOfWeek == DayOfWeek.Saturday)
+            calcBusinessDays--;
+        if (startdate.DayOfWeek == DayOfWeek.Sunday)
+            calcBusinessDays--;
 
         return Convert.ToInt16(calcBusinessDays);
 
@@ -550,7 +555,7 @@ public class CommonFunction
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
 
         if (CurrentSession.Language == "en")
-                sRet = new CultureInfo("en");
+            sRet = new CultureInfo("en");
 
         return sRet;
     }
@@ -575,7 +580,7 @@ public class CommonFunction
 
         try
         {
-           // Get the HTML from an embedded resource.
+            // Get the HTML from an embedded resource.
             string bodyTo = File.ReadAllText(HttpContext.Current.Server.MapPath(MyConstants.MAIL_TEMPLATE_PATH + MyConstants.SMTP_TEMPLATE));
 
             string bodyCC = bodyTo; // toglie il link per l'approvazione
@@ -583,8 +588,9 @@ public class CommonFunction
             bodyTo = bodyTo.Replace("%link%", "<a href='https://www.aeonvis.it/timereport/m_gestione/approval/Approval_request.aspx?approval_id=%approvalRequest_id%'>clicca per vedere la richiesta</a>");
 
             // sostituisce i parametri variabili
-            foreach (TipoParametri p in ListaParametri) {
-                bodyTo = bodyTo.Replace("%" + p.pKey + "%" , p.pValue);
+            foreach (TipoParametri p in ListaParametri)
+            {
+                bodyTo = bodyTo.Replace("%" + p.pKey + "%", p.pValue);
                 bodyCC = bodyCC.Replace("%" + p.pKey + "%", p.pValue);
             }
 
@@ -675,7 +681,7 @@ public class CheckChiusura
         DataTable dtTicket = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date from Expenses where persons_id=" + persons_id + " AND TipoBonus_id<>'0' AND date >= " + dFirst + " AND date <= " + dLast, null/* TODO Change to default(_) if this is not a reference type */);
 
         // carica date in cui sono presenti ferie / malattie / festività
-        DataTable dtFerie = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " + 
+        DataTable dtFerie = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
                                              " FROM Hours AS a " +
                                              " INNER JOIN Projects AS b ON b.projects_id = a.projects_id " +
                                              " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"]  + "  AND " +
@@ -697,7 +703,7 @@ public class CheckChiusura
         // cicla sui giorni del mese, controllo giorni senza ticket
         for (f = 1; f <= DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)); f++)
         {
-            sDate = f.ToString().PadLeft(2,'0') + "/" + sMese.PadLeft(2, '0') + "/" + sAnno;
+            sDate = f.ToString().PadLeft(2, '0') + "/" + sMese.PadLeft(2, '0') + "/" + sAnno;
 
             // giorno lavorativo
 
@@ -705,8 +711,8 @@ public class CheckChiusura
             {
 
                 // controlla che non sia festivo e non sia una giornata di Smart Working
-                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (   dtFerie.Rows.Count == 0 ||  dtFerie.Select("date = '" + sDate + "'").Length == 0  ) 
-                    && ( dtHomeOffice.Select("date = '" + sDate + "'").Length == 0 ) )
+                if (!MyConstants.DTHoliday.Rows.Contains(sDate) && (dtFerie.Rows.Count == 0 || dtFerie.Select("date = '" + sDate + "'").Length == 0)
+                    && (dtHomeOffice.Select("date = '" + sDate + "'").Length == 0))
                 {
 
                     // controlla che sia caricato un ticket
@@ -730,7 +736,7 @@ public class CheckChiusura
             }
         }
 
-            return iRet;
+        return iRet;
     }
 
     public static int CheckTicketHomeOffice(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
@@ -866,14 +872,14 @@ public class CheckChiusura
 
         // cicla sulle assenze non approvate
         foreach (DataRow rs in dtAssenze.Rows)
-            {
-              CheckAnomalia a = new CheckAnomalia();
-              a.Data = Convert.ToDateTime(rs["date"].ToString());
-              a.Descrizione = "Richiesta assenza da approvare";
-              a.ProjectName = rs["ProjectName"].ToString();
+        {
+            CheckAnomalia a = new CheckAnomalia();
+            a.Data = Convert.ToDateTime(rs["date"].ToString());
+            a.Descrizione = "Richiesta assenza da approvare";
+            a.ProjectName = rs["ProjectName"].ToString();
 
-              ListaAnomalie.Add(a);
-             }
+            ListaAnomalie.Add(a);
+        }
         return iRet;
     }
 }
