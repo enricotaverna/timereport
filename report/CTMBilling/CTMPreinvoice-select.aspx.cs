@@ -166,6 +166,7 @@ public partial class report_ricevute_select : System.Web.UI.Page
         Session["PreinvDataDa"] = TBDataDa.Text;
         Session["PreinvCodiceCliente"] = DDLCliente.SelectedValue;
         Session["PreinvProjectsId"] = Utilities.ListSelections(LBProgetti);
+        Session["PreinvWBS"] = CBWBS.Checked;
 
         // imposta il messaggio che verrò dato sulla pagina di menu
         Response.Redirect("/timereport/report/CTMBilling/CTMpreinvoice-form.aspx");

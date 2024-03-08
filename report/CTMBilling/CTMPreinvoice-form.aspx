@@ -213,6 +213,10 @@
         }
         );
 
+        $("#BTSave").click(function () {
+            MaskScreen(true);
+        });
+
         function CheckFLC() {
 
             // controllo FLC

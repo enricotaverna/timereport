@@ -91,6 +91,7 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+        UnMaskScreen();
       
         $("document").ready(() => {
 
