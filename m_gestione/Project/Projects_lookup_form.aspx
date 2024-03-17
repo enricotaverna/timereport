@@ -1164,6 +1164,14 @@
         Parsley.addMessages('it', {
             required: "Completare i campi obbligatori"
         });
+        
+        // se cambia selezione della DDL e non chargeable resetta il valore della lob
+        $("#FVProgetto_DDLTipoProgetto").change(function () {            
+            if ($("#FVProgetto_DDLTipoProgetto option:selected").val() != "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>") // mostra Box Testo
+            {
+                $('#FVProgetto_DDLLOB').val('');
+            }
+        });
 
         // *** se tipo progetto è Chargeable il cliente è obbligatorio
         window.Parsley.addValidator("checkChargeable", {
