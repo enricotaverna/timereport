@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System.Security.RightsManagement;
 
 public class EconomicsProgetto
 {
@@ -25,7 +26,11 @@ public class EconomicsProgetto
     /* estrae dati di singolo progetto */
     public EconomicsProgetto(string DataReport, string ProgettoReport)
     {
-        DataSet ds = ControlloProgetto.EseguiStoredProcedure(DataReport, ProgettoReport, "0");
+
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        // il codice manager non serve essendo chiamato per il singolo progetto
+        DataSet ds = ControlloProgetto.PopolaDataset(DataReport, ProgettoReport, "0");
+
         DataRow dr = ds.Tables["Export"].Rows[0]; // record relativo al progetto selezionato
 
         Projects_Id = (int)dr["Projects_Id"];
@@ -39,7 +44,9 @@ public class EconomicsProgetto
         MesiCopertura = dr["MesiCopertura"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["MesiCopertura"]);
         CostiActual = dr["CostiActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiActual"]);
         MargineActual = (RevenueActual - CostiActual) / RevenueActual;
-        PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
+        
+        if (dr["PrimaDataCarico"].ToString() != "")
+            PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
         
     }
 
@@ -82,44 +89,27 @@ public class ControlloProgetto
     }
 
 
-   /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
-    public static DataSet EseguiStoredProcedure(string DataReport, string ProgettoReport, string ManagerReport)
+    /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
+    public static DataSet PopolaDataset(string DataReport, string ProgettoReport, string ManagerReport)
     {
 
-        DataSet ds = new DataSet("Export");
-        string strStoredProcedure = "SPcontrolloProgetti";
-        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        List<SqlParameter> parametersList = new List<SqlParameter>();
 
-        // conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        // Se DDL non valorizzata passa NULL al parametro
+        if (ProgettoReport != "0")
+            parametersList.Add(new SqlParameter("@Project_id", Convert.ToInt16(ProgettoReport)));
 
-        using (conn)
-        {
-            SqlCommand sqlComm = new SqlCommand(strStoredProcedure, conn);
+        // Se DDL non valorizzata passa NULL al parametro
+        if (ManagerReport != "0")
+            parametersList.Add(new SqlParameter("@Manager_id", Convert.ToInt16(ManagerReport)));
 
-            // valorizza parametri della query
-            sqlComm.Parameters.AddWithValue("@DataReport", Convert.ToDateTime(DataReport));
+        parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime(DataReport)));       
+        parametersList.Add(new SqlParameter("@TipoCalcolo", 0));
 
-            // Se DDL non valorizzata passa NULL al parametro
-            if (ProgettoReport != "0")
-                sqlComm.Parameters.AddWithValue("@Project_id", Convert.ToInt16(ProgettoReport));
+        SqlParameter[] parameters = parametersList.ToArray();
 
-            // Se DDL non valorizzata passa NULL al parametro
-            if (ManagerReport != "0")
-                sqlComm.Parameters.AddWithValue("@Manager_id", Convert.ToInt16(ManagerReport));
-
-            // Tipo Calcolo
-            // sqlComm.Parameters.AddWithValue("@TipoCalcolo", Convert.ToInt16(RBTipoCalcolo.SelectedValue));
-            sqlComm.Parameters.AddWithValue("@TipoCalcolo", 0);
-
-            // esecuzione
-            sqlComm.CommandType = CommandType.StoredProcedure;
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlComm;
-
-            da.Fill(ds, "Export");
-
-        }
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        DataSet ds = Database.ExecuteStoredProcedure("SPcontrolloProgetti", parameters);
 
         // Aggiunge colonne calcolate
         ds.Tables["Export"].Columns.Add("BurnRate", typeof(Double));
@@ -133,23 +123,28 @@ public class ControlloProgetto
         ds.Tables["Export"].Columns.Add("TooltipDataFine", typeof(string)); // ToolTip sfondo data fine
 
         // Calcola colonne
-        ds = CalcolaColonne(ds, DataReport);
+        ds = ControlloProgetto.CalcolaColonne(ds, DataReport);
 
         return (ds);
-
     }
 
     // Calcola colonne aggiuntive report non valorizzate dalla storage procedure
-    private static DataSet CalcolaColonne(DataSet ds, string DataReport)
+    public static DataSet CalcolaColonne(DataSet ds, string DataReport)
     {
 
         foreach (DataRow dr in ds.Tables["Export"].Rows)
         {
+
             float dRevenueActual = dr["RevenueActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueActual"]);
             float dCostiActual = dr["CostiActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiActual"]);
             float dRevenueBudget = dr["RevenueBudget"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBudget"]);
             float RecordWithoutCost = dr["RecordWithoutCost"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RecordWithoutCost"]);
 
+            // se giorni di carico sono zero cancella il record
+            if (dr["GiorniActual"].ToString() == "") { 
+                dr.Delete();
+                continue;
+            }
             // netto budget ABAP
             //float dBudgetABAP = dr["BudgetABAP"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["BudgetABAP"]);
 
@@ -170,7 +165,7 @@ public class ControlloProgetto
                 dRevenueBudget == 0)
             {
                 dr["Status"] = "O";
-                dr["ImgUrl"] = "/timereport/images/icons/other/question_mark.png";
+                dr["ImgUrl"] = "/timereport/images/icons/other/question-mark.png";
                 dr["ToolTip"] = "Controllare dati del progetto/attività (date, budget)";
                 continue;
             }

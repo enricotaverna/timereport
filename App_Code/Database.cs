@@ -248,7 +248,7 @@ public class Database
                 {
                     connection.Open();
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
-                    adapter.Fill(dataSet);
+                    adapter.Fill(dataSet, "Export");
                 }
                 catch (Exception ex)
                 {

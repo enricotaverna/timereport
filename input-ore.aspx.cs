@@ -387,9 +387,6 @@ public partial class input_ore : System.Web.UI.Page
             e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
             // valori manager e società
             e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
-            var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
-            e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
-            e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
         }
 
         // if in change
@@ -399,6 +396,12 @@ public partial class input_ore : System.Web.UI.Page
             e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
             e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         }
+
+        // aggiorna manager e account associati al progetto
+        var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
+        e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
+        e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
+
     }
 
     protected void FVore_DataBound(object sender, EventArgs e)

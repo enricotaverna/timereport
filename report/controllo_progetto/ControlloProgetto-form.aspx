@@ -64,6 +64,7 @@
                                     <li><a href="#tabs-1">Progetto</a></li>
                                     <li><a href="#tabs-2">Economics</a></li>
                                     <li><a href="#tabs-3">Risorse</a></li>
+                                    <li><a href="#tabs-4">Actuals</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 460px; width: 100%">
@@ -211,7 +212,7 @@
                                     <!-- *** MARGINE TARGET ***  -->
                                     <div class="input">
                                         <div class="inputtext">Margine: </div>
-                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####.##}") %>'
+                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'  
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>%</label>
                                     </div>
@@ -253,12 +254,17 @@
                                 </div>
                                 <!-- *** TAB 2 ***  -->
 
-
                                 <div id="tabs-3"  style="font-size: 14px;font-family: OpenSans-Regular;max-height:400px;overflow-y:scroll" >
                                     <asp:GridView ID="GVConsulenti" runat="server" onrowdatabound="GVConsulenti_RowDataBound"  AllowPaging="False" BorderStyle="None">
                                     </asp:GridView>
                                 </div>
                                 <!-- *** TAB 3 ***  -->
+
+                                <div id="tabs-4"  style="font-size: 14px;font-family: OpenSans-Regular;max-width:540px;max-height:470px;overflow-y:scroll;overflow-x:auto !important" >
+                                    <asp:GridView ID="GVGGActuals" runat="server"  onrowdatabound="GVGGActuals_RowDataBound" AllowPaging="False" BorderStyle="None" RowStyle-Wrap="False" HeaderStyle-Wrap="False" GridLines="Both">
+                                    </asp:GridView>
+                                </div>
+                                <!-- *** TAB 4 ***  -->
 
                             </div>
                             <!-- *** TABS ***  -->
@@ -266,9 +272,11 @@
                             <!-- *** BOTTONI  ***  -->
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
-                                <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
-                                <asp:Button ID="DownloadButton" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
-                                <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
+                                <asp:Button ID="btn_save" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
+                                <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>"/>
+                                <asp:Button ID="btn_calc" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" style="width:120px" OnClick="btn_calc_Click" />
+                                <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                             </div>
 
                             </EditItemTemplate> 
@@ -351,48 +359,6 @@
             required: "Completare i campi obbligatori"
         });
 
-        // *** se tipo progetto è Chargeable il cliente è obbligatorio
-        window.Parsley.addValidator("checkChargeable", {
-            validateString: function (value, requirement) {
-
-                if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
-                    return false;
-                }
-            }
-        })  .addMessage('en', 'checkChargeable', 'Please specify a customer code')
-            .addMessage('it', 'checkChargeable', 'Codice cliente obbligatorio');
-
-        // *** controllo che non esista lo stesso codice utente *** //
-        window.Parsley.addValidator('codiceunico', function (value, requirement) {
-
-            var response = false;
-            var dataAjax = "{ sKey: 'ProjectCode', " +
-                " sValkey: '" + value + "', " +
-                " sTable: 'Projects'  }";
-
-            $.ajax({
-                url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
-                data: dataAjax,
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                type: 'post',
-                async: false,
-                success: function (data) {
-                    if (data.d == true) // esiste, quindi errore
-                        response = false;
-                    else
-                        response = true;
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                }
-            });
-            return response;
-        })
-            .addMessage('en', 'codiceunico', 'Project code already exists')
-            .addMessage('it', 'codiceunico', 'Codice progetto già esistente');
-
         // validazione campo revenue in caso il progetto sia FORFAIT
         window.Parsley.addValidator("requiredIf", {
             validateString: function (value, requirement) {
@@ -432,25 +398,30 @@
 
             // abilitate tab view
             $("#tabs").tabs();
+            $("#FVProgetto_btn1").hide();
+            $("#FVProgetto_btn2").hide();
+            $("#FVProgetto_btn_calc").hide(); 
+
+            UnMaskScreen();
 
             // stile checkbox form    
             $(":checkbox").addClass("css-checkbox");
 
             // stile checkbox form in ReadOnly   
-            $("#FVProgetto_DisActivityOn").addClass("css-checkbox")
-            $("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
+            //$("#FVProgetto_DisActivityOn").addClass("css-checkbox")
+            //$("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
+            //$("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
+            //$("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
+            //$("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
 
-            $("#FVProgetto_DisActivityOn").attr("disabled", true);
-            $("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
+            //$("#FVProgetto_DisActivityOn").attr("disabled", true);
+            //$("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);
+            //$("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
+            //$("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
+            //$("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
 
             // datepicker
-            $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
+            //$("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
             $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
 
             // formatta il campo percentuale
@@ -462,16 +433,42 @@
                 $("#FVProgetto_TBMargine").val(percentCent);
             }
 
-            $("#ui-id-1").click(function () {
-                $("#DownloadButton").hide();
-            });
-            $("#ui-id-2").click(function () {
-                $("#DownloadButton").hide();
-            });
-            $("#ui-id-3").click(function () {
-                $("#DownloadButton").show();
+            $('#FVProgetto_btn_calc').click(function () {
+                MaskScreen(true);
             });
 
+            $('#FVProgetto_btnAnnulla').click(function () {
+                MaskScreen(true);
+            });
+
+            // mostra bottoni download sul tab corrispondente
+            $("#ui-id-3").click(function () {
+                $("#FVProgetto_btn1").show();
+                $("#FVProgetto_btn2").hide();
+                $("#FVProgetto_btn_save").hide(); 
+                $("#FVProgetto_btn_calc").show(); 
+            });
+
+            $("#ui-id-4").click(function () {
+                $("#FVProgetto_btn2").show();
+                $("#FVProgetto_btn1").hide();
+                $("#FVProgetto_btn_save").hide(); 
+                $("#FVProgetto_btn_calc").hide(); 
+            });
+
+            $("#ui-id-1").click(function () {
+                $("#FVProgetto_btn2").hide();
+                $("#FVProgetto_btn1").hide();
+                $("#FVProgetto_btn_save").show(); 
+                $("#FVProgetto_btn_calc").hide(); 
+            });
+
+            $("#ui-id-2").click(function () {
+                $("#FVProgetto_btn2").hide();
+                $("#FVProgetto_btn1").hide();
+                $("#FVProgetto_btn_save").show(); 
+                $("#FVProgetto_btn_calc").hide(); 
+            });
 
         });
     </script>

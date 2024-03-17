@@ -73,14 +73,16 @@
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
                         <div style="position: absolute">
-                        <div class="inputtext">Manager</div>
+                        <div class="inputtext">Responsabile</div>
                             <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true"
-                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Director" >
-                                <asp:ListItem Value="">-- tutti i manager --</asp:ListItem>
+                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Responsabile" >
+                                <asp:ListItem Value="">-- Manager o Account --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
                     </div>
                     <br />
+                    <br />
+
                     <!--  **** DATA REPORT ** -->
                     <div class="input nobottomborder">
                         <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data Report:"></asp:Label>
@@ -129,9 +131,10 @@
     </div>
 
     <!-- *** DATASOURCE *** -->
-    -   
+    
+    <!-- *** Selezione tutti quelli che sono account o manager di un progetto CHARGEABLE *** -->
     <asp:SqlDataSource ID="DS_Persone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON ( Persons.Persons_id = Projects.ClientManager_id OR  Persons.Persons_id = Projects.AccountManager_id ) WHERE (Persons.Active = @Active AND Projects.ProjectType_id = '1')  ORDER BY Persons.Name">
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web.UI.WebControls;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
@@ -9,6 +12,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     public EconomicsProgetto ProgettoCorrente;
 
     private string prevPage = String.Empty;
+    public List<SqlParameter> parametersList = new List<SqlParameter>();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -29,16 +33,20 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             //}
             prevPage = Request.UrlReferrer.ToString();
 
-            LoadFormData();                 
+            LoadFormData();
+
+            Session["ProgettoCorrente"] = ProgettoCorrente;
+
         }
     }
 
-    protected void LoadFormData() {
+    protected void LoadFormData()
+    {
 
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
 
         // calcola i dati actual del progetto e popola l'oggeto EconomicsProgettoCorrente
-        ProgettoCorrente = new EconomicsProgetto(Session["DataReport"].ToString(), TProjects_Id.Value );
+        ProgettoCorrente = new EconomicsProgetto(Session["DataReport"].ToString(), TProjects_Id.Value);
 
         // DATA PRIMO CARICO
         TextBox TBAttivoDa = (TextBox)FVProgetto.FindControl("TBAttivoDa");
@@ -66,10 +74,31 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
-        GVConsulenti.DataSource = Database.GetData("SELECT DISTINCT Consulente, FORMAT(SUM(giorni) , 'N2')as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) +
-                                                   " GROUP BY Consulente, CostRate, BillRate", null);
+
+        DataTable dt = Database.GetData("SELECT DISTINCT Consulente, YEAR(Data) as Anno ,FORMAT(SUM(giorni) , 'N1', 'it-IT') as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost " +
+                                                   "WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) +
+                                                   " AND Data <= " + ASPcompatility.FormatDateDb(Session["DataReport"].ToString())  +
+                                                   " GROUP BY Consulente, YEAR(Data), CostRate, BillRate", null);
+
+        GVConsulenti.DataSource = dt;
         GVConsulenti.DataBind();
 
+        CalcolaActuals( TProjects_Id.Value);
+    }
+
+    // Actual
+    private void CalcolaActuals(string Projects_id)
+    {
+        // popola tabella gg actuals          
+        GridView GVGGActuals = (GridView)FVProgetto.FindControl("GVGGActuals");
+
+        parametersList.Add(new SqlParameter("@Project_id", Projects_id));
+        parametersList.Add(new SqlParameter("@DataReport", DateTime.Now));
+        SqlParameter[] parameters = parametersList.ToArray();
+
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        GVGGActuals.DataSource = Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters);
+        GVGGActuals.DataBind();
     }
 
     // Bottoni
@@ -77,6 +106,19 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
         Utilities.ExportXls("SELECT * FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente");
+    }
+
+    protected void Download_GGActuals(object sender, EventArgs e)
+    {
+        HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
+
+        parametersList.Add(new SqlParameter("@Project_id", TProjects_Id.Value));
+        parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime(Session["DataReport"].ToString())));
+        SqlParameter[] parameters = parametersList.ToArray();
+
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        Utilities.StreamOut(Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters));
+
     }
 
     protected void DSprojects_Insert(object sender, SqlDataSourceCommandEventArgs e)
@@ -113,20 +155,69 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         c.SetErrorOnField(args.IsValid, FVProgetto, "TBProgetto");
     }
 
+    protected void FormattaTabellaOutput(GridViewRowEventArgs tab, string formato) 
+    {
+
+        decimal value;
+
+        if (tab.Row.RowType == DataControlRowType.DataRow)
+        {
+            //** formattazione **/
+            // Itera attraverso le celle della riga
+            foreach (TableCell cell in tab.Row.Cells)
+            {
+                // Controlla se il valore della cella può essere convertito in un numero
+                if (decimal.TryParse(cell.Text, out value))
+                {
+                    // Formatta il valore con due decimali
+                    cell.Text = value.ToString(formato);
+                }
+                else if (cell.Text == "0") // Se il valore è zero
+                {
+                    // Imposta il testo della cella a uno spazio
+                    cell.Text = "&nbsp;";
+                }
+            }
+        }
+
+    }
+
     protected void GVConsulenti_RowDataBound(object sender, GridViewRowEventArgs e)
     {
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
 
-            string costrate = e.Row.Cells[2].Text == "0,0000" || e.Row.Cells[2].Text == "&nbsp;" ? "" : e.Row.Cells[2].Text;
-            string billrate = e.Row.Cells[3].Text == "0,0000" || e.Row.Cells[3].Text == "&nbsp;" ? "" : e.Row.Cells[3].Text;
+            FormattaTabellaOutput(e, "#.#");
+
+            // formattazione campo
+            //string costrate = e.Row.Cells[2].Text == "0" || e.Row.Cells[2].Text == "&nbsp;" ? "" : e.Row.Cells[2].Text;
+            //string billrate = e.Row.Cells[3].Text == "0,0000" || e.Row.Cells[3].Text == "&nbsp;" ? "" : e.Row.Cells[3].Text;
+            string costrate = e.Row.Cells[3].Text;
+            string billrate = e.Row.Cells[4].Text;
+
 
             // se costo o bill rate sono a zero
-            if (ProgettoCorrente.TipoContratto == "FORFAIT" &&  costrate == "" || ProgettoCorrente.TipoContratto == "T&M" && (costrate == "" || billrate== "" ))
+            if (ProgettoCorrente.TipoContratto == "FORFAIT" && costrate == "0 €" || ProgettoCorrente.TipoContratto == "T&M" && (costrate == "0 €" || billrate == "0 €"))
             {
                 e.Row.Cells[0].ForeColor = e.Row.Cells[1].ForeColor = e.Row.Cells[2].ForeColor = e.Row.Cells[3].ForeColor = System.Drawing.Color.Red; // Cambia il colore della cella in rosso                                                          
             }
         }
-        }
-
     }
+
+    protected void GVGGActuals_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        FormattaTabellaOutput(e, "0.##");
+    }
+
+    protected void btn_calc_Click(object sender, EventArgs e)
+    {
+        // imposta sessione
+        EconomicsProgetto ProgettoCorrente = (EconomicsProgetto)Session["ProgettoCorrente"];
+
+        // calcola costi per tutti i progetti del mese da chiudere
+        ControlloProgetto.CalcolaCosti(ProgettoCorrente.PrimaDataCarico, ProgettoCorrente.Projects_Id, 1);  // data, progetto, overwrite
+
+        Response.Redirect("/timereport/report/controllo_progetto/ControlloProgetto-form.aspx?ProjectCode=" + ProgettoCorrente.ProjectCode);
+    }
+
+}

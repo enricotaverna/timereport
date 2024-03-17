@@ -78,9 +78,10 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
                                  " AND a.ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"]  +
                                  " ORDER BY a.ProjectCode", conn);
 
+            DDLManager.Items.Add(new ListItem(CurrentSession.UserName, CurrentSession.Persons_id.ToString()));
             DDLManager.SelectedValue = CurrentSession.Persons_id.ToString();
             DDLManager.Enabled = false;
-    }
+        }
 
         // Se ADMIN imposta tutti i progetti di tipo FIXED 
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL"))

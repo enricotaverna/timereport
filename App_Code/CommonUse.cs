@@ -212,12 +212,19 @@ public class Utilities
         SqlConnection conn;
         SqlDataAdapter Adapter;
         DataSet ds = new DataSet();
-        DataGrid GridExp = new DataGrid();
 
         conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
         Adapter = new SqlDataAdapter(sQuery, conn);
         Adapter.Fill(ds, "export");
+
+        StreamOut(ds);
+    }
+
+    // riceve un dataaset e lo scarica in excel
+    public static void StreamOut(DataSet ds) {
+
+        DataGrid GridExp = new DataGrid();
 
         GridExp.DataSource = ds.Tables["export"].DefaultView;
         GridExp.DataBind();
@@ -241,6 +248,8 @@ public class Utilities
 
         HttpContext.Current.Response.Write(stringWrite.ToString());
         HttpContext.Current.Response.End();
+
+
     }
 
     public static DataTable ImportExcel(FileUpload FileUploadControl, ref string ErrorMessage)

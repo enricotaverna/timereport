@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Collections.Generic;
 
 public partial class report_ControlloProgettoList : System.Web.UI.Page
 {
@@ -14,7 +15,9 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        DataSet ds = BuildDataSet();
+
+        // richima storage procedure per popolare la tabella con i valori degli economics di peogetto
+        DataSet ds = ControlloProgetto.PopolaDataset(Session["DataReport"].ToString(), Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
 
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
@@ -34,25 +37,6 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
             // Valorizza indirizzo pagina chiamante
             btn_back.OnClientClick = "window.location='/timereport/report/controllo_progetto/ControlloProgetto-select.aspx'; return(false);";
         }
-    }
-
-    protected DataSet BuildDataSet() {
-
-        DataSet ds = new DataSet("Export");
-
-        // Lancia stored procedure che popola la tabella "Export" nel dataset ds
-        // Projects_Id, Codice+Nome progetto, Activity_id, Codice + Nome attività, ImportoRevenue (da progetto o attività), Importo spese (solo da progetto)
-        // DataFine (da progetto o attività), DataInizio (da progetto o attività), Nome manager,
-        // TotaleOre = Somma Ore
-        // TotaleRevenue = Somma Revenue (NULL se manca qualche CostRate)
-        // PrimaDataCarico = data primo carico ore
-        // TotaleSpese= Somma Spese 
-
-        ds = ControlloProgetto.EseguiStoredProcedure(Session["DataReport"].ToString(), Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
-
-        // torna il dataset completo    
-        return (ds);
-
     }
 
     // gestisce paginazione
@@ -83,18 +67,17 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
 
         /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
         sQuery = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + ASPcompatility.FormatDatetimeDb(Convert.ToDateTime(Session["DataReport"].ToString())) +
-                                         " ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
+                                         " AND ProjectType_id = '" + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + "'";
 
         if ( Session["ProgettoReport"].ToString() != "0")
-            Session["QueryDettaglioCosti"] += " AND Projects_id = " + Session["ProgettoReport"].ToString();
+            sQuery += " AND Projects_id = " + Session["ProgettoReport"].ToString();
 
         if ( Session["ManagerReport"].ToString() != "0")
-            Session["QueryDettaglioCosti"] += " AND ClientManager_id = " + Session["ManagerReport"].ToString();
+            sQuery += " AND ( ClientManager_id = " + Session["ManagerReport"].ToString() + " OR AccountManager_id = " + Session["ManagerReport"].ToString() + ")";
 
-        Session["QueryDettaglioCosti"] += " ORDER BY Consulente, Data";
+        sQuery += " ORDER BY Consulente, Data";
 
-
-        Utilities.ExportXls(Session["QueryDettaglioCosti"].ToString());
+        Utilities.ExportXls(sQuery);
     }
 
     // gestisce click su codice progetto per vedere dettaglio  
@@ -106,6 +89,21 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         string arg = LkBt.CommandArgument.ToString();
 
         Response.Redirect("/timereport/m_gestione/Project/Projects_lookup_form.aspx?ProjectCode=" + arg);
+
+    }
+
+    protected void GVAttivita_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        decimal value;
+
+        // se costo o bill rate sono a zero
+        if (e.Row.RowType == DataControlRowType.DataRow)
+
+            if (decimal.TryParse(e.Row.Cells[10].Text, out value)) {
+                
+                if(value < 0)
+                    e.Row.Cells[10].ForeColor = System.Drawing.Color.Red; // Cambia il colore della cella in rosso 
+            }
 
     }
 

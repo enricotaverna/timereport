@@ -46,7 +46,10 @@
 
                 <div  class="StandardForm col-9">
 
-                    <asp:GridView ID="GVAttivita" runat="server" AllowPaging="True" CssClass="GridView"
+                    <div id="wrapper"  style="font-size: 14px;font-family: OpenSans-Regular;max-width:1000px;max-height:600px;overflow-y:scroll;overflow-x:auto !important" >
+                    
+                    <asp:GridView ID="GVAttivita" runat="server" AllowPaging="False" CssClass="GridView"
+                        onrowdatabound="GVAttivita_RowDataBound"
                         AllowSorting="false" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5" OnPageIndexChanging="GVAttivita_PageIndexChanging" >
 
                         <FooterStyle CssClass="GV_footer" />
@@ -67,12 +70,13 @@
                             <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />
                             <asp:BoundField DataField="Director" HeaderText="Director" SortExpression="Director" />
                             <asp:BoundField DataField="TipoContratto" HeaderText="Contratto" SortExpression="TipoContratto"  />
+                            <asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" DataFormatString="{0:dd/MM/yyyy}" />
 
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Budget" SortExpression="RevenueBudget" DataFormatString="{0:###,###;-; }" />
                             <asp:BoundField DataField="RevenueActual" HeaderText="Revenue Act" SortExpression="RevenueActual" DataFormatString="{0:###,###;-; }" />
                             
-                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine Bdg" SortExpression="MargineProposta" DataFormatString="{0:P0}" />
-                            <asp:BoundField DataField="MargineActual" HeaderText="Margine Act" SortExpression="MargineActual" DataFormatString="{0:P0}" />
+                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine Bdg" SortExpression="MargineProposta" DataFormatString="{0:#.#%;-#.#%;}" />
+                            <asp:BoundField DataField="MargineActual" HeaderText="Margine Act" SortExpression="MargineActual" DataFormatString="{0:#.##%;-#.##%;}" />
 
                             <%--<asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />                          --%>
                             
@@ -110,9 +114,8 @@
 <%--                            <asp:BoundField DataField="BurnRate" HeaderText="Burn Rate" SortExpression="BurnRate" DataFormatString="{0:###,###.00;(0:###,###.00); }" />--%>
                             <asp:TemplateField>
                                 <ItemTemplate>
-                                    <asp:ImageButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "ControlloProgetto-form.aspx?ProjectCode={0}") %>'
-                                        CommandName="Edit" ImageUrl="/timereport/images/icons/16x16/modifica.gif"
-                                        Text="<%$ appSettings: EDIT_TXT %>" />
+                                    <asp:LinkButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "ControlloProgetto-form.aspx?ProjectCode={0}") %>'
+                                        CommandName="Edit" CssClass="fa fa-edit" Font-Size="Large" ForeColor="#333333" />
                                 </ItemTemplate>
                             </asp:TemplateField>
 
@@ -120,6 +123,7 @@
                         </Columns>
 
                     </asp:GridView>
+                    </div>
 
                     <div class="buttons">
 
