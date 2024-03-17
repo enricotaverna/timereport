@@ -293,16 +293,18 @@ public partial class input : System.Web.UI.Page
             {
 
                 iOre = Convert.ToSingle(rdr["hours"]);
-                strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                             "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
-                             "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
-                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
-                             "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
-                             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
-                             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
-                             "<br>" +
-                             "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
-                             "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
+                //strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
+                //             "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
+                //             "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
+                //             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
+                //             "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
+                //             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
+                //             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
+                //             "<br>" +
+                //             "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
+                //             "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
+
+                strTooltip = "pippo";
 
                 // imposta icona di workflow
                 WFIcon = "";
@@ -320,7 +322,7 @@ public partial class input : System.Web.UI.Page
                 else
                 {
                     Response.Write("<div id=TRitm" + rdr["Hours_id"] + ">");
-                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
+                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + " 'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
                 }
 
                 // cancellazione solo in change e se la riga non è una richiesta assenza

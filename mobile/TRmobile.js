@@ -330,7 +330,7 @@ $(document).ready(function () {
     }, "campo deve essere numerico");
 
     $.validator.addMethod("opportunityRegex", function (value, element) {
-        return /^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$/.test(value);
+        return /^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$/.test(value);
     }, "formato campo non valido");
 
     // *** spese validate ***
