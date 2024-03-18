@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Data.SqlClient;
+﻿using classiStandard;
+using Microsoft.Office.Interop.Excel;
+using Syncfusion.XlsIO;
+using System;
 using System.Configuration;
 using System.Data;
-using System.ComponentModel;
-using System.IO;
-using System.Data.OleDb;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
-using System.Threading;
-using System.Activities.Expressions;
-using Xceed.Document.NET;
+using System.IO;
+using System.Linq;
+using System.Web.UI.HtmlControls;
+using Button = System.Web.UI.WebControls.Button;
+using DataTable = System.Data.DataTable;
+using Label = System.Web.UI.WebControls.Label;
 
 public partial class report_PresenzeSpese : System.Web.UI.Page
 {
-
+    private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
     // recupera oggetto sessione
     public TRSession CurrentSession;
 
@@ -37,99 +37,297 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             Response.Redirect("/timereport/menu.aspx");
 
         // se parametro di chiamata è vuoto mette default l'anno corrent
-        if (String.IsNullOrEmpty(Request.QueryString["anno"]))
-            sAnnoCorrente = DateTime.Now.Year.ToString();
-        else
-            sAnnoCorrente = Request.QueryString["anno"];
-
-        //// valorizza testo e riferimenti sui tasti di navigazione in testata del box con i mesi
-        //btNext.NavigateUrl = "/timereport/report/checkInput/check-input-select.aspx?anno=" + (Convert.ToInt16(sAnnoCorrente) + 1).ToString();
-        //btPrev.NavigateUrl = "/timereport/report/checkInput/check-input-select.aspx?anno=" + (Convert.ToInt16(sAnnoCorrente) - 1).ToString();
-
-        AnnoCorrente.Text = sAnnoCorrente;
-
-        // disegna la tabella dei mesi
-        CostruisciTabellaMesi(sAnnoCorrente);
-
-    }
-
-    // Costruisce tabella dei mese, se mode = admin carica tutti i file
-    protected void CostruisciTabellaMesi(string sAnno)
-    {
-
-        // init
-        DateTime mese = new DateTime(2014, 1, 1);
-        var urlBottone = "";
-
-        CultureInfo CurrCulture = CultureInfo.CreateSpecificCulture(CurrentSession.Language);
-        DateTimeFormatInfo mfi = CurrCulture.DateTimeFormat;
-
-        // cicla per dodici mesi
-        for (int i = 0; i < 12; i++)
+        if (String.IsNullOrEmpty(AnnoCorrente.Text))
         {
+            sAnnoCorrente = DateTime.Now.Year.ToString();
+            AnnoCorrente.Text = sAnnoCorrente;
+        }
 
-            urlBottone = "'/timereport/report/checkInput/check-input-list.aspx?anno=" + sAnno + "&mese=" + mese.ToString("MM") + "'";
-            //ListaMesi.InnerHtml = ListaMesi.InnerHtml + "  <a onclick= \"return estrai()\" class='bottone-mese'>" + mfi.GetAbbreviatedMonthName(i + 1) + "</a>";
-
-            //< asp:Button ID="BTexec" runat = "server" Text = "<%$ Resources:timereport,EXEC_TXT%>" CssClass = "orangebutton" PostBackUrl = "/timereport/esporta.aspx" OnClick = "Sottometti_Click" CausesValidation = "False" />
-            mese = mese.AddMonths(1);
-
-        } // for (int i = 0; i < 12; i++)
-
-        // fine
-        return;
 
     }
 
-    protected void Sottometti_Click(object sender, System.EventArgs e)
+    protected void TogliAnno_Click(object sender, System.EventArgs e)
+    {
+        int Anno = Convert.ToInt16(AnnoCorrente.Text) - 1;
+        AnnoCorrente.Text = Anno.ToString();
+    }
+
+    protected void AggiungiAnno_Click(object sender, System.EventArgs e)
+    {
+        int Anno = Convert.ToInt16(AnnoCorrente.Text) + 1;
+        AnnoCorrente.Text = Anno.ToString();
+    }
+
+    /// <summary>
+    /// estrazione del foglio excel contenente spese e presenze
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void EstraiFile_Click(object sender, System.EventArgs e)
+    {
+        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        Label LabelAnno = null;
+        LabelAnno = (Label)FVMain.FindControl("AnnoCorrente");
+
+        Button btnPressed = (Button)sender;
+
+        int AnnoSelezionato = Convert.ToInt16(LabelAnno.Text.ToString());
+        int MeseSelezionato = Convert.ToInt16(btnPressed.ID.Replace("M", ""));
+        string NomePresenze = string.Format("EstrazioneOre_{0}_{1}", btnPressed.Text.ToString(), AnnoSelezionato);
+        string NomeSpese = string.Format("EstrazioneSpese_{0}_{1}", btnPressed.Text.ToString(), AnnoSelezionato);
+
+        ///* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
+
+        DataSet dsPresenze = new DataSet(NomePresenze);
+        DataSet dsSpese = new DataSet(NomeSpese);
+
+        conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        conn.Open();
+        using (conn)
+        {
+            SqlCommand sqlComm = new SqlCommand("EstraiPresenze", conn);
+
+            // valorizza parametri della query
+            sqlComm.Parameters.AddWithValue("@Anno", AnnoSelezionato);
+            sqlComm.Parameters.AddWithValue("@Mese", MeseSelezionato);
+
+            // esecuzione
+            sqlComm.CommandType = CommandType.StoredProcedure;
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = sqlComm;
+
+            da.Fill(dsPresenze, NomePresenze);
+
+            SqlCommand sqlCommSpese = new SqlCommand("EstraiSpese", conn);
+
+            // valorizza parametri della query
+            sqlCommSpese.Parameters.AddWithValue("@Anno", AnnoSelezionato);
+            sqlCommSpese.Parameters.AddWithValue("@Mese", MeseSelezionato);
+
+            // esecuzione
+            sqlCommSpese.CommandType = CommandType.StoredProcedure;
+
+            SqlDataAdapter daSpese = new SqlDataAdapter();
+            daSpese.SelectCommand = sqlCommSpese;
+
+            daSpese.Fill(dsSpese, NomePresenze);
+        }
+        //aggiungi colonne delle spese al datatable presenze
+        AggiungiColonne(ref dsPresenze);
+        //lavorazione del dt presenze aggiungengo le spese
+        LavoraDataset(dsPresenze, dsSpese);
+        //estrazione e download del foglio excel
+        EstraiEformattaExcel(dsPresenze, NomePresenze);
+
+    }
+
+    /// <summary>
+    ///aggiunta delle colonne per le spese
+    /// </summary>
+    /// <param name="dsPresenze"></param>
+    /// <param name="dsSpese"></param>
+    private void AggiungiColonne(ref DataSet dsPresenze)
     {
 
-        Label dtProgettiInDDL = null;
+        try
+        {
+            DataColumn RimborsoSpese = dsPresenze.Tables[0].Columns.Add("RimborsoSpese", typeof(decimal));
+            RimborsoSpese.AllowDBNull = true;
+            RimborsoSpese.Unique = false;
+            RimborsoSpese.ColumnName = "Rimborso Spese";
 
-        dtProgettiInDDL = (Label)FVMain.FindControl("AnnoCorrente");
+            DataColumn NRtrasfItalia = dsPresenze.Tables[0].Columns.Add("NRtrasfItalia", typeof(decimal));
+            NRtrasfItalia.AllowDBNull = true;
+            NRtrasfItalia.Unique = false;
+            NRtrasfItalia.ColumnName = "N. Tras ITALIA";
 
-        string sWhereClause = dtProgettiInDDL.Text.ToString();
-        
-        //switch (RBTipoExport.SelectedValue)
-        //{
-        //    case "1":
-        //        Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, DescLob, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId from v_ore where " + sWhereClause);
-        //        //Response.Redirect("/timereport/esporta.aspx");
-        //        break;
-        //    case "2":
-        //        Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, DescLob, " + "Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId from v_spese where " + sWhereClause);
-        //        //Response.Redirect("/timereport/esporta.aspx");
-        //        break;
-        //        //case "3":
-        //        //    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
-        //        //    break;
-        //}
+            DataColumn SpesetrasfItalia = dsPresenze.Tables[0].Columns.Add("SpesetrasfItalia", typeof(decimal));
+            SpesetrasfItalia.AllowDBNull = true;
+            SpesetrasfItalia.Unique = false;
+            SpesetrasfItalia.ColumnName = "Spese Tras ITALIA";
 
-        //switch (RBTipoReport.SelectedValue)
-        //{
-        //    case "3":
-        //        Session["SQL"] = "SELECT nomepersona, nomeprogetto, giorni, annomese FROM v_ore WHERE " + sWhereClause;
-        //        Session["ReportPath"] = "OrePerMese.rdlc";
-        //        Response.Redirect("report/rdlc/ReportExecute.aspx");
-        //        break;
-        //    case "4":
-        //        Session["SQL"] = "SELECT persona, nomeprogetto, DescSpesa, importo, annomese FROM v_spese WHERE " + sWhereClause;
-        //        Session["ReportPath"] = "SpesePerMese.rdlc";
-        //        Response.Redirect("report/rdlc/ReportExecute.aspx");
-        //        break;
-        //    case "5":
-        //        Session["SQL"] = "SELECT  * FROM v_ore WHERE " + sWhereClause;
-        //        Session["ReportPath"] = "DettaglioOre.rdlc";
-        //        Response.Redirect("report/rdlc/ReportExecute.aspx");
-        //        break;
-        //    case "6":
-        //        Session["SQL"] = "SELECT  * FROM v_spese WHERE " + sWhereClause;
-        //        Session["ReportPath"] = "DettaglioSpese.rdlc";
-        //        Response.Redirect("report/rdlc/ReportExecute.aspx");
-        //        break;
+            DataColumn NRtrasfEstero = dsPresenze.Tables[0].Columns.Add("NRtrasfEstero", typeof(decimal));
+            NRtrasfEstero.AllowDBNull = true;
+            NRtrasfEstero.Unique = false;
+            NRtrasfEstero.ColumnName = "N. Tras ESTERO";
 
-        //}
+            DataColumn SpesetrasfEstero = dsPresenze.Tables[0].Columns.Add("SpesetrasfEstero", typeof(decimal));
+            SpesetrasfEstero.AllowDBNull = true;
+            SpesetrasfEstero.Unique = false;
+            SpesetrasfEstero.ColumnName = "Spese Tras ESTERO";
+
+            DataColumn NRBuoni = dsPresenze.Tables[0].Columns.Add("NRBuoni", typeof(decimal));
+            NRBuoni.AllowDBNull = true;
+            NRBuoni.Unique = false;
+            NRBuoni.ColumnName = "N. BUONI";
+
+            DataColumn SpeseBUONI = dsPresenze.Tables[0].Columns.Add("SpeseBUONI", typeof(decimal));
+            SpeseBUONI.AllowDBNull = true;
+            SpeseBUONI.Unique = false;
+            SpeseBUONI.ColumnName = "Tot. Buoni";
+
+            DataColumn NrAltreSpese = dsPresenze.Tables[0].Columns.Add("NrAltreSpese", typeof(decimal));
+            NrAltreSpese.AllowDBNull = true;
+            NrAltreSpese.Unique = false;
+            NrAltreSpese.ColumnName = "Nr. Altre Spese";
+
+            DataColumn AltreSpese = dsPresenze.Tables[0].Columns.Add("AltreSpese", typeof(decimal));
+            AltreSpese.AllowDBNull = true;
+            AltreSpese.Unique = false;
+            AltreSpese.ColumnName = "Altre Spese";
+
+        }
+        catch (Exception ex)
+        {
+            var st = new StackTrace(ex, true);
+            var sf = st.GetFrame(st.FrameCount - 1);
+            string ErrorLine = clsUtility.NullToString(sf.GetFileLineNumber()).ToString();
+            string MethodName = clsUtility.NullToString(sf.GetMethod().Name).ToString();
+            string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
+            string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
+            clsLog.WriteErrLog("0", ex.Message, Description.ToString());
+        }
+
     }
 
+    /// <summary>
+    /// valorizzazione delle colonne spese
+    /// </summary>
+    /// <param name="dsPresenze"></param>
+    /// <param name="dsSpese"></param>
+    private void LavoraDataset(DataSet dsPresenze, DataSet dsSpese)
+    {
+        try
+        {
+            string personID = "";
+            DataTable Presenze = dsPresenze.Tables[0];
 
+            foreach (DataRow Spesa in dsSpese.Tables[0].Rows)
+            {
+                
+                personID = Spesa["Persons_id"].ToString();
+
+                DataTable totale = dsSpese.Tables[0].Select(string.Format("Persons_id = {0}", personID)).CopyToDataTable();
+                decimal sum = Convert.ToDecimal(totale.Compute("SUM(Totale)", ""));
+
+                //trovo la persona sul folgio presenze
+                if (Presenze.Select(string.Format("Persons_id = {0}", personID)).Count() > 0)
+                {
+
+                    DataRow[] rows = Presenze.Select(string.Format("Persons_id = {0}", personID));
+
+                    Presenze.Select(string.Format("Persons_id = {0}", personID));
+
+
+                    //totale rimborso spese
+                    if (sum != null) {
+                        rows[0]["Rimborso Spese"] = sum;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "Altre Spese")
+                    {
+                        rows[0]["Nr. Altre Spese"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Altre Spese"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "BUONI PASTO")
+                    {
+                        rows[0]["N. BUONI"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Tot. Buoni"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "TRASFERTA ESTERO")
+                    {
+                        rows[0]["N. Tras ESTERO"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Spese Tras ESTERO"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "TRASFERTA ITALIA")
+                    {
+                        rows[0]["N. Tras ITALIA"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Spese Tras ITALIA"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            var st = new StackTrace(ex, true);
+            var sf = st.GetFrame(st.FrameCount - 1);
+            string ErrorLine = clsUtility.NullToString(sf.GetFileLineNumber()).ToString();
+            string MethodName = clsUtility.NullToString(sf.GetMethod().Name).ToString();
+            string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
+            string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
+            //clsLog.WriteErrLog("0", ex.Message, Description.ToString());
+        }
+    }
+
+    protected void EstraiEformattaExcel(DataSet dsPresenze, string fileName)
+    {
+        using (ExcelEngine excelEngine = new ExcelEngine())
+        {
+            IApplication application = excelEngine.Excel;
+            application.DefaultVersion = ExcelVersion.Excel2016;
+
+            //Create a new workbook
+            IWorkbook workbook = application.Workbooks.Create(1);
+            IWorksheet sheet = workbook.Worksheets[0];
+
+            //Create a dataset from XML file
+            DataSet customersDataSet = dsPresenze;
+
+            //Create datatable from the dataset
+            DataTable dataTable = new DataTable();
+            dataTable = customersDataSet.Tables[0];
+           
+            //Import data from the data table with column header, at first row and first column, 
+            //and by its column type.
+            sheet.ImportDataTable(dataTable, true, 1, 1, true);
+
+            //Get the used Range
+            Syncfusion.XlsIO.IRange usedRange = sheet.UsedRange;
+
+            //Iterate the rows in the used range
+            //foreach (Syncfusion.XlsIO.IRange row in usedRange.Rows)
+            for (int a= 0; a < usedRange.Rows.Count(); a++)
+            {
+                Syncfusion.XlsIO.IRange row = usedRange.Rows[a];
+                
+                if (a == 0)
+                {
+                    row.CellStyle.Color = Color.Yellow;
+                    row.CellStyle.Font.Bold = true;
+                    row.CellStyle.Font.Size = 12;
+                }
+
+                String[] rowData = new String[row.Columns.Count()];
+
+                for (int i = 0; i < row.Columns.Count(); i++)
+                {                   
+                    if (row.Columns[2].Value.ToNullToString() == "Total")
+                    {
+                        row.CellStyle.Color = Color.LightGreen;
+                        row.CellStyle.Font.Bold = true;
+                    }
+                }
+            }
+
+            sheet.UsedRange.AutofitColumns();
+
+            Response.Clear();
+            Response.Buffer = true;
+            Response.Charset = "";
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.AddHeader("content-disposition", string.Format("attachment;filename={0}.xlsx", fileName));
+            using (MemoryStream MyMemoryStream = new MemoryStream())
+            {
+                workbook.SaveAs(MyMemoryStream);
+                MyMemoryStream.WriteTo(Response.OutputStream);
+                Response.Flush();
+                Response.End();
+            }
+
+        }
+    }
 }

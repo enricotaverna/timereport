@@ -48,11 +48,13 @@
                         <table>
                             <tr>
                                 <td>
-                                    <asp:HyperLink ID="btPrev" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-left'></i></asp:HyperLink></td>
-                                <td style="text-align: center; width:100%">
+                                    <asp:Button ID="btPrev" runat="server" CssClass="greybutton" BackColor="White" CausesValidation="False" OnClick="TogliAnno_Click" Text="Previous"></asp:Button></td>
+                                   <!-- <asp:Button ID="Button1" runat="server" CssClass="greybutton" BackColor="White" CausesValidation="False" OnClientClick="return Prev()" Text="Previous"></asp:Button></td>-->
+                                <td style="text-align: center; width:100%">                                   
                                     <asp:Label ID="AnnoCorrente" runat="server"></asp:Label></td>
                                 <td>
-                                    <asp:HyperLink ID="btNext" runat="server"><i style='font-size:x-large;color:#343a40' class='fas fa-arrow-circle-right'></i></asp:HyperLink></td>
+                                    <asp:Button ID="btNext" runat="server" CssClass="greybutton" BackColor="White" CausesValidation="False" OnClick="AggiungiAnno_Click" Text="Next"></asp:Button></td>
+                                    <!--<asp:Button ID="Button2" runat="server" CssClass="greybutton" BackColor="White" CausesValidation="False" OnClientClick="return Next()"  Text="Next"></asp:Button></td>-->
                             </tr>
 
                         </table>
@@ -62,18 +64,18 @@
                      <!-- *** SELEZIONE PER MESI ***  -->
                     <br />
                     <div class="d-flex flex-wrap justify-content-center" runat="server">  
-                        <asp:Button ID="M1" runat="server" Text="Gennaio" CssClass="bottone-mese"  OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M2" runat="server" Text="Febbraio" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M3" runat="server" Text="Marzo" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M4" runat="server" Text="Aprile" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M5" runat="server" Text="Maggio" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M6" runat="server" Text="Giugno" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M7" runat="server" Text="Luglio" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M8" runat="server" Text="Agosto" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M9" runat="server" Text="Settembre" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M10" runat="server" Text="Ottobre" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M11" runat="server" Text="Novembre" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />
-                        <asp:Button ID="M12" runat="server" Text="Dicembre" CssClass="bottone-mese" OnClick="Sottometti_Click" CausesValidation="False" />                        
+                        <asp:Button ID="M1" runat="server" Text="Gennaio" CssClass="bottone-mese"  OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M2" runat="server" Text="Febbraio" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M3" runat="server" Text="Marzo" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M4" runat="server" Text="Aprile" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M5" runat="server" Text="Maggio" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M6" runat="server" Text="Giugno" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M7" runat="server" Text="Luglio" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M8" runat="server" Text="Agosto" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M9" runat="server" Text="Settembre" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M10" runat="server" Text="Ottobre" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M11" runat="server" Text="Novembre" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />
+                        <asp:Button ID="M12" runat="server" Text="Dicembre" CssClass="bottone-mese" OnClick="EstraiFile_Click" CausesValidation="false" />                        
                     </div>
                     <br />
 
@@ -107,11 +109,23 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
-
-        function estrai() {
-            alert('aaaa');
+        function Prev() {
+            var valueoftextbox = document.getElementById('AnnoCorrente');
+            var AnnoPrecedente = parseInt(valueoftextbox.innerHTML) - 1;
+            valueoftextbox.innerHTML = AnnoPrecedente;   
+            valueoftextbox.innerText = AnnoPrecedente;
+            valueoftextbox.value = AnnoPrecedente;   
+            return false;            
         }
 
+        function Next() {
+            var valueoftextbox = document.getElementById('AnnoCorrente');
+            var AnnoSuccessivo = parseInt(valueoftextbox.innerHTML) + 1;
+            valueoftextbox.innerHTML = AnnoSuccessivo;
+            valueoftextbox.innerText = AnnoSuccessivo;
+            valueoftextbox.value = AnnoSuccessivo;  
+            return false;            
+        }
     </script>
 
 </body>
