@@ -1,7 +1,9 @@
-﻿using classiStandard;
+﻿using Amazon.EC2.Model;
+using classiStandard;
 using Microsoft.Office.Interop.Excel;
 using Syncfusion.XlsIO;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -113,12 +115,50 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
 
             daSpese.Fill(dsSpese, NomePresenze);
         }
+
+        //elimina utenti con le sole ore delle festivita (probabilmente sono andati via)
+        EliminaInattivi(dsPresenze);
         //aggiungi colonne delle spese al datatable presenze
         AggiungiColonne(ref dsPresenze);
         //lavorazione del dt presenze aggiungengo le spese
         LavoraDataset(dsPresenze, dsSpese);
         //estrazione e download del foglio excel
         EstraiEformattaExcel(dsPresenze, NomePresenze);
+
+    }
+
+    /// <summary>
+    /// eliminazione degli utenti con sole festivita inserite
+    /// </summary>
+    /// <param name="dsPresenze"></param>
+    private void EliminaInattivi(DataSet dsPresenze) {
+
+        string listaPersoneDaEliminare = "";
+
+        DataView view = new DataView(dsPresenze.Tables[0]);
+        DataTable distinctValues = view.ToTable(true, "Persons_id");
+
+        foreach (DataRow Person in distinctValues.Rows)
+        {
+            DataView FilterPerson = new DataView();
+            FilterPerson = dsPresenze.Tables[0].Select(string.Format("Persons_id = {0} AND ProjectCode <> 'Total'", Person["Persons_id"])).CopyToDataTable().AsDataView();
+            DataTable distinctOre = FilterPerson.ToTable(true, "ProjectCode");
+
+            if (distinctOre.Rows.Count == 1 && distinctOre.Rows[0]["ProjectCode"].ToString() == "FS") 
+            {
+                listaPersoneDaEliminare += "'" + Person["Persons_id"].ToString() + "',";              
+            }
+        }
+        //se ci sono persone con solo festivita le tolgo dal dataset orginale
+        if (listaPersoneDaEliminare.ToNullToString() != "")
+        {
+            listaPersoneDaEliminare.Substring(0, listaPersoneDaEliminare.Length - 1);
+
+            //listaPersoneDaEliminare
+            DataTable filtered = dsPresenze.Tables[0].Select(string.Format("Persons_id NOT IN ({0})", listaPersoneDaEliminare)).CopyToDataTable();
+            dsPresenze.Tables.RemoveAt(0);
+            dsPresenze.Tables.Add(filtered);
+        }        
 
     }
 
@@ -167,15 +207,50 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             SpeseBUONI.Unique = false;
             SpeseBUONI.ColumnName = "Tot. Buoni";
 
-            DataColumn NrAltreSpese = dsPresenze.Tables[0].Columns.Add("NrAltreSpese", typeof(decimal));
-            NrAltreSpese.AllowDBNull = true;
-            NrAltreSpese.Unique = false;
-            NrAltreSpese.ColumnName = "Nr. Altre Spese";
+            DataColumn NrIndenUSA = dsPresenze.Tables[0].Columns.Add("NrIndenUSA", typeof(decimal));
+            NrIndenUSA.AllowDBNull = true;
+            NrIndenUSA.Unique = false;
+            NrIndenUSA.ColumnName = "Inden. USA";
 
-            DataColumn AltreSpese = dsPresenze.Tables[0].Columns.Add("AltreSpese", typeof(decimal));
-            AltreSpese.AllowDBNull = true;
-            AltreSpese.Unique = false;
-            AltreSpese.ColumnName = "Altre Spese";
+            DataColumn IndenUSA = dsPresenze.Tables[0].Columns.Add("IndenUSA", typeof(decimal));
+            IndenUSA.AllowDBNull = true;
+            IndenUSA.Unique = false;
+            IndenUSA.ColumnName = "Inden. € USA";
+
+            DataColumn NrReperibiliadiurna = dsPresenze.Tables[0].Columns.Add("NrReperibiliadiurna", typeof(decimal));
+            NrReperibiliadiurna.AllowDBNull = true;
+            NrReperibiliadiurna.Unique = false;
+            NrReperibiliadiurna.ColumnName = "Nr. Reperibilità diurna";
+
+            DataColumn Reperibiliadiurna = dsPresenze.Tables[0].Columns.Add("Reperibiliadiurna", typeof(decimal));
+            Reperibiliadiurna.AllowDBNull = true;
+            Reperibiliadiurna.Unique = false;
+            Reperibiliadiurna.ColumnName = "Reperibilità diurna";
+
+            DataColumn NrReperibilitaAMSsettimanale = dsPresenze.Tables[0].Columns.Add("NrReperibilitaAMSsettimanale", typeof(decimal));
+            NrReperibilitaAMSsettimanale.AllowDBNull = true;
+            NrReperibilitaAMSsettimanale.Unique = false;
+            NrReperibilitaAMSsettimanale.ColumnName = "Nr. Reperibilità AMS settimanale";
+
+            DataColumn ReperibilitaAMSsettimanale = dsPresenze.Tables[0].Columns.Add("ReperibilitaAMSsettimanale", typeof(decimal));
+            ReperibilitaAMSsettimanale.AllowDBNull = true;
+            ReperibilitaAMSsettimanale.Unique = false;
+            ReperibilitaAMSsettimanale.ColumnName = "Reperibilità AMS settimanale";
+
+            DataColumn Totale = dsPresenze.Tables[0].Columns.Add("Totale", typeof(decimal));
+            Totale.AllowDBNull = true;
+            Totale.Unique = false;
+            Totale.ColumnName = "Somma Totale";
+
+            //DataColumn NrAltreSpese = dsPresenze.Tables[0].Columns.Add("NrAltreSpese", typeof(decimal));
+            //NrAltreSpese.AllowDBNull = true;
+            //NrAltreSpese.Unique = false;
+            //NrAltreSpese.ColumnName = "Nr. Altre Spese";
+
+            //DataColumn AltreSpese = dsPresenze.Tables[0].Columns.Add("AltreSpese", typeof(decimal));
+            //AltreSpese.AllowDBNull = true;
+            //AltreSpese.Unique = false;
+            //AltreSpese.ColumnName = "Altre Spese";
 
         }
         catch (Exception ex)
@@ -221,14 +296,16 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
 
 
                     //totale rimborso spese
-                    if (sum != null) {
-                        rows[0]["Rimborso Spese"] = sum;
+                    if (sum != null)
+                    {
+                        rows[0]["Somma Totale"] = sum;
                     }
 
                     if (Spesa["Descrizione"].ToNullToString() == "Altre Spese")
                     {
-                        rows[0]["Nr. Altre Spese"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
-                        rows[0]["Altre Spese"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                        rows[0]["Rimborso Spese"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                        //rows[0]["Nr. Altre Spese"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        //rows[0]["Altre Spese"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
                     }
 
                     if (Spesa["Descrizione"].ToNullToString() == "BUONI PASTO")
@@ -248,6 +325,25 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                         rows[0]["N. Tras ITALIA"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
                         rows[0]["Spese Tras ITALIA"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
                     }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "indennità USA")
+                    {
+                        rows[0]["Inden. USA"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Inden. € USA"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "AMS Rep. Settimanale")
+                    {
+                        rows[0]["Nr. Reperibilità diurna"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Reperibilità diurna"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
+                    if (Spesa["Descrizione"].ToNullToString() == "Reperibilità")
+                    {
+                        rows[0]["Nr. Reperibilità diurna"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Reperibilità diurna"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                    }
+
                 }
             }
         }
