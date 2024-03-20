@@ -401,7 +401,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
 
                 for (int i = 0; i < row.Columns.Count(); i++)
                 {                   
-                    if (row.Columns[2].Value.ToNullToString() == "Total")
+                    if (row.Columns[3].Value.ToNullToString() == "Total")
                     {
                         row.CellStyle.Color = Color.LightGreen;
                         row.CellStyle.Font.Bold = true;
