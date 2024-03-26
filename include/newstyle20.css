@@ -560,6 +560,31 @@ select {
         background: -webkit-linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%);
     }
 
+/* Tabella dati controllo progetto */
+.ControlloProgetto {
+    border-bottom: 1px solid #c7c7c7 !important;
+    font-size: 12px;
+    white-space: nowrap;
+    border-collapse: collapse;
+    text-align: center;
+    
+}
+
+    .ControlloProgetto th {
+        background-color: #9ad0f5;
+        color: white;
+        padding: 0px 4px;
+        border-bottom: 1px solid #c7c7c7;
+    }
+
+        .ControlloProgetto th:first-child,
+        .ControlloProgetto td:first-child {
+            text-align: left !important; /* Allinea la prima colonna a sinistra */
+            padding: 0px 20px 0px 0px;
+            border-right: 1px solid #c7c7c7;
+        }
+
+
 /*GRIDVIEW*/
 .GridView {
     /*lista elementi asp.net*/
@@ -570,7 +595,7 @@ select {
     font-size: 11px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-}
+    }
 
     .GridView td, .GridView th {
         padding: 4px 4px 4px 4px;

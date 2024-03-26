@@ -5,7 +5,6 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<%--<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>--%>
 <script src="/timereport/include/javascript/timereport.js"></script>
 
 
@@ -195,7 +194,7 @@
                 </div>
 
                 <!--  *** Box GRAFICO ***    -->
-                <%--        <div class="main- card mx-3 col-md-4 card">
+<%--                        <div class="main- card mx-3 col-md-4 card">
                         <div class="card-body">
                             <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
                                 <div class="chartjs-size-monitor-expand" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
@@ -206,9 +205,10 @@
                                 </div>
                             </div>
                             <h5 class="card-title">Vertical Bars</h5>
-                            <canvas id="verticalBar" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
+                            <canvas id="myChart" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
                         </div>
                     </div>--%>
+
             </div>
             <!-- *** 2 Row *** -->
 
@@ -295,6 +295,8 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         $(document).ready(function () {
+
+            DrawChart();
 
             $("#RichiesteAperte").click(function () {
                 location.href = "/timereport/m_gestione/Approval/Approval_list.aspx";

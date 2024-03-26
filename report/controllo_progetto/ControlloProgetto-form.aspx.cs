@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Server;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.Web.DynamicData;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
@@ -13,6 +18,9 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
     private string prevPage = String.Empty;
     public List<SqlParameter> parametersList = new List<SqlParameter>();
+
+    public string columnNamesJson;
+    public string columnSumsJson;
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -52,21 +60,30 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         TextBox TBAttivoDa = (TextBox)FVProgetto.FindControl("TBAttivoDa");
         TBAttivoDa.Text = ProgettoCorrente.PrimaDataCarico.ToString("dd/MM/yyyy");
 
-        // REVENUE ACTUAL 
-        TextBox TBRevenueActual = (TextBox)FVProgetto.FindControl("TBRevenueActual");
-        TBRevenueActual.Text = ProgettoCorrente.RevenueActual.ToString("#,###;0");
+        // REVENUE 
+        OutputLabel("lbRevenueBDG", ProgettoCorrente.RevenueBDG.ToString("#,###;0"));
+        OutputLabel("lbRevenueACT", ProgettoCorrente.RevenueACT.ToString("#,###;0"));
+        OutputLabel("lbRevenueEAC", ProgettoCorrente.RevenueEAC.ToString("#,###;0"));
 
-        // SPESEACTUAL 
-        TextBox TBSpeseActual = (TextBox)FVProgetto.FindControl("TBSpeseActual");
-        TBSpeseActual.Text = ProgettoCorrente.SpeseActual.ToString("#,###;0");
+        // COSTI
+        OutputLabel("lbCostiBDG", ProgettoCorrente.CostiBDG.ToString("#,###;0"));
+        OutputLabel("lbCostiACT", ProgettoCorrente.CostiACT.ToString("#,###;0"));
+        OutputLabel("lbCostiEAC", ProgettoCorrente.CostiEAC.ToString("#,###;0"));
 
-        // GIORNI ACTUAL 
-        TextBox TBGiorniActual = (TextBox)FVProgetto.FindControl("TBGiorniActual");
-        TBGiorniActual.Text = ProgettoCorrente.GiorniActual.ToString("#,###;0");
+        // SPESE 
+        OutputLabel("lbSpeseBDG", ProgettoCorrente.SpeseBDG.ToString("#,###;0"));
+        OutputLabel("lbSpeseACT", ProgettoCorrente.SpeseACT.ToString("#,###;0"));
+        OutputLabel("lbSpeseEAC", ProgettoCorrente.SpeseEAC.ToString("#,###;0"));
+
+        // MARGINE
+        OutputLabel("lbMargineACT", ProgettoCorrente.MargineACT.ToString("0#.#%;-#.#%;"));
+        OutputLabel("lbMargineEAC", ProgettoCorrente.MargineEAC.ToString("0#.#%;-#.#%;"));
 
         // WRITEUP
-        TextBox TBWriteUp = (TextBox)FVProgetto.FindControl("TBWriteUp");
-        TBWriteUp.Text = ProgettoCorrente.WriteUp.ToString("#,###;-#,###;0");
+        Label lbWriteUp = (Label)FVProgetto.FindControl("lbWriteoffEAC");
+        lbWriteUp.Text = ProgettoCorrente.WriteUp.ToString("#,###;-#,###;0");
+        if (ProgettoCorrente.WriteUp < 0)
+            lbWriteUp.ForeColor = Color.Red;
 
         // MESI COPERTURA
         TextBox TBMesiCopertura = (TextBox)FVProgetto.FindControl("TBMesiCopertura");
@@ -75,16 +92,21 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
 
-        DataTable dt = Database.GetData("SELECT DISTINCT Consulente, YEAR(Data) as Anno ,FORMAT(SUM(giorni) , 'N1', 'it-IT') as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost " +
+        GVConsulenti.DataSource = Database.GetData("SELECT DISTINCT Consulente, YEAR(Data) as Anno ,FORMAT(SUM(giorni) , 'N1', 'it-IT') as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost " +
                                                    "WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) +
                                                    " AND Data <= " + ASPcompatility.FormatDateDb(Session["DataReport"].ToString())  +
                                                    " GROUP BY Consulente, YEAR(Data), CostRate, BillRate", null);
 
-        GVConsulenti.DataSource = dt;
-        GVConsulenti.DataBind();
+         GVConsulenti.DataBind();
 
         CalcolaActuals( TProjects_Id.Value);
     }
+
+    private void OutputLabel(string controllo, string testo ) {
+        Label label = (Label)FVProgetto.FindControl(controllo);
+        label.Text = testo;
+    }
+
 
     // Actual
     private void CalcolaActuals(string Projects_id)
@@ -94,14 +116,41 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         parametersList.Add(new SqlParameter("@Project_id", Projects_id));
         parametersList.Add(new SqlParameter("@DataReport", DateTime.Now));
-        SqlParameter[] parameters = parametersList.ToArray();
+        SqlParameter[] param = parametersList.ToArray();
 
         // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        GVGGActuals.DataSource = Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters);
+        DataSet ds = Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", param);
+
+        GVGGActuals.DataSource = ds;
         GVGGActuals.DataBind();
+
+        // Elenco intestazioni della tabella
+        DataTable tabData = ds.Tables[0];
+        string[] columnNames = new string[tabData.Columns.Count];
+        for (int i = 1; i < tabData.Columns.Count; i++) // salta la prima colonna in cui ci sono i nomi dei consulenti
+        {
+            columnNames[i] = tabData.Columns[i].ColumnName;
+        }
+       
+        // somma per mesi
+        decimal[] columnSums = new decimal[tabData.Columns.Count];
+        // Itera su ogni riga del DataTable per calcolare le somme totali
+        foreach (DataRow row in tabData.Rows)
+        {
+            for (int i = 1; i < tabData.Columns.Count; i++)  // salta la prima colonna in cui ci sono i nomi dei consulenti
+            {
+                // Aggiungi il valore della cella alla somma corrispondente nella colonna
+                if (!Convert.IsDBNull(row[i]))
+                    columnSums[i] += Convert.ToDecimal(row[i]);
+            }
+        }
+
+        columnNamesJson = Newtonsoft.Json.JsonConvert.SerializeObject(columnNames);
+        columnSumsJson = Newtonsoft.Json.JsonConvert.SerializeObject(columnSums);
+
     }
 
-    // Bottoni
+    // Scarica dettaglio ore
     protected void Download_ore_costi(object sender, EventArgs e)
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
@@ -201,7 +250,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             {
                 e.Row.Cells[0].ForeColor = e.Row.Cells[1].ForeColor = e.Row.Cells[2].ForeColor = e.Row.Cells[3].ForeColor = System.Drawing.Color.Red; // Cambia il colore della cella in rosso                                                          
             }
-        }
+        }       
     }
 
     protected void GVGGActuals_RowDataBound(object sender, GridViewRowEventArgs e)

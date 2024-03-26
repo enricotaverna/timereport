@@ -293,18 +293,16 @@ public partial class input : System.Web.UI.Page
             {
 
                 iOre = Convert.ToSingle(rdr["hours"]);
-                //strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
-                //             "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
-                //             "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
-                //             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
-                //             "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
-                //             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
-                //             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
-                //             "<br>" +
-                //             "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
-                //             "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
-
-                strTooltip = "pippo";
+                strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
+                             "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
+                             "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
+                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
+                             "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
+                             "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
+                             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
+                             "<br>" +
+                             "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
+                             "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
 
                 // imposta icona di workflow
                 WFIcon = "";
