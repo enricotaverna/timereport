@@ -109,6 +109,9 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        UnMaskScreen();
+
         function Prev() {
             var valueoftextbox = document.getElementById('AnnoCorrente');
             var AnnoPrecedente = parseInt(valueoftextbox.innerHTML) - 1;
@@ -126,6 +129,11 @@
             valueoftextbox.value = AnnoSuccessivo;  
             return false;            
         }
+
+        $(".bottone-mese").click(function () {
+            MaskScreen(true);
+        });
+
     </script>
 
 </body>

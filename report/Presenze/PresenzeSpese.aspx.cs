@@ -1,6 +1,6 @@
 ﻿using Amazon.EC2.Model;
 using classiStandard;
-using Microsoft.Office.Interop.Excel;
+//using Microsoft.Office.Interop.Excel;
 using Syncfusion.XlsIO;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.UI.HtmlControls;
 using Button = System.Web.UI.WebControls.Button;
 using DataTable = System.Data.DataTable;
@@ -86,9 +87,9 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
         conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
         conn.Open();
         using (conn)
-        {
+        {            
             SqlCommand sqlComm = new SqlCommand("EstraiPresenze", conn);
-
+            sqlComm.CommandTimeout = 200000;
             // valorizza parametri della query
             sqlComm.Parameters.AddWithValue("@Anno", AnnoSelezionato);
             sqlComm.Parameters.AddWithValue("@Mese", MeseSelezionato);
@@ -102,6 +103,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             da.Fill(dsPresenze, NomePresenze);
 
             SqlCommand sqlCommSpese = new SqlCommand("EstraiSpese", conn);
+            sqlCommSpese.CommandTimeout = 200000;
 
             // valorizza parametri della query
             sqlCommSpese.Parameters.AddWithValue("@Anno", AnnoSelezionato);
@@ -150,7 +152,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             }
         }
         //se ci sono persone con solo festivita le tolgo dal dataset orginale
-        if (listaPersoneDaEliminare.ToNullToString() != "")
+        if (listaPersoneDaEliminare != "" )
         {
             listaPersoneDaEliminare.Substring(0, listaPersoneDaEliminare.Length - 1);
 
@@ -423,7 +425,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                 Response.Flush();
                 Response.End();
             }
-
         }
     }
 }
