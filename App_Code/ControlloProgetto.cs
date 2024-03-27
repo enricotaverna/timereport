@@ -5,17 +5,34 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System.Security.RightsManagement;
+using System.Activities.Expressions;
 
 public class EconomicsProgetto
 {
     public int Projects_Id;
     public string ProjectCode;
-    public double RevenueBudget { get; set; }
-    public double RevenueActual { get; set; }
-    public double CostiActual { get; set; }
-    public double SpeseActual { get; set; }
+
+    public double BurnRate { get; set; }
+
+    public double RevenueBDG { get; set; }
+    public double RevenueACT { get; set; }
+    public double RevenueEAC { get; set; }
+
+    public double SpeseBDG { get; set; }
+    public double SpeseACT { get; set; }
+    public double SpeseEAC { get; set; }
+
+    public double MargineACT { get; set; }
+    public double MargineEAC { get; set; }
+
+    public double CostiBDG { get; set; }
+    public double CostiACT { get; set; }
+    public double CostiEAC { get; set; }
+
+
     public double GiorniActual { get; set; }
-    public double MargineActual { get; set; }
+    
     public string TipoContratto { get; set; }
     public double WriteUp { get; set; }
     public double MesiCopertura { get; set; }
@@ -25,21 +42,44 @@ public class EconomicsProgetto
     /* estrae dati di singolo progetto */
     public EconomicsProgetto(string DataReport, string ProgettoReport)
     {
-        DataSet ds = ControlloProgetto.EseguiStoredProcedure(DataReport, ProgettoReport, "0");
+
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        // il codice manager non serve essendo chiamato per il singolo progetto
+        DataSet ds = ControlloProgetto.PopolaDataset(DataReport, ProgettoReport, "0");
+
         DataRow dr = ds.Tables["Export"].Rows[0]; // record relativo al progetto selezionato
 
         Projects_Id = (int)dr["Projects_Id"];
         ProjectCode = dr["ProjectCode"].ToString();
         TipoContratto = dr["TipoContratto"].ToString();
-        RevenueBudget = dr["RevenueBudget"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBudget"]);
-        RevenueActual = dr["RevenueActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueActual"]);
+
+        BurnRate = dr["BurnRate"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["BurnRate"]);
+
+        /** Revenue **/
+        RevenueBDG = dr["RevenueBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBDG"]);
+        RevenueACT = dr["RevenueACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueACT"]);
+        RevenueEAC = dr["RevenueEAC"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueEAC"]);
+
+        /** Spese **/
+        SpeseBDG = dr["SpeseBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseBDG"]);
+        SpeseACT = dr["SpeseACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseACT"]);
+        SpeseEAC = dr["SpeseEAC"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseEAC"]);
+
+        /** Costi **/
+        CostiBDG = dr["CostiBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiBDG"]);
+        CostiACT = dr["CostiACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiACT"]);
+        CostiEAC = dr["CostiEAC"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiEAC"]);
+
+        /** Margine **/
+        MargineACT = dr["MargineACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["MargineACT"]);
+        MargineEAC = dr["MargineEAC"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["MargineEAC"]);
+
         GiorniActual = dr["GiorniActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["GiorniActual"]);
-        SpeseActual = dr["SpeseActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseActual"]);
         WriteUp = dr["WriteUp"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["WriteUp"]);
         MesiCopertura = dr["MesiCopertura"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["MesiCopertura"]);
-        CostiActual = dr["CostiActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiActual"]);
-        MargineActual = (RevenueActual - CostiActual) / RevenueActual;
-        PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
+        
+        if (dr["PrimaDataCarico"].ToString() != "")
+            PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
         
     }
 
@@ -82,146 +122,154 @@ public class ControlloProgetto
     }
 
 
-   /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
-    public static DataSet EseguiStoredProcedure(string DataReport, string ProgettoReport, string ManagerReport)
+    /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
+    public static DataSet PopolaDataset(string DataReport, string ProgettoReport, string ManagerReport)
     {
 
-        DataSet ds = new DataSet("Export");
-        string strStoredProcedure = "SPcontrolloProgetti";
-        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        List<SqlParameter> parametersList = new List<SqlParameter>();
 
-        // conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        // Se DDL non valorizzata passa NULL al parametro
+        if (ProgettoReport != "0")
+            parametersList.Add(new SqlParameter("@Project_id", Convert.ToInt16(ProgettoReport)));
 
-        using (conn)
-        {
-            SqlCommand sqlComm = new SqlCommand(strStoredProcedure, conn);
+        // Se DDL non valorizzata passa NULL al parametro
+        if (ManagerReport != "0")
+            parametersList.Add(new SqlParameter("@Manager_id", Convert.ToInt16(ManagerReport)));
 
-            // valorizza parametri della query
-            sqlComm.Parameters.AddWithValue("@DataReport", Convert.ToDateTime(DataReport));
+        parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime(DataReport)));       
+        parametersList.Add(new SqlParameter("@TipoCalcolo", 0));
 
-            // Se DDL non valorizzata passa NULL al parametro
-            if (ProgettoReport != "0")
-                sqlComm.Parameters.AddWithValue("@Project_id", Convert.ToInt16(ProgettoReport));
+        SqlParameter[] parameters = parametersList.ToArray();
 
-            // Se DDL non valorizzata passa NULL al parametro
-            if (ManagerReport != "0")
-                sqlComm.Parameters.AddWithValue("@Manager_id", Convert.ToInt16(ManagerReport));
-
-            // Tipo Calcolo
-            // sqlComm.Parameters.AddWithValue("@TipoCalcolo", Convert.ToInt16(RBTipoCalcolo.SelectedValue));
-            sqlComm.Parameters.AddWithValue("@TipoCalcolo", 0);
-
-            // esecuzione
-            sqlComm.CommandType = CommandType.StoredProcedure;
-
-            SqlDataAdapter da = new SqlDataAdapter();
-            da.SelectCommand = sqlComm;
-
-            da.Fill(ds, "Export");
-
-        }
+        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+        DataSet ds = Database.ExecuteStoredProcedure("SPcontrolloProgetti", parameters);
 
         // Aggiunge colonne calcolate
         ds.Tables["Export"].Columns.Add("BurnRate", typeof(Double));
         ds.Tables["Export"].Columns.Add("MesiCopertura", typeof(Double));
-        ds.Tables["Export"].Columns.Add("MargineActual", typeof(Double));
+
+        //ds.Tables["Export"].Columns.Add("RevenueACT", typeof(Double));
+        ds.Tables["Export"].Columns.Add("RevenueEAC", typeof(Double));
+        ds.Tables["Export"].Columns.Add("SpeseEAC", typeof(Double));
+
+        ds.Tables["Export"].Columns.Add("MargineACT", typeof(Double));
+        ds.Tables["Export"].Columns.Add("MargineEAC", typeof(Double));
+
+        ds.Tables["Export"].Columns.Add("CostiBDG", typeof(Double));
+        ds.Tables["Export"].Columns.Add("CostiEAC", typeof(Double));
+
         ds.Tables["Export"].Columns.Add("WriteUp", typeof(Double));
         ds.Tables["Export"].Columns.Add("Status", typeof(Char)); // G = Green R = Red O = Orange
         ds.Tables["Export"].Columns.Add("ImgUrl", typeof(string)); // Url Immagine
         ds.Tables["Export"].Columns.Add("ToolTip", typeof(string)); // Commento
-        ds.Tables["Export"].Columns.Add("ColoreDataFine", typeof(string)); // Colore sfondo data fine
         ds.Tables["Export"].Columns.Add("TooltipDataFine", typeof(string)); // ToolTip sfondo data fine
 
         // Calcola colonne
-        ds = CalcolaColonne(ds, DataReport);
+        ds = ControlloProgetto.CalcolaColonne(ds, DataReport);
 
         return (ds);
-
     }
 
     // Calcola colonne aggiuntive report non valorizzate dalla storage procedure
-    private static DataSet CalcolaColonne(DataSet ds, string DataReport)
+    public static DataSet CalcolaColonne(DataSet ds, string DataReport)
     {
 
         foreach (DataRow dr in ds.Tables["Export"].Rows)
         {
-            float dRevenueActual = dr["RevenueActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueActual"]);
-            float dCostiActual = dr["CostiActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiActual"]);
-            float dRevenueBudget = dr["RevenueBudget"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBudget"]);
+
+            //*** Inizio controllo dati ** //
+
             float RecordWithoutCost = dr["RecordWithoutCost"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RecordWithoutCost"]);
-
-            // netto budget ABAP
-            //float dBudgetABAP = dr["BudgetABAP"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["BudgetABAP"]);
-
-
-            //float dRevenueBudgetNet = RBTipoCalcolo.SelectedValue == "1" ? (float)dRevenueBudget - (float)dBudgetABAP : (float)dRevenueBudget;
-            // eliminato il calcolo al netto del budget ABAP
-            float dRevenueBudgetNet = (float)dRevenueBudget;
-
-            // dr["BudgetNetto"] = dRevenueBudgetNet; // Budget revenue al netto del budget ABAP
-
             DateTime dtTBDataReport = Convert.ToDateTime(DataReport);
             DateTime dtDataFine = dr["DataFine"] != DBNull.Value ? (DateTime)dr["DataFine"] : new DateTime(2001, 1, 1);
             DateTime dtPrimaDataCarico = dr["PrimaDataCarico"] != DBNull.Value ? (DateTime)dr["PrimaDataCarico"] : new DateTime(2001, 1, 1);
+            string errMsg = "";
 
-
-            // se manca qualche dato obbligatorio mette a warning la colonna e salta i conti
-            if (dr["PrimaDataCarico"] == DBNull.Value || dr["DataFine"] == DBNull.Value ||
-                dRevenueBudget == 0)
-            {
-                dr["Status"] = "O";
-                dr["ImgUrl"] = "/timereport/images/icons/other/question_mark.png";
-                dr["ToolTip"] = "Controllare dati del progetto/attività (date, budget)";
-                continue;
+            // se giorni di carico sono zero cancella il record
+            if (dr["GiorniActual"].ToString() == "") {
+                errMsg += "<li>Nessun giorno caricato sul progetto</li>";
             }
 
-            if (RecordWithoutCost != 0)
+
+            if (dr["MargineProposta"] == DBNull.Value)
+            {
+                errMsg += "<li>Margine proposta non specificato</li>";
+            }
+
+            if (dr["DataFine"] == DBNull.Value)
+            {
+                errMsg += "<li>Data fine progetto non specificata</li>";
+            }
+            else if ( DateTime.Now > (DateTime)dr["DataFine"])
+            {
+                errMsg += "<li>Data fine progetto scaduta</li>";
+            }
+
+            if (RecordWithoutCost != 0) {
+
+                if (dr["TipoContratto"].ToString() == "FORFAIT")
+                    errMsg += "<li>Cost Rate</li>";
+                else
+                    errMsg += "<li>Cost Rate e Bill rate consulenti</li>";
+            }
+
+            if (errMsg != "") {
+                errMsg = "Errori da controllare:<ul>" + errMsg + "</ul>";
+
+            }
+
+            if (errMsg != "")
             {
                 // annulla valori calcolati perchè non tutti i dati sono presenti
-                dr["RevenueActual"] = 0;
+                dr["RevenueACT"] = 0;
                 dr["BurnRate"] = 0;
                 dr["MesiCopertura"] = 0;
                 dr["WriteUp"] = 0;
                 dr["GiorniActual"] = 0;
-                dr["SpeseActual"] = 0;
+                dr["SpeseACT"] = 0;
 
                 dr["Status"] = "O";
                 dr["ImgUrl"] = "/timereport/images/icons/other/question-mark.png";
-                dr["ToolTip"] = "Impossibile valorizzare actual, controllare FLC delle persone e margine progetto";
+                dr["ToolTip"] = errMsg;
                 continue;
             }
-           
-            // Burn Rate = Revenue Actual / Giorni lavorativi da inizio progetto a data report
-            // WriteUp/Off = Revenue Budget - Revenue Actual - (data fine - data report ) * BurnRate
-            // mesi copertura =  (Revenue Budget - Revenue Actual ) / burnrate / 20
-            //
 
-            dr["BurnRate"] = Math.Round(dRevenueActual /
-                             CommonFunction.NumeroGiorniLavorativi(dtPrimaDataCarico, Convert.ToDateTime(DataReport)), 2);
+            //*** Fine controllo dati ** //
+
+            //*** recupera valori dalla query
+            float dRevenueBDG = dr["RevenueBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBDG"]);
+            float dRevenueACT = dr["RevenueACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueACT"]);
+            float dSpeseACT = dr["SpeseACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseACT"]);
+            //float dRevenueEAC = 
+
+            float dCostiActual = dr["CostiACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiACT"]);
+            float dRevenueBDGNet = (float)dRevenueBDG;
+
+            //*** calcola valori dalla query
+            int giorniLavorativi = CommonFunction.NumeroGiorniLavorativi(dtPrimaDataCarico, Convert.ToDateTime(DataReport));
+            float dBurnRate = (float)Math.Round(dRevenueACT / giorniLavorativi, 2);
+            float dSpeseBurnRate = (float)Math.Round(dSpeseACT / giorniLavorativi, 2);
+            float dCostiBurnRate = (float)Math.Round(dCostiActual / giorniLavorativi, 2);
+
+            dr["BurnRate"] = dBurnRate;
 
             // se la data fine è nel futuro proietta writeup e mesi di copertura
-            if (dtTBDataReport < (DateTime)dr["DataFine"])
-            {
-                dr["WriteUp"] = Math.Round(dRevenueBudgetNet - dRevenueActual - CommonFunction.NumeroGiorniLavorativi(dtTBDataReport, (DateTime)dr["DataFine"]) * Convert.ToDouble(dr["BurnRate"]), 2);
-                //dr["COloreDataFine"] = "#FFCC00";
-                //dr["TooltipDataFine"] = "Data fine progetto nel futuro";
-            }
-            else
-            {
-                // calcola writeup/off senza proiezione
-                dr["WriteUp"] = Math.Round(dRevenueBudgetNet - dRevenueActual, 2);
-                // mette in arancione lo sfondo
-                dr["ColoreDataFine"] = "#FFCC00";
-                dr["TooltipDataFine"] = "Progetto terminato";
-            }
+            dr["WriteUp"] = Math.Round(dRevenueBDGNet - dRevenueACT - CommonFunction.NumeroGiorniLavorativi(dtTBDataReport, (DateTime)dr["DataFine"]) * Convert.ToDouble(dr["BurnRate"]), 2);
 
-            dr["MargineActual"] = Math.Round( Convert.ToDouble(dr["MargineProposta"]) + Convert.ToDouble(dr["WriteUp"]) / dRevenueActual, 2 );
+            // Calcolo BDG
+            dr["CostiBDG"] = Math.Round( (dRevenueBDG) / ( 1 - Convert.ToDouble(dr["MargineProposta"])), 2);
+
+            // calcolo ACT
+            dr["MargineACT"] = Math.Round((dRevenueACT - dCostiActual) / dRevenueACT, 2);
+
+            // calcolo EAC
+            dr["RevenueEAC"] = Math.Round( dRevenueACT  + dBurnRate * giorniLavorativi, 2);
+            dr["SpeseEAC"] = Math.Round(dSpeseACT + dSpeseBurnRate * giorniLavorativi, 2);
+            dr["MargineEAC"] = Math.Round( Convert.ToDouble(dr["MargineProposta"]) + Convert.ToDouble(dr["WriteUp"]) / dRevenueACT, 2 );
+            dr["CostiEAC"] = Math.Round(dCostiActual + dCostiBurnRate * giorniLavorativi, 2);
 
             // Se writeup positivo calcola mesi di copertura altrimenti li forza a zero
-            //if ((double)dr["WriteUp"] > 0)
-                dr["MesiCopertura"] = Math.Round(((dRevenueBudgetNet - dRevenueActual) / Convert.ToDouble(dr["BurnRate"])) / 20, 2);
-            //else
-            //    dr["MesiCopertura"] = 0;
+            dr["MesiCopertura"] = Math.Round(((dRevenueBDGNet - dRevenueACT) / Convert.ToDouble(dr["BurnRate"])) / 20, 2);
 
             if (Convert.ToDouble(dr["WriteUp"]) > 0)
             {

@@ -406,8 +406,8 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
 
         // carica lista oggetti
         //listaCard.Add(RichiesteAperte);
-        listaCard.Add(GiorniTraining);
-        listaCard.Add(TrainingDaValutare);
+        //listaCard.Add(GiorniTraining); 022023 disabilitato in quanto gestito in Ragic
+        //listaCard.Add(TrainingDaValutare); 022023 disabilitato in quanto gestito in Ragic
         listaCard.Add(OreNelMese);
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);

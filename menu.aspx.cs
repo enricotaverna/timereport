@@ -21,14 +21,14 @@ public partial class menu : System.Web.UI.Page
         if (ConfigurationManager.AppSettings["LEAVE_ON"] == "false")
             RichiesteAperte.Visible = false;
 
-        if (Session["TrainingCheckSecondCall"] == null)
-            Session["TrainingCheckSecondCall"] = "false";
-        else
-            Session["TrainingCheckSecondCall"] = "true";
+        //if (Session["TrainingCheckSecondCall"] == null)
+        //    Session["TrainingCheckSecondCall"] = "false";
+        //else
+        //    Session["TrainingCheckSecondCall"] = "true";
 
         // spegne box GiorniTraining e GiorniAssenza in assenza di autorizzazioni
         if (!Auth.ReturnPermission("REPORT", "PEOPLE_ALL")) { 
-            GiorniTraining.Visible = false;
+            //GiorniTraining.Visible = false;
             GiorniAssenza.Visible = false;
         }
 
@@ -37,11 +37,8 @@ public partial class menu : System.Web.UI.Page
             CVdaConfermare.Visible = false;
 
         // spegne box Feedback training in assenza di autorizzazioni
-        if (!Auth.ReturnPermission("TRAINING", "RATE"))
-            TrainingDaValutare.Visible = false;
-
-        if (CurrentSession.UserLevel != MyConstants.AUTH_ADMIN)
-            ContrattiSubco.Visible = false;
+        //if (!Auth.ReturnPermission("TRAINING", "RATE"))
+        //    TrainingDaValutare.Visible = false;
 
         // spegne box Assenze da approvare in assenza di autorizzazioni
         //if (!Auth.ReturnPermission("DATI", "ASSENZE"))

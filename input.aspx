@@ -68,7 +68,7 @@
                     <div class="input nobottomborder" id="lbOpportunityId">
                         <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" 
-                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$"  MaxLength="15" />
+                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$"  MaxLength="15" />
                     </div>
 
                     <div class="input nobottomborder">
@@ -339,7 +339,7 @@
 
                     if (col.id.includes("hdr")) {
                         var span = document.getElementById("ore" + col.id.replace("hdr", ""));
-                        span.textContent = "";
+                        if (span != null) span.textContent = ""; // 170324 fix per evitare che Javascript andasse in errore su ore di mesi chiusi
                     }
 
                     //prendo solamente le celle dove è possibile inserire i time (escludo i titoli dei giorni)
@@ -355,14 +355,18 @@
                             });
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
-                            span.textContent = "Ore: " + sommaOre.toFixed(2);
-                            span.style.color = '#666666';
-                            if (sommaOre == 0) {
-                                span.textContent = "";
-                            } else if (sommaOre < 8) {
-                                //se minore di 8 segnalo in rosso
-                                span.style.color = 'red';
-                            }
+
+                            if (span != null) {
+
+                                span.textContent = "Ore: " + sommaOre.toFixed(2);
+                                span.style.color = '#666666';
+                                if (sommaOre == 0) {
+                                    span.textContent = "";
+                                } else if (sommaOre < 8) {
+                                    //se minore di 8 segnalo in rosso
+                                    span.style.color = 'red';
+                                } // 170324 fix per evitare che Javascript andasse in errore su ore di mesi chiusi
+                            } 
                         }
                     } 
                 }

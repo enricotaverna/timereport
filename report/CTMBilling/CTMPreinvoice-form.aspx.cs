@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Activities.Expressions;
 using System.Text.RegularExpressions;
 using Xceed.Document.NET;
+using System.Collections.Generic;
 
 public class PreInvoiceData
 {
@@ -98,6 +99,23 @@ public partial class Preinvoice_form : System.Web.UI.Page
         string WordTemplate = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PREINVOICE_PATH"]) + "TemplateConsuntivo-IT.docx";
         using (var document = DocX.Load(WordTemplate))
         {
+
+            // rimuove la colonna WBS se non richiesta
+            if (preInv.WBS)
+            {
+                document.Tables[0].Remove(); // cancella le tabelle senza la colonna WBS
+                document.Tables[1].Remove();
+            }
+            else {
+                document.Tables[1].Remove(); // cancella le tabelle con la colonna WBS
+                document.Tables[2].Remove();
+            }
+
+            // Spese 
+            var ExpensesTable = document.Tables[ExpensesTableIndex];
+            var ProjectsTable = document.Tables[ProjectsTableIndex];
+            var HoursTable = document.Tables[HoursTableIndex];
+
             document.ReplaceText("<intestatario>", preInv.NomeCliente);
             document.ReplaceText("<numero>", preInv.Number);
             document.ReplaceText("<data>", preInv.Date);
@@ -109,9 +127,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
             document.ReplaceText("<signed_by>", CurrentSession.UserName);
             document.ReplaceText("<mail>", CurrentSession.UserMail);
 
-            // Progetti
-            var ProjectsTable = document.Tables[ProjectsTableIndex];
-
+            
             DataTable dt;
             
             if (!preInv.WBS)
@@ -146,10 +162,6 @@ public partial class Preinvoice_form : System.Web.UI.Page
                 loopIndex++;
             }
 
-
-            // Rates
-            var HoursTable = document.Tables[HoursTableIndex];
-
             // dt = Database.GetData(preInv.SubtotalAmountQuery + " ORDER BY NomeConsulente, Progetto", null);
             if (!preInv.WBS)
                 dt = Database.GetData("SELECT NomeConsulente, progetto, SUM(ore)/8 as giorni, tariffa, SUM(Importo) as importo FROM ( " + preInv.AllDaysQuery +
@@ -181,9 +193,6 @@ public partial class Preinvoice_form : System.Web.UI.Page
                 loopIndex++;
             }
 
-            // Spese 
-            var ExpensesTable = document.Tables[ExpensesTableIndex];
-
             dt = Database.GetData("SELECT Cliente, NomeConsulente, Progetto, TipoSpesa, SUM(Importo) as 'Importo' FROM (" +
                                   preInv.AllExpenseQuery +
                                   " ) AS TAB GROUP BY Cliente, NomeConsulente, Progetto, TipoSpesa" , null);
@@ -208,16 +217,7 @@ public partial class Preinvoice_form : System.Web.UI.Page
                 ExpensesTable.Remove();
                 document.ReplaceText("Rimborso spese", ""); ;
             }
-
-            
-
-            // rimuove la colonna WBS se non richiesta
-            if (!preInv.WBS) { 
-                ProjectsTable.RemoveColumn(1);
-                HoursTable.SetWidthsPercentage(new[] { 30f, 35f, 15f, 15f, 15f }, 560); // percentuale larghezza colonne + dimensione tabella in punti
-                HoursTable.RemoveColumn(2);
-            }
-
+           
             // Save this document to disk.
             string UrlWordSaved = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PREINVOICE_PATH"]) + "consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/","") + ".docx";
             document.SaveAs(UrlWordSaved);

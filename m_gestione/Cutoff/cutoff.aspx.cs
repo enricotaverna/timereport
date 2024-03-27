@@ -44,7 +44,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
         DateTime oldCutoffDate = CurrentSession.dCutoffDate;
         
         // calcola costi per tutti i progetti del mese da chiudere
-        ControlloProgetto.CalcolaCosti(oldCutoffDate , 0, 0);
+        ControlloProgetto.CalcolaCosti(oldCutoffDate , 0, 0); // data, progetto, overwrite
 
         Response.Redirect("/timereport/m_gestione/Cutoff/cutoff.aspx");
     }
