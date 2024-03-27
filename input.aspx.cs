@@ -320,7 +320,7 @@ public partial class input : System.Web.UI.Page
                 else
                 {
                     Response.Write("<div id=TRitm" + rdr["Hours_id"] + ">");
-                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
+                    Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + " 'class=hours href=/timereport/m_gestione/Approval/LeaveRequestCreate.aspx?action=fetch&ApprovalRequest_id=" + rdr["ApprovalRequest_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
                 }
 
                 // cancellazione solo in change e se la riga non è una richiesta assenza

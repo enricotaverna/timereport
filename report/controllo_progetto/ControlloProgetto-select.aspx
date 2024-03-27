@@ -48,7 +48,9 @@
 
                 <div id="FormWrap" class="StandardForm col-5">
 
-                    <div class="formtitle">Controllo Progetto</div>
+                    <div class="formtitle">
+                        <asp:Literal runat="server" Text="Controllo Progetto" />
+                    </div>
 
                     <!--  *** PROGETTO *** -->
                     <div class="input nobottomborder">
@@ -71,37 +73,39 @@
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
                         <div style="position: absolute">
-                        <div class="inputtext">Director</div>
-                            <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id"
-                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone">
-                                <asp:ListItem Value="0">-- tutti i director --</asp:ListItem>
+                        <div class="inputtext">Responsabile</div>
+                            <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true"
+                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Responsabile" >
+                                <asp:ListItem Value="">-- Manager o Account --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
                     </div>
                     <br />
-                    <!--  **** DATA REPORT ** -->
-                    <div class="input">
-                        <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data Report:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ErrorMessage="Inserire data fine" ID="TBDataReport" runat="server" MaxLength="10" Rows="12" Columns="10"
-                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" data-parsley-required="true" />
-                    </div>
+                    <br />
 
                     <!--  **** DATA REPORT ** -->
                     <div class="input nobottomborder">
-                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Metodo calcolo"></asp:Label>
+                        <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data Report:"></asp:Label>
+                        <asp:TextBox CssClass="ASPInputcontent" ID="TBDataReport" runat="server" MaxLength="10" Rows="12" Columns="10"  Enabled="False" />
+                    </div>
 
-                        <asp:RadioButtonList ID="RBTipoCalcolo" runat="server">
+                    <!--  **** DATA REPORT ** 
+                        
+                       // forzato default calcolo Tipo 0
+
+                       <div class="input nobottomborder">
+                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Metodo calcolo"></asp:Label>--                        
+                        <asp:RadioButtonList ID="RBTipoCalcolo" runat="server"> 
                             <asp:ListItem Value="0" Selected="True">Budget Totale</asp:ListItem>
                             <asp:ListItem Value="1">Budget Netto ABAP</asp:ListItem>
-                        </asp:RadioButtonList>
+                        </asp:RadioButtonList>--%>
 
-                    </div>
+                    </div> -->
 
                     <div class="buttons">
                         <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
                         <asp:Button ID="report" runat="server" Text="<%$ appSettings: REPORT_TXT %>" CssClass="orangebutton" CommandName="report" OnClick="sottometti_Click" />
                         <asp:Button ID="CancelButton" runat="server" formnovalidate="" CssClass="greybutton" OnClientClick="document.location.href='/timereport/menu.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
-
                     </div>
 
                 </div>
@@ -127,9 +131,10 @@
     </div>
 
     <!-- *** DATASOURCE *** -->
-    -   
+    
+    <!-- *** Selezione tutti quelli che sono account o manager di un progetto CHARGEABLE *** -->
     <asp:SqlDataSource ID="DS_Persone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON ( Persons.Persons_id = Projects.ClientManager_id OR  Persons.Persons_id = Projects.AccountManager_id ) WHERE (Persons.Active = @Active AND Projects.ProjectType_id = '1')  ORDER BY Persons.Name">
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>
@@ -147,14 +152,19 @@
         $('#DDLManager').SumoSelect({ placeholder: 'Director', search: true, searchText: 'Director' });
         $('.SumoSelect').css('width', '270px');
 
-        $(function () {
-            // datepicker
-            $("#TBDataReport").datepicker($.datepicker.regional['it']);
-        });
+        //$(function () {
+        //    // datepicker
+        //    $("#TBDataReport").datepicker($.datepicker.regional['it']);
+        //});
 
         // *** Esclude i controlli nascosti *** 
-        $('#FormProgetto').parsley({
+        $('#FVForm').parsley({
             excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
+
+        // Quando il form è valido
+        $('#FVForm').parsley().on('form:success', function () {
+            MaskScreen(true);
         });
 
     </script>

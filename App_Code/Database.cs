@@ -1,8 +1,14 @@
-﻿using System;
+﻿using Amazon.EC2.Model.Internal.MarshallTransformations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
+using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Runtime.Serialization;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 
 public class Database
@@ -178,7 +184,9 @@ public class Database
 
         string sret;
 
-        System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+        JavaScriptSerializer serializer = new JavaScriptSerializer();
+        // Impostare maxJsonLength su un valore più grande, ad esempio 2097152 (2 MB)
+        serializer.MaxJsonLength = 2097152;
         List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
         Dictionary<string, object> row;
         foreach (DataRow dr in dt.Rows)
@@ -190,7 +198,9 @@ public class Database
             }
             rows.Add(row);
         }
-        sret = serializer.Serialize(rows);
+
+        sret = JsonConvert.SerializeObject(rows, new IsoDateTimeConverter() { DateTimeFormat = "dd/MM/yyyy" });
+        //sret = serializer.Serialize(rows, new IsoDateTimeConverter() { DateTimeFormat = "dd-yyyy-MM-dd" });
 
         return sret;
 
@@ -209,7 +219,10 @@ public class Database
                 con.Open();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
-                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                // Impostare maxJsonLength su un valore più grande, ad esempio 2097152 (2 MB)
+                serializer.MaxJsonLength = 2097152;
+
                 List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
                 Dictionary<string, object> row;
                 foreach (DataRow dr in dt.Rows)
@@ -221,10 +234,49 @@ public class Database
                     }
                     rows.Add(row);
                 }
-                JsonString = serializer.Serialize(rows);
+
+                JsonString = JsonConvert.SerializeObject(rows, new IsoDateTimeConverter() { DateTimeFormat = "dd/MM/yyyy" });
+
+                //JsonString = serializer.Serialize(rows);
                 return JsonString;
             }
         }
 
     }
+
+    // 02.2024: Lancia stored procedure con parametri
+    public static DataSet ExecuteStoredProcedure(string storedProcedureName, SqlParameter[] parameters)
+    {
+        DataSet dataSet = new DataSet();
+
+        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+        {
+            using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                if (parameters != null)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                command.CommandTimeout = 60; // imposta timeout max al minuto
+
+                try
+                {
+                    connection.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(dataSet, "Export");
+                }
+                catch (Exception ex)
+                {
+                    // Gestione dell'eccezione
+                    // Console.WriteLine($"Errore durante l'esecuzione della stored procedure: {ex.Message}");
+                    return null; // errore
+                }
+            }
+        }
+
+        return dataSet;
+    }
+
 }

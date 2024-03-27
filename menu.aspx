@@ -5,7 +5,6 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<%--<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>--%>
 <script src="/timereport/include/javascript/timereport.js"></script>
 
 
@@ -47,57 +46,6 @@
             <!-- *** 1 Row *** -->
             <div class="row" id="row1" runat="server">
 
-                <!--  *** Box TRAINING DA VALUTARE ***    -->
-                <div class="col-md-4" id="TrainingDaValutare" runat="server">
-                    <div class="card my-2 widget-content hoverOn">
-                        <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                                <div class="widget-heading">Training da valutare</div>
-                                <div class="widget-subheading">concluso entro 120gg</div>
-                            </div>
-                            <div class="widget-content-right">
-                                <div class="widget-numbers"><span id="TrainingDaValutare-KPIValue0">0</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--  *** Box CV ***    -->
-                <div class="col-md-4" id="CVdaConfermare" runat="server">
-                    <div class="card  my-2 widget-content hoverOn">
-                        <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                                <div class="widget-heading">Curriculum da confermare</div>
-                                <div class="widget-subheading">da parte manager</div>
-                            </div>
-                            <div class="widget-content-right">
-                                <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--  *** Box GG TRAINING ***    -->
-                <div class="col-md-4" id="GiorniTraining" runat="server">
-                    <div class="card  my-2 widget-content hoverOn">
-                        <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                                <div class="widget-heading">Giornate training team</div>
-                                <div class="widget-subheading">prossimi 90 gg</div>
-                            </div>
-                            <div class="widget-content-right">
-                                <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- *** 1 Row *** -->
-
-            <!-- *** 2 Row *** -->
-            <div class="row" id="row2" runat="server">
-
                 <!--  *** Box ORE CARICATE ***    -->
                 <div class="col-md-4">
                     <div class="card my-2 widget-content hoverOn" id="OreNelMese">
@@ -125,8 +73,8 @@
                 </div>
 
                 <!--  *** Box Controllo contratti Subco ***    -->
-                <div class="col-md-4" id="ContrattiSubco" runat="server">
-<%--                    <div class="card my-2 widget-content hoverOn">
+<%--                <div class="col-md-4" id="ContrattiSubco" runat="server">
+                    <div class="card my-2 widget-content hoverOn">
                         <div class="widget-content-wrapper">
                             <div class="widget-content-left">
                                 <div class="widget-heading">Subco senza contratto</div>
@@ -136,8 +84,8 @@
                                 <div class="widget-numbers"><span id="ContrattiSubco-KPIValue0">0</span></div>
                             </div>
                         </div>
-                    </div>--%>
-                </div>
+                    </div>
+                </div>--%>
 
                 <!--  *** Box ASSENZE ***    -->
                 <div class="col-md-4" id="GiorniAssenza" runat="server">
@@ -155,11 +103,57 @@
                     </div>
                 </div>
 
-            </div>
-            <!-- *** 2 Row *** -->
+                <!--  *** Box CV ***    -->
+                <div class="col-md-4" id="CVdaConfermare" runat="server">
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Curriculum da confermare</div>
+                                <div class="widget-subheading">da parte manager</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- *** 3 Row *** -->
-            <div class="row" id="row3" runat="server">
+
+                <!--  *** Box TRAINING DA VALUTARE ***    -->
+<%--                <div class="col-md-4" id="TrainingDaValutare" runat="server">
+                    <div class="card my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Training da valutare</div>
+                                <div class="widget-subheading">concluso entro 120gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="TrainingDaValutare-KPIValue0">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>--%>
+
+                <!--  *** Box GG TRAINING ***    -->
+<%--                <div class="col-md-4" id="GiorniTraining" runat="server">
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Giornate training team</div>
+                                <div class="widget-subheading">prossimi 90 gg</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers text-success"><span id="GiorniTraining-KPIValue0">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>--%>
+
+            </div>
+            <!-- *** 1 Row *** -->
+
+            <!-- *** 2 Row *** -->
+            <div class="row" id="row2" runat="server">
 
                 <!--  *** Box SPESE NEL MESE ***    -->
                 <div class="col-md-4 my-2 hoverOn" id="SpeseNelMese">
@@ -200,7 +194,7 @@
                 </div>
 
                 <!--  *** Box GRAFICO ***    -->
-                <%--        <div class="main- card mx-3 col-md-4 card">
+<%--                        <div class="main- card mx-3 col-md-4 card">
                         <div class="card-body">
                             <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
                                 <div class="chartjs-size-monitor-expand" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
@@ -211,13 +205,14 @@
                                 </div>
                             </div>
                             <h5 class="card-title">Vertical Bars</h5>
-                            <canvas id="verticalBar" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
+                            <canvas id="myChart" height="253" width="508" class="chartjs-render-monitor" style="display: block; height: 203px; width: 407px;"></canvas>
                         </div>
                     </div>--%>
-            </div>
-            <!-- *** 3 Row *** -->
 
-            <!-- *** 4 Row *** -->
+            </div>
+            <!-- *** 2 Row *** -->
+
+            <!-- *** 3 Row *** -->
             <div class="row" id="row4" runat="server">
 
                 <!--  *** ListaLocation ***    -->
@@ -266,7 +261,7 @@
                 </div>
 
             </div>
-            <!-- *** 4 Row *** -->
+            <!-- *** 3 Row *** -->
 
         </div>
         <!-- *** End container *** -->
@@ -300,6 +295,8 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         $(document).ready(function () {
+
+            DrawChart();
 
             $("#RichiesteAperte").click(function () {
                 location.href = "/timereport/m_gestione/Approval/Approval_list.aspx";

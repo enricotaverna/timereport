@@ -166,6 +166,18 @@ function InitPage ( Bkgcolor, BkgImg ) {
     }
 }
 
+function downloadExcel(jsonRawData, sheetName, fileName) {
 
+    var jsonResp = $.parseJSON(jsonRawData);
+
+    /* generate worksheet and workbook */
+    const worksheet = XLSX.utils.json_to_sheet(jsonResp);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    // export del file con SheetJS
+    XLSX.writeFile(workbook, fileName);
+
+}
 
 

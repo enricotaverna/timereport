@@ -94,7 +94,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -207,7 +207,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -314,7 +314,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                                 <!-- per stile CSS -->
                                     <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'  Enabled="False"
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -405,7 +405,7 @@
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id,hours.OpportunityId,hours.SalesforceTaskID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
         InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,OpportunityId,SalesforceTaskID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id,@OpportunityId, @SalesforceTaskID)"
-        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType,OpportunityId=@OpportunityId,SalesforceTaskID=@SalesforceTaskID WHERE (Hours_Id = @Hours_id)"
+        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType,OpportunityId=@OpportunityId,SalesforceTaskID=@SalesforceTaskID, AccountManager_id = @AccountManager_id, ClientManager_id=@ClientManager_id WHERE (Hours_Id = @Hours_id)"
         OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
         <InsertParameters>
@@ -439,6 +439,8 @@
             <asp:Parameter Name="CancelFlag" />
             <asp:Parameter Name="Comment" />
             <asp:Parameter Name="TransferFlag" />
+            <asp:Parameter Name="AccountManager_id" />
+            <asp:Parameter Name="ClientManager_id" />
             <asp:Parameter Name="Activity_id" />
             <asp:Parameter Name="Projects_Id" />
             <asp:Parameter Name="LocationKey" />
