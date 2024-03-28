@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using Button = System.Web.UI.WebControls.Button;
 using DataTable = System.Data.DataTable;
@@ -336,8 +337,8 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
 
                     if (Spesa["Descrizione"].ToNullToString() == "AMS Rep. Settimanale")
                     {
-                        rows[0]["Nr. Reperibilità diurna"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
-                        rows[0]["Reperibilità diurna"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
+                        rows[0]["Nr. Reperibilità AMS settimanale"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
+                        rows[0]["Reperibilità AMS settimanale"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
                     }
 
                     if (Spesa["Descrizione"].ToNullToString() == "Reperibilità")
@@ -423,6 +424,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                 workbook.SaveAs(MyMemoryStream);
                 MyMemoryStream.WriteTo(Response.OutputStream);
                 Response.Flush();
+                //Response.Redirect("/timereport/report/Presenze/PresenzeSpese.aspx");
                 Response.End();
             }
         }

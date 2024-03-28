@@ -130,9 +130,9 @@
             return false;            
         }
 
-        $(".bottone-mese").click(function () {
-            MaskScreen(true);
-        });
+        //$(".bottone-mese").click(function () {
+        //    MaskScreen(true);
+        //});
 
     </script>
 
