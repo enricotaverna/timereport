@@ -1,5 +1,7 @@
 ﻿using Amazon.EC2.Model;
 using classiStandard;
+using Microsoft.Office.Interop.Excel;
+
 //using Microsoft.Office.Interop.Excel;
 using Syncfusion.XlsIO;
 using System;
@@ -398,6 +400,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                     row.CellStyle.Color = Color.Yellow;
                     row.CellStyle.Font.Bold = true;
                     row.CellStyle.Font.Size = 12;
+                    row.FreezePanes();
                 }
 
                 String[] rowData = new String[row.Columns.Count()];
@@ -413,6 +416,12 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             }
 
             sheet.UsedRange.AutofitColumns();
+
+            //Blocco header
+            sheet.Range["A2"].FreezePanes();
+
+            //le prime 4 colonne
+            sheet.Range["E2"].FreezePanes();
 
             Response.Clear();
             Response.Buffer = true;
