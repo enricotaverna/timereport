@@ -32,7 +32,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
         string sQuery;
 
         /* scarica record con ore non valorizzate */
-        sQuery = "SELECT DISTINCT Consulente, ProjectCode, NomeProgetto, TipoContratto, Director, AnnoMese, CostRate, BillRate, OreRicavi FROM v_oreWithCost WHERE Data >= " + ASPcompatility.FormatDatetimeDb(CurrentSession.dCutoffDate) +
+        sQuery = "SELECT DISTINCT Consulente, ProjectCode, NomeProgetto, TipoContratto, Director, CONVERT(varchar, data, 103) as date, CostRate, BillRate, OreRicavi FROM v_oreWithCost WHERE Data >= " + ASPcompatility.FormatDatetimeDb(CurrentSession.dCutoffDate) +
                                          " AND ( OreRicavi = 0 or OreRicavi is null ) AND ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
 
         Utilities.ExportXls(sQuery);

@@ -100,11 +100,9 @@
 
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" runat="server" Text="Allegati"></asp:Label>
-                        <asp:LinkButton ID="LinkButton1" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_Preinvoice">Consuntivo</asp:LinkButton>
+                        <asp:LinkButton ID="LinkButton1" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_Preinvoice">Rapporto(docx)</asp:LinkButton>
                         <span>&nbsp &nbsp </span>
-                        <asp:LinkButton ID="LinkButton2" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllRatesQuery">Dettaglio Ore</asp:LinkButton>
-                        <span>&nbsp &nbsp </span>
-                        <asp:LinkButton ID="LinkButton3" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_AllExpenseQuery">Dettaglio Spese</asp:LinkButton>
+                        <asp:LinkButton ID="LinkButton2" runat="server" NavigateUrl="#" CssClass="link-primary" OnClick="Download_Query">Consuntivi(xlsx)</asp:LinkButton>
                     </div>
 
                    <div class="" style="font-size: 10px; line-height: 14px; margin: 20px 0px 10px 10px; color: dimgrey">
@@ -115,7 +113,7 @@
                     <div class="buttons">
                         <div id="valMsg" class="col parsely-single-error"></div>
                         <asp:Button ID="BTSave" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClick="InsertButton_Click" />
-                        <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings:    CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" formnovalidate />
+                        <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" formnovalidate />
                     </div>
 
                     <!-- *** campi nascosti usati da Javascript ***  -->
@@ -192,7 +190,6 @@
         const disableButtons = () => {
             $("#LinkButton1").hide();
             $("#LinkButton2").hide();
-            $("#LinkButton3").hide();
             $("#BTSave").hide();
         }
 

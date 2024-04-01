@@ -71,7 +71,6 @@
 
                     <asp:FormView ID="FVProgetto" runat="server" DataKeyNames="Projects_Id"
                         DataSourceID="projects" OnItemUpdated="FVProgetto_ItemUpdated"
-                        OnModeChanging="FVProgetto_ModeChanging"
                         DefaultMode="Edit" Width="100%">
 
                         <EditItemTemplate>
@@ -318,7 +317,7 @@
                                 <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
                                 <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
                                 <asp:Button ID="btn_calc" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" Style="width: 120px" OnClick="btn_calc_Click" />
-                                <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
+                                <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" PostBackUrl="/timereport/report/controllo_progetto/ControlloProgetto-list.aspx" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                             </div>
 
                         </EditItemTemplate>
@@ -510,10 +509,10 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: <%=columnNamesJson  %>,
+                    labels: <%=Session["columnNamesJson"]  %>,
                     datasets: [{
                         label: 'mandays',
-                        data:  <%=columnSumsJson  %>,
+                        data:  <%=Session["columnSumsJson"]  %>,
                         borderWidth: 1
                     }]
                 },
