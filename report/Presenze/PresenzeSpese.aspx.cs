@@ -17,6 +17,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
+using System.Windows;
 using Button = System.Web.UI.WebControls.Button;
 using DataTable = System.Data.DataTable;
 using Label = System.Web.UI.WebControls.Label;
@@ -366,6 +367,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
 
     protected void EstraiEformattaExcel(DataSet dsPresenze, string fileName)
     {
+        bool ret;
         using (ExcelEngine excelEngine = new ExcelEngine())
         {
             IApplication application = excelEngine.Excel;
@@ -423,19 +425,24 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             //le prime 4 colonne
             sheet.Range["E2"].FreezePanes();
 
-            Response.Clear();
-            Response.Buffer = true;
-            Response.Charset = "";
-            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            Response.AddHeader("content-disposition", string.Format("attachment;filename={0}.xlsx", fileName));
-            using (MemoryStream MyMemoryStream = new MemoryStream())
-            {
-                workbook.SaveAs(MyMemoryStream);
-                MyMemoryStream.WriteTo(Response.OutputStream);
-                Response.Flush();
-                //Response.Redirect("/timereport/report/Presenze/PresenzeSpese.aspx");
-                Response.End();
-            }
+            ret = Utilities.ExporXlsxWorkbook(workbook, string.Format("{0}.xlsx", fileName));
+
+            //Response.Clear();
+            //Response.Buffer = true;
+            //Response.Charset = "";
+            //Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            //Response.AddHeader("content-disposition", string.Format("attachment;filename={0}.xlsx", fileName));
+            //using (MemoryStream MyMemoryStream = new MemoryStream())
+            //{
+            //    workbook.SaveAs(MyMemoryStream);
+            //    MyMemoryStream.WriteTo(Response.OutputStream);
+            //    Response.Flush();
+            //    //Response.Redirect("/timereport/report/Presenze/PresenzeSpese.aspx");
+            //    Response.End();
+            //}
         }
+
+        // Avvio download dopo che è stato prodotto il file
+        if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('"+fileName+".xlsx'); };", true);
     }
 }
