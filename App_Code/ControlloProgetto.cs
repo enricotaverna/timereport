@@ -121,7 +121,6 @@ public class ControlloProgetto
         return numRec;
     }
 
-
     /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
     public static DataSet PopolaDataset(string DataReport, string ProgettoReport, string ManagerReport)
     {
@@ -168,6 +167,26 @@ public class ControlloProgetto
         ds = ControlloProgetto.CalcolaColonne(ds, DataReport);
 
         return (ds);
+    }
+
+    /* Estrae giorni con costi */
+    public static DataTable EstraiGiorniCosti(string DataReport, string ProgettoReport, string ManagerReport) {
+        string sQuery;
+
+        /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
+        sQuery = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + ASPcompatility.FormatDatetimeDb(Convert.ToDateTime(DataReport)) +
+                                         " AND ProjectType_id = '" + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + "'";
+
+        if (ProgettoReport != "0")
+            sQuery += " AND Projects_id = " + ProgettoReport;
+
+        if (ManagerReport != "0")
+            sQuery += " AND ( ClientManager_id = " + ManagerReport + " OR AccountManager_id = " + ManagerReport + ")";
+
+        sQuery += " ORDER BY Consulente, Data";
+
+        return (Database.GetData(sQuery, null));
+
     }
 
     // Calcola colonne aggiuntive report non valorizzate dalla storage procedure

@@ -40,7 +40,6 @@
 </head>
 
 <body>
-
     <!-- *** APPLICTION MENU *** -->
     <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
@@ -109,8 +108,7 @@
 
                         <%--Messaggio se nessun dato selezionato --%>
                         <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
-                        <asp:Button ID="btn_ExportSintesi" runat="server" CssClass="orangebutton" Style="width: 140px" Text="Download Sintesi"   />
-                        <asp:Button ID="btn_ExportDettagli" runat="server" CssClass="orangebutton" Style="width: 140px" Text="Donwload Dettagli"  />
+                        <asp:Button ID="btn_ExportDettagli" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
 
                     </div>
@@ -143,51 +141,14 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
-        UnMaskScreen();
+        UnMaskScreen();        
 
         $("#btn_ExportDettagli").click(function (e) {
-
-            e.preventDefault()
             MaskScreen(true); // cursore e finestra modale
-            
-            $.ajax({
-                type: "POST",
-                url: "/timereport/webservices/WS_SheetJS.asmx/ControlloProgetto_ExportDetailHoursWithCost",
-                //data: values, no input needed
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    UnMaskScreen();
-                    downloadExcel(msg.d, "Hours", "ExportDetailHours.xlsx"); // dati, nome sheet, nome file
-                },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    alert(xhr.responseText);
-                }
-            }); // ajax
-
         });
 
-        $("#btn_ExportSintesi").click(function (e) {
-            e.preventDefault()
+        $("#BtnExport_Sintesi_Click").click(function (e) {
             MaskScreen(true); // cursore e finestra modale
-
-            $.ajax({
-                type: "POST",
-                url: "/timereport/webservices/WS_SheetJS.asmx/ControlloProgetto_ExportSintesi",
-                //data: values, no input needed
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    UnMaskScreen();
-                    downloadExcel(msg.d, "Progetti", "ExportSintesi.xlsx"); // dati, nome sheet, nome file
-                },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    alert(xhr.responseText);
-                }
-            }); // ajax
-
         });
 
         // tooltip : hideDelay default 500, riduce tempo prima che sia nascosto il tooltip
@@ -199,5 +160,6 @@
 
     </script>
 
-</body>
+    </body>
+
 </html>

@@ -15,6 +15,16 @@ var displayAlert = function () {
         }
 };
 
+// forza il trigger di un link sul client per avviare il download di un file
+function triggeFileExport(filename) {
+
+    // se non c'è la div mask la aggiunge
+    if (document.getElementById("exportLink") == null)
+        $("body").append("<a id = 'exportLink' href = '/public/" + filename + "' ></a> ");
+
+    $('#exportLink')[0].click();
+}
+
 // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
 function ShowPopup(message, url, titleBox) {
     $(function () {

@@ -1,10 +1,12 @@
 ﻿using Microsoft.SqlServer.Server;
+using Syncfusion.XlsIO;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Web.DynamicData;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -34,11 +36,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         if (!IsPostBack)
         {
-            //if (Request.QueryString["Projectcode"] != null)
-            //{
-            //    FVProgetto.ChangeMode(FormViewMode.Edit);
-            //    FVProgetto.DefaultMode = FormViewMode.Edit;
-            //}
             prevPage = Request.UrlReferrer.ToString();
 
             LoadFormData();
@@ -107,7 +104,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         label.Text = testo;
     }
 
-
     // Actual
     private void CalcolaActuals(string Projects_id)
     {
@@ -145,8 +141,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             }
         }
 
-        columnNamesJson = Newtonsoft.Json.JsonConvert.SerializeObject(columnNames);
-        columnSumsJson = Newtonsoft.Json.JsonConvert.SerializeObject(columnSums);
+        Session["columnNamesJson"] = Newtonsoft.Json.JsonConvert.SerializeObject(columnNames);
+        Session["columnSumsJson"] = Newtonsoft.Json.JsonConvert.SerializeObject(columnSums);
 
     }
 
@@ -154,26 +150,43 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     protected void Download_ore_costi(object sender, EventArgs e)
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
-        Utilities.ExportXls("SELECT * FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente");
+        DataTable dtDettaglio = Database.GetData("SELECT * FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente", null);
+        bool ret = Utilities.ExporXlsxWorkbook(dtDettaglio,"export.xlsx");
+        // Avvio download dopo che è stato prodotto il file
+        if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
     }
 
     protected void Download_GGActuals(object sender, EventArgs e)
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
 
-        parametersList.Add(new SqlParameter("@Project_id", TProjects_Id.Value));
-        parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime(Session["DataReport"].ToString())));
-        SqlParameter[] parameters = parametersList.ToArray();
+        using (ExcelEngine excelEngine = new ExcelEngine())
+        {
+            IApplication application = excelEngine.Excel;
+            application.DefaultVersion = ExcelVersion.Excel2013;
+            IWorkbook workbook = application.Workbooks.Create(0);
+            IWorksheet wsSintesi = workbook.Worksheets.Create("Sintesi Progetto");
+            IWorksheet wsDettaglio = workbook.Worksheets.Create("Dettaglio Ore");
 
-        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        Utilities.StreamOut(Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters));
+            //*** Worksheet con sintesi progetti
+            parametersList.Add(new SqlParameter("@Project_id", TProjects_Id.Value));
+            parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime( DateTime.Now )));
+            SqlParameter[] parameters = parametersList.ToArray();
+            // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+            DataTable dtSintesi = Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters).Tables[0];
+            wsSintesi.ImportDataTable(dtSintesi, true, 1, 1);
 
-    }
+            //*** Worksheet con dettaglio ore progetti
+            DataTable dtDettaglio = Database.GetData("SELECT Consulente, ProjectCode, NomeProgetto, TipoContratto, Director, AccountManager, CONVERT(varchar, Data, 103) as Date, AnnoMese, Hours, Giorni, CostRate, BillRate, OreRicavi, CostAmount, RevenueAmount, Comment FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente", null);
+            wsDettaglio.ImportDataTable(dtDettaglio, true, 1, 1);
 
-    protected void DSprojects_Insert(object sender, SqlDataSourceCommandEventArgs e)
-    {
-        e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
-        e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+            // Formatta il foglio excel con le intestazioni
+            Utilities.FormatWorkbook(ref workbook);
+
+            bool ret = Utilities.ExporXlsxWorkbook(workbook, "export.xlsx");
+            // Avvio download dopo che è stato prodotto il file
+            if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
+        }
     }
 
     protected void DSprojects_Update(object sender, SqlDataSourceCommandEventArgs e)
@@ -185,23 +198,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     protected void FVProgetto_ItemUpdated(Object sender, System.Web.UI.WebControls.FormViewUpdatedEventArgs e)
     {
         Response.Redirect("ControlloProgetto-list.aspx");
-    }
-
-    protected void FVProgetto_ModeChanging(Object sender, System.Web.UI.WebControls.FormViewModeEventArgs e)
-    {
-        if (e.CancelingEdit == true)
-            Response.Redirect("ControlloProgetto-list.aspx");
-    }
-
-    protected void ValidaProgetto_ServerValidate(Object sender, ServerValidateEventArgs args)
-    {
-        ValidationClass c = new ValidationClass();
-
-        // true se non esiste già il record
-        args.IsValid = !c.CheckExistence("ProjectCode", args.Value, "Projects");
-
-        // Evidenzia campi form in errore
-        c.SetErrorOnField(args.IsValid, FVProgetto, "TBProgetto");
     }
 
     protected void FormattaTabellaOutput(GridViewRowEventArgs tab, string formato) 
@@ -258,6 +254,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         FormattaTabellaOutput(e, "0.##");
     }
 
+    // ** Avvia la procedura di ricalcolo Costi
     protected void btn_calc_Click(object sender, EventArgs e)
     {
         // imposta sessione

@@ -8,6 +8,11 @@ using System.Activities.Expressions;
 using System.Text.RegularExpressions;
 using Xceed.Document.NET;
 using System.Collections.Generic;
+using Syncfusion.XlsIO;
+using System.Data.SqlClient;
+using System.Web.UI;
+using System.Drawing;
+using Microsoft.IdentityModel.Tokens;
 
 public class PreInvoiceData
 {
@@ -538,18 +543,38 @@ public partial class Preinvoice_form : System.Web.UI.Page
         CreatePreinvoice(preInv);
         // crea documento Word
         
-        Response.Redirect("/public/TR-PREINVOICE/consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/", "") + ".docx");
+        Response.Redirect("/public/TR-PREINVOICE/Prospetto-Consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/", "") + ".docx");
     }
 
-    // Bottoni
-    protected void Download_AllRatesQuery(object sender, EventArgs e)
+    // Export di excel con ore e spese dei consuntivi
+    protected void Download_Query(object sender, EventArgs e)
     {
-        Utilities.ExportXls(preInv.AllDaysQuery + " ORDER BY NomeConsulente, Data");
-    }
 
-    protected void Download_AllExpenseQuery(object sender, EventArgs e)
-    {
-        Utilities.ExportXls(preInv.AllExpenseQuery  + " ORDER BY NomeConsulente, Data");
+        using (ExcelEngine excelEngine = new ExcelEngine())
+        {
+            IApplication application = excelEngine.Excel;
+            application.DefaultVersion = ExcelVersion.Excel2013;
+            IWorkbook workbook = application.Workbooks.Create(0);
+            IWorksheet wsOre = workbook.Worksheets.Create("Ore");
+            IWorksheet wsSpese = workbook.Worksheets.Create("Spese");
+
+            //*** Worksheet con sintesi progetti
+            // Esecuzione della stored procedure e ottenimento del risultato come DataSet
+            DataTable dtOre = Database.GetData(preInv.AllDaysQuery + " ORDER BY NomeConsulente, Data", null);
+            wsOre.ImportDataTable(dtOre, true, 1, 1);
+
+            //*** Worksheet con dettaglio ore progetti
+            DataTable dtSpese = Database.GetData(preInv.AllExpenseQuery + " ORDER BY NomeConsulente, Data", null);
+            wsSpese.ImportDataTable(dtSpese, true, 1, 1);
+
+            // Formatta il foglio excel con le intestazioni
+            Utilities.FormatWorkbook(ref workbook);
+
+            string filename = "Consuntivi-" + preInv.CodiceCliente.TrimEnd() + "-" + preInv.Date.ToString().Replace("/", "") + ".xlsx";
+            bool ret = Utilities.ExporXlsxWorkbook(workbook, filename);
+            // Avvio download dopo che è stato prodotto il file
+            if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('" + filename + "'); };", true);
+        }
     }
 
     protected void UpdateCancelButton_Click(object sender, EventArgs e)

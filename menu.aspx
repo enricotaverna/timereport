@@ -296,8 +296,6 @@
 
         $(document).ready(function () {
 
-            DrawChart();
-
             $("#RichiesteAperte").click(function () {
                 location.href = "/timereport/m_gestione/Approval/Approval_list.aspx";
             });

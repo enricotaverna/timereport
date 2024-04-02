@@ -1,10 +1,12 @@
 ﻿using ExcelDataReader;
+using Syncfusion.XlsIO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -155,6 +157,29 @@ public class Auth
 public class Utilities
 {
 
+    // Applica alcune formattazioni standard a tutti i worksheet 
+    public static void FormatWorkbook(ref IWorkbook wb)
+    {
+
+        //Defining header style
+        IStyle headerStyle = wb.Styles.Add("HeaderStyle");
+        headerStyle.BeginUpdate();
+        headerStyle.Color = Color.FromArgb(14, 40, 65); // dark blue
+        headerStyle.Font.RGBColor = Color.White;
+        headerStyle.Font.Bold = true;
+        headerStyle.EndUpdate();
+
+        // formatta i ws contenuti nel wb            
+        // dimensiona righe e colonne in base al contenuto
+        // applica formattazione alla prima riga di intestazione
+        foreach (var ws in wb.Worksheets)
+        {
+            ws.UsedRange.AutofitColumns();
+            ws.UsedRange.AutofitRows();
+            ws.Rows[0].CellStyle = headerStyle;
+        }
+    }
+
     public static void CheckAutMobile(int UserLevel, int PageLevel)
     {
 
@@ -218,12 +243,6 @@ public class Utilities
         Adapter = new SqlDataAdapter(sQuery, conn);
         Adapter.Fill(ds, "export");
 
-        StreamOut(ds);
-    }
-
-    // riceve un dataaset e lo scarica in excel
-    public static void StreamOut(DataSet ds) {
-
         DataGrid GridExp = new DataGrid();
 
         GridExp.DataSource = ds.Tables["export"].DefaultView;
@@ -249,7 +268,45 @@ public class Utilities
         HttpContext.Current.Response.Write(stringWrite.ToString());
         HttpContext.Current.Response.End();
 
+    }
 
+    // Esporta Xls usando il framework Synfusion, torna false in caso di errore
+    // riceve in input un workbook
+    public static bool ExporXlsxWorkbook(IWorkbook workbook, string filename ) {
+
+        try
+        {
+            //Saving the workbook as stream
+            string FolderPath = ConfigurationManager.AppSettings["FolderPath"];
+            string FilePath = HttpContext.Current.Server.MapPath(FolderPath + filename);
+
+            FileStream stream = new FileStream(FilePath, FileMode.Create, FileAccess.ReadWrite);
+            workbook.SaveAs(stream);
+            stream.Dispose();
+            return true; // successo
+        }
+        catch {
+            return false; // errore
+        }
+    }
+
+    // Esporta Xls usando il framework Synfusion, torna false in caso di errore
+    // riceve in input una datatable
+    public static bool ExporXlsxWorkbook(DataTable dt, string filename)
+    {
+        using (ExcelEngine excelEngine = new ExcelEngine())
+        {
+            IApplication application = excelEngine.Excel;
+            application.DefaultVersion = ExcelVersion.Excel2013;
+            IWorkbook workbook = application.Workbooks.Create(1);
+            IWorksheet worksheet = workbook.Worksheets[0];
+
+            //Import DataTable to the worksheet
+            worksheet.ImportDataTable(dt, true, 1, 1);
+
+            return Utilities.ExporXlsxWorkbook(workbook, filename);
+
+        }
     }
 
     public static DataTable ImportExcel(FileUpload FileUploadControl, ref string ErrorMessage)
