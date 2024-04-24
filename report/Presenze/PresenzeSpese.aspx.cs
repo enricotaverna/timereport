@@ -168,8 +168,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
         }
     }
 
-
-
     /// <summary>
     /// spalma gli straordinari come da specifiche
     /// 1. nei giorni lavorativo max ore straordinario è 2h
@@ -500,17 +498,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             Totale.AllowDBNull = true;
             Totale.Unique = false;
             Totale.ColumnName = "Somma Totale";
-
-            //DataColumn NrAltreSpese = dsPresenze.Tables[0].Columns.Add("NrAltreSpese", typeof(decimal));
-            //NrAltreSpese.AllowDBNull = true;
-            //NrAltreSpese.Unique = false;
-            //NrAltreSpese.ColumnName = "Nr. Altre Spese";
-
-            //DataColumn AltreSpese = dsPresenze.Tables[0].Columns.Add("AltreSpese", typeof(decimal));
-            //AltreSpese.AllowDBNull = true;
-            //AltreSpese.Unique = false;
-            //AltreSpese.ColumnName = "Altre Spese";
-
         }
         catch (Exception ex)
         {
@@ -651,7 +638,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             {
                 decimal Somma = 0;
                 try
-                {
+                {                    
                     string NomeColonna = OnlyTotal.Columns[x].ColumnName;
 
                     //totale delle ore
@@ -662,7 +649,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                     }
 
                     //totale per ogni giorno
-                    //DateTime dateTime = DateTime.Parse(NomeColonna);
                     Somma = OnlyTotal.AsEnumerable().Sum(r => r.Field<decimal?>(NomeColonna) ?? 0);
                     Totale[OnlyTotal.Columns[x].ColumnName] = Somma;
                 }
@@ -738,7 +724,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
         try
         {
             Syncfusion.XlsIO.IRange usedRange = sheet.UsedRange;
-
             for (int a = 0; a < usedRange.Rows.Count(); a++)
             {
                 Syncfusion.XlsIO.IRange row = usedRange.Rows[a];
@@ -763,13 +748,29 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                     row.EntireRow.CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
                     row.EntireRow.CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
                     row.EntireRow.CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
+
+                    //ciclo per inserire la sommatoria di tutte le colonne nel grand total
+                    for (int i = 4; i < row.Cells.Count(); i++)
+                    {
+                        string SummCell = "";
+                        //ciclo tutte le righe per prendere solo le righe contenenti i totali
+                        for (int y = 0; y < usedRange.Rows.Count(); y++) 
+                        {
+                            IRange rowTot = usedRange.Rows[y];
+                            if (rowTot.Columns[3].Value.ToNullToString() == "Total") 
+                            {
+                                //salvo le varie celle da sommare
+                                SummCell += rowTot.Cells[i].AddressLocal.ToString() + ";";
+                            }
+                        }
+                        //assegno la fornula alla cella
+                        row.Cells[i].Formula = string.Format("=Sum({0})", SummCell.Substring(0, SummCell.Length -1));
+                    }
                 }
             }
         }
         catch (Exception)
         {
-
-            throw;
         }
     }
 
@@ -799,7 +800,6 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
             //colore sabato e domenica
             for (int i = 1; i < row.Columns.Count(); i++)
             {
-
                 try
                 {
                     //controllo se SAB o DOM cosi da colorare in giallo la riga
@@ -807,13 +807,11 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                     {
                         sheet.Range[row.Columns[i].AddressLocal].EntireColumn.CellStyle.Color = Color.Yellow;
                     }
-
                 }
                 catch (Exception)
                 {
                 }
             }
-
         }
         catch (Exception)
         {
