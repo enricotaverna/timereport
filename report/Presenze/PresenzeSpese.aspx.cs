@@ -758,40 +758,32 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                     for (int i = 4; i < row.Cells.Count(); i++)
                     {
                         string SummCell = "";
+                        string SummCellByPerson = "";
                         //ciclo tutte le righe per prendere solo le righe contenenti i totali
                         for (int y = 0; y < usedRange.Rows.Count(); y++)
                         {
+
                             IRange rowTot = usedRange.Rows[y];
+                            //se è una riga di totale salvo l'indirizzo della cella e inserisco la formula per le singole ore della persona
                             if (rowTot.Columns[3].Value.ToNullToString() == "Total")
                             {
                                 //salvo le varie celle da sommare
                                 SummCell += rowTot.Cells[i].AddressLocal.ToString() + ";";
+                                //assegno la fornula alla cella
+                                rowTot.Cells[i].Formula = string.Format("=Sum({0})", SummCellByPerson.Substring(0, SummCellByPerson.Length - 1));
+
+                                SummCellByPerson = "";
+                            }
+                            else
+                            {
+                                //se non è riga totali mi salvo l'indirizzo della cella, appena trovo un total inserisco la formula
+                                SummCellByPerson += rowTot.Cells[i].AddressLocal.ToString() + ";";
                             }
                         }
                         //assegno la fornula alla cella
                         row.Cells[i].Formula = string.Format("=Sum({0})", SummCell.Substring(0, SummCell.Length - 1));
                     }
                 }
-                //else if (row.Columns[3].Value.ToNullToString() == "Grand Total Formula")
-                //{
-                //    //ciclo per inserire la sommatoria di tutte le colonne nel grand total
-                //    for (int i = 4; i < row.Cells.Count(); i++)
-                //    {
-                //        string SummCell = "";
-                //        //ciclo tutte le righe per prendere solo le righe contenenti i totali
-                //        for (int y = 0; y < usedRange.Rows.Count(); y++)
-                //        {
-                //            IRange rowTot = usedRange.Rows[y];
-                //            if (rowTot.Columns[3].Value.ToNullToString() == "Total")
-                //            {
-                //                //salvo le varie celle da sommare
-                //                SummCell += rowTot.Cells[i].AddressLocal.ToString() + ";";
-                //            }
-                //        }
-                //        //assegno la fornula alla cella
-                //        row.Cells[i].Formula = string.Format("=Sum({0})", SummCell.Substring(0, SummCell.Length - 1));
-                //    }
-                //}
             }
         }
         catch (Exception)
