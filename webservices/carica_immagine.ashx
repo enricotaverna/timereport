@@ -39,8 +39,8 @@ public class carica_immagine : IHttpHandler, IRequiresSessionState
 
                 // costruisce il nome file     
                 string ext = Path.GetExtension(strFileName);
-                string filename = "PersonalBkgrImg" + ext;
-                //string filename = Path.GetFileName(strFileName);
+                string filename = context.Request["clickedBox"] + ext; // il nome del file corrisponde al box selezionato
+                //string filename =  "PersonalBkgrImg" + ext; ;
                 string FilePath = TargetLocation + filename;
                 string WebPath = ConfigurationManager.AppSettings["PATH_IMMAGINI"] +  CurrentSession.Persons_id.ToString() + "/" + filename;
 

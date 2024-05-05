@@ -119,7 +119,13 @@
                     <!-- riempito da query -->
                 </select>
 
-                <input id="SpeseOpportunityId" placeholder="Opportunità" name="SpeseOpportunityId" maxlength="10" />
+<%--                <input id="SpeseOpportunityId" placeholder="Opportunità" name="SpeseOpportunityId" maxlength="10" />--%>
+
+                <span id="spanSpeseOpportunityId">
+                    <select id="SpeseOpportunityId">
+                        <!-- riempito da query -->
+                    </select>
+                </span>
 
                 <br />
 
@@ -209,7 +215,13 @@
                     </select>
                 </div>
 
-                <input id="OpportunityId" placeholder="Opportunità" name="OpportunityId" maxlength="10" />
+<%--                <input id="OpportunityId" placeholder="Opportunità" name="OpportunityId" maxlength="10" />--%>
+
+                <span id="spanOpportunityId">
+                    <select id="OpportunityId">
+                        <!-- riempito da query -->
+                    </select>
+                </span>
 
                 <div id="DDLLocation" name="DDLLocation">
                     <select id="ore_Location_Id" name="ore_Location_Id">

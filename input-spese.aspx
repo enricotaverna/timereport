@@ -13,6 +13,8 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
@@ -20,6 +22,8 @@
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="/timereport/include/uploader/uploader.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <!-- Jquery per Uploader  -->
@@ -96,12 +100,16 @@
                                     </asp:DropDownList>
                                 </div>
 
-                                <!-- *** OpportunityId ***  -->
+                                <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <div style="position: absolute">
+                                    <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true"  data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15"/>
+                                    <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"  
+                                         data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                    </asp:DropDownList>
+                                    </div>                               
+                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -111,7 +119,7 @@
                                     <span class="input2col">
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6"
                                             meta:resourcekey="TBAmountResource2"
-                                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(\d*\,)?\d+$" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$"/>
                                     </span>
 
                                 </div>
@@ -203,12 +211,16 @@
                                     </asp:DropDownList>
                                 </div>
 
-                                <!-- *** OpportunityId ***  -->
+                                <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <div style="position: absolute">
+                                    <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15"/>
+                                    <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"  
+                                         data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                    </asp:DropDownList>
+                                    </div>                               
+                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -217,7 +229,7 @@
                                     <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource1"></asp:Label>
                                     <span class="input2col">
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource1"
-                                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(\d*\,)?\d+$" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$"/>
                                     </span>
 
                                 </div>
@@ -308,12 +320,16 @@
                                     </asp:DropDownList>
                                 </div>
 
-                                <!-- *** OpportunityId ***  -->
+                                <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                    <div style="position: absolute">
+                                    <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' Enabled="False"
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                    <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
+                                         Enabled="False">
+                                    </asp:DropDownList>
+                                    </div>                               
+                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -466,6 +482,7 @@
             <asp:Parameter Name="Company_id" />
             <asp:Parameter Name="AdditionalCharges" />
             <asp:Parameter Name="AmountInCurrency" />
+            <asp:Parameter Name="OpportunityId" />       
         </InsertParameters>
 
         <UpdateParameters>
@@ -488,6 +505,7 @@
             <asp:Parameter Name="TipoBonus_id" />
             <asp:Parameter Name="AdditionalCharges" />
             <asp:Parameter Name="AmountInCurrency" />
+            <asp:Parameter Name="OpportunityId" />       
         </UpdateParameters>
 
     </asp:SqlDataSource>
@@ -531,6 +549,10 @@
             $("#FVSpese_disCBCompanyPayed").attr("disabled", true);
 
             BindOpportunity();
+
+            // Sumo Select
+            $('#FVSpese_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
+            $('.SumoSelect').css('width', '270px');
 
             // se in edit chiama Ajax per controllo carico spese sul giorni
             if (!$('#FVSpese_DDLprogetto')[0].disabled) {

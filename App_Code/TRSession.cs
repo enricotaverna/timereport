@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Web.Configuration;
 using System.Globalization;
+using System.Activities.Expressions;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -21,6 +22,29 @@ public class LocationRecord
     public string LocationDescription { get; set; }
 }
 
+public class Opportunity
+{
+    //[JsonProperty("Account.Name")]
+    //public string AccountName { get; set; }
+
+    public class Account
+    {
+        [JsonProperty("Name")]
+        public string AccountName { get; set; }
+    }
+
+    [JsonProperty("Code__c")]
+    public string OpportunityCode { get; set; }
+    [JsonProperty("Name")]
+    public string OpportunityName { get; set; }
+    [JsonProperty("Account")]
+    public Account OpportunityAccount { get; set; }
+    [JsonProperty("Open_date__c")]
+    public string OpenDate { get; set; }
+    [JsonProperty("StageName")]
+    public string StageName { get; set; }
+}
+
 public class TRSession
 {
     // bufferizza la lista delle location selezionabili in input_spese.aspx
@@ -31,6 +55,8 @@ public class TRSession
     public DataTable dtProgettiTutti;
     public DataTable dtSpeseTutte;
     public List<TaskRay> ListaTask = new List<TaskRay>();
+    public List<Opportunity> ListaOpenOpportunity = new List<Opportunity>();
+    public List<Opportunity> ListaAllOpportunity = new List<Opportunity>();
     // personal setting
     public int Persons_id;
     public int Company_id;
@@ -66,6 +92,9 @@ public class TRSession
         {
             LoadSFTask();
         }
+
+        LoadSFOpportunity();
+
     }
 
     public void LoadProgettieSpese()
@@ -218,6 +247,68 @@ public class TRSession
             string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
             string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
             clsLog.WriteErrLog("0", ex.Message, Description.ToString());
+        }
+
+    }
+
+    //** Carica elenco opportunità da SF Aeonvis **//
+    public void LoadSFOpportunity()
+    {
+
+        // selezione solo opportunità aperte non più vecchie di 2 anni
+        string sAnnoPrima = (DateTime.Now.Year - 4).ToString() + "-01-01";
+        int maxLung;
+
+        try
+        {
+            string serviceURL = "";
+
+            string SFconnect = WebConfigurationManager.AppSettings["TRSALESFORCE"];
+            string[] Splitted = SFconnect.ToString().Split(';');
+
+            clsParametri.Parametri.clientID = Splitted[0].ToString().Split('=')[1];
+            clsParametri.Parametri.ClientSecret = Splitted[1].ToString().Split('=')[1];
+            clsParametri.Parametri.refresh_token = Splitted[2].ToString().Replace("refresh_token=", "");
+            clsParametri.Parametri.EndpointSF = Splitted[3].ToString().Split('=')[1];
+            clsParametri.Parametri.SFVersione = Splitted[4].ToString().Split('=')[1];
+
+            string SFtoken = clsUtility.GetTokenSF();
+
+            serviceURL += string.Format("SELECT Code__c, Name, Account.Name, Open_date__c, StageName FROM Opportunity ORDER BY Account.Name, Name", SalesforceAccount);
+
+            string JSON_TOT = "";
+            clsStandard.GetAllRecord AllRecord = new clsStandard.GetAllRecord();
+            clsUtility.GetPagedData(serviceURL, ref JSON_TOT, ref AllRecord);
+
+            ListaOpenOpportunity.Clear();
+            ListaAllOpportunity.Clear();
+
+            if (AllRecord.records != null)
+            {
+                //ciclo     tutti i record di ritorno 
+                for (int i = 0; i <= AllRecord.records.Count - 1; i++)
+                {
+                    Opportunity newRec = new Opportunity();
+                    newRec = JsonConvert.DeserializeObject<Opportunity>(AllRecord.records[i].ToString());
+
+                    maxLung = newRec.OpportunityAccount.AccountName.Length > 12 ? 12 : newRec.OpportunityAccount.AccountName.Length;
+                    
+                    // se tronca mette i puntini al nome Account
+                    if (maxLung < newRec.OpportunityAccount.AccountName.Length)
+                        newRec.OpportunityAccount.AccountName = newRec.OpportunityAccount.AccountName.Substring(0, maxLung) + "..";
+                    else
+                        newRec.OpportunityAccount.AccountName = newRec.OpportunityAccount.AccountName.Substring(0, maxLung);
+
+                    ListaAllOpportunity.Add(newRec);
+
+                    if (newRec.StageName != "Closed Won" && newRec.StageName != "Closed Lost" &&  string.Compare(newRec.OpenDate, sAnnoPrima) == 1 )
+                        ListaOpenOpportunity.Add(newRec);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            //* gestione errore **//
         }
 
     }

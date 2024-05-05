@@ -268,7 +268,6 @@ select {
     padding-bottom: 0px;
 }
  
-:
 .logTexText A {
     float: left;
     width: 2wi
@@ -906,8 +905,23 @@ textarea.parsley-error {
 }
 
 select.parsley-error {
+    color: red !important;
+    background-color: lightyellow !important;
+}
+
+/* cambia il colore dell'elemento successivo in caso di errore */
+.SumoSelect > .parsley-error + .CaptionCont {
     color: red;
     background-color: lightyellow;
+}
+
+.SumoSelect.disabled {
+    opacity: 1;
+}
+
+.SumoSelect.disabled > .CaptionCont {
+    color: #777;
+    background-color: #ddd;
 }
 
 .parsley-errors-list {

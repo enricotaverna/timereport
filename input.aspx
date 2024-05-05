@@ -17,12 +17,16 @@
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <!-- ToolTip jquey add-in  -->
 <script type="text/javascript" src="/timereport/include/jquery/tooltip/jquery.smallipop.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 <link href="/timereport/include/jquery/tooltip/jquery.smallipop.css" rel="stylesheet" />
 
@@ -65,10 +69,22 @@
                     </div>
 
                     <!-- *** OpportunityId ***  -->
-                    <div class="input nobottomborder" id="lbOpportunityId">
+<%--                    <div class="input nobottomborder" id="lbOpportunityId">
                         <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
                         <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" 
                             data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$"  MaxLength="15" />
+                    </div>--%>
+
+                    <!-- *** DDL Opportunità ***  -->
+                    <div class="input nobottomborder" id="lbOpportunityId">
+                        <div style="position: absolute">
+                            <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;"></asp:Label>
+                            <!-- per stile CSS -->
+                            <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True" 
+                                data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                            </asp:DropDownList>
+                        </div>
+                        <br />
                     </div>
 
                     <div class="input nobottomborder">
@@ -383,6 +399,10 @@
             else
                 $('#lbOpportunityId').hide(); // visualizza DropDown
             CalcolaSommaOre();
+
+            // Sumo Select
+            $('#DDLOpportunity').SumoSelect({ search: true, searchText: '' });
+            $('.SumoSelect').css('width', '270px');
         }
 
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB

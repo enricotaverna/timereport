@@ -69,7 +69,7 @@
                     <!-- *** ORE ***  -->
                     <div class="input nobottomborder">
                         <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" data-parsley-validate-if-empty="true" data-parsley-mandatory-if-single-date="true" data-parsley-pattern="^\d+(,\d+)?$|^$" ID="TBOre" runat="server" Columns="10" data-parsley-errors-container="#valMsg" />
+                        <asp:TextBox CssClass="ASPInputcontent" data-parsley-validate-if-empty="true" data-parsley-mandatory-if-single-date="true" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" ID="TBOre" runat="server" Columns="10" data-parsley-errors-container="#valMsg" />
                     </div>
 
                     <!-- *** DDL Progetto ***  -->

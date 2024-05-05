@@ -13,12 +13,16 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -89,16 +93,21 @@
                                 </asp:DropDownList>
                             </div>
 
-                            <!-- *** OpportunityId ***  -->
+                            <!-- *** DDL Opportunità ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <div style="position: absolute">
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                 <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
+                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                                </div>                               
+                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
+                                <div style="position: absolute">
                                 <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"  meta:resourcekey="Label2" ></asp:Label>
                                 <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
@@ -107,7 +116,8 @@
                                 </asp:DropDownList>
                                 <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server" Width="270px" Text='<%# Bind("LocationDescription") %>'
                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" />
-
+                                </div>
+                                <br />
                             </div>
 
                             <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
@@ -120,7 +130,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
                                 <span class="input2col">
                                     <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1"
-                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
 
                                 <!-- *** Checkboc Remote ***  -->
@@ -202,12 +212,16 @@
                                 </asp:DropDownList>
                             </div>
 
-                            <!-- *** OpportunityId ***  -->
+                            <!-- *** DDL Opportunity ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <div style="position:absolute">
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                 <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>' 
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True" 
+                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                </asp:DropDownList>
+                                </div>
+                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -230,7 +244,7 @@
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
                                 <span class="input2col">
                                     <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
-                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^\d+(,\d+)?$" data-parsley-required="true" />
+                                        data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
 
                                 <!-- *** Checkboc Remote ***  -->
@@ -309,12 +323,16 @@
                                 </asp:DropDownList>
                             </div>
 
-                            <!-- *** OpportunityId ***  -->
+                            <!-- *** DDL Opportunità ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <asp:Label CssClass="inputtext" ID="Label3" runat="server" Text="Opportunità" meta:resourcekey="lbOpportunityId"></asp:Label>
+                                <div style="position: absolute">
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                 <!-- per stile CSS -->
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="TBOpportunityId" runat="server" Text='<%# Bind("OpportunityId") %>'  Enabled="False"
-                                        data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$" Columns="15" MaxLength="15" />
+                                <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
+                                     Enabled="False">
+                                </asp:DropDownList>
+                                </div>                               
+                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
@@ -404,7 +422,7 @@
     <asp:SqlDataSource ID="DSore" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id,hours.OpportunityId,hours.SalesforceTaskID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,OpportunityId,SalesforceTaskID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id,@OpportunityId, @SalesforceTaskID)"
+        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,OpportunityId,SalesforceTaskID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @OpportunityId, @SalesforceTaskID)"
         UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType,OpportunityId=@OpportunityId,SalesforceTaskID=@SalesforceTaskID, AccountManager_id = @AccountManager_id, ClientManager_id=@ClientManager_id WHERE (Hours_Id = @Hours_id)"
         OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
 
@@ -428,6 +446,7 @@
             <asp:Parameter Name="CreationDate" />
             <asp:Parameter Name="AccountingDate" Type="DateTime" />
             <asp:Parameter Name="WorkedInRemote" />
+            <asp:Parameter Name="OpportunityId" />           
             <asp:Parameter Name="SalesforceTaskID" />
         </InsertParameters>
         <SelectParameters>
@@ -453,6 +472,7 @@
             <asp:Parameter Name="LastModificationDate" />
             <asp:Parameter Name="AccountingDate" Type="DateTime" />
             <asp:Parameter Name="WorkedInRemote" />
+            <asp:Parameter Name="OpportunityId" />           
             <asp:Parameter Name="SalesforceTaskID" />
         </UpdateParameters>
     </asp:SqlDataSource>
@@ -496,6 +516,10 @@
             BindLocation();
             BindOpportunity();
 
+            // Sumo Select
+            $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
+            $('.SumoSelect').css('width', '270px');
+
         });
 
         // *** Esclude i controlli nascosti *** 
@@ -505,7 +529,7 @@
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
         window.Parsley.addValidator('testoObbligatorio', {
-            validateString: function (value) {
+            validateString: function (value) {FVore_DDLLocation
 
                 var flagObbligatorio = $("#FVore_DDLprogetto option:selected").attr("data-desc-obbligatorio");
                 var messaggio = $("#FVore_DDLprogetto option:selected").attr("data-desc-message");
@@ -554,12 +578,9 @@
                         }));
                 });
                 $('#lbDDLAttivita').show(); // visualizza DropDown
+
             }
 
-            //// se è valorizzato lo mostra comunqua
-            //$('#lbDDLAttivita').show(); // visualizza DropDown
-            //if ($("#FVore_DDLAttivita").find("option:selected").value != "")
-            //    $('#lbDDLAttivita').show(); // visualizza DropDown
         }
 
         function BindOpportunity() {
@@ -602,7 +623,6 @@
                 });
 
                 $("#FVore_DDLLocation").append($('<option>', { value: 'T:99999', text: '-- Testo Libero --' }));
-
                 $('#FVore_DDLLocation').show(); // visualizza DropDown
 
                 $('#FVore_TBLocation').val(""); // reset e spegnimento campo
@@ -613,7 +633,8 @@
         // Mostra box testo in caso della corrispondente selezione della DDL Location
         $("#FVore_DDLLocation").change(function () {
             if ($("#FVore_DDLLocation").val() == 'T:99999') // mostra Box Testo
-            {
+            {               
+/*                $('#FVore_DDLLocation').SumoSelect().sumo.unload();*/
                 $('#FVore_DDLLocation').hide();
                 $('#FVore_TBLocation').show();
             }

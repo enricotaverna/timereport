@@ -9,13 +9,14 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.IO;
 using System.Threading;
+using System.Collections.Generic;
 
 public partial class input_spese : System.Web.UI.Page
 {
     // attivata MARS .
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
 
-    public string lProject_id, lExpenseType_id;
+    public string lProject_id, lExpenseType_id, OpportunityId;
     public int lTipoBonus_id;
     public string lDataSpesa, lExpense_id;
 
@@ -183,13 +184,14 @@ public partial class input_spese : System.Web.UI.Page
     protected void Get_record(string strExpenses_Id)
     {
 
-        DataRow dr = Database.GetRow("SELECT Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.ExpenseType_id, Expenses.TipoBonus_id, Expenses.Date FROM Expenses where expenses_id = " + strExpenses_Id, null);
+        DataRow dr = Database.GetRow("SELECT Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.ExpenseType_id, Expenses.TipoBonus_id, Expenses.Date, OpportunityId FROM Expenses where expenses_id = " + strExpenses_Id, null);
 
         lProject_id = dr["Projects_id"].ToString(); // projects_id - usata per dare default a DDL
         lExpenseType_id = dr["ExpenseType_id"].ToString(); // ExpenseType_id - - usata per dare default a DDL
         lTipoBonus_id = Convert.ToInt16(dr["TipoBonus_id"].ToString());  // usata per dare gestire stato/valore campo Amount
         lExpense_id = dr["Expenses_Id"].ToString();
         lDataSpesa = ((DateTime)dr["date"]).ToString("yyyyMMdd");
+        OpportunityId = dr["OpportunityId"].ToString(); // activity_id
 
     }
 
@@ -303,6 +305,37 @@ public partial class input_spese : System.Web.UI.Page
 
     }
 
+    //valorizzazione della DDL delle task di Salesforce
+    protected void Bind_DDLOpportunita()
+    {
+        DropDownList DDLOpportunity;
+        List<Opportunity> ListaOpportunita = new List<Opportunity>();
+
+        //valorizzazione con valore default
+        DDLOpportunity = (DropDownList)FVSpese.FindControl("DDLOpportunity");
+        DDLOpportunity.Items.Clear();
+        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+
+        if (FVSpese.CurrentMode == FormViewMode.Insert | FVSpese.CurrentMode == FormViewMode.Edit)
+            ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+        else
+            ListaOpportunita = CurrentSession.ListaAllOpportunity;
+
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        foreach (Opportunity opp in ListaOpportunita)
+        {
+            ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+            DDLOpportunity.Items.Add(liItem);
+        }
+
+        DDLOpportunity.DataTextField = "OpportunityName";
+        DDLOpportunity.DataValueField = "OpportunityId";
+        DDLOpportunity.DataBind();
+        if (OpportunityId != "")
+            DDLOpportunity.SelectedValue = OpportunityId;
+    }
+
     protected void DSSpese_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
     {
         //      Chiamato in aggiornamento e inserimento record rende negativo il valore delle ore
@@ -379,6 +412,9 @@ public partial class input_spese : System.Web.UI.Page
         e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
         e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
 
+        DropDownList ddlOpportunity = (DropDownList)FVSpese.FindControl("DDLOpportunity");
+        e.Command.Parameters["@OpportunityId"].Value = ddlOpportunity.SelectedValue;
+
     }
 
     protected void FVSpese_modechanging(object sender, FormViewModeEventArgs e)
@@ -406,6 +442,7 @@ public partial class input_spese : System.Web.UI.Page
 
         Bind_DDLprogetto();
         Bind_DDLTipoSpesa();
+        Bind_DDLOpportunita();
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
         if (!Auth.ReturnPermission("ADMIN", "CUTOFF"))
