@@ -18,7 +18,7 @@ public partial class input_ore : System.Web.UI.Page
     private List<TaskRay> ListaTaskTotale = new List<TaskRay>();
     //private DropDownList ddlActivity;
 
-    public string lProject_id, lActivity_id, lLocationKey, SalesforceTaskID;
+    public string lProject_id, lActivity_id, lLocationKey, SalesforceTaskID, OpportunityId;
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -71,7 +71,7 @@ public partial class input_ore : System.Web.UI.Page
     {
 
         DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, "+"" +
-            "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTaskID "+
+            "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTaskID, OpportunityId " +
             "FROM Hours "+"" +
             "LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id "+
             "INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
@@ -80,6 +80,7 @@ public partial class input_ore : System.Web.UI.Page
         lActivity_id = drRecord["Activity_id"].ToString(); // activity_id
         lLocationKey = drRecord["LocationType"].ToString() + ":" + drRecord["LocationKey"].ToString(); // LocationKey
         SalesforceTaskID = drRecord["SalesforceTaskID"].ToString(); // activity_id
+        OpportunityId = drRecord["OpportunityId"].ToString(); // activity_id
 
     }
 
@@ -229,6 +230,37 @@ public partial class input_ore : System.Web.UI.Page
 
     }
 
+    //valorizzazione della DDL delle task di Salesforce
+    protected void Bind_DDLOpportunita()
+    {
+        DropDownList DDLOpportunity;
+        List<Opportunity> ListaOpportunita = new List<Opportunity>();
+
+        //valorizzazione con valore default
+        DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
+        DDLOpportunity.Items.Clear();
+        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+
+        if (FVore.CurrentMode == FormViewMode.Insert | FVore.CurrentMode == FormViewMode.Edit)
+            ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+        else
+            ListaOpportunita = CurrentSession.ListaAllOpportunity;
+
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        foreach (Opportunity opp in ListaOpportunita)
+        {
+           ListItem liItem = new ListItem( opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode );
+           DDLOpportunity.Items.Add(liItem);
+        }
+
+        DDLOpportunity.DataTextField = "OpportunityName";
+        DDLOpportunity.DataValueField = "OpportunityId";
+        DDLOpportunity.DataBind();
+        if (OpportunityId != "")
+            DDLOpportunity.SelectedValue = OpportunityId;
+    }
+
     public void Bind_DDLAttivita()
     {
         DropDownList ddlActivity = (DropDownList)FVore.FindControl("DDLHidden");
@@ -346,6 +378,9 @@ public partial class input_ore : System.Web.UI.Page
         DropDownList ddlList = (DropDownList)FVore.FindControl("DDLprogetto");
         e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
 
+        DropDownList ddlOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
+        e.Command.Parameters["@OpportunityId"].Value = ddlOpportunity.SelectedValue;
+       
         DropDownList ddlList1 = (DropDownList)FVore.FindControl("DDLAttivita");
         if (ddlList1.SelectedValue != null)
             e.Command.Parameters["@Activity_id"].Value = ddlList1.SelectedValue;
@@ -420,12 +455,14 @@ public partial class input_ore : System.Web.UI.Page
             Bind_DDLprogetto();
             Bind_DDLAttivita();
             Bind_DDLTaskSF();
+            Bind_DDLOpportunita();
         }
         else // insert
         {
             Bind_DDLprogetto();
             Bind_DDLAttivita();
             Bind_DDLTaskSF();
+            Bind_DDLOpportunita();
         }
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza

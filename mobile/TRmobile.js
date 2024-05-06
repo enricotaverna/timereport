@@ -83,6 +83,29 @@ $(document).ready(function () {
     });
     //#endregion
 
+    //#region *** POPOLA OPPORTUNITA' ***
+    $.ajax({
+        type: "POST",
+        url: "aggiornav2.asmx/GetOpportunityList",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: "",
+        success: function (response) {
+            var ddl2 = (response.d == undefined) ? response : response.d; // compatibilità ASP.NET 2.0
+            for (var i = 0; i < ddl2.length; i++) {
+                var selectOption = $(document.createElement('option'));
+                $('#SpeseOpportunityId').append(selectOption.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));
+                $('#OpportunityId').append(selectOption.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));                
+            }
+            $("#SpeseOpportunityId").val($("#SpeseOpportunityId option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
+            $("#OpportunityId").val($("#OpportunityId option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            alert(xhr.responseText);
+        }
+    });
+    //#endregion
+
     function PopulateLocation(Projects_id) {
 
         $('#ore_Location_Id').empty();
@@ -171,15 +194,15 @@ $(document).ready(function () {
                 if (msg.d > 0) {
                     if (msg.d == 2) {
                         if (type == "ore")
-                            $('#OpportunityId').show();
+                            $('#spanOpportunityId').show();
                         else
-                            $('#SpeseOpportunityId').show();
+                            $('#spanSpeseOpportunityId').show();
                     }
                     else {
                         if (type == "ore")
-                            $('#OpportunityId').hide();
+                            $('#spanOpportunityId').hide();
                         else
-                            $('#SpeseOpportunityId').hide();
+                            $('#spanSpeseOpportunityId').hide();
                     }
                 }
             },

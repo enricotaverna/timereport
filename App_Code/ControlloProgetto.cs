@@ -110,7 +110,7 @@ public class ControlloProgetto
     public static int NumeroRecorSenzaCosti(DateTime dataDa, int Projects_id) {
 
         int numRec;
-        string sQuery = "SELECT COUNT(*) FROM v_oreWithCost where (OreRicavi = 0 or OreRicavi is null) AND data >=" + ASPcompatility.FormatDatetimeDb(dataDa) +
+        string sQuery = "SELECT COUNT(*) FROM v_oreWithCost where ( hours > 0 and ( OreRicavi = 0 or OreRicavi is null ) ) AND data >" + ASPcompatility.FormatDatetimeDb(dataDa) +
                         " AND ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
 
         if (Projects_id != 0)

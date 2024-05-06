@@ -39,8 +39,10 @@ public partial class input : System.Web.UI.Page
         //    ProcessDragDrop(Request["__EVENTARGUMENT"]);
         //}
 
-        if ((string)Session["type"] == "bonus")
+        if ((string)Session["type"] == "bonus") { 
             BindDDLProjects();
+            Bind_DDLOpportunita();
+        }
     }
 
     //   ****************************************
@@ -69,6 +71,34 @@ public partial class input : System.Web.UI.Page
         // se in creazione imposta il default di progetto 
         if (Session["ProjectCodeDefault"] != null)
             DDLProgetto.SelectedValue = Session["ProjectCodeDefault"].ToString();
+    }
+
+    //   ****************************************
+    //   Bind_DDLOpportunita()
+    //   ****************************************
+    protected void Bind_DDLOpportunita()
+    {
+        //DropDownList DDLOpportunity;
+        List<Opportunity> ListaOpportunita = new List<Opportunity>();
+
+        //valorizzazione con valore default
+        // DDLOpportunity = DDLOpportunity;
+        DDLOpportunity.Items.Clear();
+        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+
+        ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+ 
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        foreach (Opportunity opp in ListaOpportunita)
+        {
+            ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+            DDLOpportunity.Items.Add(liItem);
+        }
+
+        DDLOpportunity.DataTextField = "OpportunityName";
+        DDLOpportunity.DataValueField = "OpportunityId";
+        DDLOpportunity.DataBind();
     }
 
     //   ****************************************
@@ -229,7 +259,7 @@ public partial class input : System.Web.UI.Page
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
-            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
+            sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId, expenses.CreatedBy, expenses.CreationDate FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
         else if ((string)Session["type"] == "bonus")
@@ -275,6 +305,7 @@ public partial class input : System.Web.UI.Page
         string sDate, sISODate;
         float iOre = 0;
         string WFIcon = "";
+        string oppDescription = "";
 
         if (intDayNumber <= ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])))
         {
@@ -292,11 +323,17 @@ public partial class input : System.Web.UI.Page
             foreach (DataRow rdr in drRow)
             {
 
+                /* trova descrizione opportunità dal codice */
+                    Opportunity found = CurrentSession.ListaAllOpportunity.FirstOrDefault(o => o.OpportunityCode == rdr["OpportunityId"].ToString());
+                    oppDescription = found != null ? "<br><b>Opp.nit&agrave:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + found.OpportunityAccount.AccountName + " - " + found.OpportunityName : "";
+
+                string actDescription = rdr["ActivityName"].ToString() != "" ? "<br><b>Attivit&agrave:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] : "";
+
                 iOre = Convert.ToSingle(rdr["hours"]);
                 strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
                              "<br><b>Progetto:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["name"]) +
-                             "<br><b>Attività:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] +
-                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
+                             actDescription +
+                             oppDescription +
                              "<br><b>Ore:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + iOre.ToString("G") +
                              "<br><b>Luogo:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["LocationDescription"]) +
                              "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"]) +
@@ -345,6 +382,7 @@ public partial class input : System.Web.UI.Page
         string sDate, sISODate;
         float fSpese = 0;
         string strIconaRicevuta;
+        string oppDescription = "";
 
         // recupera il buffer con le spese che hanno ricevuta
         List<int> iRicevuteBuffer = (List<int>)Session["RicevuteBuffer"];
@@ -368,13 +406,20 @@ public partial class input : System.Web.UI.Page
                 sFlag = Convert.ToBoolean(rdr["CompanyPayed"]) ? sFlag + " PA " : sFlag;
                 sFlag = Convert.ToBoolean(rdr["InvoiceFlag"]) ? sFlag + " FAT " : sFlag;
 
+                /* trova descrizione opportunità dal codice */
+                Opportunity found = CurrentSession.ListaAllOpportunity.FirstOrDefault(o => o.OpportunityCode == rdr["OpportunityId"].ToString());
+                oppDescription = found != null ? "<br><b>Opp.nit&agrave:</b>&nbsp;&nbsp;" + found.OpportunityAccount.AccountName + " - " + found.OpportunityName : "";
+
                 strTooltip = "<b>Data:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["date"]) +
                              "<br><b>Progetto:</b>&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["Name"]) +
-                             "<br><b>Opp.nità:</b>&nbsp;&nbsp;&nbsp;" + rdr["OpportunityId"] +
+                             oppDescription +
                              "<br><b>Spesa:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["NomeSpesa"] +
                              "<br><b>Importo:</b>&nbsp;&nbsp;&nbsp;" + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] +
                              "<br><b>Flag:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sFlag +
-                             "<br><br>" + HttpUtility.HtmlEncode(rdr["comment"].ToString());
+                             "<br><b>Nota:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + HttpUtility.HtmlEncode(rdr["comment"].ToString()) +
+                             "<br>" +
+                             "<br><b>Creato da:</b>&nbsp;&nbsp;&nbsp;" + rdr["CreatedBy"] +
+                             "<br><b>Creato il:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + String.Format("{0:dd/MM/yyyy}", rdr["CreationDate"]);
 
                 // se la spesa ha una ricevuta stampa un icona, altrimenti lascia blank
                 if (iRicevuteBuffer.Contains(Convert.ToInt32(rdr["expenses_id"])))
@@ -604,7 +649,7 @@ public partial class input : System.Web.UI.Page
                 "'" + CurrentSession.Company_id + "' ," +
                 "'false' , " +
                  ASPcompatility.FormatNumberDB(Convert.ToDouble(dr[0]["ConversionRate"].ToString())) + " ," +
-                 ASPcompatility.FormatStringDb(TBOpportunityId.Text) +
+                 ASPcompatility.FormatStringDb(Request.Form["DDLOpportunity"].ToString()) +
                 " )";
 
         Database.ExecuteSQL(cmd, this.Page);

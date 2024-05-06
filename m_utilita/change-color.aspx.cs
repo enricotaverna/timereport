@@ -17,7 +17,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
 
         if (!IsPostBack) {
             BackgroundColor.Value = CurrentSession.BackgroundColor;
-            BackgroundImg.Value = CurrentSession.BackgroundImage;
+            BackgroundImg.Value = CurrentSession.BackgroundImage; 
         }
 
     }

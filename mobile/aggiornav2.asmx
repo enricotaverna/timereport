@@ -27,6 +27,12 @@ public class Spese
     public string SpeseName { get; set; }
 }
 
+public class Opportunita
+{
+    public string OpportunityId { get; set; }
+    public string OpportunityName { get; set; }
+}
+
 public class TipoOre
 {
     public int TipoOreId { get; set; }
@@ -156,6 +162,28 @@ public class Aggiorna : System.Web.Services.WebService
             {
                 SpeseId = (int)rs["ExpenseType_Id"],
                 SpeseName = rs["descrizione"].ToString()
+            };
+            ReturnList.Add(emp);
+        }
+
+        return ReturnList;
+
+    } // GetSpesaList
+
+    //  ***** Leggi Opportunità ****   
+    [WebMethod(EnableSession = true)] // per avere variabili di sessione 
+    public List<Opportunita> GetOpportunityList()
+    {
+        var ReturnList = new List<Opportunita>();
+        // recupera oggetto con variabili di sessione
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+
+        foreach (Opportunity rs in CurrentSession.ListaOpenOpportunity)
+        {
+            var emp = new Opportunita
+            {
+                OpportunityId = rs.OpportunityCode,
+                OpportunityName = rs.OpportunityAccount.AccountName + " - " + rs.OpportunityName
             };
             ReturnList.Add(emp);
         }

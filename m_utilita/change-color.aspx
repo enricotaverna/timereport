@@ -90,6 +90,13 @@
                                     <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr4.jpg')"></div>
                                     <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr5.jpg')"></div>
                                 </div>
+                                <div class="accordion-body justify-content-center row">
+                                    <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr6.jpg')"></div>
+                                    <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr7.jpg')"></div>
+                                    <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr8.jpg')"></div>
+                                    <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr9.jpg')"></div>
+                                    <div class="col-2 squaredBox pickImg" style="background-size: 150px; background-image: url('/timereport/images/background/choice/bkgr10.jpg')"></div>
+                                </div>
                             </div>
                         </div>
                         <div class="accordion-item">
@@ -100,6 +107,13 @@
                             </h2>
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
+                                    <div class="accordion-body justify-content-center row">                           
+                                            <div class="col-2 squaredBox pickMyImg" id="myImg1" style="border:solid;border-color:lightgray;background-size: 150px; background-image: url('/public/TR-IMMAGINI-CHOICE/<%= CurrentSession.Persons_id %>/myImg1.jpg' ) "></div>
+                                            <div class="col-2 squaredBox pickMyImg" id="myImg2" style="border:solid;border-color:lightgray;background-size: 150px; background-image: url('/public/TR-IMMAGINI-CHOICE/<%= CurrentSession.Persons_id %>/myImg2.jpg' ) "></div>
+                                            <div class="col-2 squaredBox pickMyImg" id="myImg3" style="border:solid;border-color:lightgray;background-size: 150px; background-image: url('/public/TR-IMMAGINI-CHOICE/<%= CurrentSession.Persons_id %>/myImg3.jpg' ) "></div>
+                                            <div class="col-2 squaredBox pickMyImg" id="myImg4" style="border:solid;border-color:lightgray;background-size: 150px; background-image: url('/public/TR-IMMAGINI-CHOICE/<%= CurrentSession.Persons_id %>/myImg4.jpg' ) "></div>
+                                            <div class="col-2 squaredBox pickMyImg" id="myImg5" style="border:solid;border-color:lightgray;background-size: 150px; background-image: url('/public/TR-IMMAGINI-CHOICE/<%= CurrentSession.Persons_id %>/myImg5.jpg' ) "></div>
+                                    </div>
                                     <div class="form-group">
                                         <label for="exampleFormControlFile1"><asp:Literal runat="server" Text="<%$ Resources:Carica_Immagine %>" /></label>
                                         <input type="file" class="form-control-file" id="CaricaImmagine" name="files[]">
@@ -151,6 +165,10 @@
         // Lingua
         window.Parsley.setLocale('<%=CurrentSession.Language%>');
 
+        // salva il box cliccato per il caricamento di immagini personalizzate
+        var clickedBoxId;
+
+        // *** chiamata da cambio sfondo per colore ***
         $('.pickColor').click(function () {
             $('#BackgroundColor').val($(this).css('background-color')); // colore da passare al backend con il post
             $('.MainWindowBackground').css("background-color", $(this).css('background-color'));
@@ -158,17 +176,38 @@
             $('.MainWindowBackground').css("background-image", "");
         });
 
-        $('.pickImg').click(function () {
-            $('#BackgroundImg').val($(this).css('background-image')); // colore da passare al backend con il post
-            $('.MainWindowBackground').css("background-image", $(this).css('background-image'));
-            $('.MainWindowBackground').css("background-size", "cover");
-            $('#BackgroundColor').val(""); // resetta colore
-            $('.MainWindowBackground').css("background-color", "");
+        // *** chiamata da cambio sfondo con immagine caricata da file ***
+        $('.pickMyImg').click(function () {
+
+            // illumina il bordo cliccato
+            $('.pickMyImg').css('border-color', "lightgray");
+            $(this).css('border-color', "lightgreen");
+            clickedBoxId = $(this).attr('id');
+            ChangeImage($(this));
+
         });
 
-        // Initialize the jQuery File Upload widget:  
+        // *** chiamata da cambio sfondo con una delle immagini proposte ***
+        $('.pickImg').click(function () {
+            ChangeImage($(this));
+        });
+
+        // *** chiamata dal click per cambiare l'immagine di sfondo, viene passato l'oggetto cliccato ***
+        function ChangeImage(obj) {
+
+            //if (obj.css('background-image') == 'none') se non contiene un'immagine non cambia sfondo
+            //    return;
+
+            $('#BackgroundImg').val(obj.css('background-image')); // colore da passare al backend con il post
+            $('.MainWindowBackground').css("background-image", obj.css('background-image'));
+            $('.MainWindowBackground').css("background-size", "cover");
+
+            $('#BackgroundColor').val(""); // resetta colore
+            $('.MainWindowBackground').css("background-color", "");
+        }
+
+        // *** Initialize the jQuery File Upload widget:  
         $('#CaricaImmagine').fileupload({
-            // i parametri addizionali vengono letti dal form e passati nella url
             url: "/timereport/webservices/carica_immagine.ashx",
             dataType: 'json',
             // caricamento parte alla selezione del file
@@ -189,20 +228,41 @@
                     alert(uploadErrors.join("\n"));
                 } else {
                     //data.context = $('<p/>').text('In caricamento...').appendTo(document.body);
+
                     data.submit();
                 }
             },
         })
             .bind('fileuploaddone', function (e, data) {
                 $('#BackgroundImg').val("url('" + data.result + "')"); // url tornato dal servizio
+
+                // visualizza immagine nella miniatura cliccata 
                 // forza refresh il cambio url
                 const randomId = new Date().getTime();
+
+                if (clickedBoxId != null) {
+                    $("#" + clickedBoxId).css("background-image", "url('" + data.result + "?random=" + randomId + "')");
+                    }
+
                 $('.MainWindowBackground').css("background-image", "url('" + data.result + "?random=" + randomId + "')");
                 $('.MainWindowBackground').css("background-size", "cover");
             })
             .bind('fileuploadfail', function (e, data) {
                 alert("errore nel caricamento del file");
             })
+
+        // *** valorizza il parametro clickedBox con il box selezionato
+        // *** necessario fare una bind dopo che il controllo è stato creato 
+        $('#CaricaImmagine').bind('fileuploadsubmit', function (e, data) {
+
+            if (!clickedBoxId) {
+                ShowPopup("Selezionare una posizione per caricare l'immagine");                    
+                return false;
+            }
+            data.formData = { clickedBox: `${clickedBoxId}` };
+            return true;
+
+        });
 
     </script>
 
