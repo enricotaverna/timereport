@@ -403,6 +403,7 @@
             // Sumo Select
             $('#DDLOpportunity').SumoSelect({ search: true, searchText: '' });
             $('.SumoSelect').css('width', '270px');
+            $('.SumoSelect > .optWrapper').css('width', '550px');
         }
 
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB

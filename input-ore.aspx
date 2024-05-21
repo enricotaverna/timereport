@@ -519,7 +519,7 @@
             // Sumo Select
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
             $('.SumoSelect').css('width', '270px');
-
+            $('.SumoSelect > .optWrapper').css('width', '550px');
         });
 
         // *** Esclude i controlli nascosti *** 

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Web.Configuration;
 using System.Globalization;
 using System.Activities.Expressions;
+using System.Web;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -299,9 +300,13 @@ public class TRSession
                     else
                         newRec.OpportunityAccount.AccountName = newRec.OpportunityAccount.AccountName.Substring(0, maxLung);
 
+                    // evita problemi con caratteri speciali
+                    newRec.OpportunityName = HttpUtility.HtmlEncode(newRec.OpportunityName);
+                    newRec.OpportunityAccount.AccountName = HttpUtility.HtmlEncode(newRec.OpportunityAccount.AccountName);
+
                     ListaAllOpportunity.Add(newRec);
 
-                    if (newRec.StageName != "Closed Won" && newRec.StageName != "Closed Lost" &&  string.Compare(newRec.OpenDate, sAnnoPrima) == 1 )
+                    if (newRec.StageName != "Closed Won" && newRec.StageName != "Closed Lost" && newRec.StageName != "Closed Archived" &&  string.Compare(newRec.OpenDate, sAnnoPrima) == 1 )
                         ListaOpenOpportunity.Add(newRec);
                 }
             }
