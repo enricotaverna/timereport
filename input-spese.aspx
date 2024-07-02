@@ -553,6 +553,7 @@
             // Sumo Select
             $('#FVSpese_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
             $('.SumoSelect').css('width', '270px');
+            $('.SumoSelect > .optWrapper').css('width', '550px');
 
             // se in edit chiama Ajax per controllo carico spese sul giorni
             if (!$('#FVSpese_DDLprogetto')[0].disabled) {
