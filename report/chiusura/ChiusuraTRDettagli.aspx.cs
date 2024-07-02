@@ -13,6 +13,7 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
     const string RQS_SPESA = "02";
     const string RQS_ASSENZA = "03";
     const string RQS_TICKET_HOMEOFFICE = "04";
+    const string RQS_ORE_MANCANTI = "05";
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -128,6 +129,31 @@ public partial class Templates_TemplateForm : System.Web.UI.Page
                 DataRow dr = dt.NewRow();
                 dr["Data"] = curr.Data.ToShortDateString();
                 dr["Causale"] = curr.ProjectName;
+                dr["Nota"] = curr.Descrizione;
+                dt.Rows.Add(dr);
+            }
+        }
+
+        if (Request.QueryString["type"] == RQS_ORE_MANCANTI) // check assenze
+        {
+            CheckChiusura.CheckOreMancanti(Session["Month"].ToString(),
+                                                       Session["Year"].ToString(),
+                                                       CurrentSession.Persons_id.ToString(),
+                                                               ref ListaAnomalie);
+
+            //  popola grid di visualizzazione
+            dt.Reset();
+            // costruisce la struttura della tabella di output
+            dt.Columns.Add("Data");
+            dt.Columns.Add("Ore Mancanti");
+            dt.Columns.Add("Nota");
+
+            foreach (CheckChiusura.CheckAnomalia curr in ListaAnomalie)
+            {
+                // popola la tabella
+                DataRow dr = dt.NewRow();
+                dr["Data"] = curr.Data.ToShortDateString();
+                dr["Ore Mancanti"] = curr.ProjectName.Replace("-","");
                 dr["Nota"] = curr.Descrizione;
                 dt.Rows.Add(dr);
             }

@@ -106,6 +106,17 @@
                         </div>
                     </div>
                     <!-- End Row -->
+
+                    <!-- End Row -->
+                    <div class="row p-2">
+                        <div class="col-1">
+                            <asp:Image ID="CheckOreMancantiImg" runat="server" ImageAlign="Top" meta:resourcekey="CheckSpeseImgResource1" Width="25px" />
+                        </div>
+                        <div class="col-9">
+                            <asp:Label ID="CheckOreMancanti" runat="server" Text="" meta:resourcekey="CheckOreMancanti"></asp:Label>
+                        </div>
+                    </div>
+                    <!-- End Row -->
    
                     <!-- *** BOTTONI ***  -->
                     <div class="buttons">

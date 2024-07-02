@@ -948,4 +948,55 @@ public class CheckChiusura
         }
         return iRet;
     }
+
+    public static int CheckOreMancanti(string sMese, string sAnno, string persons_id, ref List<CheckAnomalia> ListaAnomalie)
+    {
+        // Funzione ritorna
+        // 0 = nessun problema
+        // 1 = warning
+        // 2 = errore
+        // La lista di oggetti contiene le anomalie secondo la struttura della class CheckAnomalia        
+        int iRet;
+
+        ListaAnomalie.Clear();
+        
+        string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
+        string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
+        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        DataSet dsOreMancanti = new DataSet();
+
+        conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        conn.Open();
+        using (conn)
+        {
+            SqlCommand sqlComm = new SqlCommand("CheckMissingHours", conn);
+            sqlComm.CommandTimeout = 200000;
+            // valorizza parametri della query
+            sqlComm.Parameters.AddWithValue("@Anno", sAnno);
+            sqlComm.Parameters.AddWithValue("@Mese", Convert.ToInt16(sMese));
+            sqlComm.Parameters.AddWithValue("@Person_id", persons_id);
+
+            // esecuzione
+            sqlComm.CommandType = CommandType.StoredProcedure;
+
+            SqlDataAdapter da = new SqlDataAdapter();
+            da.SelectCommand = sqlComm;
+
+            da.Fill(dsOreMancanti);
+        }
+
+        iRet = dsOreMancanti.Tables[0].Rows.Count; // numero anomalie
+
+        // cicla sulle assenze non approvate
+        foreach (DataRow rs in dsOreMancanti.Tables[0].Rows)
+        {
+            CheckAnomalia a = new CheckAnomalia();
+            a.Data = Convert.ToDateTime(rs["date"].ToString());
+            a.Descrizione = "Ore mancanti";
+            a.ProjectName = rs["Ore da inserire"].ToString();
+
+            ListaAnomalie.Add(a);
+        }
+        return iRet;
+    }
 }

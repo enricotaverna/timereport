@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
+using System.Web.UI.WebControls;
 
 public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
 {
@@ -103,6 +105,22 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
         {
             CheckAssenze.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=03'>" + ListaAnomalie.Count + " richieste</a> in attesa di conferma";
             CheckAssenzeImg.ImageUrl = "/timereport/images/icons/50x50/icon-alert.png";
+        }
+
+        // ********* Check ore mancanti ************* 
+        int iCheckOreMancanti = CheckChiusura.CheckOreMancanti(Session["Month"].ToString(),
+                                                     Session["Year"].ToString(),
+                                                     CurrentSession.Persons_id.ToString(),
+                                                     ref ListaAnomalie);
+
+        Button InsertButton = (Button)FVMain.FindControl("InsertButton");
+        InsertButton.Enabled = true;
+
+        if (iCheckOreMancanti > 0)
+        {
+            CheckOreMancanti.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=05'>" + ListaAnomalie.Count + " richieste</a> in attesa di conferma";
+            CheckOreMancantiImg.ImageUrl = "/timereport/images/icons/50x50/icon-error.png";
+            InsertButton.Enabled = false;
         }
 
     } // Page_Load()      
