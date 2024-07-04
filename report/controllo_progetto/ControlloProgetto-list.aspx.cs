@@ -19,7 +19,7 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     {
 
         // richima storage procedure per popolare la tabella con i valori degli economics di peogetto
-        DataSet ds = ControlloProgetto.PopolaDataset(Session["DataReport"].ToString(), Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
+        DataSet ds = ControlloProgetto.PopolaDataset(Session["DataReport"].ToString(), Session["DDLCpProgetto"].ToString(), Session["DDLCpManager"].ToString());
         Session["dataset"] = ds;
 
         // recupera oggetto con variabili di sessione

@@ -83,12 +83,12 @@
                                 <asp:BoundField DataField="RevenueBDG" HeaderText="Budget" SortExpression="RevenueBDG" DataFormatString="{0:###,###;-; }" />
                                 <asp:BoundField DataField="RevenueACT" HeaderText="Revenue ACT" SortExpression="RevenueACT" DataFormatString="{0:###,###;-; }" />
 
-                                <asp:BoundField DataField="MargineProposta" HeaderText="Margine BDG" SortExpression="MargineProposta" DataFormatString="{0:#.#%;-#.#%;}" />
+                                <asp:BoundField DataField="MargineBDG" HeaderText="Margine BDG" SortExpression="MargineBDG" DataFormatString="{0:#.#%;-#.#%;}" />
                                 <asp:BoundField DataField="MargineEAC" HeaderText="Margine EAC" SortExpression="MargineEAC" DataFormatString="{0:#.##%;-#.##%;}" />
 
                                 <%--<asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />                          --%>
 
-                                <asp:BoundField DataField="WriteUp" HeaderText="Write Up/Off" SortExpression="WriteUp" DataFormatString="{0:###,###;-###,###; }" />
+                                <asp:BoundField DataField="WriteUpEAC" HeaderText="Write Up/Off" SortExpression="WriteUpEAC" DataFormatString="{0:###,###;-###,###; }" />
                                 <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" DataFormatString="{0:###,###.0;-###,###.0; }" />
 
                                 <asp:TemplateField>

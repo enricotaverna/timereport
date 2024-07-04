@@ -38,29 +38,18 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 
         // salva data report utilizzata nella gridview per il drill sulle revenue
         Session["DataReport"] = TBDataReport.Text;
-        Session["ProgettoReport"] = DDLProgetti.SelectedValue;
-        Session["ManagerReport"] = DDLManager.SelectedValue;
+        Session["DDLCpProgetto"] = DDLProgetti.SelectedValue;
+        Session["DDLCpManager"] = DDLManager.SelectedValue;
         
         Response.Redirect("ControlloProgetto-list.aspx");
 
     }
 
     // salva valori dei controlli
-    protected void SalvaControlli() 
-    {
-        Session["DDLCpProgetti"] = DDLProgetti.SelectedIndex;
-        Session["DDLCpManager"] = DDLManager.SelectedIndex;
-        Session["TBCpDataReport"] = TBDataReport.Text;
-    }
-
-    // salva valori dei controlli
     protected void RipristinaControlli()
     {
-        if (Session["DDLCpProgetti"] != null) DDLProgetti.SelectedIndex = (int)Session["DDLCpProgetti"];
-        //if (Session["DDLCpAttivita"] != null) DDLAttivita.SelectedIndex = (int)Session["DDLCpAttivita"];
-        if (Session["DDLCpManager"] != null) DDLManager.SelectedIndex = (int)Session["DDLCpManager"];
-        if (Session["TBCpDataReport"] != null) TBDataReport.Text = Session["TBCpDataReport"].ToString();
-        //if (Session["RBCpTipoCalcolo"] != null) RBTipoCalcolo.SelectedIndex = (int)Session["RBCpTipoCalcolo"];
+        if (Session["DDLCpProgetto"] != null) DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
+        if (Session["DDLCpManager"] != null) DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
     }
 
     protected void Bind_DDLProgetti()

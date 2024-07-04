@@ -188,7 +188,7 @@
                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" Enabled="False" />
 
                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
-                                       <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>'
+                                       <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' 
                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                    </div>
 
@@ -196,6 +196,7 @@
                                 <!-- *** TAB 1 ***  --
 
                                 <!-- *** TAB 2 ***  -->
+                                <!-- *** Economics ***  -->
 
                                 <div id="tabs-2" style="height: 480px; width: 100%">
 
@@ -264,9 +265,11 @@
                                             <tr>
                                                 <th scope="row" style="color:grey;font-weight:normal">Writeup</th>
                                                 <td></td>
-                                                <td></td>
                                                 <td>
-                                                    <asp:Label ID="lbWriteoffEAC" runat="server" />
+                                                    <asp:Label ID="lbWriteUpACT" runat="server" />
+                                                </td>
+                                                <td>
+                                                    <asp:Label ID="lbWriteUpEAC" runat="server" />
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -281,6 +284,10 @@
                                         <asp:TextBox ID="TBMesiCopertura" class="ASPInputcontent" runat="server" Enabled="False" />
                                         <label>mesi</label>
                                     </div>
+<%--                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Messaggi: </div>
+                                        <asp:TextBox ID="TBMessage"  runat="server" Enabled="False" Rows="4" Columns="20" />
+                                    </div>--%>
 
                                 </div>
 
