@@ -252,8 +252,8 @@ public class ControlloProgetto
             float dRevenueBDG = dr["RevenueBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBDG"]);
             dr["CostiBDG"] = Math.Round((dRevenueBDG) * (1 - Convert.ToDouble(dr["MargineBDG"])), 2);
 
-            dr["MargineACT"] = Math.Round((dRevenueBDG - dCostiACT) / dRevenueBDG, 2);
-            dr["WriteUpACT"] = Math.Round(dRevenueBDG - dRevenueACT, 2);
+            dr["MargineACT"] = Math.Round((dRevenueACT - dCostiACT) / dRevenueACT, 2);
+            //dr["WriteUpACT"] = Math.Round(dRevenueBDG - dRevenueACT, 2);
 
             // i giorni per calcolo EAC sono 
             // se la data fine progetto è > data ultimo carico -> data fine progetto - data report
