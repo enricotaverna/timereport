@@ -241,7 +241,7 @@ public class ControlloProgetto
 
             //*** calcola valori dalla query
             int giorniLavorativi = CommonFunction.NumeroGiorniLavorativi(primaDataCarico, TBDataReport);
-            int giorniLavorativiRestanti;
+            int giorniLavorativiRestanti=0;
 
             //*** calcola ACTUALS
             float dRevenueACT = dr["RevenueACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueACT"]);
@@ -256,12 +256,21 @@ public class ControlloProgetto
             //dr["WriteUpACT"] = Math.Round(dRevenueBDG - dRevenueACT, 2);
 
             // i giorni per calcolo EAC sono 
-            // se la data fine progetto è > data ultimo carico -> data fine progetto - data report
-            // se la data fine progetto è < data ultimo carico -> data ultimo carico - data report (con warning)
-            if (dataFineProgetto > ultimaDataCarico)
-                giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, dataFineProgetto);
-            else
-                giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, ultimaDataCarico);
+            // se la data fine progetto è > data ultimo carico -> EAC = ACT + BR * ( data fine progetto - data report )
+            // se la data fine progetto è < data ultimo carico e data report < data ultimo carico -> EAC = ACT + BR * ( data ultimo carico - data report ) con WARNING
+            // se la data fine progetto è < data ultimo carico e data report > data ultimo carico -> EAC = ACT
+
+            if (dataFineProgetto >= ultimaDataCarico)
+                if (dataFineProgetto > TBDataReport)
+                    giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, dataFineProgetto); 
+                else
+                    giorniLavorativiRestanti = 0;
+
+            if (dataFineProgetto < ultimaDataCarico)
+               if (ultimaDataCarico > TBDataReport)
+                    giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, ultimaDataCarico);
+                else
+                    giorniLavorativiRestanti = 0;
 
             float dBurnRate = (float)Math.Round(dRevenueACT / giorniLavorativi, 2);
             float dSpeseBurnRate = (float)Math.Round(dSpeseACT / giorniLavorativi, 2);

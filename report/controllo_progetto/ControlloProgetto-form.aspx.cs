@@ -92,7 +92,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         // MESI COPERTURA
         TextBox TBMesiCopertura = (TextBox)FVProgetto.FindControl("TBMesiCopertura");
-        TBMesiCopertura.Text = ProgettoCorrente.MesiCopertura.ToString("#,###.##;0");
+        TBMesiCopertura.Text = ProgettoCorrente.MesiCopertura.ToString("#,##0.#;-#,##0.#;0");
            
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
