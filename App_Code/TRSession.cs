@@ -83,9 +83,9 @@ public class TRSession
 
         LoadPersonsRecord();
 
-        LoadProgettieSpese();
-
         LoadOptions();
+
+        LoadProgettieSpese();
 
         LoadPersonalSetting();
 
@@ -103,17 +103,19 @@ public class TRSession
         if (ForcedAccount)
         {
             //** A.1 Carica progetti possibili
-            dtProgettiForzati = Database.GetData("SELECT DISTINCT v_Projects.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType,ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM ForcedAccounts RIGHT JOIN v_Projects ON ForcedAccounts.Projects_id = v_Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR v_Projects.Always_available = 1 ) AND v_Projects.active = 1 )  ORDER BY v_Projects.ProjectCode", null);
+            // 04/10/24 filtra progetti con data fine > data cutoff
+            dtProgettiForzati = Database.GetData("SELECT DISTINCT v_Projects.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType,ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM ForcedAccounts RIGHT JOIN v_Projects ON ForcedAccounts.Projects_id = v_Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR v_Projects.Always_available = 1 ) AND v_Projects.active = 1 AND v_Projects.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " )  ORDER BY v_Projects.ProjectCode", null);
 
             //** A.2 Carica spese possibili				
             //** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
-            // carica spese forzate per persona                
+            // carica spese forzate per persona
             dtSpeseForzate = Database.GetData("SELECT ExpenseType.ExpenseType_Id, ExpenseType.ExpenseCode, ExpenseType.ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ForcedExpensesPers RIGHT JOIN ExpenseType ON ForcedExpensesPers.ExpenseType_Id = ExpenseType.ExpenseType_Id WHERE ForcedExpensesPers.Persons_id = " + ASPcompatility.FormatNumberDB(Persons_id) + " ORDER BY ExpenseType.ExpenseCode", null);
         }
         else
         {
             //** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
-            dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 ORDER BY ProjectCode", null);
+            // 04/10/24 filtra progetti con data fine > data cutoff
+            dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 AND v_Projects.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " ORDER BY ProjectCode", null);
             //** B.2 tutte le spese attive 							
             dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", null);
         }

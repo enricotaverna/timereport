@@ -115,7 +115,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         Session["DDLCliente"] = ddl.SelectedValue;
     }
     
-        // controlli di integrità e quindi cancellazione del record "Progetto"
+    // controlli di integrità e quindi cancellazione del record "Progetto"
     protected void GVProjects_RowCommand(object sender, GridViewCommandEventArgs e)
     {
 
@@ -145,7 +145,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
     {
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
         {
-            GVProjects.Columns[12].Visible = false;
+            GVProjects.Columns[13].Visible = false;
         }
     }
 
