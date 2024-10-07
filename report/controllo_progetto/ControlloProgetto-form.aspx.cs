@@ -73,19 +73,27 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         OutputLabel("lbSpeseEAC", ProgettoCorrente.SpeseEAC.ToString("#,###;0"));
 
         // MARGINE
-        OutputLabel("lbMargineACT", ProgettoCorrente.MargineACT.ToString("0#.#%;-#.#%;"));
-        OutputLabel("lbMargineEAC", ProgettoCorrente.MargineEAC.ToString("0#.#%;-#.#%;"));
+        OutputLabel("lbMargineBDG", ProgettoCorrente.MargineBDG.ToString("#.#%;-#.#%;"));
+        OutputLabel("lbMargineACT", ProgettoCorrente.MargineACT.ToString("#.#%;-#.#%;"));
+        OutputLabel("lbMargineEAC", ProgettoCorrente.MargineEAC.ToString("#.#%;-#.#%;"));
 
         // WRITEUP
-        Label lbWriteUp = (Label)FVProgetto.FindControl("lbWriteoffEAC");
-        lbWriteUp.Text = ProgettoCorrente.WriteUp.ToString("#,###;-#,###;0");
-        if (ProgettoCorrente.WriteUp < 0)
-            lbWriteUp.ForeColor = Color.Red;
+        OutputLabel("lbWriteUpACT", ProgettoCorrente.WriteUpACT.ToString("#,###;-#,###;"));
+        OutputLabel("lbWriteUpEAC", ProgettoCorrente.WriteUpEAC.ToString("#,###;-#,###;"));
+
+        Label lbWriteUpEAC = (Label)FVProgetto.FindControl("lbWriteUpEAC");
+        Label lbWriteUpACT = (Label)FVProgetto.FindControl("lbWriteUpACT");
+
+        if (ProgettoCorrente.WriteUpEAC < 0)
+            lbWriteUpEAC.ForeColor = Color.Red;
+
+        if (ProgettoCorrente.WriteUpACT < 0)
+            lbWriteUpACT.ForeColor = Color.Red;
 
         // MESI COPERTURA
         TextBox TBMesiCopertura = (TextBox)FVProgetto.FindControl("TBMesiCopertura");
-        TBMesiCopertura.Text = ProgettoCorrente.MesiCopertura.ToString("#,###.##;0");
-
+        TBMesiCopertura.Text = ProgettoCorrente.MesiCopertura.ToString("#,##0.#;-#,##0.#;0");
+           
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
 
