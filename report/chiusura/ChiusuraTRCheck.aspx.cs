@@ -118,7 +118,7 @@ public partial class report_chiusura_ChiusuraTRCheck : System.Web.UI.Page
 
         if (iCheckOreMancanti > 0)
         {
-            CheckOreMancanti.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=05'>" + ListaAnomalie.Count + " richieste</a> in attesa di conferma";
+            CheckOreMancanti.Text = "<a style='text-decoration: underline' href='/timereport/report/chiusura/ChiusuraTRDettagli.aspx?type=05'>" + ListaAnomalie.Count + " giornate </a> con carichi ore non completi";
             CheckOreMancantiImg.ImageUrl = "/timereport/images/icons/50x50/icon-error.png";
             InsertButton.Enabled = false;
             InsertButton.Style["visibility"] = "hidden";
