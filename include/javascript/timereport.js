@@ -31,7 +31,7 @@ function ShowPopup(message, url, titleBox) {
 
         if (titleBox == null)
             titleBox = "Messaggio";
-            
+
         // se non c'è la div mask la aggiunge
         if (document.getElementById("dialog") == null)
             $("body").append("<div id='dialog'></div>");
@@ -45,7 +45,7 @@ function ShowPopup(message, url, titleBox) {
             buttons: {
                 Close: function () {
                     $(this).dialog('close');
-                    if (url != undefined && url != '' )
+                    if (url != undefined && url != '')
                         window.location.href = url;
                 }
             },
@@ -71,7 +71,7 @@ function openDialogForm(ModalForm) {
 
     //Get the window height and width
     //var winW = 960;
-    var winW = $(window).width();   
+    var winW = $(window).width();
 
     //Set the popup window to center
     $(ModalForm).css('top', 40);
@@ -136,6 +136,21 @@ function UnMaskScreen() {
 
 }
 
+// Blocca postkback a seguito con pressione INVIO
+function stopPostbackWithEnter() {
+    document.addEventListener("keydown", function (event) {
+        // Verifica se il tasto premuto è "Enter"
+        if (event.key === "Enter") {
+            let activeElement = document.activeElement;
+
+            // Se l'elemento attualmente in focus è un TextBox, impedisci il postback
+            if (activeElement.tagName === "INPUT" && activeElement.type === "text") {
+                event.preventDefault(); // Impedisce il postback
+            }
+        }
+    });
+
+}
 // include Html Menu
 function includeHTML() {
     var z, i, elmnt, file, xhttp;
@@ -165,9 +180,9 @@ function includeHTML() {
     }
 }
 
-function InitPage ( Bkgcolor, BkgImg ) {
+function InitPage(Bkgcolor, BkgImg) {
     //$('.MainWindowBackground').css("background-color", "<%=CurrentSession.BackgroundColor%>");
-    if ( Bkgcolor != "")
+    if (Bkgcolor != "")
         $('.MainWindowBackground').css("background-color", Bkgcolor);
 
     if (BkgImg != "") {

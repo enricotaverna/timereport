@@ -516,6 +516,9 @@
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
+        // evita il postback con INVIO (che non faceva funzionare bene il bind delle attivita)
+        stopPostbackWithEnter();
+
         // ***  Controllo che esista un commento se il progetto lo richiede ***
         window.Parsley.addValidator('testoObbligatorio', {
             validateString: function (value) {

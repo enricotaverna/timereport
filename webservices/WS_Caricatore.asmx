@@ -29,8 +29,12 @@ public class ProjectInput //
     public string AccountManager { get; set; }
     public string AccountManager_id { get; set; }
     public string CodiceCliente { get; set; }
+    public string CopiaConsulentiDa { get; set; }
+    public string CopiaConsulentiDa_id { get; set; }
     public string ProjectType { get; set; }
     public string ProjectType_id { get; set; }
+    public string LOB { get; set; }
+    public string LOB_id { get; set; }
     public string Channels { get; set; }
     public string Channels_id { get; set; }
     public string Company { get; set; }
@@ -103,6 +107,7 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("AccountManager_id", "int", null ),
                                            new Record("CodiceCliente", "string", null ),
                                            new Record("ProjectType_id", "int", null ),
+                                           new Record("LOB_id", "int", null ),
                                            new Record("Channels_id", "int", null ),
                                            new Record("Company_id", "int", null ),
                                            new Record("TipoContratto_id", "float", null ),
@@ -210,39 +215,41 @@ public class WS_Caricatore : System.Web.Services.WebService
 
             default:
                 return false; // tipo aggiornamento non gestito
-                break;
         };
 
-        object r = null;
+        object recWithValues = null;
+        int CopiaConsulentiDa_id = 0; // id progetto da cui copiare le forzature consulenti
 
         // aggiorna dati TR con valori di SF
         for ( int i = 0; i < arr.Length; i++ )
         {
 
-            r = js.Deserialize(arr[i], tipoStruttura);
+            // array json con l'elenco dei valori da inserire
+            recWithValues = js.Deserialize(arr[i], tipoStruttura);
 
             //double dMargine = Convert.ToDouble(r.sfexpectedmargin) / 100;
             //string sTipoContratto_id = r.sfengagementtype == "TM" ? "1" : "2";
 
             string SQLInsert = "INSERT INTO " + TableToUpdate + " (";
 
+            // loop sui campi da valorizzare per l'update
             foreach (Record rec in RowsToUpdate) {
                 SQLInsert += rec.Campo + ",";
             }
             SQLInsert = SQLInsert.Substring(0, SQLInsert.Length - 1) + " ) VALUES (";
 
-            Type tipo = r.GetType();
+            Type tipo = recWithValues.GetType();
 
-            foreach (Record rec in RowsToUpdate) {
-                PropertyInfo prop = tipo.GetProperty(rec.Campo);
+            foreach (Record recWithFieldNames in RowsToUpdate) {
+                PropertyInfo prop = tipo.GetProperty(recWithFieldNames.Campo);
                 object valore;
 
-                if (rec.Default == null) // valore di default
-                    valore = prop.GetValue(r);
+                if (recWithFieldNames.Default == null) // valore di default
+                    valore = prop.GetValue(recWithValues);
                 else
-                    valore = rec.Default ;
+                    valore = recWithFieldNames.Default ;
 
-                switch (rec.Tipo) {
+                switch (recWithFieldNames.Tipo) {
 
                     case "author":
                         SQLInsert += ASPcompatility.FormatStringDb(CurrentSession.UserId) + ",";
@@ -271,11 +278,33 @@ public class WS_Caricatore : System.Web.Services.WebService
             }
 
             SQLInsert = SQLInsert.Substring(0, SQLInsert.Length - 1) + ")";
-
             ret = Database.ExecuteSQL(SQLInsert, null);
 
+            // memoriza il codice progetto per forzature consulenti da usare dopo l'insert del progetto
+            CopiaConsulentiDa_id = tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues) == null ? 0 : int.Parse(tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues).ToString());
+
+            // se qualcosa è andato male esce
             if (ret == false)
                 break;
+
+            // se bisogna copiare le forzature per consulente
+            if (type == "PROJECT" && CopiaConsulentiDa_id != 0 ) {
+
+                // recupera il codice progetto creato
+                string ProjectCode= tipo.GetProperty("ProjectCode").GetValue(recWithValues).ToString();
+                // recupera il Project_id
+                object obj = Database.ExecuteScalar("SELECT Projects_id FROM Projects WHERE ProjectCode = " + ASPcompatility.FormatStringDb(ProjectCode), null );
+
+                if (obj == null)
+                    return false; //errore progetto non trovato
+
+                // copia le forzature
+                int Project_id;
+                if (int.TryParse(obj.ToString(), out Project_id)) {
+                    Database.ExecuteScalar("INSERT INTO ForcedAccounts (Persons_id, Projects_id) SELECT Persons_id, " + ASPcompatility.FormatNumberDB(Project_id) + " FROM ForcedAccounts WHERE Projects_id = " + ASPcompatility.FormatNumberDB(CopiaConsulentiDa_id), null);
+                }
+            }
+
         }
 
         return ret;

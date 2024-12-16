@@ -1,13 +1,10 @@
 ﻿using classiStandard;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Web.Configuration;
 using System.Web.UI.WebControls;
 
 public partial class input_ore : System.Web.UI.Page
@@ -33,7 +30,9 @@ public partial class input_ore : System.Web.UI.Page
 
         //      Modo di default è insert, se richiamata con id va in change / display
         if (IsPostBack)
-            return;       
+        {
+            return;
+        }
 
         //      in caso di update recupera il valore del progetto e attività
         if (Request.QueryString["hours_id"] != null)
@@ -48,7 +47,7 @@ public partial class input_ore : System.Web.UI.Page
             // verifica se TR della persona è chiuso
             var trChiuso = Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND stato=1 AND mese=" + dateRecord.Month.ToString() + " AND anno=" + dateRecord.Year.ToString());
 
-            if (dateRecord  < CurrentSession.dCutoffDate || trChiuso)
+            if (dateRecord < CurrentSession.dCutoffDate || trChiuso)
                 FVore.ChangeMode(FormViewMode.ReadOnly);
             else
                 FVore.ChangeMode(FormViewMode.Edit);
@@ -70,10 +69,10 @@ public partial class input_ore : System.Web.UI.Page
     protected void Get_record(string strHours_Id)
     {
 
-        DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, "+"" +
+        DataRow drRecord = Database.GetRow("SELECT Hours.Projects_Id, Hours.Activity_id, Activity.Name AS NomeAttivita, Projects.Name AS NomeProgetto, Hours.LastModificationDate, Hours.CreationDate, Hours.LastModifiedBy, " + "" +
             "Hours.CreatedBy, Hours.AccountingDate, LocationKey, LocationType,SalesforceTaskID, OpportunityId " +
-            "FROM Hours "+"" +
-            "LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id "+
+            "FROM Hours " + "" +
+            "LEFT OUTER JOIN Activity ON Hours.Activity_id = Activity.Activity_id " +
             "INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id where hours_id = " + strHours_Id, null);
 
         lProject_id = drRecord["Projects_id"].ToString(); // projects_id
@@ -179,7 +178,7 @@ public partial class input_ore : System.Web.UI.Page
             case FormViewMode.Edit:
                 ListaTaskTotale = CurrentSession.ListaTask;
                 //raggruppo tutti codici commessa per poter eseguire la query sul DB
-                var ListaCommesseAE = ListaTaskTotale.GroupBy( u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c ).ToList();
+                var ListaCommesseAE = ListaTaskTotale.GroupBy(u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c).ToList();
 
                 //preparo la variabile per eseguire la select con IN, in questo modo eseguo una sola select
                 string Commesse = "";
@@ -191,10 +190,10 @@ public partial class input_ore : System.Web.UI.Page
                 if (clsUtility.NullToString(Commesse) != "")
                 {
                     Commesse = Commesse.Substring(0, Commesse.Length - 1);
-                }                
+                }
 
                 //selezioni dal database tutti i progetti contenutio nelle task di SF
-                DataTable dtAct = Database.GetData(string.Format("SELECT [Projects_Id],[ProjectCode] FROM [Projects] WHERE [ProjectCode] in ({0}) ", Commesse),null);
+                DataTable dtAct = Database.GetData(string.Format("SELECT [Projects_Id],[ProjectCode] FROM [Projects] WHERE [ProjectCode] in ({0}) ", Commesse), null);
 
                 // aggiunge gli item con l'attributo project_id per valorizzare automaticamente la DDL dei preogetti
                 foreach (TaskRay Task in CurrentSession.ListaTask)
@@ -250,8 +249,8 @@ public partial class input_ore : System.Web.UI.Page
         // di progetti chiusi
         foreach (Opportunity opp in ListaOpportunita)
         {
-           ListItem liItem = new ListItem( opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode );
-           DDLOpportunity.Items.Add(liItem);
+            ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+            DDLOpportunity.Items.Add(liItem);
         }
 
         DDLOpportunity.DataTextField = "OpportunityName";
@@ -380,7 +379,7 @@ public partial class input_ore : System.Web.UI.Page
 
         DropDownList ddlOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
         e.Command.Parameters["@OpportunityId"].Value = ddlOpportunity.SelectedValue;
-       
+
         DropDownList ddlList1 = (DropDownList)FVore.FindControl("DDLAttivita");
         if (ddlList1.SelectedValue != null)
             e.Command.Parameters["@Activity_id"].Value = ddlList1.SelectedValue;

@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Web.UI;
-using System.Collections.Generic;
-using System.Reflection;
 
 /*
  * Per aggiungere un caricatore:
@@ -36,8 +35,12 @@ public partial class SFimport_select : System.Web.UI.Page
         new Colonna() { valore = "AccountManager", tipo = "string", controllo = "EXIST", tabellaControllo = "Persons;Name;Persons_id;AccountManager_id" },
         new Colonna() { valore = "AccountManager_id"},
         new Colonna() { valore = "CodiceCliente", tipo = "string", controllo = "EXIST", tabellaControllo = "Customers;Nome1;CodiceCliente;CodiceCliente" },
+        new Colonna() { valore = "CopiaConsulentiDa", tipo = "string", controllo = "EXIST", tabellaControllo = "Projects;ProjectCode;Projects_id;CopiaConsulentiDa_id" },
+        new Colonna() { valore = "CopiaConsulentiDa_id"},
         new Colonna() { valore = "ProjectType", tipo = "string", controllo = "EXIST", tabellaControllo = "ProjectType;Name;ProjectType_id" },
         new Colonna() { valore = "ProjectType_id"},
+        new Colonna() { valore = "LOB", tipo = "string", controllo = "EXIST", tabellaControllo = "Lob;LobCode;LOB_Id;LOB_Id" },
+        new Colonna() { valore = "LOB_id"},
         new Colonna() { valore = "Channels", tipo = "string", controllo = "EXIST", tabellaControllo = "Channels;Name;Channels_Id" },
         new Colonna() { valore = "Channels_Id"},
         new Colonna() { valore = "Company", tipo = "string", controllo = "EXIST", tabellaControllo = "Company;Name;Company_id" },
@@ -106,7 +109,7 @@ public partial class SFimport_select : System.Web.UI.Page
             DDLImport.SelectedValue = (string)Session["SelectedValue"];
         }
 
-            switch (DDLImport.SelectedValue)
+        switch (DDLImport.SelectedValue)
         {
             case "PROJECT":
                 HyperLinkFile.NavigateUrl = "/timereport/m_gestione/Caricatori/template/progetti-template.xlsx";
@@ -188,7 +191,7 @@ public partial class SFimport_select : System.Web.UI.Page
         Regex rgx = new Regex(@"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$");
         EsitoControllo ritorno = new EsitoControllo();
 
-        int numberOfColumnsInExcel; 
+        int numberOfColumnsInExcel;
 
         // loop dalla 2 riga in avanti
         for (int i = 1; i < dt.Rows.Count; i++)
@@ -202,7 +205,7 @@ public partial class SFimport_select : System.Web.UI.Page
             foreach (Colonna nomeColonna in ColonneFileInput)
             {
 
-                if (count >= numberOfColumnsInExcel | nomeColonna.tipo == null ) // file non corretto!
+                if (count >= numberOfColumnsInExcel | nomeColonna.tipo == null) // file non corretto!
                     continue;
 
                 valoreCellaStr = dt.Rows[i][count].ToString();
@@ -226,12 +229,13 @@ public partial class SFimport_select : System.Web.UI.Page
                         break;
 
                     case "date":
-                        if (valoreCellaStr.Length < 10) {
+                        if (valoreCellaStr.Length < 10)
+                        {
                             drCheck["ProcessingStatus"] = "ERR";
                             drCheck["ProcessingMessage"] = "Il valore " + valoreCellaStr + " di " + nomeColonna.valore + " non è una data.";
                             continue;
                         }
-                        valoreCellaStr = valoreCellaStr.Substring(0, 10); 
+                        valoreCellaStr = valoreCellaStr.Substring(0, 10);
                         if (!rgx.IsMatch(valoreCellaStr))
                         {
                             drCheck["ProcessingStatus"] = "ERR";
@@ -257,13 +261,15 @@ public partial class SFimport_select : System.Web.UI.Page
 
                 };
 
-                if (nomeColonna.mandatory && valoreCellaStr.Trim().Length == 0) {
+                if (nomeColonna.mandatory && valoreCellaStr.Trim().Length == 0)
+                {
                     drCheck["ProcessingStatus"] = "ERR";
                     drCheck["ProcessingMessage"] = "Il valore di " + nomeColonna.valore + " non può essere vuoto.";
                     continue;
                 }
 
-                    if (nomeColonna.controllo != null)
+                // effettua controllo su valore del campo se non nullo
+                if (nomeColonna.controllo != null && valoreCellaStr.Trim().Length != 0)
                 {
                     ritorno = ControlloCampo(valoreCellaStr, nomeColonna.controllo, nomeColonna.tabellaControllo);
                     drCheck["ProcessingStatus"] = drCheck["ProcessingStatus"].ToString() == "" ? ritorno.codice : drCheck["ProcessingStatus"];
@@ -278,7 +284,8 @@ public partial class SFimport_select : System.Web.UI.Page
             }
 
             /* controlli specializzati */
-            if (DDLImport.SelectedValue == "FLC" && drCheck["ProcessingStatus"].ToString() == "") {
+            if (DDLImport.SelectedValue == "FLC" && drCheck["ProcessingStatus"].ToString() == "")
+            {
                 ritorno = ControlloFLC(drCheck);
                 drCheck["ProcessingStatus"] = drCheck["ProcessingStatus"].ToString() == "" ? ritorno.codice : drCheck["ProcessingStatus"];
                 drCheck["ProcessingMessage"] = drCheck["ProcessingMessage"].ToString() == "" ? ritorno.messaggio : drCheck["ProcessingMessage"];
@@ -303,7 +310,8 @@ public partial class SFimport_select : System.Web.UI.Page
         return dtResult;
     }
 
-    protected EsitoControllo ControlloFLC(DataRow record) {
+    protected EsitoControllo ControlloFLC(DataRow record)
+    {
         EsitoControllo ritorno = new EsitoControllo();
         var dataArray = record.ItemArray;
         /*
@@ -313,12 +321,13 @@ public partial class SFimport_select : System.Web.UI.Page
          */
 
         // se non è bufferizzato carica i valori in memoria
-        if (FLCCache == null) {
+        if (FLCCache == null)
+        {
             FLCCache = Database.GetData("SELECT * from PersonsCostRate", null);
         }
 
         string recordPersonsid = ASPcompatility.FormatStringDb(dataArray[3].ToString());
-        string dataRecordDa = ASPcompatility.FormatDateDb(dataArray[5].ToString()).Replace("'","");
+        string dataRecordDa = ASPcompatility.FormatDateDb(dataArray[5].ToString()).Replace("'", "");
         string dataRecordA = ASPcompatility.FormatDateDb(dataArray[6].ToString()).Replace("'", "");
 
         //string filter = " [persons_id] = " + recordPersonsid + " AND ( ( " +
@@ -337,14 +346,16 @@ public partial class SFimport_select : System.Web.UI.Page
 
         // trova il maggiore
         DateTime maxDateA = DateTime.MinValue;
-        foreach (DataRow dr in drRow) {
+        foreach (DataRow dr in drRow)
+        {
             if (Convert.ToDateTime(dr.ItemArray[5]) > maxDateA)
                 maxDateA = Convert.ToDateTime(dr.ItemArray[5]);
         }
 
         maxDateA = maxDateA.AddDays(1);
 
-        if (maxDateA != Convert.ToDateTime(dataArray[5]))  { 
+        if (maxDateA != Convert.ToDateTime(dataArray[5]))
+        {
             ritorno.codice = "ERR";
             ritorno.messaggio = "Record precedente già presente, la data inizio deve essere " + maxDateA.ToString("dd/MM/yy");
         }
@@ -400,6 +411,7 @@ public partial class SFimport_select : System.Web.UI.Page
 
         return ritorno;
     }
+
     protected EsitoControllo ControlloCampo(string valore, string controllo, string tabellaControllo)
     {
 
@@ -407,7 +419,7 @@ public partial class SFimport_select : System.Web.UI.Page
         string[] campiTabella = tabellaControllo.Split(';');
         bool found = false;
         DataRow dr;
-        string recordFound="";
+        string recordFound = "";
 
         string key = campiTabella[0] + ";" + campiTabella[1] + ";" + valore; // tabella, campo chiave, valore chiave
 
@@ -422,7 +434,8 @@ public partial class SFimport_select : System.Web.UI.Page
             string campoDaEstrarre = campiTabella.Length > 2 ? campiTabella[2] : "*";
             dr = Database.GetRow("SELECT " + campoDaEstrarre + " from " + campiTabella[0] + " WHERE " + campiTabella[1] + "='" + valore + "'", null);
 
-            if (dr != null) {
+            if (dr != null)
+            {
                 found = true;
                 recordFound = dr[0].ToString();
             }
@@ -452,9 +465,7 @@ public partial class SFimport_select : System.Web.UI.Page
         return ritorno;
     }
 
-    //
     // Crea la tabella risultato
-    //
     protected DataTable CreateDataTable()
     {
 
@@ -472,9 +483,7 @@ public partial class SFimport_select : System.Web.UI.Page
         return dt;
     }
 
-    //
     // Aggiunge una colonna
-    //
     protected DataColumn CreateColumn(string sType, string sField, string sName)
     {
 

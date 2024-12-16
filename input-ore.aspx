@@ -243,7 +243,7 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
                                 <span class="input2col">
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
+                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" AutoPostBack="false" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
 
@@ -483,6 +483,9 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        // evita il postback con INVIO (che non faceva funzionare bene il bind delle attivita)
+        stopPostbackWithEnter();
 
         // *** Page Load ***  
         $(function () {
