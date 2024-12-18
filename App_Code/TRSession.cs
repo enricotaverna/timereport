@@ -219,7 +219,7 @@ public class TRSession
 
             string SFtoken = clsUtility.GetTokenSF();
 
-            serviceURL += string.Format("SELECT+id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email+" +
+            serviceURL += string.Format("SELECT+id,Name,TASKRAY__Project__r.Name,TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c,Owner.Name,Owner.Email,Codice_Progetto_TR__c+" +
                                             "FROM+TASKRAY__Project_Task__c+WHERE+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+TASKRAY__trCompleted__c=false" +
                                             "+AND+TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c!=null+AND+Owner.Email='{0}'" +
                                             "+AND+Milestone_Senza_peso__c=False+AND+TASKRAY__trIsMilestone__c=False+AND+TASKRAY__List__c+!='Finished'+AND+TASKRAY__List__c+!='To Be Confirmed'" +

@@ -8,6 +8,7 @@ public class TaskRay
 {
     public string Id { get; set; }
     public string Name { get; set; }
+    public string Codice_Progetto_TR__c { get; set; }
 
     public TASKRAY__Project__r TASKRAY__Project__r { get; set; }
 
