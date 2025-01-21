@@ -178,7 +178,10 @@ public partial class input_ore : System.Web.UI.Page
             case FormViewMode.Edit:
                 ListaTaskTotale = CurrentSession.ListaTask;
                 //raggruppo tutti codici commessa per poter eseguire la query sul DB
-                var ListaCommesseAE = ListaTaskTotale.GroupBy(u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c).ToList();
+                //var ListaCommesseAE = ListaTaskTotale.GroupBy(u => u.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c).ToList();
+
+                // 18-12-2024 modifica per selezionare correttamente la commessa ferie e permessi
+                var ListaCommesseAE = ListaTaskTotale.GroupBy(u => u.Codice_Progetto_TR__c.ToNullToString()).ToList();
 
                 //preparo la variabile per eseguire la select con IN, in questo modo eseguo una sola select
                 string Commesse = "";
@@ -199,7 +202,10 @@ public partial class input_ore : System.Web.UI.Page
                 foreach (TaskRay Task in CurrentSession.ListaTask)
                 {
                     ListItem liItem = new ListItem(Task.TASKRAY__Project__r.Name.ToString() + " - " + Task.Name.ToString(), Task.Id.ToString());
-                    string ProjectCode = Task.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c.ToString();
+                    //string ProjectCode = Task.TASKRAY__Project__r.Contratto__r.Commessa_Aeonvis__c.ToString();
+
+                    // 18-12-2024 modifica per selezionare correttamente la commessa ferie e permessi
+                    string ProjectCode = Task.Codice_Progetto_TR__c.ToNullToString();
                     //controllo se esiste dai progetti ricercati precedentemente
                     if (dtAct.Select(string.Format("ProjectCode='{0}'", ProjectCode)).Count() == 1)
                     {
