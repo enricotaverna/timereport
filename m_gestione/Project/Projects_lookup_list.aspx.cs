@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -31,7 +28,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         // Se manager cancella bottone crea
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
             btn_crea.Visible = false;
-   }
+    }
 
     // Imposta query selezione
     protected void ImpostaQuery()
@@ -47,41 +44,41 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
                        " ( Projects.CodiceCliente = @CodiceCliente or @CodiceCliente = '0' )";
 
         // se manager limita i progetti visibili
-        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL")  ? sWhere + " AND ( Projects.ClientManager_id=" + CurrentSession.Persons_id + " OR Projects.AccountManager_id=" + CurrentSession.Persons_id + ")" : sWhere;
+        sWhere = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL") ? sWhere + " AND ( Projects.ClientManager_id=" + CurrentSession.Persons_id + " OR Projects.AccountManager_id=" + CurrentSession.Persons_id + ")" : sWhere;
 
         DSProgetti.SelectCommand = "SELECT Projects.Projects_Id, Projects.ProjectCode, SUBSTRING(Projects.Name,1,40) AS ProjectName, Projects.ProjectType_Id, Projects.Active, Projects.ClientManager_id, Persons.Name AS ManagerName, b.Name as AccountName, SUBSTRING(ProjectType.Name,1,15)  AS ProjectType, Customers.Nome1, Projects.RevenueBudget, Projects.BudgetABAP, Projects.SpeseBudget, Projects.MargineProposta, TipoContratto.Descrizione as TipoContrattoDesc " +
                                          " FROM Projects " +
                                          " LEFT OUTER JOIN Persons AS b ON Projects.AccountManager_id = b.Persons_id " +
                                          " LEFT OUTER JOIN Persons ON Projects.ClientManager_id = Persons.Persons_id " +
                                          " LEFT OUTER JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
-                                         " LEFT OUTER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id LEFT OUTER JOIN Customers ON Projects.CodiceCliente = Customers.CodiceCliente" + sWhere + strQueryOrdering;             
-    } 
+                                         " LEFT OUTER JOIN ProjectType ON Projects.ProjectType_Id = ProjectType.ProjectType_Id LEFT OUTER JOIN Customers ON Projects.CodiceCliente = Customers.CodiceCliente" + sWhere + strQueryOrdering;
+    }
 
     // Imposta i valori degli elementi del form da variabili di sessione
     protected void InizializzaForm()
-     {
+    {
 
-         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-         if (Session["DDLManager"] != null)
-             DDLManager.SelectedValue = Session["DDLManager"].ToString();
+        // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
+        if (Session["DDLManager"] != null)
+            DDLManager.SelectedValue = Session["DDLManager"].ToString();
 
-         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-         if (Session["DDLCliente"] != null)
-             DDLCliente.SelectedValue = Session["DDLCliente"].ToString();
+        // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
+        if (Session["DDLCliente"] != null)
+            DDLCliente.SelectedValue = Session["DDLCliente"].ToString();
 
-         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-         if (Session["DDLFlattivo"] != null)
-             DDLFlattivo.SelectedValue = Session["DDLFlattivo"].ToString();
+        // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
+        if (Session["DDLFlattivo"] != null)
+            DDLFlattivo.SelectedValue = Session["DDLFlattivo"].ToString();
 
-         if (Session["TB_Codice"] != null)
-             TB_Codice.Text = Session["TB_Codice"].ToString();
+        if (Session["TB_Codice"] != null)
+            TB_Codice.Text = Session["TB_Codice"].ToString();
 
-         // Imposta indice di aginazione
-         if (Session["GVProjectsPageNumber"] != null)
-         {
-             GVProjects.PageIndex = (int)Session["GVProjectsPageNumber"];
-         }
-      }
+        // Imposta indice di aginazione
+        if (Session["GVProjectsPageNumber"] != null)
+        {
+            GVProjects.PageIndex = (int)Session["GVProjectsPageNumber"];
+        }
+    }
 
     protected void GVProjects_SelectedIndexChanged(object sender, System.EventArgs e)
     {
@@ -114,7 +111,7 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         DropDownList ddl = (DropDownList)sender;
         Session["DDLCliente"] = ddl.SelectedValue;
     }
-    
+
     // controlli di integrità e quindi cancellazione del record "Progetto"
     protected void GVProjects_RowCommand(object sender, GridViewCommandEventArgs e)
     {
@@ -132,14 +129,27 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
             // from the Rows collection.
             GridViewRow row = GVProjects.Rows[index];
 
+            // Controllo di integrità sulle tabelle Hours e Expenses
+            string projectId = row.Cells[0].Text;
+            string checkQuery = "SELECT (SELECT COUNT(*) FROM Hours WHERE Projects_id = " + ASPcompatility.FormatStringDb(projectId) + ") + " +
+                    "(SELECT COUNT(*) FROM Expenses WHERE Projects_id = " + ASPcompatility.FormatStringDb(projectId) + ")";
+            int linkedRecordsCount = (int)Database.ExecuteScalar(checkQuery, lPage);
+
+            if (linkedRecordsCount > 0)
+            {
+                // Genera un messaggio di errore
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ShowPopup", "ShowPopup('Non è possibile cancellare il progetto. Esistono record associati nelle tabelle Hours o Expenses.');", true);
+                return;
+            }
+
             // controlli passati, cancella il record
-            Database.ExecuteSQL("DELETE FROM Projects WHERE Projects_id=" + row.Cells[0].Text, lPage);
+            Database.ExecuteSQL("DELETE FROM Projects WHERE Projects_id=" + projectId, lPage);
 
             // forza refresh
             GVProjects.DataBind();
         }
     }
-    
+
     // se manager nasconde icona cancellazione
     protected void GVProjects_DataBound(object sender, EventArgs e)
     {
@@ -168,5 +178,5 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         Session["GVProjectsPageNumber"] = e.NewPageIndex;
     }
 
- 
+
 }
