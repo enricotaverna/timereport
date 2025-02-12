@@ -172,7 +172,6 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         $('.SumoDLL').SumoSelect({ search: true });
-        $('.SumoSelect').css('width', '270px');
 
     </script>
 

@@ -255,4 +255,7 @@
   <data name="titolo" xml:space="preserve">
     <value>Inserimento Spese</value>
   </data>
+  <data name="DDLprogetto.testo" xml:space="preserve">
+    <value>-- seleziona un progetto --</value>
+  </data>
 </root>

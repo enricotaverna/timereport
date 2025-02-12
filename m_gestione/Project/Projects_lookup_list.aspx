@@ -1,11 +1,11 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Projects_lookup_list.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" EnableEventValidation="false" CodeFile="Projects_lookup_list.aspx.cs" Inherits="m_gestione_Projects_lookup_list" %>
 
 <!DOCTYPE html>
 
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v2.0"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -144,9 +144,10 @@
                                 <ItemTemplate>
 
                                     <asp:ImageButton ID="BT_delete" runat="server" CausesValidation="False"
-                                        OnClientClick="return confirm('Il record verrà cancellato, confermi?');"
                                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                                        OnClientClick="openDeleteConfirmModal(event, this); return false;"
                                         CommandName="cancella" ImageUrl="/timereport/images/icons/16x16/trash.gif"
+                                        data-row-index="<%# ((GridViewRow) Container).RowIndex %>"
                                         Text="<%$ appSettings: DELETE_TXT %>" />
 
                                 </ItemTemplate>
@@ -208,6 +209,15 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        function openDeleteConfirmModal(e, button) {
+            e.preventDefault();
+            var rowIndex = button.getAttribute('data-row-index');
+
+            ConfirmDialog("Cancellazione", "Confermi la cancellazione del record?", "Cancella",
+                (result) => { result && (__doPostBack('GVProjects', 'cancella$' + rowIndex)) }  )
+        };
+      
     </script>
 
 </body>

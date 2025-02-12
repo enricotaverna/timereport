@@ -78,7 +78,7 @@
                     </asp:Table>
 
                     <div class="buttons">
-                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <div id="valMsg" class="parsley-single-error"></div>
                         <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: SAVE_TXT %>" CssClass="orangebutton" CommandName="Exec" />
                         <asp:Button ID="BTRefresh" runat="server" Text="<%$ appSettings: REFRESH_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="BTDownload" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" CommandName="download" />

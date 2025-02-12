@@ -59,7 +59,7 @@ BODY {
     display: none;
 }
 
-.link {
+link {
     text-align: center;
     clear: both;
     padding: 20px 0;
@@ -122,11 +122,11 @@ a, a:visited, a:hover, a:active {
     padding-bottom: 5px;
 }
 
-.TRitem:hover {
+.TRitem:hover, TRitemDisabled:hover {
     font-weight: bold;
 }
 
-.TRitem {
+.TRitem, TRitemDisabled {
     float: left;
     display: inline-block;
     width: 100%;
@@ -397,22 +397,21 @@ select {
 
 .greybutton {
     width: 85px;
-    background-color: #e1e1e1;
-    border: 1px solid #e1e1e1;
+    background-color: #e1e1e1 !important;
+    border: 1px solid #e1e1e1 !important;
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
     line-height: 20px;
     font-size: 14px;
     padding: 6px 6px;
-    color: dimgrey;
+    color: dimgrey !important;
     /*text-shadow: -1px -1px #BABABA;*/
     float: right;
     margin-left: 10px;
     cursor: pointer;
     outline: none;
 }
-
 
     .greybutton:hover {
         background: #BABABA;
@@ -421,8 +420,8 @@ select {
 
 .orangebutton {
     width: 85px;
-    background: #FFC339;
-    border: 1px solid #FFC339;
+    background: #FFC339 !important;
+    border: 1px solid #FFC339 !important;
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
@@ -627,6 +626,8 @@ select {
 }
 
 .datepickclass {
+    color: #777;
+    font-size: 14px;
     /*usata per attaccare il datepicker su gridview*/
 }
 
@@ -672,8 +673,9 @@ select {
 /*#region Jquery UI e plugin*/
 .SUMOselect {
     border-bottom: 0;
-    margin: 10px 30px 10px 10px;
+    /*    margin: 10px 30px 10px 10px;*/
     /*    line-height: 14px;*/
+    height: 28px;
     color: #777;
     float: left;
 }
@@ -708,15 +710,26 @@ select {
 
 /* per dialog box messaggi START */
 .ui-widget-header {
-    background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;
+    /*background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;*/
     /*  background: #ffbd27;
     background: linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%); */
 }
 
 .ui-widget-header {
-    background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;
+    /*background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;*/
     /*  background: #ffbd27;
     background: linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%); */
+}
+
+.ui-widget.ui-widget-content {
+    border: none;
+}
+
+.ui-widget-overlay.custom-overlay {
+    background-color: black;
+    background-image: none;
+    opacity: 0.5;
+    z-index: 1040;
 }
 
 .ui-dialog {
@@ -878,14 +891,19 @@ select {
 /*#endregion */
 
 /*#region Parsley validator*/
-.parsely-single-error {
+#valMsg {
     display: inline-block;
-    width: 130px;
+    width: 200px;
 }
 
-    .parsely-single-error .filled ~ .filled {
-        display: none;
-    }
+.parsely-single-error {
+    display: inline-block;
+    width: 200px;
+}
+
+.parsley-single-error .parsley-errors-list.filled:not(:first-of-type) {
+    display: none !important;
+}
 
 input.parsley-success,
 select.parsley-success,
@@ -931,8 +949,8 @@ select.parsley-error {
     list-style-type: none;
     font-size: 0.9em;
     line-height: 0.9em;
-    white-space: nowrap;
-    opacity: 0;
+/*    white-space: nowrap;
+*/    opacity: 0;
     transition: all .3s ease-in;
     -o-transition: all .3s ease-in;
     -moz-transition: all .3s ease-in;
@@ -948,7 +966,7 @@ select.parsley-error {
 /*#region Tabulator*/
 .tabulator {
     font-size: 12px;
-    border: none;
+    font-family: sans-serif !important;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 }
@@ -962,8 +980,16 @@ select.parsley-error {
     border: none !important;
 }
 
+.tabulator-row {
+    color: #555 !important;
+    background: white !important;
+    border-bottom: 1px #eee solid;
+/*    padding: 2px 0px !important;*/
+}  
+
 .tabulator-cell {
     border: none !important;
+/*    padding: 0px !important;*/
 }
 
 .tabulator-header {
@@ -1153,4 +1179,45 @@ select.parsley-error {
     cursor: pointer;
 }
 
+/*#endregion*/
+
+/*#region Altro*/
+#mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    display: none;
+}
+
+#spinner {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: none;
+}
+
+.spinner {
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-top: 8px solid #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
 /*#endregion*/

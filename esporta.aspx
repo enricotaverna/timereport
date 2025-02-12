@@ -40,6 +40,8 @@
     .SumoSelect {
         width: 280px;
     }
+
+
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -169,7 +171,7 @@
 
                     </div>
 
-                    <div class="input">
+                    <div class="input" style="display: flex;align-items: center;">
                         <div class="inputtext">
                             <asp:Literal runat="server" Text="<%$ Resources:rangedate%>" />
                         </div>

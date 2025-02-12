@@ -51,7 +51,6 @@
 
                     <asp:FormView ID="FVore" runat="server" DataKeyNames="Hours_Id"
                         DataSourceID="DSore" align="center" DefaultMode="Edit"
-                        OnItemInserted="FVore_ItemInserted" OnItemUpdated="FVore_ItemUpdated"
                         OnDataBound="FVore_DataBound"
                         OnModeChanging="FVore_modechanging" CellPadding="0">
 
@@ -171,8 +170,8 @@
                             <!-- *** BOTTONI ***  -->
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error"></div>
-                                <asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
-                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
                             </div>
 
                         </EditItemTemplate>
@@ -285,8 +284,8 @@
                             <!-- *** BOTTONI ***  -->
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error"></div>
-                                <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
-                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
                             </div>
 
                         </InsertItemTemplate>
@@ -389,7 +388,7 @@
 
                             <!-- *** BOTTONI ***  -->
                             <div class="buttons">
-                                <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
                             </div>
 
                         </ItemTemplate>
@@ -421,60 +420,12 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSore" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-       SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id,hours.OpportunityId,hours.SalesforceTaskID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)"
-        InsertCommand="INSERT INTO Hours(Projects_Id, Persons_id, Date, HourType_Id, Hours, CancelFlag, Comment, TransferFlag, Activity_id, CreatedBy, CreationDate, AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, ClientManager_id, AccountManager_id, Company_id,OpportunityId,SalesforceTaskID) VALUES (@Projects_id, @Persons_id, @Date, @HourType_id, @Hours, @CancelFlag, @Comment, @TransferFlag, @Activity_id, @CreatedBy, @CreationDate, @AccountingDate, @WorkedInRemote, @LocationKey, @LocationDescription, @LocationType, @ClientManager_id, @AccountManager_id, @Company_id, @OpportunityId, @SalesforceTaskID)"
-        UpdateCommand="UPDATE Hours SET Hours = @Hours, HourType_Id = @HourType_Id, CancelFlag = @CancelFlag, Comment = @Comment, TransferFlag = @TransferFlag, Activity_id = @Activity_id, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, WorkedInRemote=@WorkedInRemote, LocationKey = @LocationKey, LocationDescription=@LocationDescription, LocationType=@LocationType,OpportunityId=@OpportunityId,SalesforceTaskID=@SalesforceTaskID, AccountManager_id = @AccountManager_id, ClientManager_id=@ClientManager_id WHERE (Hours_Id = @Hours_id)"
-        OnInserting="DSore_Insert_Update" OnUpdating="DSore_Insert_Update">
+        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.HourType_Id, Hours.CancelFlag, Hours.Comment, Hours.TransferFlag, Hours.Activity_id, Persons.Name, Hours.CreatedBy, Hours.CreationDate, Hours.LastModifiedBy,  Hours.LastModificationDate,AccountingDate, WorkedInRemote, LocationKey, LocationDescription, LocationType, hours.ClientManager_id, hours.AccountManager_id, hours.Company_id,hours.OpportunityId,hours.SalesforceTaskID FROM Hours INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id WHERE (Hours.Hours_Id = @hours_id)">
 
-        <InsertParameters>
-            <asp:Parameter Name="Projects_id" />
-            <asp:Parameter Name="Persons_id" />
-            <asp:Parameter Name="Date" />
-            <asp:Parameter Name="HourType_id" DefaultValue="1" />
-            <asp:Parameter Name="Hours" />
-            <asp:Parameter Name="CancelFlag" />
-            <asp:Parameter Name="Comment" />
-            <asp:Parameter Name="LocationKey" />
-            <asp:Parameter Name="LocationType" />
-            <asp:Parameter Name="LocationDescription" />
-            <asp:Parameter Name="ClientManager_id" />
-            <asp:Parameter Name="AccountManager_id" />
-            <asp:Parameter Name="Company_id" />
-            <asp:Parameter Name="TransferFlag" />
-            <asp:Parameter Name="Activity_id" />
-            <asp:Parameter Name="CreatedBy" />
-            <asp:Parameter Name="CreationDate" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="WorkedInRemote" />
-            <asp:Parameter Name="OpportunityId" />           
-            <asp:Parameter Name="SalesforceTaskID" />
-        </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="hours_id" QueryStringField="hours_id" />
         </SelectParameters>
-        <UpdateParameters>
-            <asp:Parameter Name="Hours" />
-            <asp:Parameter Name="HourType_Id" DefaultValue="1" />
-            <asp:Parameter Name="CancelFlag" />
-            <asp:Parameter Name="Comment" />
-            <asp:Parameter Name="TransferFlag" />
-            <asp:Parameter Name="AccountManager_id" />
-            <asp:Parameter Name="ClientManager_id" />
-            <asp:Parameter Name="Activity_id" />
-            <asp:Parameter Name="Projects_Id" />
-            <asp:Parameter Name="LocationKey" />
-            <asp:Parameter Name="LocationType" />
-            <asp:Parameter Name="LocationDescription" />
-            <asp:Parameter Name="Hours_id" />
-            <asp:Parameter Name="CreatedBy" />
-            <asp:Parameter Name="CreationDate" />
-            <asp:Parameter Name="LastModifiedBy" />
-            <asp:Parameter Name="LastModificationDate" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="WorkedInRemote" />
-            <asp:Parameter Name="OpportunityId" />           
-            <asp:Parameter Name="SalesforceTaskID" />
-        </UpdateParameters>
+
     </asp:SqlDataSource>
 
     <!-- *** JAVASCRIPT *** -->
@@ -521,13 +472,12 @@
 
             // Sumo Select
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            $('.SumoSelect').css('width', '270px');
             $('.SumoSelect > .optWrapper').css('width', '550px');
         });
 
-        // *** Esclude i controlli nascosti *** 
-        $('#FormOre').parsley({
-           excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        // Initialize Parsley
+        var form = $('#FormOre').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
         });
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
@@ -685,6 +635,60 @@
             //alert("Handler for `click` called.");
             $('#FormOre').off('submit.Parsley');
             //$('#FormOre').off('form:validate');
+        });
+
+        $("#FVore_PostButton").on("click", function (e) {
+
+            e.preventDefault();
+
+            // Trigger validation without submitting the form
+            form.validate();
+
+            // Check if the form is valid
+            if (!form.isValid()) 
+                return;
+
+            // formattazione valori
+            var Activity = isNullOrEmpty($('#FVore_DDLAttivita').val()) ? 0 : $('#FVore_DDLAttivita').val();
+            var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val())  ? "" : $('#FVore_DDLTaskName').val();
+            var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
+            var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
+            var hoursId = '<%= String.IsNullOrEmpty(Request.QueryString["hours_id"]) ? "0" : Request.QueryString["hours_id"] %>';
+
+            // tipo ora sempre defaultato a 1
+            var values = "{ 'Hours_Id': " + hoursId + 
+                ", 'Date': '" + $('#FVore_LBdate').text() + "'" +
+                ", 'Hours': '" + $('#FVore_HoursTextBox').val().replace(',', '.') + "'"  +
+                ", 'Person_Id': " + <%= CurrentSession.Persons_id %> + 
+                " , 'Project_Id': " + $('#FVore_DDLprogetto').val() + 
+                " , 'Activity_Id': " + Activity + 
+                " , 'Comment': '" + $('#FVore_TBComment').val() + "'" +
+                " , 'CancelFlag': " + $('#FVore_CancelFlagCheckBox').is(':checked')  +
+                " , 'LocationKey': '" + LocationKey + "'" +
+                " , 'LocationDescription': '" + LocationDescription + "'" +
+                " , 'OpportunityId': '" + ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : '') + "'" +
+                " , 'AccountingDate': '" + $('#FVore_TBAccountingDate').val() + "'" + 
+                " , 'SalesforceTaskID': '" + TaskName + "'}";
+                 
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/SaveHours",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+
+                    if (msg.d)
+                        window.location.href = "/timereport/input.aspx";
+                        //ShowPopup("Aggiornamento effettuato");
+                    else
+                        ShowPopup('Errore durante aggiornamento');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    ShowPopup(xhr.responseText);
+                }
+            }); // ajax
+
         });
 
     </script>

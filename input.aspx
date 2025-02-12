@@ -365,9 +365,7 @@
                             let sommaOre = 0;
                             //ciclo ogni time del giorno sommando le ore
                             Array.from(col.getElementsByClassName('TRitem')).forEach(function (element) {
-                                //console.log(element.innerText.split(':')[1].replace("ore", "").trimEnd());
                                 sommaOre += parseFloat(element.innerText.split(':')[1].replace("ore", "").trimEnd().replace(",", "."), 10);
-                                console.log(sommaOre);
                             });
                             //trovo la cella del giorno corrispondente tramite l'id unico per ogni time
                             let span = document.getElementById("ore" + col.id.replace("TDitm", ""));
@@ -386,7 +384,6 @@
                         }
                     } 
                 }
-                //console.log('Fine riga');
             }
         }
 
@@ -402,46 +399,44 @@
 
             // Sumo Select
             $('#DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            $('.SumoSelect').css('width', '270px');
             $('.SumoSelect > .optWrapper').css('width', '550px');
         }
 
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB
-        function CancellaId(Id) {
+        function DeleteRecord(Id) {
 
             // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-            var values = "{'Id': '" + Id + "'  }";
+            var values = "{'Id': '" + Id + "', DeletionType : '<%=Session["type"].ToString() %>' }";
 
             $.ajax({
 
                 type: "POST",
-                url: "/timereport/webservices/WStimereport.asmx/CancellaId",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/DeleteRecord",
                 data: values,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
 
                 // se tutto va bene
-                success: function (msg) {
-                    // funzione restituisce 
-                    // d[0] true / false per esito
-                    // d[1] "" se ore, aaaammgg se spese
-                    if (msg.d[0] == "true") {
+                success: function (response) {
+                    var result = response.d; // La risposta è contenuta nella proprietà 'd' dell'oggetto JSON
+
+                    if (result.Success) {
 
                         var elemtohide = document.getElementById("TRitm" + Id);
                         elemtohide.remove();
                         CalcolaSommaOre();
-                        if (msg.d[1] != "") {
-                            var hdrIcon = "#hdrIcon" + msg.d[1]; // yyyymmdd in caso di ticket                  
+                        if (result.RecordHtmlText != "") {
+                            var hdrIcon = "#hdrIcon" + result.RecordHtmlText; // yyyymmdd in caso di ticket                  
                             $(hdrIcon).show(); // accende icone travel
                         }
                     }
                     else
-                        alert(Risultato);
+                        ShowPopup(result.Message);
                 },
 
                 // in caso di errore
                 error: function (xhr, textStatus, errorThrown) {
-                    alert(xhr.responseText);
+                    ShowPopup(xhr.responseText);
                 }
 
             }); // ajax
@@ -500,7 +495,7 @@
             $.ajax({
 
                 type: "POST",
-                url: "/timereport/webservices/WStimereport.asmx/CreaTicket",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/CreaTicket",
                 data: values,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -518,7 +513,7 @@
                         // visualizza la stringa con il ticket creato
                         var htmlString = "<div class=TRitem id=TRitm" + msg.d + ">";
                         htmlString = htmlString + "<a id=" + msg.d + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + msg.d + " >ZZ90101:BPA : 1 BP</a>";
-                        htmlString = htmlString + "<a href=# onclick='CancellaId(" + msg.d + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
+                        htmlString = htmlString + "<a href=# onclick='DeleteRecord(" + msg.d + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
                         htmlString = htmlString + "</div>";
                         $(idItem).html(htmlString);
 
@@ -554,12 +549,12 @@
 
         // cursore in attesa durante chiamata ajax
         $(document).ajaxStart(function () {
-            $('body').addClass('ajaxLoading');
+            //$('body').addClass('ajaxLoading');
+            MaskScreen(true);
 
         }).ajaxComplete(function () {
-
-            $('body').removeClass('ajaxLoading');
-
+            UnMaskScreen();
+            //$('body').removeClass('ajaxLoading');
         });
 
         $(document).ready(function () {
@@ -582,23 +577,24 @@
                 drop: function (event, ui) {
 
                     var strTooltip = "";
-                    var values = "{'sId': '" + ui.draggable.attr("id").substr(5) + "' , " +
-                        " 'sInsDate': '" + $(this).attr("title") + "'   } ";
+                    var values = `{'sId': '${ui.draggable.attr("id").substr(5)}' , 'sInsDate': '${$(this).attr("title")}', 'sessionType' : '<%=Session["type"].ToString()%>'}`
+
                     var refThis = $(this);
                     var sSessione = "<%= Session["type"]  %>";
 
                     // chiama Ajax per creare il nuovo record
                     $.ajax({
                         type: "POST",
-                        url: "/timereport/webservices/WStimereport.asmx/ProcessDragDrop",
+                        url: "/timereport/webservices/WS_DBUpdates.asmx/ProcessDragDrop",
                         data: values,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
+                        dataType: "json",
 
-                        success: function (msg) {
+                        success: function (response) {
 
-                            // se call OK inserisce una riga sotto l'elemento 
-                            if (msg.d != "") { // msg.d[0] = testo da stampare, msg.d[1] = id dell'ora
+                            var result = response.d; // La risposta è contenuta nella proprietà 'd' dell'oggetto JSON
+                            if (result.Success) {
 
                                 var itemDate = refThis.attr("title").substr(6, 4) + refThis.attr("title").substr(3, 2) + refThis.attr("title").substr(0, 2); // formato yyyymmdd
                                 var idItem = "#TDitm" + itemDate;    //id dell'elemento td che contiene gli item
@@ -607,14 +603,14 @@
                                 if ($(idItem).html() == "&nbsp;")
                                     $(idItem).html("");
 
-                                var htmlString = $(idItem).html() + "<div class=TRitem id=TRitm" + msg.d[1] + ">";
+                                var htmlString = $(idItem).html() + "<div class=TRitem id=TRitm" + result.RecordId + ">";
 
                                 if (sSessione == "hours")
-                                    htmlString = htmlString + "<a id=TRitm" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-ore.aspx?action=fetch&hours_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+                                    htmlString = htmlString + "<a id=TRitm" + result.RecordId + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-ore.aspx?action=fetch&hours_id=" + result.RecordId + " >" + result.RecordHtmlText + "</a>";
                                 else
-                                    htmlString = htmlString + "<a id=TRitm" + msg.d[1] + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-spese.aspx?action=fetch&expenses_id=" + msg.d[1] + " >" + msg.d[0] + "</a>";
+                                    htmlString = htmlString + "<a id=TRitm" + result.RecordId + " title=' " + strTooltip + "' class='hours ui-draggable ui-draggable-handle' href=input-spese.aspx?action=fetch&expenses_id=" + result.RecordId + " >" + result.RecordHtmlText + "</a>";
 
-                                htmlString = htmlString + "<a href=# onclick='CancellaId(" + msg.d[1] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
+                                htmlString = htmlString + "<a href=# onclick='DeleteRecord(" + result.RecordId + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
                                 htmlString = htmlString + "</div>";
                                 $(idItem).html(htmlString);
 
@@ -636,7 +632,7 @@
                                 CalcolaSommaOre();
                             }
                             else
-                                alert("Errore: dato non inserito");
+                                ShowPopup("Errore in aggiornamento: " + result.Message);
                         },
 
                         error: function (xhr, textStatus, errorThrown) {
@@ -652,7 +648,7 @@
             $('.hours').smallipop({
                 hideDelay: 0,
                 theme: 'blue',
-                popupDelay: 0
+                popupDelay: 700
             });
 
             // Mostra box testo in caso della corrispondente selezione della DDL Location
@@ -675,6 +671,9 @@
 
                 // setta il progetto come default
                 $("#DDLProgetto").val(aData[1]);
+
+                // setta opportunità come default
+                $("#DDLOpportunity").val(aData[2]);
 
                 // mostra o nasconde campo opportunità nella finestra modale quando si inserisce la diaria giornaliera
                 BindOpportunity();

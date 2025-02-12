@@ -1,257 +1,4 @@
-﻿<%@ Page Language="VB" %>
-
-<%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.SqlClient" %>
-
-<!DOCTYPE html>
-
-<script runat="server">
-
-    Sub DDLTipoOraFt_DataBound(ByVal sender As Object, ByVal e As System.EventArgs)
-        '       imposta valore di default
-        sender.items.FindByText("STD001 Standard").selected = True
-    End Sub
-
-    Public CurrentSession As TRSession
-
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs)
-
-        If Not Page.IsPostBack Then
-            Dim currentDate As String = DateTime.Now.ToString("dd/MM/yyyy")
-            TB_Datada.Text = currentDate
-        End If
-        Dim sWhere As String = ""
-
-        Auth.CheckPermission("ADMIN", "MASSCHANGE")
-        CurrentSession = Session("CurrentSession")
-
-        If DDL_Persona_Sel.SelectedValue <> "all" Or
-(Session("DDL_Persona_Sel") <> Nothing And Not IsPostBack) Then
-            sWhere = IIf(sWhere = "", " WHERE Hours.Persons_id = (@DDL_Persona_Sel)", sWhere & " AND Hours.Persons_id = (@DDL_Persona_Sel)")
-        End If
-
-        If DDL_Progetti_Sel.SelectedValue <> "all" Or
-            (Session("DDL_Progetti_Sel") <> Nothing And Not IsPostBack) Then
-            sWhere = IIf(sWhere = "", " WHERE Hours.Projects_id = (@DDL_Progetti_Sel)", sWhere & " AND Hours.Projects_id = (@DDL_Progetti_Sel)")
-        End If
-
-        If TB_Datada.Text <> Nothing Or
-            (Session("TB_Datada") <> Nothing And Not IsPostBack) Then
-            sWhere = IIf(sWhere = "", " WHERE Hours.Date >= (@TB_Datada)", sWhere & " AND Hours.Date >= (@TB_Datada)")
-        End If
-
-        If TB_DataA.Text <> Nothing Or
-            (Session("TB_DataA") <> Nothing And Not IsPostBack) Then
-            sWhere = IIf(sWhere = "", " WHERE Hours.Date <= (@TB_DataA)", sWhere & " AND Hours.Date <= (@TB_DataA)")
-        End If
-
-        DShours.SelectCommand = "SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.AccountingDate, Hours.CancelFlag, Hours.Comment, Persons.Name AS NomePersona, " _
-                                & " Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, Activity.Activity_Id , Activity.ActivityCode + ' ' + Activity.Name AS NomeAttivita FROM Hours INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id" _
-                                & " LEFT JOIN Activity ON Activity.Activity_id = Hours.Activity_id " & sWhere & " ORDER BY Hours.Date, Hours.Projects_ID, Hours.Persons_Id"
-
-    End Sub
-
-    Protected Sub GV_Ore_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs)
-
-        ' Insert data if the CommandName == "Insert" 
-        ' and the validation controls indicate valid data... 
-        If e.CommandName = "Insert" AndAlso Page.IsValid Then
-
-            ' Programmatically reference Web controls in the inserting interface... 
-            Dim NewProjectsId As DropDownList = GV_Ore.FooterRow.FindControl("DDLProjects_Id")
-            Dim NewActivityId As DropDownList = GV_Ore.FooterRow.FindControl("DDLActivity_Id")
-            Dim NewPersonaId As DropDownList = GV_Ore.FooterRow.FindControl("DDL_Persona")
-            Dim NewData As TextBox = GV_Ore.FooterRow.FindControl("TB_Data")
-            Dim NewOre As TextBox = GV_Ore.FooterRow.FindControl("TB_Ore")
-            Dim NewAccountingDate As TextBox = GV_Ore.FooterRow.FindControl("TB_AccountingDate")
-            Dim NewStorno As CheckBox = GV_Ore.FooterRow.FindControl("CB_Storno")
-            Dim NewTrasferta As CheckBox = GV_Ore.FooterRow.FindControl("CB_Trasferta")
-            Dim NewComment As TextBox = GV_Ore.FooterRow.FindControl("TX_Comment")
-
-            ' trova la società legata all'utente
-            Dim dr As DataRow = Database.GetRow("SELECT company_id FROM Persons WHERE Persons_id = " & ASPcompatility.FormatNumberDB(NewPersonaId.SelectedValue), Nothing)
-
-            DShours.InsertParameters("Projects_Id").DefaultValue = NewProjectsId.SelectedValue
-            DShours.InsertParameters("Persons_id").DefaultValue = NewPersonaId.SelectedValue
-
-            If NewActivityId.SelectedValue = "" Then
-                DShours.InsertParameters("Activity_Id").DefaultValue = 0
-            Else
-                DShours.InsertParameters("Activity_Id").DefaultValue = NewActivityId.SelectedValue
-            End If
-
-            DShours.InsertParameters("Date").DefaultValue = NewData.Text
-            DShours.InsertParameters("Hours").DefaultValue = NewOre.Text
-            DShours.InsertParameters("AccountingDate").DefaultValue = NewAccountingDate.Text
-            DShours.InsertParameters("CancelFlag").DefaultValue = NewStorno.Checked
-            DShours.InsertParameters("HourType_Id").DefaultValue = 1 ' valore di default
-            DShours.InsertParameters("Comment").DefaultValue = NewComment.Text
-
-            DShours.InsertParameters("Company_id").DefaultValue = dr("Company_id")
-            Dim result = Utilities.GetManagerAndAccountId(NewProjectsId.SelectedValue)
-            DShours.InsertParameters("ClientManager_id").DefaultValue = result.Item1
-            DShours.InsertParameters("AccountManager_id").DefaultValue = result.Item2
-
-            If NewStorno.Checked Then
-                DShours.InsertParameters("Hours").DefaultValue = DShours.InsertParameters("Hours").DefaultValue * -1
-            End If
-
-            ' Log
-            DShours.InsertParameters("CreatedBy").DefaultValue = CurrentSession.UserId
-            DShours.InsertParameters("CreationDate").DefaultValue = DateTime.Now()
-
-            DShours.Insert()
-
-        End If
-
-    End Sub
-
-    Protected Sub DDL_Persona_Sel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs)
-        Session("DDL_Persona_Sel") = IIf(sender.selectedValue <> "all", sender.selectedValue, Nothing)
-    End Sub
-
-    Protected Sub DDL_Persona_Sel_DataBound(ByVal sender As Object, ByVal e As System.EventArgs)
-        ' Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-        If Not IsPostBack And Session("DDL_Persona_Sel") <> Nothing Then
-            DDL_Persona_Sel.SelectedValue = Session("DDL_Persona_Sel")
-        End If
-    End Sub
-
-    Protected Sub DDL_Progetti_Sel_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs)
-        Session("DDL_Progetti_Sel") = IIf(sender.selectedValue <> "all", sender.selectedValue, Nothing)
-    End Sub
-
-    Protected Sub DDL_Progetti_Sel_DataBound(ByVal sender As Object, ByVal e As System.EventArgs)
-        ' Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-        If Not IsPostBack And Session("DDL_Progetti_Sel") <> Nothing Then
-            DDL_Progetti_Sel.SelectedValue = Session("DDL_Progetti_Sel")
-        End If
-    End Sub
-
-    Protected Sub TB_Datada_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
-        Session("TB_DataDa") = sender.text
-    End Sub
-
-    Protected Sub TB_Datada_Load(ByVal sender As Object, ByVal e As System.EventArgs)
-        ' Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-        If Not IsPostBack And Session("TB_DataDa") <> Nothing Then
-            TB_Datada.Text = Session("TB_DataDa")
-        End If
-    End Sub
-
-    Protected Sub TB_DataA_Load(ByVal sender As Object, ByVal e As System.EventArgs)
-        ' Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
-        If Not IsPostBack And Session("TB_DataA") <> Nothing Then
-            TB_DataA.Text = Session("TB_DataA")
-        End If
-    End Sub
-
-    Protected Sub TB_DataA_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs)
-        Session("TB_DataA") = sender.text
-    End Sub
-
-    Protected Sub DShours_Updated(ByVal sender As Object, ByVal e As SqlDataSourceStatusEventArgs)
-
-        ' scrive log record cancellato
-        Database.ExecuteSQL("INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('HOUR', " + e.Command.Parameters(0).Value.ToString() + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')", Nothing)
-
-    End Sub
-
-    Protected Sub DShours_Updating(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.SqlDataSourceCommandEventArgs)
-
-        ' gestisce storno
-        If e.Command.Parameters("@cancelflag").Value Then
-            e.Command.Parameters("@hours").Value = e.Command.Parameters("@hours").Value * -1
-        End If
-
-        ' Audit    
-        e.Command.Parameters("@LastModifiedBy").Value = CurrentSession.UserId
-        e.Command.Parameters("@LastModificationDate").Value = DateTime.Now()
-    End Sub
-
-    Protected Sub GV_Ore_OnRowDataBound(sender As Object, e As GridViewRowEventArgs)
-
-        If Not ((e.Row.RowState = DataControlRowState.Edit) Or (e.Row.RowState = DataControlRowState.Alternate + DataControlRowState.Edit)) Then
-            Return
-        End If
-
-        Dim DDLProjects_Id As DropDownList = e.Row.FindControl("DDLProjects_Id")
-        Dim DDLActivity_id As DropDownList = e.Row.FindControl("DDLActivity_Id")
-
-        If e.Row.DataItem("Activity_id").ToString <> "" Then
-            ' id progetto, controll DDL attività, indice attività          
-            Call BindDDL(DDLProjects_Id.SelectedValue, DDLActivity_id, e.Row.DataItem("Activity_id"))
-        Else
-            DDLActivity_id.Enabled = False
-            DDLActivity_id.Visible = False
-        End If
-
-    End Sub
-
-    Protected Sub BindDDL(iProject_id As String, DDLActivity_Id As DropDownList, iActivity_Id As Integer)
-
-        ' recupera valore ore                        
-        Using conn As New SqlConnection(ConfigurationManager.ConnectionStrings("MSSql12155ConnectionString").ConnectionString)
-
-            conn.Open()
-
-            Dim cmd As SqlCommand = New SqlCommand("select Activity_id, ActivityCode + '  ' + left(Name,20) AS iActivity FROM Activity where Projects_id='" + iProject_id + "' AND active = 'true' ORDER BY ActivityCode", conn)
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            DDLActivity_Id.DataSource = dr
-            DDLActivity_Id.Items.Clear()
-            DDLActivity_Id.DataTextField = "iActivity"
-            DDLActivity_Id.DataValueField = "Activity_id"
-            DDLActivity_Id.DataBind()
-
-            If iActivity_Id <> 0 Then
-                DDLActivity_Id.SelectedValue = iActivity_Id
-            End If
-
-            DDLActivity_Id.Visible = True
-
-            '      Se il progetto prevede attività rende il controllo visibile 
-            If dr.HasRows = False Then
-                DDLActivity_Id.Enabled = False
-                DDLActivity_Id.Visible = False
-            Else
-                DDLActivity_Id.Enabled = True
-                DDLActivity_Id.Visible = True
-            End If
-
-            ' se in creazione imposta il default di progetto 
-            'if (FVore.CurrentMode == FormViewMode.Insert & dr.HasRows)
-            '    ddlActivity.SelectedValue = (string)Session["ActivityDefault"];
-
-        End Using
-
-    End Sub
-
-    Protected Sub GV_Ore_RowUpdating(sender As Object, e As GridViewUpdateEventArgs)
-
-        '      Forza i valori da passare alla select di insert. essendo le dropdown in
-        '      dipendenza non si riesce a farlo tramite un normale bind del controllo
-
-        Dim ddlList As DropDownList = GV_Ore.Rows(e.RowIndex).Cells(2).FindControl("DDLActivity_Id")
-        DShours.UpdateParameters("Activity_id").DefaultValue = ddlList.SelectedValue
-
-
-    End Sub
-
-    Protected Sub DDLProjects_Id_SelectedIndexChanged(sender As Object, e As EventArgs)
-
-        Dim gvrow As GridViewRow = CType(sender, DropDownList).NamingContainer
-        ' Dim rowindex As Integer = CType(gvrow, GridViewRow).RowIndex
-
-        Dim DDLProjects_Id As DropDownList = gvrow.FindControl("DDLProjects_Id")
-        Dim DDLActivity As DropDownList = gvrow.FindControl("DDLActivity_Id")
-
-        'aggiornta attività collegate al progetto
-        Call BindDDL(DDLProjects_Id.SelectedValue, DDLActivity, 0)
-
-    End Sub
-
-</script>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="mass_insert_hours.aspx.cs" Inherits="mass_insert_hours" EnableEventValidation="False" %>
 
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -264,12 +11,16 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <style>
@@ -296,7 +47,7 @@
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
-        <form id="form1" runat="server">
+        <form id="formOre" runat="server">
 
             <!--**** Riquadro navigazione ***-->
             <div class="form-group row justify-content-center">
@@ -308,22 +59,24 @@
                             <label class="inputtext">Persona</label>
                         </div>
                         <div class="col-5">
+                            <div style="position:absolute">
                             <asp:DropDownList ID="DDL_Persona_Sel" runat="server"
                                 AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
                                 DataSourceID="DDSPersone" DataTextField="Name" DataValueField="Persons_id" OnSelectedIndexChanged="DDL_Persona_Sel_SelectedIndexChanged" OnDataBound="DDL_Persona_Sel_DataBound">
                                 <asp:ListItem Text="Tutti i valori" Value="all" />
                             </asp:DropDownList>
-                        </div>
+                        </div></div>
                         <div class="col-1">
                             <label class="inputtext">Progetto</label>
                         </div>
                         <div class="col-5">
+                            <div style="position:absolute">
                             <asp:DropDownList ID="DDL_Progetti_Sel" runat="server"
                                 AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
                                 DataSourceID="dsProjects" DataTextField="codice" DataValueField="Projects_Id" OnSelectedIndexChanged="DDL_Progetti_Sel_SelectedIndexChanged" OnDataBound="DDL_Progetti_Sel_DataBound" Width="220px">
                                 <asp:ListItem Text="Tutti i valori" Value="all" />
                             </asp:DropDownList>
-                        </div>
+                        </div></div>
 
                     </div>
                     <!-- End row -->
@@ -336,10 +89,6 @@
                         </div>
                         <div class="col-5">
                             <asp:TextBox ID="TB_Datada" class="ASPInputcontent datepickclass" runat="server" Columns="10" MaxLength="10" OnTextChanged="TB_Datada_TextChanged" OnLoad="TB_Datada_Load" />
-                            <asp:RangeValidator ID="RV_DataDa" runat="server" Display="Dynamic"
-                                ErrorMessage="Inserire un valore valido" MaximumValue="31/12/9999"
-                                MinimumValue="01/01/2000" Type="Date" ValidationGroup="input"
-                                ControlToValidate="TB_Datada">*</asp:RangeValidator>
                         </div>
                         <div class="col-1">
                             <label class="inputtext">Data a</label>
@@ -347,13 +96,7 @@
                         <div class="col-5">
                             <asp:TextBox ID="TB_DataA" class="ASPInputcontent datepickclass" runat="server" Columns="10" MaxLength="10"
                                 OnLoad="TB_DataA_Load" OnTextChanged="TB_DataA_TextChanged"></asp:TextBox>
-                            <asp:RangeValidator ID="RV_DataA" runat="server" Display="Dynamic"
-                                ErrorMessage="Inserire un valore valido" MaximumValue="31/12/9999"
-                                MinimumValue="01/01/2000" Type="Date" ValidationGroup="input"
-                                ControlToValidate="TB_DataA">*</asp:RangeValidator>
-
-                            <asp:Button ID="BT_filtra" runat="server" Text="<%$ appSettings: FILTER_TXT %>" class="SmallOrangeButton"
-                                ValidationGroup="input" />
+                            <asp:Button ID="BT_filtra" runat="server" Text="<%$ appSettings: FILTER_TXT %>" class="SmallOrangeButton"/>
                         </div>
 
                     </div>
@@ -371,32 +114,18 @@
                     <asp:GridView ID="GV_Ore" runat="server" AllowPaging="True" CssClass="GridView"
                         AllowSorting="True" AutoGenerateColumns="False"
                         DataKeyNames="Hours_Id" PageSize="16" ShowFooter="True"
-                        OnRowCommand="GV_Ore_RowCommand" DataSourceID="DShours" GridLines="None" OnRowDataBound="GV_Ore_OnRowDataBound" EnableModelValidation="True" OnRowUpdating="GV_Ore_RowUpdating">
+                        DataSourceID="DShours" GridLines="None" OnRowDataBound="GV_Ore_OnRowDataBound" EnableModelValidation="True" >
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle CssClass="GV_row" />
                         <Columns>
+
+                            <%-- data --%>
                             <asp:TemplateField HeaderText="Data" SortExpression="Date">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TB_Data" runat="server"
-                                        class="datepickclass" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server"
-                                        ControlToValidate="TB_Data" Display="None"
-                                        ErrorMessage="Necessario specificare una data">*</asp:RequiredFieldValidator>
-                                    <asp:RangeValidator ID="RangeValidator1" runat="server"
-                                        ControlToValidate="TB_Data" Display="None"
-                                        ErrorMessage="Inserire una data valida" MaximumValue="31/12/9999"
-                                        MinimumValue="01/01/2000" Type="Date"></asp:RangeValidator>
+                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="dataField datepickclass" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Data" runat="server" Columns="8" class="datepickclass" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server"
-                                        ControlToValidate="TB_Data" Display="None"
-                                        ErrorMessage="Necessario specificare una data" ValidationGroup="Insert">*</asp:RequiredFieldValidator>
-                                    &nbsp;
-                                    <asp:RangeValidator ID="RangeValidator1" runat="server"
-                                        ControlToValidate="TB_Data" Display="None"
-                                        ErrorMessage="Inserire una data valida" MaximumValue="31/12/9999"
-                                        MinimumValue="01/01/2000" Type="Date" ValidationGroup="Insert"></asp:RangeValidator>
+                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="datepickclass footerForm" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:Label ID="Label1" runat="server" Text='<%# Bind("Date", "{0:d}") %>'></asp:Label>
@@ -404,12 +133,13 @@
                                 <FooterStyle Wrap="False" />
                             </asp:TemplateField>
 
+                            <%-- progetto --%>
                             <asp:TemplateField HeaderText="Progetto" SortExpression="Projects_Id">
                                 <EditItemTemplate>
                                     <asp:DropDownList ID="DDLProjects_Id" runat="server" DataSourceID="dsProjects"
                                         DataTextField="codice" DataValueField="Projects_Id"
                                         SelectedValue='<%# Bind("Projects_Id") %>' Width="140px"
-                                        CssClass="TabellaLista" OnSelectedIndexChanged="DDLProjects_Id_SelectedIndexChanged" AutoPostBack="True" AppendDataBoundItems="True">
+                                        CssClass="TabellaLista projectField" OnSelectedIndexChanged="DDLProjects_Id_SelectedIndexChanged" AutoPostBack="True" AppendDataBoundItems="True">
                                     </asp:DropDownList>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
@@ -419,14 +149,11 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:DropDownList ID="DDLProjects_Id" runat="server"
-                                        AppendDataBoundItems="True" CssClass="TabellaLista" DataSourceID="dsProjects"
-                                        DataTextField="codice" DataValueField="Projects_Id"
+                                        AppendDataBoundItems="True" CssClass="TabellaLista footerForm" DataSourceID="dsProjects"
+                                        DataTextField="codice" DataValueField="Projects_Id" data-parsley-required="true"
                                         SelectedValue='<%# Bind("Projects_Id") %>' Width="140px" AutoPostBack="True" OnSelectedIndexChanged="DDLProjects_Id_SelectedIndexChanged">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
                                     </asp:DropDownList>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server"
-                                        ControlToValidate="DDLProjects_Id" Display="None"
-                                        ErrorMessage="Specificare un codice progetto" ValidationGroup="Insert">*</asp:RequiredFieldValidator>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TextBox4" runat="server" Text='<%#Bind("NomeProgetto") %>'
@@ -434,10 +161,11 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
+                            <%-- attività --%>
                             <asp:TemplateField HeaderText="Attività" SortExpression="NomeAttivita">
                                 <EditItemTemplate>
                                     <asp:DropDownList ID="DDLActivity_Id" runat="server"
-                                        CssClass="TabellaLista" Width="140px">
+                                        CssClass="TabellaLista activityField" Width="140px">
                                     </asp:DropDownList>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
@@ -449,15 +177,7 @@
                                     <asp:DropDownList ID="DDLActivity_Id" runat="server" AppendDataBoundItems="True"
                                         CssClass="TabellaLista" Width="140px" Visible="True">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
-                                        <%--                    <asp:DropDownList ID="DDLActivity_Id" runat="server" 
-                        AppendDataBoundItems="True" CssClass="TabellaLista" DataSourceID="DSattivita" 
-                        DataTextField="iAttivita" DataValueField="Activity_Id" 
-                        SelectedValue='<%# Bind("Activity_Id")%>' Width="90px">
-                        <asp:ListItem  Value="" Text="Selezionare un valore"/>--%>
                                     </asp:DropDownList>
-                                    <%--                    <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" 
-                        ControlToValidate="DDLActivity_Id" Display="None" 
-                        ErrorMessage="Specificare un codice progetto" ValidationGroup="Insert">*</asp:RequiredFieldValidator>--%>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TBActivity" runat="server" Width="110px" Text='<%#Bind("NomeAttivita") %>'
@@ -465,9 +185,10 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
+                            <%-- persona --%>
                             <asp:TemplateField HeaderText="Persona" SortExpression="Persons_id">
                                 <EditItemTemplate>
-                                    <asp:DropDownList ID="DropDownList1" runat="server" CssClass="TabellaLista"
+                                    <asp:DropDownList ID="DDL_Persona_Id" runat="server" CssClass="TabellaLista personField"
                                         DataSourceID="DDSPersone" DataTextField="Name" DataValueField="Persons_id"
                                         SelectedValue='<%# Bind("Persons_id") %>' Width="130px">
                                     </asp:DropDownList>
@@ -477,59 +198,41 @@
                                         Text='<%#Bind("NomePersona") %>'></asp:TextBox>
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
-                                    <asp:DropDownList ID="DDL_Persona" runat="server" AppendDataBoundItems="True"
-                                        CssClass="TabellaLista" DataSourceID="DDSPersone" DataTextField="Name"
-                                        DataValueField="Persons_id"
+                                    <asp:DropDownList ID="DDL_Persona_Id" runat="server" AppendDataBoundItems="True"
+                                        CssClass="TabellaLista footerForm" DataSourceID="DDSPersone" DataTextField="Name"
+                                        DataValueField="Persons_id" data-parsley-required="true"
                                         SelectedValue='<%# Bind("Persons_id") %>' Width="130px">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
                                     </asp:DropDownList>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server"
-                                        ControlToValidate="DDL_Persona" Display="None"
-                                        ErrorMessage="Specificare una persona di carico ore" ValidationGroup="Insert">*</asp:RequiredFieldValidator>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TextBox5" runat="server" CssClass="GV_row"
                                         ReadOnly="True" Text='<%#Bind("NomePersona") %>'></asp:TextBox>
                                 </ItemTemplate>
                             </asp:TemplateField>
+
+                            <%-- ore --%>
                             <asp:TemplateField HeaderText="Ore" SortExpression="Hours">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista" Width="50px"
+                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista hoursField" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
                                         MaxLength="6" Text='<%# Bind("Hours", "{0:#.##;#.##}") %>'></asp:TextBox>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server"
-                                        ControlToValidate="TB_Ore" Display="None"
-                                        ErrorMessage="Necessario specificare un valore per le ore">*</asp:RequiredFieldValidator>
-                                    <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server"
-                                        ControlToValidate="TB_Ore" Display="None"
-                                        ErrorMessage="Inserire un valore numerico"
-                                        ValidationExpression="(^\d*\,?\d*[1-9]+\d*$)|(^[1-9]+\d*\,\d*$)"></asp:RegularExpressionValidator>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista" Width="50px"
-                                        MaxLength="6" Text='<%# Bind("Hours", "{0:N}") %>' CausesValidation="True"></asp:TextBox>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server"
-                                        ControlToValidate="TB_Ore" Display="None"
-                                        ErrorMessage="Necessario specificare un valore" ValidationGroup="Insert">*</asp:RequiredFieldValidator>
-                                    <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server"
-                                        ControlToValidate="TB_Ore" Display="None"
-                                        ErrorMessage="Inserire un valore numerico"
-                                        ValidationExpression="(^\d*\,?\d*[1-9]+\d*$)|(^[1-9]+\d*\,\d*$)"
-                                        ValidationGroup="Insert"></asp:RegularExpressionValidator>
+                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista footerForm" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
+                                        MaxLength="6" Text='<%# Bind("Hours", "{0:N}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
-                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>' ></asp:Label>
+                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
+
+                            <%-- data competenza --%>
                             <asp:TemplateField HeaderText="Competenza" SortExpression="AccountingDate">
                                 <EditItemTemplate>
                                     <asp:TextBox ID="TB_AccountingDate" runat="server"
-                                        class="datepickclass" Columns="8" MaxLength="10"
+                                        class="datepickclass TabellaLista accountingDateField" Columns="8" MaxLength="10"
                                         Text='<%# Bind("AccountingDate", "{0:d}") %>'>
                                     </asp:TextBox>
-                                    <asp:RangeValidator ID="TB_AccountingDate_RV" runat="server"
-                                        ControlToValidate="TB_AccountingDate" Display="None"
-                                        ErrorMessage="Inserire una data competenza valida" MaximumValue="31/12/9999"
-                                        MinimumValue="01/01/2000" Type="Date"></asp:RangeValidator>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
                                     <asp:TextBox ID="TextBox6" runat="server" CssClass="GV_row_alt" ReadOnly="True"
@@ -540,19 +243,17 @@
                                         class="datepickclass" Columns="8" MaxLength="10"
                                         Text='<%# Bind("AccountingDate", "{0:d}") %>'>
                                     </asp:TextBox>
-                                    <asp:RangeValidator ID="TB_AccountingDate_RV" runat="server"
-                                        ControlToValidate="TB_AccountingDate" Display="None"
-                                        ErrorMessage="Inserire una data competenza valida" MaximumValue="31/12/9999"
-                                        MinimumValue="01/01/2000" Type="Date" ValidationGroup="Insert"></asp:RangeValidator>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TextBox6" runat="server" CssClass="GV_row"
                                         ReadOnly="True" Text='<%#Bind("AccountingDate", "{0:d}") %>'></asp:TextBox>
                                 </ItemTemplate>
                             </asp:TemplateField>
+
+                            <%-- flag storno --%>
                             <asp:TemplateField HeaderText="ST" SortExpression="CancelFlag">
                                 <EditItemTemplate>
-                                    <asp:CheckBox ID="CheckBox1" runat="server"
+                                    <asp:CheckBox ID="CheckBox1" runat="server" CssClass="cancelFlagField"
                                         Checked='<%# Bind("CancelFlag") %>' />
                                 </EditItemTemplate>
                                 <FooterTemplate>
@@ -564,9 +265,11 @@
                                         Enabled="false" />
                                 </ItemTemplate>
                             </asp:TemplateField>
+
+                            <%-- commento --%>
                             <asp:TemplateField HeaderText="Nota" SortExpression="Comment">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TextBox3" runat="server" Columns="15" CssClass="TabellaLista"
+                                    <asp:TextBox ID="TextBox3" runat="server" Columns="15" CssClass="TabellaLista commentField"
                                         Rows="3" Text='<%# Bind("Comment") %>' TextMode="MultiLine"></asp:TextBox>
                                 </EditItemTemplate>
                                 <ItemTemplate>
@@ -577,41 +280,39 @@
                                         Text='<%# Bind("Comment") %>' TextMode="SingleLine"></asp:TextBox>
                                 </FooterTemplate>
                             </asp:TemplateField>
+
+                            <%-- pulsanti --%>
                             <asp:TemplateField ShowHeader="False">
                                 <EditItemTemplate>
-                                    <asp:ImageButton ID="ImageButton1" runat="server" CausesValidation="True"
-                                        CommandName="Update" ImageUrl="/timereport/images/icons/16x16/S_F_OKAY.gif"
+                                    <asp:Label ID="Hours_Id" CssClass="Hours_idField fieldsToHide" runat="server" Text='<%# Eval("Hours_Id") %>' />
+                                    <asp:Label ID="LocationKey" CssClass="LocationKeyField fieldsToHide" runat="server" Text='<%# Eval("LocationType") + ":" + Eval("LocationKey") %>' />
+                                    <asp:Label ID="LocationDescription" CssClass="LocationDescriptionField fieldsToHide" runat="server" Text='<%# Eval("LocationDescription") %>' />
+                                    <asp:Label ID="SalesforceTaskId" CssClass="TaskNameField fieldsToHide" runat="server" Text='<%# Eval("SalesforceTaskId") %>' />
+                                   <asp:ImageButton ID="BTSave" runat="server" CausesValidation="True" CssClass="EditButtonSave"
+                                        ImageUrl="/timereport/images/icons/16x16/S_F_OKAY.gif"
                                         Text="<%$ appSettings: SAVE_TXT %>" />
-                                    &nbsp;<asp:ImageButton ID="ImageButton2" runat="server" CausesValidation="False"
-                                        CommandName="Cancel" ImageUrl="/timereport/images/icons/16x16/S_F_CANC.GIF"
-                                        Text="<%$ appSettings: CANCEL_TXT %>" />
+                                    &nbsp;<asp:ImageButton ID="BTCancel" runat="server" CausesValidation="False" CssClass="CancelButton"
+                                        ImageUrl="/timereport/images/icons/16x16/S_F_CANC.GIF"  Text="<%$ appSettings: CANCEL_TXT %>" />
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:Button ID="Insert" runat="server" CommandName="Insert" Text="<%$ appSettings: CREATE_TXT %>" class="SmallOrangeButton"
-                                        ValidationGroup="Insert" />
+                                    <asp:Button ID="BTInsert" runat="server" Text="<%$ appSettings: CREATE_TXT %>" class="SmallOrangeButton" />
                                 </FooterTemplate>
                                 <ItemTemplate>
-                                    <asp:ImageButton ID="ImageButton3" runat="server" CausesValidation="False" CommandName="Edit"
-                                        ImageUrl="/timereport/images/icons/16x16/modifica.gif" Text="<%$ appSettings: EDIT_TXT %>" />&nbsp;
-                        <asp:ImageButton ID="ImageButton4" runat="server" CausesValidation="False" CommandName="Delete"
-                            ImageUrl="/timereport/images/icons/16x16/trash.gif" OnClientClick="return confirm('Il record verrà cancellato, confermi?');"
-                            Text="<%$ appSettings: DELETE_TXT %>" />
+                                    <asp:Label ID="Hours_Id" CssClass="Hours_idField fieldsToHide" runat="server" Text='<%# Eval("Hours_Id") %>' />
+                                    <asp:ImageButton ID="BTUpdate" runat="server" CssClass="EditButtonOpen" CommandName="Edit"
+                                        ImageUrl="/timereport/images/icons/16x16/modifica.gif" Text="<%$ appSettings: EDIT_TXT %>" />&nbsp;                      
+                                    <asp:ImageButton ID="BTDelete" runat="server" CausesValidation="False" CssClass="DeleteButton"
+                                        ImageUrl="/timereport/images/icons/16x16/trash.gif"
+                                        Text="<%$ appSettings: DELETE_TXT %>" />
                                 </ItemTemplate>
                                 <ItemStyle Wrap="False" />
                             </asp:TemplateField>
+                        
                         </Columns>
                         <PagerStyle CssClass="GV_footer" />
                         <HeaderStyle CssClass="GV_header" />
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                     </asp:GridView>
-
-                    <!-- **** VALIDATION **** -->
-                    <asp:ValidationSummary ID="ValidationSummary1" runat="server"
-                        ShowMessageBox="True" ShowSummary="False" />
-                    <asp:ValidationSummary ID="ValidationSummary3" runat="server"
-                        ValidationGroup="input" ShowMessageBox="True" ShowSummary="False" />
-                    <asp:ValidationSummary ID="ValidationSummary2" runat="server"
-                        ShowMessageBox="True" ShowSummary="False" ValidationGroup="Insert" />
 
                 </div>
                 <!-- *** End col *** -->
@@ -635,11 +336,7 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DShours" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.AccountingDate, Hours.CancelFlag, Hours.Comment, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto FROM Hours INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id ORDER BY Hours.Date, Hours.Projects_Id, Hours.Persons_id"
-        DeleteCommand="DELETE FROM [Hours] WHERE [Hours_Id] = @Hours_Id"
-        InsertCommand="INSERT INTO [Hours] ([Projects_Id], [Persons_id], [Date], [Hours], [HourType_Id], [AccountingDate], [CancelFlag], [Comment], [CreatedBy], [CreationDate], [Activity_id], Company_id, ClientManager_id, AccountManager_id) VALUES (@Projects_Id, @Persons_id, @Date, @Hours, @HourType_Id, @AccountingDate, @CancelFlag, @Comment, @CreatedBy, @CreationDate, @activity_id, @Company_id, @ClientManager_id, @AccountManager_id)"
-        UpdateCommand="UPDATE Hours SET Projects_Id = @Projects_Id, Persons_id = @Persons_id, Date = @Date, Hours = @Hours, AccountingDate = @AccountingDate, CancelFlag = @CancelFlag, Comment = @Comment, LastModifiedBy = @LastModifiedBy, LastModificationDate = @LastModificationDate, Activity_Id = @Activity_Id WHERE (Hours_Id = @Hours_Id)"
-        OnUpdating="DShours_Updating" OnDeleted="DShours_Updated">
+        SelectCommand="** backend **"  >
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel"
                 PropertyName="SelectedValue" DefaultValue="%" />
@@ -653,36 +350,7 @@
         <DeleteParameters>
             <asp:Parameter Name="Hours_Id" Type="Int32" />
         </DeleteParameters>
-        <UpdateParameters>
-            <asp:Parameter Name="Projects_Id" Type="Int32" />
-            <asp:Parameter Name="Persons_id" Type="Int32" />
-            <asp:Parameter Name="Date" Type="DateTime" />
-            <asp:Parameter Name="Hours" Type="Decimal" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="CancelFlag" Type="Boolean" />
-            <asp:Parameter Name="Comment" Type="String" />
-            <asp:Parameter Name="LastModifiedBy" Type="String" />
-            <asp:Parameter Name="LastModificationDate" Type="DateTime" />
-            <asp:Parameter Name="Activity_Id" Type="Int32" />
-            <asp:Parameter Name="Hours_Id" Type="Int32" />
-        </UpdateParameters>
-        <InsertParameters>
-            <asp:Parameter Name="Projects_Id" Type="Int32" />
-            <asp:Parameter Name="Persons_id" Type="Int32" />
-            <asp:Parameter Name="Date" Type="DateTime" />
-            <asp:Parameter Name="Hours" Type="Decimal" />
-            <asp:Parameter Name="HourType_Id" Type="Int32" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="CancelFlag" Type="Boolean" />
-            <asp:Parameter Name="Comment" Type="String" />
-            <asp:Parameter Name="CreatedBy" Type="String" />
-            <asp:Parameter Name="CreationDate" Type="DateTime" />
-            <asp:Parameter Name="Activity_id" Type="Int32" />
-            <asp:Parameter Name="ClientManager_id" />
-            <asp:Parameter Name="AccountManager_id" />
-            <asp:Parameter Name="Company_id" />
 
-        </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSattivita" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
@@ -695,7 +363,7 @@
         SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) ORDER BY Name"></asp:SqlDataSource>
 
     <!-- *** JAVASCRIPT *** -->
-    <script>
+    <script type="text/javascript">
 
         // include di snippet html per menu and background color mgt
         includeHTML();
@@ -703,9 +371,186 @@
 
         $(document).ready(function () {
 
+            $(".fieldsToHide").hide(); // nasconde i campi utilizzato solo per update
             $(".datepickclass").datepicker($.datepicker.regional['it']);
 
+            // Inizializza SumoSelect
+            $('#DDL_Persona_Sel').SumoSelect({ search: true, searchText: '' });
+            $('#DDL_Progetti_Sel').SumoSelect({ search: true, searchText: '' });
+            $('.SumoSelect').css('width', '220px');
+
         });
+
+        // Initialize Parsley
+        var form = $('#formOre').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=image], input[type=hidden], [disabled], :hidden"
+        });
+
+        // Disabilita temporaneamente la validazione di Parsley quando si preme il tasto edit o filtra
+        $(".EditButtonOpen, .CancelButton, #BT_filtra").on("click", function (e) {
+            $('#formOre').parsley().destroy();
+        });
+
+        // Cancella record
+        $(".DeleteButton").on("click", function (e) {
+            e.preventDefault();
+            var row = $(this).closest("tr");
+            ConfirmDialog("Conferma cancellazione", "Vuoi cancellare il record?", "Cancella", (confirm) => { confirm && DeleteRecord(row) });
+        });
+
+        // chiude riga di edit
+        $(".CancelButton").on("click", function (e) {
+            e.preventDefault();
+            window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
+        });
+
+        // Aggiorna Ore
+        $(".EditButtonSave").on("click", function (e) {
+
+            $('.footerForm').attr('data-parsley-required', 'false');
+
+            // Check if the form is valid
+            form.validate();
+            if (!form.isValid())
+                return;
+
+            // Trova la riga contenente il pulsante cliccato
+            var row = $(this).closest("tr");
+
+            // Accedi ai campi all'interno di quella riga
+            var hoursId = row.find(".Hours_idField").text();
+            var LocationKey = row.find(".LocationKeyField").text();
+            var LocationDescription = row.find(".LocationDescriptionField").text();
+            var TaskName = row.find(".SalesforceTaskIdField").text();
+            var dataField = row.find(".dataField").val();
+            var projectField = row.find(".projectField").val();            
+            var activityField = isNullOrEmpty(row.find(".activityField").val()) ? 0 : row.find(".activityField").val();
+            var personField = row.find(".personField").val();
+            var hoursField = row.find(".hoursField").val().replace(',', '.');
+            var accountingDateField = row.find(".accountingDateField").val();
+            // checkbox viene renderizzato con una span padre del checkbox
+            var cancelFlagField = row.find(".cancelFlagField > input").is(":checked");
+            var commentField = row.find(".commentField").val();
+
+            var OpportunityId = "";
+
+            var values = "{ 'Hours_Id': " + hoursId +
+                " , 'Date': '" + dataField + "'" +
+                " , 'Hours': '" + hoursField + "'" +
+                " , 'Person_Id': " + personField +
+                " , 'Project_Id': " + projectField +
+                " , 'Activity_Id': " + activityField +
+                " , 'Comment': '" + commentField + "'" +
+                " , 'CancelFlag': " + cancelFlagField +
+                " , 'LocationKey': '" + LocationKey + "'" +
+                " , 'LocationDescription': '" + LocationDescription + "'" +
+                " , 'OpportunityId': '" + OpportunityId + "'" +
+                " , 'AccountingDate': '" + accountingDateField + "'" +
+                " , 'SalesforceTaskID': '" + TaskName + "'}";
+
+            // Aggiorna ore
+            PostAjax(values);
+
+        });
+
+        // Crea Ore
+        $("#GV_Ore_BTInsert").on("click", function (e) {
+
+            e.preventDefault();
+
+            // Trigger validation without submitting the form
+            form.validate();
+
+            // Check if the form is valid
+            if (!form.isValid())
+                return;
+
+            // formattazione valori
+            var Activity = isNullOrEmpty($('#GV_Ore_DDLActivity_Id').val()) ? 0 : $('#GV_Ore_DDLActivity_Id').val();
+            var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val()) ? "" : $('#FVore_DDLTaskName').val();
+            var LocationKey = "99999";
+            var LocationDescription = "NOT SPECIFIED";
+            var OpportunityId = "";
+            //var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
+            //var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
+            var hoursId = 0;
+
+            // tipo ora sempre defaultato a 1
+            var values = "{ 'Hours_Id': " + hoursId +
+                " , 'Date': '" + $('#GV_Ore_TB_Data').val() + "'" +
+                " , 'Hours': '" + $('#GV_Ore_TB_Ore').val().replace(',', '.') + "'" +
+                " , 'Person_Id': " + $('#GV_Ore_DDL_Persona_Id').val() +
+                " , 'Project_Id': " + $('#GV_Ore_DDLProjects_Id').val() +
+                " , 'Activity_Id': " + Activity +
+                " , 'Comment': '" + $('#GV_Ore_TX_comment').val() + "'" +
+                " , 'CancelFlag': " + $('#GV_Ore_CB_Storno').is(':checked') +
+                " , 'LocationKey': '" + LocationKey + "'" +
+                " , 'LocationDescription': '" + LocationDescription + "'" +
+                " , 'OpportunityId': '" + OpportunityId + "'" +
+                " , 'AccountingDate': '" + $('#GV_Ore_TB_AccountingDate').val() + "'" +
+                " , 'SalesforceTaskID': '" + TaskName + "'}";
+
+            // Inserisci ore
+            PostAjax(values);
+
+        });
+
+        // Cancella record
+        function DeleteRecord(row) {
+
+            var hoursId = row.find(".Hours_idField").text();
+            var values = "{'Id': '" + hoursId + "', DeletionType : 'hours' }";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/DeleteRecord",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (response) {
+                    var result = response.d
+                    if (result.Success == true)
+                        window.location.reload();
+                    else
+                        ShowPopup('Errore');
+                },
+
+                // in caso di errore
+                error: function (xhr, textStatus, errorThrown) {
+                    ShowPopup(xhr.responseText);
+                }
+
+            }); // ajax
+        }
+
+        // Chiamata AJAX
+        function PostAjax(values) {
+
+            MaskScreen();
+
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/SaveHours",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    UnMaskScreen();
+                    if (msg.d)
+                        window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
+                    //ShowPopup("Aggiornamento effettuato");
+                    else
+                        ShowPopup('Errore durante aggiornamento');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    UnMaskScreen();
+                    ShowPopup(xhr.responseText);
+                }
+            }); // ajax
+        }
+
     </script>
 
 </body>

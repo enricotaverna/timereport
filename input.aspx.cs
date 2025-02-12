@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Configuration;
 using System.Data;
-using System.IO;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
+using System.Web;
 using System.Web.UI.WebControls;
 
 public partial class input : System.Web.UI.Page
@@ -39,7 +38,8 @@ public partial class input : System.Web.UI.Page
         //    ProcessDragDrop(Request["__EVENTARGUMENT"]);
         //}
 
-        if ((string)Session["type"] == "bonus") { 
+        if ((string)Session["type"] == "bonus")
+        {
             BindDDLProjects();
             Bind_DDLOpportunita();
         }
@@ -87,7 +87,7 @@ public partial class input : System.Web.UI.Page
         DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
 
         ListaOpportunita = CurrentSession.ListaOpenOpportunity;
- 
+
         // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
         // di progetti chiusi
         foreach (Opportunity opp in ListaOpportunita)
@@ -186,28 +186,28 @@ public partial class input : System.Web.UI.Page
         int iStart;
 
         // legge i file nel mese / utente
-        string[] filePaths = TrovaRicevuteLocale(-1,  CurrentSession.UserName, Session["year"].ToString() + Session["month"].ToString() + "01");
+        string[] filePaths = CommonFunction.TrovaRicevuteLocale("", CurrentSession.UserName, Session["year"].ToString() + Session["month"].ToString() + "01");
 
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
 
-         if (filePaths.Length != null)
-         {
+        if (filePaths.Length != null)
+        {
 
-             try
-             {
-                 // carica il buffer estraendo l'ID della nome del file
-                 for (int i = 0; i < filePaths.Length; i++)
-                 {
-                     iStart = filePaths[i].IndexOf("fid-") + 4;
-                     iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
-                 }
-             }
-             catch
-             {
+            try
+            {
+                // carica il buffer estraendo l'ID della nome del file
+                for (int i = 0; i < filePaths.Length; i++)
+                {
+                    iStart = filePaths[i].IndexOf("fid-") + 4;
+                    iList.Add(Convert.ToInt32(filePaths[i].Substring(iStart, filePaths[i].LastIndexOf("-") - iStart)));
+                }
+            }
+            catch
+            {
 
-             }
-         }
+            }
+        }
 
         // avedo caricato il buffer spese il flag di refresh
         Session["RefreshRicevuteBuffer"] = "";
@@ -255,7 +255,7 @@ public partial class input : System.Web.UI.Page
     {
 
         string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
-        string sQuery="";
+        string sQuery = "";
 
         // Estrae i record di spesa o bonus a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
@@ -269,32 +269,6 @@ public partial class input : System.Web.UI.Page
 
         if (sQuery != "") // chiamata da scheda spese
             dtenses = Database.GetData(sQuery, this.Page);
-
-    }
-
-    // riceve in input id spesa, nome user, data spesa (YYYYMMGG) e restutuisce array con nome file
-    // Se id spesa = -1 allora estrae tutte le spese del mese per l'utente
-    public static string[] TrovaRicevuteLocale(int iId, string sUserName, string sData)
-    {
-
-        string[] filePaths = null;
-
-        try
-        {
-            // costruisci il pach di ricerca: public + anno + mese + nome persona 
-            string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationManager.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
-            // carica immagini
-            filePaths = Directory
-                .GetFiles(TargetLocation, "fid-" + (iId == -1 ? "" : iId.ToString()) + "*.*")
-                                .Where(file => file.ToLower().EndsWith("jpg") || file.ToLower().EndsWith("tiff") || file.ToLower().EndsWith("pdf") || file.ToLower().EndsWith("png") || file.ToLower().EndsWith("jpeg") || file.ToLower().EndsWith("gif") || file.ToLower().EndsWith("bmp"))
-                                .ToArray();
-            return (filePaths);
-        }
-        catch (Exception e)
-        {
-            //non fa niente ma evita il dump
-            return (null);
-        }
 
     }
 
@@ -324,8 +298,8 @@ public partial class input : System.Web.UI.Page
             {
 
                 /* trova descrizione opportunità dal codice */
-                    Opportunity found = CurrentSession.ListaAllOpportunity.FirstOrDefault(o => o.OpportunityCode == rdr["OpportunityId"].ToString());
-                    oppDescription = found != null ? "<br><b>Opp.nit&agrave:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + found.OpportunityAccount.AccountName + " - " + found.OpportunityName : "";
+                Opportunity found = CurrentSession.ListaAllOpportunity.FirstOrDefault(o => o.OpportunityCode == rdr["OpportunityId"].ToString());
+                oppDescription = found != null ? "<br><b>Opp.nit&agrave:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + found.OpportunityAccount.AccountName + " - " + found.OpportunityName : "";
 
                 string actDescription = rdr["ActivityName"].ToString() != "" ? "<br><b>Attivit&agrave:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + rdr["ActivityName"] : "";
 
@@ -351,7 +325,12 @@ public partial class input : System.Web.UI.Page
 
                 if (rdr["ApprovalStatus"].ToString().Length == 0)
                 {
-                    Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
+
+                    if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
+                        Response.Write("<div class=TRitem id=TRitm" + rdr["Hours_id"] + ">");
+                    else
+                        Response.Write("<div class=TRitemDisabled id=TRitm" + rdr["Hours_id"] + ">");
+
                     Response.Write("<a id=" + rdr["Hours_id"] + " title=' " + strTooltip + "' class=hours href=input-ore.aspx?action=fetch&hours_id=" + rdr["Hours_id"] + " >" + rdr["ProjectCode"] + " : " + iOre.ToString("G") + " " + GetLocalResourceObject("oreUOM") + WFIcon + "</a>");
                 }
                 else
@@ -362,7 +341,7 @@ public partial class input : System.Web.UI.Page
 
                 // cancellazione solo in change e se la riga non è una richiesta assenza
                 if (Convert.ToBoolean(Session["InputScreenChangeMode"]) & (rdr["ApprovalStatus"].ToString().Length == 0))
-                    Response.Write("<a href=# onclick='CancellaId(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+                    Response.Write("<a href=# onclick='DeleteRecord(" + rdr["Hours_id"] + ")' ><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
 
                 Response.Write("</div>"); // TRore
             }
@@ -428,11 +407,14 @@ public partial class input : System.Web.UI.Page
                     strIconaRicevuta = "";
 
                 // l'id viene messo uguale al numero record per essere poi usato nel drag&drop
-                Response.Write("<div class=TRitem id=TRitm" + rdr["expenses_id"] + ">");
+                if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
+                    Response.Write("<div class=TRitem id=TRitm" + rdr["expenses_id"] + ">");
+                else
+                    Response.Write("<div class=TRitemDisabled id=TRitm" + rdr["expenses_id"] + ">");
 
                 Response.Write("<a id=" + rdr["expenses_id"] + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + rdr["expenses_id"] + " >" + strIconaRicevuta + rdr["ProjectCode"] + ":" + rdr["ExpenseCode"] + " : " + fSpese.ToString("G") + " " + rdr["UnitOfMeasure"] + "</a>");
                 if (Convert.ToBoolean(Session["InputScreenChangeMode"]))
-                    Response.Write("<a  align=right href=# onclick='CancellaId(" + rdr["expenses_id"] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
+                    Response.Write("<a  align=right href=# onclick='DeleteRecord(" + rdr["expenses_id"] + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>");
 
                 Response.Write("</div>"); // TRexp
 
@@ -509,26 +491,38 @@ public partial class input : System.Web.UI.Page
         }
     }
 
-    // carica progetti accessibili all'utente per box spese trasferta
-    protected string GetProject(string sDate)
+    private class HoursData
     {
+        public string Projects_Id { get; set; }
+        public string Opportunity_Id { get; set; }
+    }
 
-        // 0208 FUNZIONE MIGRATA
+    // carica progetti accessibili all'utente per box spese trasferta
+    private HoursData GetProject(string sDate)
+    {
+        HoursData ret = new HoursData();
 
-        DataRow[] drProgetto = dtHours.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
+        DataRow[] drProgetto = dtHours.Select("Date = '" + Convert.ToDateTime(sDate) + "'");
 
         if (drProgetto.Count() == 0)
-            return "";
+        {
+            ret.Projects_Id = "";
+            ret.Opportunity_Id = "";
+        }
         else
-            return drProgetto[0][0].ToString();
+        {
+            ret.Projects_Id = drProgetto[0][0].ToString();
+            ret.Opportunity_Id = drProgetto[0][13].ToString();
+        }
 
+        return ret;
     }
 
     protected void OutputColumn(int intDayNumber)
     {
 
         string sDate, sISODate;
-        string strProject;
+        HoursData HoursData = new HoursData();
         int intDayWeek = 0;
         Boolean bHoliday = false;
 
@@ -586,12 +580,12 @@ public partial class input : System.Web.UI.Page
 
                     case "bonus":  // CALENDARIO SPECIALI
                                    // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
-                        DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) +"'");
+                        DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) + "'");
 
                         if (!bHoliday) // giorno on è un festivo
                         {
 
-                            string sDisplay="";
+                            string sDisplay = "";
 
                             if (drFound.Count() != 0) // se ci sono item le icone viaggio e ticket vengono spente <img align=right src=images/icons/16x16/restaurant.png  border=0>
                                 sDisplay = "style='display:none'";
@@ -599,10 +593,10 @@ public partial class input : System.Web.UI.Page
                             // id hdrIcn usato per nascondere le icone
                             Response.Write("<span " + sDisplay + " id='hdrIcon" + sISODate + "'><a href='#' class='tktRest' restDate='" + sISODate + "'><i class='fas fa-utensils'></i></a>");
 
-                            strProject = GetProject(sDate);
+                            HoursData = GetProject(sDate);
 
                             // il titolo del link viene impostato uguale alla data per essere poi impostato da javascript nella finestra modale
-                            Response.Write("<a title=" + sDate + ";" + strProject + " href=#dialog name=modal>  <img align=right src=images/icons/16x16/travel.png border=0></a><span>");
+                            Response.Write("<a title=" + sDate + ";" + HoursData.Projects_Id + ";" + HoursData.Opportunity_Id + " href=#dialog name=modal>  <img align=right src=images/icons/16x16/travel.png border=0></a><span>");
                         }
 
                         break;

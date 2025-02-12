@@ -15,6 +15,10 @@ public class ASPcompatility
 
     public static string FormatStringDb(string InputString)
     {
+
+        if (InputString == null)
+            return "NULL";
+
         string sRet = "'" + InputString.Replace("'", "''") + "'";
         return sRet;
     }
@@ -122,7 +126,8 @@ public class ASPcompatility
         return sRet;
     }
 
-    public static string FormatDatetimeDb(DateTime DateToConvert, bool timestamp = false) {
+    public static string FormatDatetimeDb(DateTime DateToConvert, bool timestamp = false)
+    {
 
         string sRet = "";
         CultureInfo cultureIT = CultureInfo.GetCultureInfo("it-IT");
@@ -142,7 +147,8 @@ public class ASPcompatility
             else
                 dateFormat = shortUS;
         }
-        else {
+        else
+        {
             if (timestamp)
                 dateFormat = longIT;
             else
@@ -162,10 +168,9 @@ public class ASPcompatility
 
         DateTime DateToConvert;
 
-        if (sDateToConvert == "")
+        if (sDateToConvert == "" | sDateToConvert == "null" | sDateToConvert == "NULL" | sDateToConvert == null)
         {
-            sRet = "NULL";
-            return sRet;
+            return "NULL";
         } //  init
 
         if (timestamp)

@@ -301,7 +301,7 @@ public class WS_Caricatore : System.Web.Services.WebService
                 // copia le forzature
                 int Project_id;
                 if (int.TryParse(obj.ToString(), out Project_id)) {
-                    Database.ExecuteScalar("INSERT INTO ForcedAccounts (Persons_id, Projects_id) SELECT Persons_id, " + ASPcompatility.FormatNumberDB(Project_id) + " FROM ForcedAccounts WHERE Projects_id = " + ASPcompatility.FormatNumberDB(CopiaConsulentiDa_id), null);
+                    Database.ExecuteScalar("INSERT INTO ForcedAccounts (Persons_id, Projects_id, CreationDate, CreatedBy) SELECT Persons_id, " + ASPcompatility.FormatNumberDB(Project_id) + ", " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + "," + ASPcompatility.FormatStringDb(CurrentSession.UserId) + " FROM ForcedAccounts WHERE Projects_id = " + ASPcompatility.FormatNumberDB(CopiaConsulentiDa_id), null);
                 }
             }
 

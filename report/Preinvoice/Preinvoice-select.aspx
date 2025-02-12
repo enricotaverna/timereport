@@ -102,7 +102,7 @@
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <div class="buttons">
-                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <div id="valMsg" class="parsley-single-error"></div>
                         <asp:Button ID="btnReport" runat="server" Text="<%$ appSettings: REPORT_TXT %>" CssClass="orangebutton" CommandName="report" OnClick="report_Click" />
                         <%--OnClick="sottometti_Click"--%>
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="document.location.href='/timereport/report/preinvoice/preinvoice-list.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
@@ -146,7 +146,6 @@
 
         $('.SumoDLL').SumoSelect({ search: true });
         $('#LBProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
-        $('.SumoSelect').css('width', '270px');
 
         // datepicker
         $("#TBDataDa").datepicker($.datepicker.regional['it']);

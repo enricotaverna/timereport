@@ -183,24 +183,10 @@
         function confermaCancellazione(dati, riga) {
 
             // cancella solo se proprietario del record o amministratore
-            if (dati.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5') { 
-
-                $('#dialog-confirm').dialog({
-                    resizable: false,
-                    height: "auto",
-                    width: 400,
-                    modal: true,
-                    buttons: {
-                        "Cancella": function () {
-                            $(this).dialog("close");
-                            cancellaRecord(dati, riga);
-                        },
-                        "Annulla": function () {
-                            $(this).dialog("close");
-                            return;
-                        }
-                    }
-                });
+            if (dati.DirectorsName.includes($('#TBUserName').val()) || $('#TBUserLevel').val() == '5')
+            { 
+                // Valore tasto e funzione da eseguire se confermato
+                ConfirmDialog("Conferma la cancellazione","Vuoi cancellare la prefattura?","Cancella", (confirm) => confirm && (cancellaRecord(dati, riga)));
             }
         }
 
@@ -240,10 +226,6 @@
         } // cancella record, chiamata da Tabulator
 
     </script>
-
-    <div id="dialog-confirm" title="Conferma la cancellazione">
-          <p>Vuoi cancellare la prefattura?</p>
-    </div>
 
 </body>
 

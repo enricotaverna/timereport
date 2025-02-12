@@ -47,11 +47,13 @@
 
                 <div id="FormWrap" class="StandardForm col-5">
 
-                    <asp:FormView ID="SchedaClienteForm" runat="server" DataKeyNames="CodiceCliente"
+                    <asp:FormView ID="FVCustomer" runat="server" DataKeyNames="CodiceCliente"
                         DataSourceID="CustomerDataSource" DefaultMode="Insert"
-                        OnItemInserted="SchedaClienteForm_ItemInserted"
+                        OnItemInserted="BackToList"
+                        OnItemInserting="FVCustomer_ItemInserting"
+                        OnItemUpdating="FVCustomer_ItemUpdating"
                         OnModeChanging="SchedaClienteForm_ModeChanging"
-                        OnItemUpdated="SchedaClienteForm_ItemUpdated" Width="100%">
+                        OnItemUpdated="BackToList" Width="100%">
 
                         <EditItemTemplate>
 
@@ -121,9 +123,8 @@
                                     <!-- *** Manager ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Manager</div>
-                                            <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="Manager"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ClientManager_id") %>'
+                                            <asp:DropDownList ID="DDLManager" runat="server" 
+                                                AppendDataBoundItems="True"
                                                 data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                             </asp:DropDownList>
                                     </div>
@@ -209,7 +210,7 @@
 
                             <!-- *** BOTTONI  ***  -->
                             <div class="buttons">
-                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <div id="valMsg" class="parsley-single-error"></div>
                                 <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
                                 <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate="" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />
                             </div>
@@ -286,9 +287,8 @@
                                     <!-- *** Manager ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Manager</div>
-                                            <asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="Manager"
-                                                DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
-                                                SelectedValue='<%# Bind("ClientManager_id") %>'
+                                            <asp:DropDownList ID="DDLManager" runat="server" 
+                                                AppendDataBoundItems="True"
                                                 data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
@@ -375,7 +375,7 @@
 
                             <!-- *** BOTTONI  ***  -->
                             <div class="buttons">
-                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <div id="valMsg" class="parsley-single-error"></div>
                                 <asp:Button ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
                                 <asp:Button ID="InsertCancelButton" runat="server" formnovalidate="" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" />
                             </div>
@@ -471,13 +471,6 @@
     <asp:SqlDataSource ID="terminidipagamento" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [TerminiPagamento]"></asp:SqlDataSource>
-    <asp:SqlDataSource ID="Manager" runat="server"
-        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT [Persons_id], [Name] FROM [Persons] WHERE ([Active] = @Active) ORDER BY Name">
-        <SelectParameters>
-            <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
-        </SelectParameters>
-    </asp:SqlDataSource>
 
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">

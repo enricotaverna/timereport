@@ -75,7 +75,7 @@
 
                         <!-- *** BOTTONI  ***  -->
                         <div class="buttons">
-                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                            <div id="valMsg" class="parsley-single-error"></div>
                             <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CssClass="orangebutton" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" />
                             <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                         </div>
@@ -104,7 +104,7 @@
 
                         <!-- *** BOTTONI  ***  -->
                         <div class="buttons">
-                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                            <div id="valMsg" class="parsley-single-error"></div>
                             <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" CssClass="orangebutton" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" />
                             <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                         </div>

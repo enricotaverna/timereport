@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -38,7 +34,8 @@ public partial class m_gestione_Customer_customer_lookup_list : System.Web.UI.Pa
     }
 
     // Imposta i valori degli elementi del form da variabili di sessione
-    protected void InizializzaForm() {
+    protected void InizializzaForm()
+    {
 
         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
         if (Session["DL_manager_val"] != null)
@@ -55,7 +52,7 @@ public partial class m_gestione_Customer_customer_lookup_list : System.Web.UI.Pa
         }
     }
 
-        protected void GVCustomers_SelectedIndexChanged(object sender, System.EventArgs e)
+    protected void GVCustomers_SelectedIndexChanged(object sender, System.EventArgs e)
     {
         Response.Redirect("customer_lookup_form.aspx?CodiceCliente=" + GVCustomers.SelectedValue);
     }

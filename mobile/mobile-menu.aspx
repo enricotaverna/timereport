@@ -85,7 +85,7 @@
 
             <div data-role="header">
                 <a href="#mainmenu" class='ui-btn-left' data-icon='arrow-l'>Back</a>
-                <h1 id="speseToptitle">Inserisci spese</h1>
+                <h1 data-role="headerTitle" id="speseToptitle">Inserisci spese</h1>
             </div>
             <!-- /header -->
 
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="ui-block-b">
-                        <input type="text" runat="server"  name="TbExpenseAmount" id="TbExpenseAmount" placeholder="Importo spesa">
+                        <input type="number" runat="server"  name="TbExpenseAmount" id="TbExpenseAmount" placeholder="Importo spesa">
                     </div>
 
                 </div>
@@ -187,7 +187,7 @@
 
             <div data-role="header">
                 <a href="#mainmenu" class='ui-btn-left' data-icon='arrow-l'>Back</a>
-                <h1 id="oreToptitle">Inserisci ore</h1>
+                <h1 data-role="headerTitle" id="oreToptitle">Inserisci ore</h1>
             </div>
             <!-- /header -->
 

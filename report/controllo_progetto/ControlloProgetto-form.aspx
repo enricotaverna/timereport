@@ -319,7 +319,7 @@
 
                             <!-- *** BOTTONI  ***  -->
                             <div class="buttons">
-                                <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                                <div id="valMsg" class="parsley-single-error"></div>
                                 <asp:Button ID="btn_save" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
                                 <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
                                 <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />

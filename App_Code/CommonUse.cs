@@ -191,7 +191,7 @@ public class Utilities
     public static void CreateMessageAlert(ref Page aspxPage, string strMessage, string strKey)
     {
         string strScript = "<script language=JavaScript>" +
-                           " alert('" + strMessage + "') " +
+                           " ShowPopup('" + strMessage + "'); " +
                            " </script>";
 
         if ((!aspxPage.IsStartupScriptRegistered(strKey)))
@@ -272,7 +272,8 @@ public class Utilities
 
     // Esporta Xls usando il framework Synfusion, torna false in caso di errore
     // riceve in input un workbook
-    public static bool ExporXlsxWorkbook(IWorkbook workbook, string filename ) {
+    public static bool ExporXlsxWorkbook(IWorkbook workbook, string filename)
+    {
 
         try
         {
@@ -285,7 +286,8 @@ public class Utilities
             stream.Dispose();
             return true; // successo
         }
-        catch {
+        catch
+        {
             return false; // errore
         }
     }
@@ -451,7 +453,7 @@ public class Utilities
             tuple = new Tuple<int, int>(Convert.ToInt32(rows[0]["ClientManager_id"]), Convert.ToInt32(rows[0]["AccountManager_id"]));
         else  // il manager non è bufferizzato, va cercato sul db
         {
-            DataRow dr = Database.GetRow("select * from Projects where projects_id = " + ASPcompatility.FormatNumberDB(Projects_id) , null);
+            DataRow dr = Database.GetRow("select * from Projects where projects_id = " + ASPcompatility.FormatNumberDB(Projects_id), null);
             if (dr != null)
                 tuple = new Tuple<int, int>(Convert.ToInt32(dr["ClientManager_id"]), Convert.ToInt32(dr["AccountManager_id"]));
         }
@@ -534,7 +536,7 @@ public class CommonFunction
 
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"]; // recupera oggetto con variabili di sessione
 
-        object obj = Database.ExecuteScalar("SELECT SUM(hours) as somma FROM Hours WHERE Persons_id = " + Persons_id + " AND Date >= " + sFromDate + " AND Date <= " + sToDate, null );
+        object obj = Database.ExecuteScalar("SELECT SUM(hours) as somma FROM Hours WHERE Persons_id = " + Persons_id + " AND Date >= " + sFromDate + " AND Date <= " + sToDate, null);
         if (obj != DBNull.Value)
             iContaOre = Convert.ToInt32(obj);
         else
@@ -578,7 +580,7 @@ public class CommonFunction
         //var days = (enddate - startdate).Days + 1;
         //return workDaysInFullWeeks(days) + workDaysInPartialWeek(startdate.DayOfWeek, days);
 
-        double calcBusinessDays =  1 + ((enddate - startdate).TotalDays * 5 - (startdate.DayOfWeek - enddate.DayOfWeek) * 2) / 7;
+        double calcBusinessDays = 1 + ((enddate - startdate).TotalDays * 5 - (startdate.DayOfWeek - enddate.DayOfWeek) * 2) / 7;
 
         if (enddate.DayOfWeek == DayOfWeek.Saturday)
             calcBusinessDays--;
@@ -707,6 +709,31 @@ public class CommonFunction
         return true;
     }
 
+    // riceve in input id spesa, nome user, data spesa (YYYYMMGG) e restutuisce array con nome file
+    // Se id spesa = -1 allora estrae tutte le spese del mese per l'utente
+    public static string[] TrovaRicevuteLocale(string sId, string sUserName, string sData)
+    {
+
+        string[] filePaths = null;
+
+        try
+        {
+            // costruisci il pach di ricerca: public + anno + mese + nome persona 
+            string TargetLocation = HttpContext.Current.Server.MapPath(ConfigurationSettings.AppSettings["PATH_RICEVUTE"]) + sData.Substring(0, 4) + "\\" + sData.Substring(4, 2) + "\\" + sUserName + "\\";
+            // carica immagini
+            filePaths = Directory
+                        .GetFiles(TargetLocation, "fid-" + sId + "*.*")
+                        .Where(file => file.ToLower().EndsWith("jpg") || file.ToLower().EndsWith("tiff") || file.ToLower().EndsWith("pdf") || file.ToLower().EndsWith("png") || file.ToLower().EndsWith("jpeg") || file.ToLower().EndsWith("gif") || file.ToLower().EndsWith("bmp"))
+                        .ToArray();
+            return (filePaths);
+        }
+        catch (Exception)
+        {
+            //non fa niente ma evita il dump
+            return (null);
+        }
+
+    }
 }
 
 public class CheckChiusura
@@ -750,7 +777,7 @@ public class CheckChiusura
         DataTable dtFerie = Database.GetData("SELECT FORMAT(date,'dd/MM/yyyy') AS date " +
                                              " FROM Hours AS a " +
                                              " INNER JOIN Projects AS b ON b.projects_id = a.projects_id " +
-                                             " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"]  + "  AND " +
+                                             " WHERE b.ProjectCode IN " + ConfigurationManager.AppSettings["CODICI_FERIE"] + "  AND " +
                                              " persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null);
 
         DataTable dtHomeOffice = new DataTable();
@@ -865,7 +892,7 @@ public class CheckChiusura
         ListaAnomalie.Clear();
 
         string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
-        string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth( Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
+        string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
 
         // carica spese nel mese della persona per il controllo
         DataTable dtProgettiMese = Database.GetData("Select FORMAT(date,'dd/MM/yyyy') as date, Projects_id from Hours WHERE Persons_id=" + persons_id + " AND date >= " + dFirst + " AND date <= " + dLast, null/* TODO Change to default(_) if this is not a reference type */);
@@ -959,7 +986,7 @@ public class CheckChiusura
         int iRet;
 
         ListaAnomalie.Clear();
-        
+
         string dFirst = ASPcompatility.FormatDateDb("01/" + sMese.PadLeft(2, '0') + "/" + sAnno);
         string dLast = ASPcompatility.FormatDateDb(DateTime.DaysInMonth(Convert.ToInt32(sAnno), Convert.ToInt32(sMese)).ToString() + "/" + sMese + "/" + sAnno);
         SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);

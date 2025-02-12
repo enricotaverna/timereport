@@ -235,7 +235,6 @@ public partial class input_ore : System.Web.UI.Page
 
     }
 
-    //valorizzazione della DDL delle task di Salesforce
     protected void Bind_DDLOpportunita()
     {
         DropDownList DDLOpportunity;
@@ -262,7 +261,10 @@ public partial class input_ore : System.Web.UI.Page
         DDLOpportunity.DataTextField = "OpportunityName";
         DDLOpportunity.DataValueField = "OpportunityId";
         DDLOpportunity.DataBind();
-        if (OpportunityId != "")
+
+        if (FVore.CurrentMode == FormViewMode.Insert)
+            DDLOpportunity.SelectedValue = (string)Session["OpportunityDefault"];
+        else
             DDLOpportunity.SelectedValue = OpportunityId;
     }
 
@@ -274,7 +276,13 @@ public partial class input_ore : System.Web.UI.Page
         DropDownList ddlActivity_temp = (DropDownList)FVore.FindControl("DDLAttivita");
         DropDownList ddlLocation_temp = (DropDownList)FVore.FindControl("DDLLocation");
 
-        DataTable dtAct = Database.GetData("select Activity_id, ActivityCode + '  ' + left(a.Name,20) AS DescActivity, a.Projects_id FROM Activity as a JOIN Projects as b ON b.Projects_id = a.Projects_id where b.active = 'true' AND a.active = 'true' ORDER BY ActivityCode", null);
+        DataTable dtAct;
+
+        // se display carica tutte le attività, altrimenti solo quelle attive
+        if (FVore.CurrentMode != FormViewMode.ReadOnly)
+            dtAct = Database.GetData("select Activity_id, ActivityCode + '  ' + left(a.Name,20) AS DescActivity, a.Projects_id FROM Activity as a JOIN Projects as b ON b.Projects_id = a.Projects_id where b.active = 'true' AND a.active = 'true' ORDER BY ActivityCode", null);
+        else
+            dtAct = Database.GetData("select Activity_id, ActivityCode + '  ' + left(a.Name,20) AS DescActivity, a.Projects_id FROM Activity as a JOIN Projects as b ON b.Projects_id = a.Projects_id ORDER BY ActivityCode", null);
 
         // ** carica location in DDLHiddenLocation
         ddlLocation.Items.Clear();
@@ -348,102 +356,6 @@ public partial class input_ore : System.Web.UI.Page
             Response.Redirect("input.aspx");
     }
 
-    protected void FVore_ItemInserted(object sender, FormViewInsertedEventArgs e)
-    {
-        Response.Redirect("input.aspx");
-    }
-
-    protected void FVore_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
-    {
-        Response.Redirect("input.aspx");
-    }
-
-    protected void DSore_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
-    {
-        //      Chiamato in aggiornamento e inserimento record rende negativo il valore delle ore
-        //      nel caso sia valorizzato il flag storno         
-        decimal iCalc = 0;
-
-        CheckBox CBcancel = (CheckBox)FVore.FindControl("CancelFlagCheckBox");
-        TextBox TBAccountingDate = (TextBox)FVore.FindControl("TBAccountingDate");
-
-        if (CBcancel.Checked)
-        {
-            iCalc = Convert.ToDecimal(e.Command.Parameters["@Hours"].Value) * (-1);
-            e.Command.Parameters["@Hours"].Value = iCalc;
-        }
-        else
-        {
-            e.Command.Parameters["@Hours"].Value = Convert.ToDecimal(e.Command.Parameters["@Hours"].Value);
-        }
-
-        //      Forza i valori da passare alla select di insert. essendo le dropdown in
-        //      dipendenza non si riesce a farlo tramite un normale bind del controllo
-
-        DropDownList ddlList = (DropDownList)FVore.FindControl("DDLprogetto");
-        e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
-
-        DropDownList ddlOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
-        e.Command.Parameters["@OpportunityId"].Value = ddlOpportunity.SelectedValue;
-
-        DropDownList ddlList1 = (DropDownList)FVore.FindControl("DDLAttivita");
-        if (ddlList1.SelectedValue != null)
-            e.Command.Parameters["@Activity_id"].Value = ddlList1.SelectedValue;
-
-        // Se valorizzato la DDL
-        DropDownList ddlList2 = (DropDownList)FVore.FindControl("DDLLocation");
-        if (ddlList2.SelectedValue != "")
-        {
-            e.Command.Parameters["@LocationKey"].Value = ddlList2.SelectedValue.Substring(2); // chiave della location
-            e.Command.Parameters["@LocationType"].Value = ddlList2.SelectedValue.Substring(0, 1); // tipo C o P della location
-            e.Command.Parameters["@LocationDescription"].Value = ddlList2.SelectedItem.Text;
-        }
-
-        // Se valorizzato il testo libero
-        TextBox TBLocation = (TextBox)FVore.FindControl("TBLocation");
-        if (TBLocation.Text != "")
-        {
-            e.Command.Parameters["@LocationDescription"].Value = TBLocation.Text;
-            e.Command.Parameters["@LocationType"].Value = "T";
-            e.Command.Parameters["@LocationKey"].Value = "99999";
-        }
-
-        DropDownList DDLTaskName = (DropDownList)FVore.FindControl("DDLTaskName");
-        e.Command.Parameters["@SalesforceTaskID"].Value = DDLTaskName.SelectedValue;
-
-        // salva default per select list
-        Session["ProjectCodeDefault"] = ddlList.SelectedValue;
-        Session["ActivityDefault"] = ddlList1.SelectedValue;
-        Session["LocationDefault"] = ddlList2.SelectedValue;
-
-        // solo insert
-        if (FVore.CurrentMode == FormViewMode.Insert)
-        {
-            e.Command.Parameters["@Persons_id"].Value = CurrentSession.Persons_id;
-            Label LBdate = (Label)FVore.FindControl("LBdate");
-            e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
-            // Audit
-            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
-            e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
-            // valori manager e società
-            e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
-        }
-
-        // if in change
-        if (FVore.CurrentMode == FormViewMode.Edit)
-        {
-            // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
-            e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
-        }
-
-        // aggiorna manager e account associati al progetto
-        var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
-        e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
-        e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
-
-    }
-
     protected void FVore_DataBound(object sender, EventArgs e)
     {
         //      formattta il campo numerico delle ore, nel DB le ore stornate sono negative
@@ -488,6 +400,7 @@ public partial class input_ore : System.Web.UI.Page
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
     }
+
     /// <summary>
     /// rfresh delle task di salesforce
     /// </summary>

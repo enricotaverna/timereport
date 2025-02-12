@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="buttons">
-                    <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                    <div id="valMsg" class="parsley-single-error"></div>
                     <asp:Button ID="report" runat="server" Text="<%$ appSettings: EXEC_TXT %>" CssClass="orangebutton" CommandName="report" OnClick="sottometti_Click" />
                     <asp:Button ID="CancelButton" runat="server" formnovalidate="" CssClass="greybutton" OnClientClick="document.location.href='/timereport/menu.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                 </div>

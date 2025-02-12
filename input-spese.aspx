@@ -64,7 +64,7 @@
                         <asp:FormView ID="FVSpese" runat="server" DataKeyNames="Expenses_Id"
                             DataSourceID="DSspese" align="center" DefaultMode="Edit"
                             OnDataBound="FVSpese_DataBound" CellPadding="0"
-                            OnItemUpdated="FVSpese_ItemUpdated" OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1" >
+                            OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1" >
 
                             <%--  INSERT   --%>
                             <InsertItemTemplate>
@@ -85,8 +85,8 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
-                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource2" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged" >
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"  data-parsley-required="true" data-parsley-errors-container="#valMsg"
+                                        meta:resourcekey="DDLprogettoResource2"   >
                                     </asp:DropDownList>
                                 </div>
 
@@ -167,10 +167,10 @@
 
                                 <!-- *** Bottoni ***  -->
                                 <div class="buttons">
-                                    <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
-                                    <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" />
-                                    <asp:Button ID="RicevuteButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ Resources:timereport, TICKETS %>" />
-                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate PostBackUrl="/timereport/input.aspx" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" />
+                                    <div id="valMsg" class="parsley-single-error"></div>
+                                    <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>"  />
+                                    <asp:Button ID="RicevuteButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport, TICKETS %>" />
+                                    <asp:Button ID="CancelButton" runat="server" formnovalidate  CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" />
                                 </div>
 
                             </InsertItemTemplate>
@@ -196,8 +196,8 @@
                                     <div class="inputtext">
                                         <asp:Literal runat="server" Text="<%$ Resources:progetto%>" />
                                     </div>
-                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True" 
-                                        AutoPostBack="True" meta:resourcekey="DDLprogettoResource1" OnSelectedIndexChanged="DDLprogetto_SelectedIndexChanged">
+                                    <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"  data-parsley-required="true" data-parsley-errors-container="#valMsg"
+                                        meta:resourcekey="DDLprogettoResource1"  >
                                     </asp:DropDownList>
                                 </div>
 
@@ -276,9 +276,9 @@
 
                                 <!-- *** Bottoni ***  -->
                                 <div class="buttons">
-                                    <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
-                                    <asp:Button ID="UpdateButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
-                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" />
+                                    <div id="valMsg" class="parsley-single-error"></div>
+                                    <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport, SAVE_TXT %>" meta:resourcekey="UpdateButtonResource1" />
+                                    <asp:Button ID="CancelButton" runat="server"  CommandName="Cancel" formnovalidate CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>" meta:resourcekey="UpdateCancelButtonResource1" />
                                 </div>
 
                             </EditItemTemplate>
@@ -385,7 +385,7 @@
 
                                 <!-- *** Bottoni ***  -->
                                 <div class="buttons">
-                                    <asp:Button ID="UpdateCancelButton" runat="server" formnovalidate PostBackUrl="/timereport/input.aspx" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>"  meta:resourcekey="UpdateCancelButtonResource3" />
+                                    <asp:Button ID="CancelButton" runat="server" formnovalidate PostBackUrl="/timereport/input.aspx" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>"  meta:resourcekey="UpdateCancelButtonResource3" />
                                 </div>
 
                             </ItemTemplate>
@@ -451,63 +451,10 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSSpese" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, Expenses.CreatedBy, Expenses.CreationDate, Expenses.LastModifiedBy, Expenses.LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name, Expenses.ClientManager_id, Expenses.AccountManager_id, Expenses.Company_id, Expenses.AdditionalCharges, Expenses.OpportunityId FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id  WHERE (Expenses_Id = @Expenses_Id)"
-        InsertCommand="INSERT INTO Expenses(Projects_Id, Persons_id, Date, ExpenseType_Id, Amount, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, Comment, CreatedBy, CreationDate, AccountingDate, TipoBonus_id, ClientManager_id, AccountManager_id, Company_id, AdditionalCharges, AmountInCurrency, OpportunityId) VALUES (@Projects_Id, @Persons_id, @Date, @ExpenseType_id, @Amount, @CancelFlag, @CreditCardPayed, @CompanyPayed, @InvoiceFlag, @Comment, @CreatedBy, @CreationDate, @AccountingDate, @TipoBonus_id, @ClientManager_id, @AccountManager_id, @Company_id, @AdditionalCharges, @AmountInCurrency, @OpportunityId);"
-        UpdateCommand="UPDATE Expenses SET Amount = @Amount , ExpenseType_Id = @ExpenseType_Id, CancelFlag = @CancelFlag, Comment = @Comment, InvoiceFlag = @InvoiceFlag, CreditCardPayed = @CreditCardPayed, CompanyPayed = @CompanyPayed, Projects_Id = @Projects_Id, LastModifiedBy= @LastModifiedBy, LastModificationDate = @LastModificationDate, AccountingDate = @AccountingDate, TipoBonus_id = @TipoBonus_id, AdditionalCharges = @AdditionalCharges, AmountInCurrency = @AmountInCurrency, OpportunityId=@OpportunityId, AccountManager_id=@AccountManager_id, ClientManager_id=@ClientManager_id WHERE (Expenses_Id = @Expenses_Id)"
-        OnInserting="DSSpese_Insert_Update" OnUpdating="DSSpese_Insert_Update" OnInserted="DSSpese_Inserted">
-
+        SelectCommand="SELECT Expenses_Id, Projects_Id, Expenses.Persons_id, ExpenseType_id, Date, Amount, Comment, CreditCardPayed, CompanyPayed, CancelFlag, InvoiceFlag, Expenses.CreatedBy, Expenses.CreationDate, Expenses.LastModifiedBy, Expenses.LastModificationDate, AccountingDate, TipoBonus_id, Persons.Name, Expenses.ClientManager_id, Expenses.AccountManager_id, Expenses.Company_id, Expenses.AdditionalCharges, Expenses.OpportunityId FROM Expenses INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id  WHERE (Expenses_Id = @Expenses_Id)"  >
         <SelectParameters>
             <asp:QueryStringParameter Name="expenses_id" QueryStringField="expenses_id" />
         </SelectParameters>
-
-        <InsertParameters>
-            <asp:Parameter Name="Expenses_Id" />
-            <%-- per ritornare l'id del record inserito--%>
-            <asp:Parameter Name="Projects_Id" />
-            <asp:Parameter Name="Persons_id" />
-            <asp:Parameter Name="Date" />
-            <asp:Parameter Name="ExpenseType_id" />
-            <asp:Parameter Name="Amount" />
-            <asp:Parameter Name="CancelFlag" />
-            <asp:Parameter Name="CreditCardPayed" />
-            <asp:Parameter Name="CompanyPayed" />
-            <asp:Parameter Name="InvoiceFlag" />
-            <asp:Parameter Name="Comment" />
-            <asp:Parameter Name="CreatedBy" />
-            <asp:Parameter Name="CreationDate" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="TipoBonus_id" />
-            <asp:Parameter Name="ClientManager_id" />
-            <asp:Parameter Name="AccountManager_id" />
-            <asp:Parameter Name="Company_id" />
-            <asp:Parameter Name="AdditionalCharges" />
-            <asp:Parameter Name="AmountInCurrency" />
-            <asp:Parameter Name="OpportunityId" />       
-        </InsertParameters>
-
-        <UpdateParameters>
-            <asp:Parameter Name="expenses_id" />
-            <asp:Parameter Name="Projects_Id" />
-            <asp:Parameter Name="Persons_id" />
-            <asp:Parameter Name="Date" />
-            <asp:Parameter Name="ExpenseType_id" />
-            <asp:Parameter Name="ClientManager_id" />
-            <asp:Parameter Name="AccountManager_id" />
-            <asp:Parameter Name="Amount" />
-            <asp:Parameter Name="CancelFlag" />
-            <asp:Parameter Name="CreditCardPayed" />
-            <asp:Parameter Name="CompanyPayed" />
-            <asp:Parameter Name="InvoiceFlag" />
-            <asp:Parameter Name="Comment" />
-            <asp:Parameter Name="LastModifiedBy" />
-            <asp:Parameter Name="LastModificationDate" />
-            <asp:Parameter Name="AccountingDate" Type="DateTime" />
-            <asp:Parameter Name="TipoBonus_id" />
-            <asp:Parameter Name="AdditionalCharges" />
-            <asp:Parameter Name="AmountInCurrency" />
-            <asp:Parameter Name="OpportunityId" />       
-        </UpdateParameters>
-
     </asp:SqlDataSource>
 
     <script type="text/javascript">
@@ -518,6 +465,11 @@
 
         // evita il postback con INVIO (che non faceva funzionare bene il bind delle attivita)
         stopPostbackWithEnter();
+
+        // Initialize Parsley
+        var form = $('#FormSpese').parsley({
+                excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+            });
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
         window.Parsley.addValidator('testoObbligatorio', {
@@ -540,6 +492,10 @@
             }
         });
 
+        $("#FVSpese_DDLprogetto").on("change", function () {
+            BindOpportunity();
+        });
+
         $(function () {
 
             $("#FVSpese_TBAccountingDate").datepicker($.datepicker.regional['it']);
@@ -555,11 +511,14 @@
 
             // Sumo Select
             $('#FVSpese_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            $('.SumoSelect').css('width', '270px');
             $('.SumoSelect > .optWrapper').css('width', '550px');
 
             // se in edit chiama Ajax per controllo carico spese sul giorni
-            if (!$('#FVSpese_DDLprogetto')[0].disabled) {
+            $('#FVSpese_DDLprogetto').change(function () {
+
+                if ($('#FVSpese_DDLprogetto').val() == "")
+                    return;
+
                 $.ajax({
                     type: "POST",
                     url: "/timereport/webservices/WStimereport.asmx/CheckCaricoSpesa",
@@ -570,7 +529,7 @@
                         // se messaggio tornato è diverso da stringa vuota emette un messaggio di warning
                         if (msg.d != "") {
                             MaskScreen(true);
-                            ShowPopup(msg.d,'','Attenzione');
+                            ShowPopup(msg.d, '', 'Attenzione');
                             UnMaskScreen();
                             //BindOpportunity();
                         }
@@ -579,16 +538,7 @@
                         alert(xhr.responseText);
                     }
                 }); // ajax
-            }
-
-        });
-
-        // *** Esclude i controlli nascosti *** 
-        $('#FormSpese').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
-        });
-
-        $("#FVSpese_DDLprogetto").on("change", function () {
+            });
 
         });
 
@@ -632,7 +582,6 @@
 
         } // cancella_ricevuta
 
-
         //  ***** CARICA RICEVUTA *****
         $(function () {
             var FormDate = $('#FVSpese_LBdate').html();
@@ -668,6 +617,64 @@
                 .bind('fileuploadfail', function (e, data) {
                     alert(data);
                 })
+        });
+
+        // *****  SALVA FORM *****
+        $("#FVSpese_PostButton, #FVSpese_RicevuteButton" ).on("click", function (e) {
+
+            e.preventDefault();
+
+            // Trigger validation without submitting the form
+            form.validate();
+
+            // Check if the form is valid
+            if (!form.isValid())
+                return;
+
+            var ExpensesId = '<%= String.IsNullOrEmpty(Request.QueryString["expenses_id"]) ? "0" : Request.QueryString["expenses_id"] %>';
+
+            // Submit the form
+            var values = "{ 'Expenses_Id' : " + ExpensesId  +
+                " , 'Date': '" + $('#FVSpese_LBdate').text() + "'" +
+                " , 'ExpenseAmount': '" + $('#FVSpese_TBAmount').val().replace(',', '.') + "'" +
+                " , 'Person_Id': '" + <%= CurrentSession.Persons_id %> + "'" +
+                " , 'Project_Id': '" + $('#FVSpese_DDLprogetto').val() + "'" +
+                " , 'ExpenseType_Id': '" + $('#FVSpese_DDLTipoSpesa').val() + "'" +
+                " , 'Comment': '" + $('#FVSpese_TBComment').val() + "'" +
+                " , 'CreditCardPayed': " + $('#FVSpese_CBCreditCard').is(':checked') + 
+                " , 'CompanyPayed': " + $('#FVSpese_CBCompanyPayed').is(':checked') + 
+                " , 'CancelFlag': " + $('#FVSpese_CBcancel').is(':checked') + 
+                " , 'InvoiceFlag': " + $('#FVSpese_CBInvoice').is(':checked') + 
+                " , 'strFileName': ''" + // non salva il file 
+                " , 'strFileData': ''" +
+                " , 'OpportunityId': '" + ($('#FVSpese_DDLOpportunity').is(':visible') ? $('#FVSpese_DDLOpportunity').val() : '') + "'" +
+                " , 'AccountingDate': '" + $('#FVSpese_TBAccountingDate').val() + "'" + 
+                " , 'UserId': ''" +
+                "}";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_DBUpdates.asmx/SaveExpenses",
+                data: values,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var result = response.d;
+                    if (result.Success) {
+                        if (e.target.id === "FVSpese_PostButton")
+                            window.location.href = "/timereport/input.aspx";
+                        else
+                            window.location.href = "/timereport/input-spese.aspx?action=fetch&expenses_id=" + result.ExpensesId;
+                    } else {
+                        ShowPopup('Errore durante aggiornamento');
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    ShowPopup(xhr.responseText);
+                }
+            }); // ajax
+
         });
 
     </script>

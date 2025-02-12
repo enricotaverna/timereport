@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 public partial class m_gestione_ForzaUtenti_selection_utenti : System.Web.UI.Page
 {
@@ -19,6 +14,9 @@ public partial class m_gestione_ForzaUtenti_selection_utenti : System.Web.UI.Pag
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
+        if (!IsPostBack && Session["SelectedPersons_id"] != null)
+            IdPersonaSelezionata.SelectedValue = Session["SelectedPersons_id"].ToString();
+
         if (Request["cancel_from_list"] == "Cancel")
             Response.Redirect("/timereport/menu.aspx");
     }
@@ -26,6 +24,13 @@ public partial class m_gestione_ForzaUtenti_selection_utenti : System.Web.UI.Pag
     protected void UpdateCancelButton_Click(object sender, EventArgs e)
     {
         Response.Redirect("/timereport/menu.aspx");
+    }
+
+    protected void Submit_Click(object sender, EventArgs e)
+    {
+        // Memorizza l'ultimo valore selezionato nella sessione
+        Session["SelectedPersons_id"] = IdPersonaSelezionata.SelectedValue;
+        Response.Redirect("/timereport/m_gestione/ForzaUtenti/ForcedAccounts.aspx");
     }
 
 }

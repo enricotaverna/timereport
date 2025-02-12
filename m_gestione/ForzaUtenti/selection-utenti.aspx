@@ -13,9 +13,12 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
@@ -38,7 +41,7 @@
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
-        <form id="FVMain" runat="server" method="post" action="imposta-valori-utenti.aspx">
+        <form id="FVMain" runat="server">
 
             <div class="row justify-content-center" >
 
@@ -47,16 +50,24 @@
                     <!-- *** TITOLO FORM ***  -->
                     <div class="formtitle">Selezionare</div>
 
+                    <div style="margin-top:40px" ></div>
+
                     <!-- *** SELECT ***  -->
                     <div class="input nobottomborder">
-                        <div class="inputtext">Persona :</div>
-                            <asp:DropDownList ID="IdPersonaSelezionata" runat="server" DataSourceID="DSPersone" DataTextField="Name" DataValueField="Persons_id">
+                        <div style="position: absolute">
+                        <div class="inputtext">Consulente </div>                             
+                            <asp:DropDownList ID="IdPersonaSelezionata" runat="server" DataTextField="Name" DataValueField="Persons_id" 
+                                AppendDataBoundItems="True" AutoPostBack="False" DataSourceID="DSPersone"  style="width:250px">
+                            <asp:ListItem Text="-- Tutti i consulenti --" Value="" />
                             </asp:DropDownList>
+                        </div>
                     </div>
 
-                    <div class="buttons">
-                        <input runat="server" name="Submit" type="submit" class="orangebutton"  value="<%$ appSettings: EXEC_TXT %>" >
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    <br /><br /><br />
+
+                    <div class="buttons" >
+                        <asp:Button id="btn_submit" runat="server" class="orangebutton"  Text="<%$ appSettings: EXEC_TXT %>" OnClick="Submit_Click" />
+                        <asp:Button id="btn_back"  runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
 
                 </div>
@@ -88,6 +99,8 @@
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
+        $('#IdPersonaSelezionata').SumoSelect({ search: true});
+        
     </script>
 
 </body>

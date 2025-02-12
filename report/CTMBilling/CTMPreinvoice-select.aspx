@@ -67,7 +67,7 @@
                         <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Cliente</div>
-                            <asp:DropDownList ID="DDLCliente" runat="server" CssClass="SumoDLL"
+                            <asp:DropDownList ID="DDLCliente" runat="server" CssClass="SUMOselect"
                                 AppendDataBoundItems="True" AutoPostBack="true" Visible="false">
                                 <asp:ListItem Value="" Text="--- Tutti i clienti ---" />
                             </asp:DropDownList>
@@ -82,7 +82,7 @@
                         <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Progetto</div>
-                            <asp:ListBox ID="LBProgetti" runat="server" SelectionMode="Multiple" Visible="false" CssClass="SumoDLL" AppendDataBoundItems="True" DataTextField="projectname" DataValueField="Projects_id"></asp:ListBox>
+                            <asp:ListBox ID="LBProgetti" runat="server" SelectionMode="Multiple" Visible="false" CssClass="SUMOselect" AppendDataBoundItems="True" DataTextField="projectname" DataValueField="Projects_id"></asp:ListBox>
                             </div>
                     </div>
 
@@ -101,7 +101,7 @@
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <div class="buttons">
-                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <div id="valMsg" class="parsley-single-error"></div>
                         <asp:Button ID="btnReport" runat="server" Text="<%$ appSettings: REPORT_TXT %>" CssClass="orangebutton" CommandName="report" OnClick="report_Click" />
                         <%--OnClick="sottometti_Click"--%>
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="document.location.href='/timereport/report/CTMBilling/CTMpreinvoice-list.aspx'; return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
@@ -143,7 +143,7 @@
             excluded: "input[type=reset], [disabled]"
         });
 
-        $('.SumoDLL').SumoSelect({ search: true });
+        $('.SUMOselect').SumoSelect({ search: true });
         $('#LBProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
         $('.SumoSelect').css('width', '270px');
 

@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Threading;
-using System.Collections.Generic;
+using System.Web;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 
 public partial class input_spese : System.Web.UI.Page
 {
@@ -43,7 +42,7 @@ public partial class input_spese : System.Web.UI.Page
         }
 
         // di default il box revicevute non è visibile
-        BoxRicevute.Visible = false;        
+        BoxRicevute.Visible = false;
 
         //      in caso di update recupera il valore del progetto e attività
         if (Request.QueryString["expenses_id"] != null)
@@ -201,6 +200,7 @@ public partial class input_spese : System.Web.UI.Page
         DropDownList ddlProject = (DropDownList)FVSpese.FindControl("DDLprogetto");
 
         ddlProject.Items.Clear();
+        ddlProject.Items.Add(new ListItem(GetLocalResourceObject("DDLprogetto.testo").ToString(), ""));
 
         switch (FVSpese.CurrentMode)
         {
@@ -296,16 +296,14 @@ public partial class input_spese : System.Web.UI.Page
         ddlTipoSpesa.DataValueField = "ExpenseType_Id";
         ddlTipoSpesa.DataBind();
 
-        if (lExpenseType_id != "")
-            ddlTipoSpesa.SelectedValue = lExpenseType_id;
-
-        // se in creazione imposta il default di progetto 
         if (FVSpese.CurrentMode == FormViewMode.Insert)
-            ddlTipoSpesa.SelectedValue = (string)Session["ExpenseTypeDefault"];
+            ddlTipoSpesa.SelectedValue = (string)Session["ExpenseDefault"];
+        else
+            ddlTipoSpesa.SelectedValue = lExpenseType_id;
 
     }
 
-    //valorizzazione della DDL delle task di Salesforce
+    //valorizzazione della DDL delle opportunità
     protected void Bind_DDLOpportunita()
     {
         DropDownList DDLOpportunity;
@@ -332,89 +330,11 @@ public partial class input_spese : System.Web.UI.Page
         DDLOpportunity.DataTextField = "OpportunityName";
         DDLOpportunity.DataValueField = "OpportunityId";
         DDLOpportunity.DataBind();
-        if (OpportunityId != "")
-            DDLOpportunity.SelectedValue = OpportunityId;
-    }
 
-    protected void DSSpese_Insert_Update(object sender, SqlDataSourceCommandEventArgs e)
-    {
-        //      Chiamato in aggiornamento e inserimento record rende negativo il valore delle ore
-        //      nel caso sia valorizzato il flag storno         
-        double iCalc = 0;
-
-        CheckBox CBcancel = (CheckBox)FVSpese.FindControl("CBcancel");
-
-        if (CBcancel.Checked)
-        {
-            iCalc = Convert.ToDouble(e.Command.Parameters["@Amount"].Value) * (-1);
-            e.Command.Parameters["@Amount"].Value = iCalc;
-        }
-        else
-        {
-            e.Command.Parameters["@Amount"].Value = Convert.ToDouble(e.Command.Parameters["@Amount"].Value);
-        }
-
-        //      Forza i valori da passare alla select di insert. essendo le dropdown in
-        //      dipendenza non si riesce a farlo tramite un normale bind del controllo
-
-        DropDownList ddlList = (DropDownList)FVSpese.FindControl("DDLprogetto");
-        e.Command.Parameters["@Projects_id"].Value = ddlList.SelectedValue;
-
-        DropDownList ddlList1 = (DropDownList)FVSpese.FindControl("DDLTipoSpesa");
-        if (ddlList1.SelectedValue != null)
-            e.Command.Parameters["@ExpenseType_id"].Value = ddlList1.SelectedValue;
-
-        // Valorizza tipo Bonus se il tipo spesa è di tipo bonus
-        DataTable dtTipoSpesa = CurrentSession.dtSpeseForzate;
-        DataRow[] dr = dtTipoSpesa.Select("ExpenseType_id =  " + ddlList1.SelectedValue);
-
-        if (dr.Count() == 1)
-        {  // dovrebbe essere sempre così
-            e.Command.Parameters["@TipoBonus_id"].Value = Convert.ToInt32(dr[0]["TipoBonus_id"].ToString());
-            e.Command.Parameters["@AdditionalCharges"].Value = dr[0]["AdditionalCharges"];
-            e.Command.Parameters["@AmountInCurrency"].Value = Convert.ToDouble(dr[0]["ConversionRate"].ToString()) * Convert.ToDouble(e.Command.Parameters["@Amount"].Value);
-        }
-        else { 
-            e.Command.Parameters["@TipoBonus_id"].Value = 0; 
-            e.Command.Parameters["@AdditionalCharges"].Value = 0;
-            e.Command.Parameters["@AmountInCurrency"].Value = 0;
-        }
-
-        // salva default per select list
-        Session["ProjectCodeDefault"] = ddlList.SelectedValue;
-        Session["ExpenseTypeDefault"] = ddlList1.SelectedValue;
-        Session["TipoBonus_IdDefault"] = e.Command.Parameters["@TipoBonus_id"].Value; // usato per spegnere/accendere il campo in insert
-        //}
-
-        // solo insert
         if (FVSpese.CurrentMode == FormViewMode.Insert)
-        {
-            e.Command.Parameters["@persons_id"].Value = CurrentSession.Persons_id;
-            Label LBdate = (Label)FVSpese.FindControl("LBdate");
-            e.Command.Parameters["@Date"].Value = Convert.ToDateTime(LBdate.Text);
-            // Audit
-            e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
-            e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
-            // valori manager e società
-            e.Command.Parameters["@Company_id"].Value = CurrentSession.Company_id;
-        }
-
-        // if in change
-        if (FVSpese.CurrentMode == FormViewMode.Edit)
-        {
-            // Audit
-            e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
-            e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
-        }
-
-        // aggiorna manager e account associati al progetto
-        var result = Utilities.GetManagerAndAccountId(Convert.ToInt32(ddlList.SelectedValue));
-        e.Command.Parameters["@ClientManager_id"].Value = result.Item1; // ClientManager_id
-        e.Command.Parameters["@AccountManager_id"].Value = result.Item2; // AccountManager_id
-
-        DropDownList ddlOpportunity = (DropDownList)FVSpese.FindControl("DDLOpportunity");
-        e.Command.Parameters["@OpportunityId"].Value = ddlOpportunity.SelectedValue;
-
+            DDLOpportunity.SelectedValue = (string)Session["OpportunityDefault"];
+        else
+            DDLOpportunity.SelectedValue = OpportunityId;
     }
 
     protected void FVSpese_modechanging(object sender, FormViewModeEventArgs e)
@@ -457,59 +377,10 @@ public partial class input_spese : System.Web.UI.Page
 
     }
 
-    // recupera la chiave primaria inserita e richiama la pagina in modifica
-    protected void DSSpese_Inserted(object sender, SqlDataSourceStatusEventArgs e)
-    {
-        int newIdentity;
-
-        // se aggiornamento ha avuto luogo recupera l'ultimo Id della spesa inserita e richiama la pagina in aggiornamento per
-        // consentire il caricamento delle spese
-        if (e.Exception == null)
-        {
-
-            // se premuto il tasto "Ricevute" rimanda sulla stessa pagina aprendola in modifica in modo da poter caricare le rivevute   
-            if (!String.IsNullOrEmpty(Request.Form["FVSpese$RicevuteButton"]))
-            {
-                using (SqlConnection c = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
-                {
-                    c.Open();
-                    SqlCommand cmd = new SqlCommand("SELECT MAX(Expenses_id) from Expenses where Persons_Id=" + e.Command.Parameters["@Persons_id"].Value, c);
-                    newIdentity = (int)cmd.ExecuteScalar();
-                }
-                Response.Redirect("input-spese.aspx?action=fetch&expenses_id=" + newIdentity.ToString());
-            }
-            else
-                Response.Redirect("input.aspx");
-        }
-        else
-            Response.Redirect("input.aspx");
-    } // DSSpese_Inserted
-
     protected override void InitializeCulture()
     {
         // Imposta la lingua della pagina
         Thread.CurrentThread.CurrentUICulture = CommonFunction.GetCulture();
-    }
-
-    protected void DDLprogetto_SelectedIndexChanged(object sender, EventArgs e)
-    {
-
-    //    Label LBdate = (Label)FVSpese.FindControl("LBdate");
-
-     DropDownList DDLprogetto = (DropDownList)FVSpese.FindControl("DDLprogetto");
-
-    lProject_id = DDLprogetto.SelectedValue;
-
-    //    if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where projects_id= " + DDLprogetto.SelectedValue + " AND date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-    //        // non ci sono ore caricate sul progetto, cerca se ci sono altri progetti
-    //        if (!Database.RecordEsiste("Select hours_id , projects_id from Hours where date = " + ASPcompatility.FormatDateDb(LBdate.Text), this.Page))
-    //            ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioNonEsisteProgetto") + "'); } );", true);
-    //        else
-    //            ClientScript.RegisterStartupScript(Page.GetType(), "Popup", "$( function () { ShowPopup('" + GetLocalResourceObject("messaggioAltriProgetti") + "'); } );", true);
-
-    Bind_DDLprogetto(); // ripristina gli attributi sulla select
-    Bind_DDLTipoSpesa();
-
     }
 
 }

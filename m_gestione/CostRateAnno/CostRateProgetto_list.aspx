@@ -126,6 +126,7 @@
                             <div class="inputtext">Valido da</div>
                             <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataDa" Columns="10"
                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-no-focus="true" data-parsley-errors-messages-disabled=""
+                                data-parsley-firstdayofmonth="true"
                                 data-parsley-dateinsequenza="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                             &nbsp;&nbsp;a&nbsp;&nbsp;
                 <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataA" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-no-focus="true"
@@ -135,13 +136,15 @@
                         <div class="input nobottomborder">
                             <!-- ** COST RATE ** -->
                             <div class="inputtext">Cost Rate(€)</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" Columns="10" 
+                                data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
                         </div>
 
                         <div class="input nobottomborder">
                             <!-- ** BILL RATE ** -->
                             <div class="inputtext">Bill Rate(€)</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBBillRate" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBBillRate" Columns="10" 
+                                data-parsley-required="true" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
                         </div>
 
                         <div class="input nobottomborder">
@@ -158,7 +161,7 @@
                         <asp:TextBox runat="server" ID="TBProjectCostRate_id" Style="visibility: hidden; height: 0px; margin: 0px" />
 
                         <div class="buttons">
-                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 230px"></div>
                             <asp:Button ID="btnSalvaModale" runat="server" CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>" CssClass="orangebutton" />
                             <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />
                         </div>
@@ -218,7 +221,8 @@
             var dataACompare = $("#TBDataA").val().substring(6, 11) + $("#TBDataA").val().substring(3, 5) + $("#TBDataA").val().substring(0, 2);
 
             // controllo sequenza
-            if (dataDaCompare > dataACompare) {
+            if (dataDaCompare > dataACompare && dataACompare != "") {
+                $("#TBDataDa").parsley().removeError('dateinsequenza');
                 $("#TBDataDa").parsley().addError('dateinsequenza', { message: 'Data inizio deve essere < data fine', updateClass: true });
                 return false;
             }
@@ -254,6 +258,17 @@
             return response;
         }, 32);
         //    .addMessage('it', 'dateinsequenza', 'Controllare le date di validità');
+
+        // Validatore personalizzato per controllare che la data inizi con il primo giorno del mese
+        window.Parsley.addValidator('firstdayofmonth', {
+            validateString: function (value) {
+                if (value.substring(0, 2) != '01' && value != "") {
+                    $("#TBDataDa").parsley().removeError('firstdayofmonth');
+                    $("#TBDataDa").parsley().addError('firstdayofmonth', { message: 'La data deve essere primo giorno del mese', updateClass: true });
+                    return false;
+                }
+            }
+        });
 
         // ** INTERFACCIA **
 
@@ -293,8 +308,13 @@
             //Cancel the link behavior
             e.preventDefault();
 
-            if (!$('#FVForm').parsley().validate())
+            if (!$('#FVForm').parsley().validate()) {
+                // in modale la sola applicazione di fogli di stile per nascondere i messaggi di errore non è sufficiente
+                var errorMessages = $('#valMsg .parsley-errors-list.filled');
+                if (errorMessages.length > 1)
+                    errorMessages.not(':first').hide();
                 return;
+            }
 
             submitCreaAggiornaRecord();
 
@@ -344,8 +364,8 @@
                 { title: "A", field: "DataA", sorter: "string", width: 80, headerFilter: true },
                 { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
                 { title: "Prj Code", field: "ProjectCode", sorter: "string", headerFilter: true },
-                { title: "Prj Name", field: "ProjectName", sorter: "string", headerFilter: true },
-                { title: "Societa", field: "CompanyName", sorter: "string", headerFilter: true },
+                { title: "Prj Name", field: "ProjectName", width: 200, sorter: "string", headerFilter: true },
+                { title: "Societa", field: "CompanyName", width: 120, sorter: "string", headerFilter: true },
                 { title: "Cost Rate", field: "CostRate", sorter: "number", width: 60, headerFilter: true },
                 { title: "Bill Rate", field: "BillRate", sorter: "number", width: 60, headerFilter: true },
                 <% if (Auth.ReturnPermission("MASTERDATA", "COSTRATE_UPDATE"))
@@ -362,12 +382,13 @@
         function initValue() {
 
             $('#TBProjectCostRate_id').val('0'); // attenzione!
-            $('#DDLProjects').val('');
+            $('#DDLPersons').val('');
+/*          $('#DDLProjects').val('');*/
             $('#TBComment').val('');
             $('#TBCostRate').val('');
             $('#TBBillRate').val('');
-            $('#TBDataDa').val('');
-            $('#TBDataA').val('');
+            //$('#TBDataDa').val(''); // togliendo reset si propone come dafault l'ultimo valore inserito
+            //$('#TBDataA').val('');
             $('#LBCreatedBy').text('');
             $('#LBCreationDate').text('');
             $('#LBLastModifiedBy').text('');

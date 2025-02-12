@@ -42,14 +42,24 @@ label.error {
     padding:5px 5px 5px 5px;
     background-repeat: no-repeat;
     background-position: 10px center;
-    color: #D8000C;
+    color: black;
     text-shadow: none;
 }
 
 .backgroundError {
-    background-color: #ffdddd;
-    border-color: #ffdddd;
-    background-image:none;
+    color: black;
+    text-shadow: none;
+    background-color: orangered;
+    border-color: orangered;
+    background-image: none;
+}
+
+.backgroundInfo {
+    color: black;
+    text-shadow: none;
+    background-color: lawngreen;
+    border-color: lawngreen;
+    background-image: none;
 }
 
 .backgroundNormal {

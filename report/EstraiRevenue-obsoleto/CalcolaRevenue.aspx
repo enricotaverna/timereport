@@ -72,7 +72,7 @@
                     </div>
 
                     <div class="buttons">
-                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <div id="valMsg" class="parsley-single-error"></div>
                         <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: EXEC_TXT %>" CssClass="orangebutton" CommandName="Exec" OnClick="sottometti_Click" />
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.history.back(1);return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                     </div>

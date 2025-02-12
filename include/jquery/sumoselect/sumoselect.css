@@ -1,7 +1,7 @@
 .SumoSelect p {margin: 0;}
-/*.SumoSelect{width: 200px;} originale */
+.SumoSelect{width: 270px;} 
 .SumoSelect {
-    width: inherit;
+/*    width: inherit;*/
     line-height: 20px;
     
 }  /* adatta dimensioni del select */

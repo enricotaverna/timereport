@@ -252,4 +252,7 @@
   <data name="messaggioNonEsisteProgetto" xml:space="preserve">
     <value>No WBS are found on this day</value>
   </data>
+  <data name="DDLprogetto.testo" xml:space="preserve">
+    <value>-- select a project --</value>
+  </data>
 </root>

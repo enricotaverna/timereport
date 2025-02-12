@@ -25,9 +25,55 @@ function triggeFileExport(filename) {
     $('#exportLink')[0].click();
 }
 
+// dialogo con richiesta scelta utente
+function ConfirmDialog(title, message, testoTasto, callback) {
+
+    // se non c'è la div mask la aggiunge
+    if (document.getElementById("dialog-confirm") == null) {
+        var stringToAppend = "<div id='dialog-confirm' title='" + title + "'>" +
+            "<p>" + message + "</p></div>";
+
+        $("body").append(stringToAppend);
+    }
+
+    $('#dialog-confirm').dialog({
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: [
+            {
+                text: testoTasto,
+                "class": 'orangebutton',
+                click: function () {
+                    UnMaskScreen();
+                    $(this).dialog("close");
+                    if (typeof callback === "function") 
+                        callback(true);                    
+                }
+            },
+            {
+                text: "Annulla",
+                "class": 'greybutton',
+                /*"class": 'cancelButtonClass',*/
+                click: function () {                    
+                    $(this).dialog("close");
+                    if (typeof callback === "function")
+                        callback(false);     
+                }
+            }
+        ],
+        open: function () {
+             $('.ui-widget-overlay').addClass('custom-overlay');
+        },          
+        close: function () {
+            $(this).dialog("close");
+        }
+    });
+}
+
 // ** NB: deve essere aggiunto un DIV dialog nel corpo HTML
 function ShowPopup(message, url, titleBox) {
-    $(function () {
 
         if (titleBox == null)
             titleBox = "Messaggio";
@@ -37,21 +83,26 @@ function ShowPopup(message, url, titleBox) {
             $("body").append("<div id='dialog'></div>");
 
         $("#dialog").html(message);
+
         $("#dialog").dialog({
             title: titleBox,
-            classes: {
-                "ui-dialog": "dialogMessage"
-            },
-            buttons: {
+            //classes: {
+            //    "ui-dialog": "dialogMessage"
+            //},
+            modal: true,
+            buttons:
+            {
                 Close: function () {
                     $(this).dialog('close');
-                    if (url != undefined && url != '')
+;
+                    if (url != undefined && url != '' )
                         window.location.href = url;
                 }
             },
-            modal: true
+            open: function () {
+                $('.ui-widget-overlay').addClass('custom-overlay');
+            },          
         });
-    });
 };
 
 //custom formatter definition
@@ -87,52 +138,33 @@ function openDialogForm(ModalForm) {
 
 // Maschera lo schermo con una effetto Fade
 // wait true -> cursone di attesa
-function MaskScreen(wait) {
+function MaskScreen(wait=true) {
 
     // se non c'è la div mask la aggiunge
-    if (document.getElementById("mask") == null)
+    if (document.getElementById("mask") == null) {
         $("body").append("<div id='mask'></div>");
+    }
 
-    //Get the screen height and width
-    var maskHeight = $(document).height();
-    var maskWidth = $(window).width();
+    // Mostra la maschera e lo spinner
+    $("#mask").show();
 
-    //Set heigth and width to mask to fill up the whole screen
-    $("#mask").css({ 'width': maskWidth, 'height': maskHeight });
-
-    //transition effect		
-    //$('#mask').fadeIn(200);
-    $("#mask").fadeTo("fast", 0.5);
-
-    if (wait)
-        document.body.style.cursor = 'wait';
+    // se non c'è la div spinner la aggiunge
+    if (wait) {
+        if (document.getElementById("spinner") == null ) 
+            $("body").append("<div id='spinner'><div class='spinner'></div></div>");
+        $("#spinner").show();
+    }
 
 }
 
 // Riporta lo schermo alla normalità//
 function UnMaskScreen() {
 
-    //Get the screen height and width
-    var maskHeight = $(document).height();
-    var maskWidth = $(window).width();
-
-    //Set heigth and width to mask to fill up the whole screen
-    $("#mask").css({ 'width': 0, 'height': 0 });
-
-    //transition effect		
-    $("#mask").fadeTo("fast", 0);
+    // Nasconde la maschera e lo spinner
+    $("#mask").hide();
+    $("#spinner").hide();
 
     document.body.style.cursor = 'default';
-
-    //// Crea un evento del mouse "fake"
-    //let event = new MouseEvent('mousemove', {
-    //    'view': window,
-    //    'bubbles': true,
-    //    'cancelable': true
-    //});
-
-    //// Simula l'evento del mouse
-    //document.body.dispatchEvent(event);
 
 }
 
@@ -151,6 +183,7 @@ function stopPostbackWithEnter() {
     });
 
 }
+
 // include Html Menu
 function includeHTML() {
     var z, i, elmnt, file, xhttp;
@@ -205,4 +238,39 @@ function downloadExcel(jsonRawData, sheetName, fileName) {
 
 }
 
+function isNullOrEmpty(value) {
+    return value === null || value === undefined || value.trim() === "";
+}
 
+function isNullOrZero(value) {
+    return value === null || value === 0;
+}
+
+// verifica che codice progetto non esista già
+function CheckCodiceUnico(value, requirement) {
+
+    var response = false;
+    var dataAjax = "{ sKey: 'ProjectCode', " +
+        " sValkey: '" + value + "', " +
+        " sTable: 'Projects'  }";
+
+    $.ajax({
+        url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
+        data: dataAjax,
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        type: 'post',
+        async: false,
+        success: function (data) {
+            if (data.d == true) // esiste, quindi errore
+                response = false;
+            else
+                response = true;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+    return response;
+}

@@ -19,9 +19,14 @@ public partial class Esporta : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
-        // se non ADMIN o MANAGER spegne il tasto Chargeable
+        // se non ADMIN o MANAGER spegne il tasto Chargeable e selezioni per società/cliente/manager
         if (!Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
+        {
             btChargeable.Visible = false;
+            DivManager.Visible = false;
+            DivCliente.Visible = false;
+            DivSocieta.Visible = false;
+        }
 
         // inizializza bottoni toggle e DDL Persone e Progetti
         if (!IsPostBack)
@@ -263,11 +268,11 @@ public partial class Esporta : System.Web.UI.Page
         switch (RBTipoExport.SelectedValue)
         {
             case "1":
-                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode from v_ore where " + sWhereClause);
+                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_ore where " + sWhereClause);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
             case "2":
-                Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode from v_spese where " + sWhereClause);
+                Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_spese where " + sWhereClause);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
                 //case "3":

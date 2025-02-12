@@ -75,7 +75,7 @@ $(document).ready(function () {
                 var selectOption = $(document.createElement('option'));
                 $('#Spese_Id').append(selectOption.val(ddl2[i].SpeseId).html(ddl2[i].SpeseName));
             }
-                    $("#Spese_Id").val($("#Spese_Id option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
+            $("#Spese_Id").val($("#Spese_Id option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
         },
         error: function (xhr, textStatus, errorThrown) {
             alert(xhr.responseText);
@@ -94,8 +94,9 @@ $(document).ready(function () {
             var ddl2 = (response.d == undefined) ? response : response.d; // compatibilità ASP.NET 2.0
             for (var i = 0; i < ddl2.length; i++) {
                 var selectOption = $(document.createElement('option'));
-                $('#SpeseOpportunityId').append(selectOption.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));
-                $('#OpportunityId').append(selectOption.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));                
+                var selectOption2 = $(document.createElement('option'));
+                $('#OpportunityId').append(selectOption.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));
+                $('#SpeseOpportunityId').append(selectOption2.val(ddl2[i].OpportunityId).html(ddl2[i].OpportunityName));
             }
             $("#SpeseOpportunityId").val($("#SpeseOpportunityId option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
             $("#OpportunityId").val($("#OpportunityId option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
@@ -124,11 +125,11 @@ $(document).ready(function () {
                 if (ddl3.length > 0) {
                     for (var i = 0; i < ddl3.length; i++) {
                         var selectOption = $(document.createElement('option'));
-                        $('#ore_Location_Id').append(selectOption.val(ddl3[i].LocationKey).html(ddl3[i].LocationDescription));
+                        $('#ore_Location_Id').append(selectOption.val(ddl3[i].LocationType + ":" + ddl3[i].LocationKey).html(ddl3[i].LocationDescription));
                         // imposta attribbuto custom
-                        $('#ore_Location_Id').eq(i).attr("data-LocationType", ddl3[i].LocationType)
+                        //$('#ore_Location_Id').eq(i).attr("data-LocationType", ddl3[i].LocationType)
                     }
-                            $('#ore_Location_Id').append(selectOption.val("T:99999").html("--- testo libero ---"));
+                    $('#ore_Location_Id').append(selectOption.val("T:99999").html("--- testo libero ---"));
                     $("#ore_Location_Id").val($("#ore_Location_Id option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
                     $('#DDLLocation').show();
                 }
@@ -163,7 +164,7 @@ $(document).ready(function () {
                         var selectOption = $(document.createElement('option'));
                         $('#ore_Activity_Id').append(selectOption.val(ddl3[i].ActivityId).html(ddl3[i].ActivityName));
                     }
-                            $("#ore_Activity_Id").val($("#ore_Activity_Id option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
+                    $("#ore_Activity_Id").val($("#ore_Activity_Id option:first-child").val()).selectmenu().selectmenu('refresh', true); // default
                     $('#DDLActivity').show();
                 }
                 else
@@ -213,7 +214,7 @@ $(document).ready(function () {
 
         $('#DDLActivity').hide();
     }
-    
+
     //#region *** VALIDAZIONI ***
     var ErrMsg = "";
     $.validator.addMethod(
@@ -348,9 +349,9 @@ $(document).ready(function () {
         // messaggio di ritorno
         function () { return ErrMsg });
 
-    $.validator.addMethod("numberRegex", function (value, element) {
-        return /^[0-9,]+$/i.test(value);
-    }, "campo deve essere numerico");
+    //$.validator.addMethod("numberRegex", function (value, element) {
+    //    return /^[0-9,]+$/i.test(value);
+    //}, "campo deve essere numerico");
 
     $.validator.addMethod("opportunityRegex", function (value, element) {
         return /^AV\d{2}[A-Z]\d{3,4}$|^AP\w{1,13}$/.test(value);
@@ -360,7 +361,7 @@ $(document).ready(function () {
     var speseValidator = $("#SpeseForm").validate({
         rules: {
             Tbdate: { required: true, date: false },
-            TbExpenseAmount: { required: true, numberRegex: true },
+            TbExpenseAmount: { required: true, number: true },
             //fileToUpload: {required: false, extension: "gif|jpg|png|jpeg"  }
             comment: { CampoNoteObbligatorio: true },  // validatore custom obbligatorietà campo note
             Projects_Id: { BloccoCaricoSpese: true },
@@ -368,7 +369,7 @@ $(document).ready(function () {
         },
         messages: {
             Tbdate: { required: "Inserire un valore!" },
-            TbExpenseAmount: { required: "Inserire un valore!", numberRegex: "Campo numerico!" }
+            TbExpenseAmount: { required: "Inserire un valore!", number: "Campo numerico!" }
             //fileToUpload: {extension: "Selezionare un formato file valido" }
         },
         submitHandler: function () {
@@ -400,13 +401,13 @@ $(document).ready(function () {
             TbdateForHours: { required: true, date: false },
             TbHours: { required: true, number: true },
             ore_comment: { CampoNoteObbligatorioFormOre: true },  // validatore custom obbligatorietà campo note
-            TBLocation: { required: true, CheckLocation: true },
-            OpportunityId: { required: true, opportunityRegex: true }, 
+            TBLocation: { required: true },
+            OpportunityId: { required: true, opportunityRegex: true },
         },
         messages: {
             TbdateForHours: { required: "Inserire un valore!" },
             TbHours: { required: "Inserire un valore!", number: "Campo numerico!" },
-            TBLocation: { CheckLocation: "Inserire un valore!" },
+            TBLocation: { required: "Inserire un valore!" },
         },
         submitHandler: function () {
             OreAjaxSubmit();
@@ -441,7 +442,7 @@ $(document).ready(function () {
         if ($('#ore_Projects_Id').val() != "0") {
             PopulateActivity($('#ore_Projects_Id').val());
             PopulateLocation($('#ore_Projects_Id').val());
-            ShowOpportunityId($('#ore_Projects_Id').val(), "ore");            
+            ShowOpportunityId($('#ore_Projects_Id').val(), "ore");
         }
     });
 
@@ -489,20 +490,26 @@ $(document).ready(function () {
 
     function SpeseSubmit() {
 
-        var values = "{'Tbdate': '" + $('#Tbdate').val() + "'" +
-            ", 'TbExpenseAmount': '" + $('#TbExpenseAmount').val() + "'" +
-            ", 'Person_id': '" + persons_id + "'" +
-            ", 'UserName': '" + $('#UserName').val() + "'" +
-            " , 'Projects_Id': '" + $('#Projects_Id').val() + "'" +
+        // trasformo data da YYYY-MM-DD a DD/MM/YYYY
+        var dateParts = $('#Tbdate').val().split("-");
+        var dateFormatted = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+
+        var values = "{ 'Expenses_Id' : 0 " +
+            " , 'Date': '" + dateFormatted + "'" +
+            " , 'ExpenseAmount': '" + $('#TbExpenseAmount').val() + "'" +
+            " , 'Person_Id': '" + persons_id + "'" +
+            " , 'Project_Id': '" + $('#Projects_Id').val() + "'" +
             " , 'ExpenseType_Id': '" + $('#Spese_Id').val() + "'" +
-            " , 'comment': '" + $('#comment').val() + "'" +
+            " , 'Comment': '" + $('#comment').val() + "'" +
             " , 'CreditCardPayed': '" + $('#CreditCardPayed').is(':checked') + "'" +
             " , 'CompanyPayed': '" + $('#CompanyPayed').is(':checked') + "'" +
             " , 'CancelFlag': '" + $('#CancelFlag').is(':checked') + "'" +
             " , 'InvoiceFlag': '" + $('#InvoiceFlag').is(':checked') + "'" +
             " , 'strFileName': '" + strFileName + "'" +
             " , 'strFileData': '" + strFileData + "'" +
-            " , 'OpportunityId': '" + $('#SpeseOpportunityId').val() + "'" +
+            " , 'OpportunityId': '" + ($('#SpeseOpportunityId').is(':visible') ? $('#SpeseOpportunityId').val() : '') + "'" +
+            " , 'AccountingDate': '' " +
+            " , 'UserId': ''" +
             "}";
 
         $.mobile.showPageLoadingMsg("a", "Caricamento... ", true);
@@ -529,12 +536,19 @@ $(document).ready(function () {
             },
 
             type: "POST",
-            url: "aggiornav2.asmx/salvaspese",
+            url: "/timereport/webservices/WS_DBUpdates.asmx/SaveExpenses",
             data: values,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
+            success: function (response) {
+                var result = response.d;
+                if (result.Success)
+                    SpeseSucceeded(msg);
+                else
+                    alert("Errore in aggiornamento");
+            },
             success: function (msg) {
-                SpeseSucceeded(msg);
+                SpeseAjaxSucceeded(msg);
             },
             error: function (xhr, textStatus, errorThrown) {
                 alert(xhr.responseText);
@@ -545,41 +559,37 @@ $(document).ready(function () {
 
     function OreAjaxSubmit() {
 
-        var Activity;
-        var LocationKey;
-        var LocationDescription;
-        var LocationType;
+        // formattazione valori
+        var Activity = ($('#ore_Activity_Id').val() == null || $('#ore_Activity_Id').val() == '') ? 0 : $('#ore_Activity_Id').val();
+        //var Opportunity = ($('#OpportunityId').val() == null || $('#OpportunityId').val() == '') ? "" : $('#OpportunityId').val();
 
-        if ($('#ore_Activity_Id').val() == null)
-            Activity = "0";
-        else
-            Activity = $('#ore_Activity_Id').val();
+        var LocationKey = $('#ore_Location_Id').is(':hidden') ? "T:99999" : $('#ore_Location_Id').val();
+        var LocationDescription = $('#ore_Location_Id').is(':hidden') ? $('#TBLocation').val() : $('#ore_Location_Id option:selected').text();
 
-        // imposta tipo location in base al controllo valorizzato
-        LocationKey = $('#ore_Location_Id').is(':hidden') ? "99999" : $('#ore_Location_Id').val();
-        LocationDescription = $('#ore_Location_Id').is(':hidden') ? $('#TBLocation').val() : $('#ore_Location_Id option:selected').text();
-        LocationType = $('#ore_Location_Id').is(':hidden') ? "T" : $('#ore_Location_Id').attr("data-LocationType")
+        // trasformo data da YYYY-MM-DD a DD/MM/YYYY
+        var dateParts = $('#ore_TbdateForHours').val().split("-");
+        var dateFormatted = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
 
         // tipo ora sempre defaultato a 1
-        var values = "{'TbdateForHours': '" + $('#ore_TbdateForHours').val() + "'" +
-            ", 'TbHours': '" + $('#ore_TbHours').val() + "'" +
-            ", 'Person_id': '" + persons_id + "'" +
-            " , 'Projects_Id': '" + $('#ore_Projects_Id').val() + "'" +
+        var values = "{ 'Hours_Id': 0 " +
+            " , 'Date': '" + dateFormatted + "'" +
+            " , 'Hours': '" + $('#ore_TbHours').val() + "'" +
+            " , 'Person_Id': '" + persons_id + "'" +
+            " , 'Project_Id': '" + $('#ore_Projects_Id').val() + "'" +
             " , 'Activity_Id': '" + Activity + "'" +
-            " , 'HourType_Id': '1'" +
-            " , 'comment': '" + $('#ore_comment').val() + "'" +
+            " , 'Comment': '" + $('#ore_comment').val() + "'" +
             " , 'CancelFlag': '" + $('#ore_CancelFlag').is(':checked') + "'" +
             " , 'LocationKey': '" + LocationKey + "'" +
-            " , 'LocationType': '" + LocationType + "'" +
             " , 'LocationDescription': '" + LocationDescription + "'" +
-            " , 'OpportunityId': '" + $('#OpportunityId').val() + "'" +
-            "}";
+            " , 'OpportunityId': '" + ($('#OpportunityId').is(':visible') ? $('#OpportunityId').val() : '') + "'" +
+            " , 'AccountingDate': '' " +
+            " , 'SalesforceTaskID': ''}";
 
         $.mobile.showPageLoadingMsg("c", "Aggiornamento", true);
 
         $.ajax({
             type: "POST",
-            url: "aggiornav2.asmx/salvaore",
+            url: "/timereport/webservices/WS_DBUpdates.asmx/SaveHours",
             data: values,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -630,49 +640,58 @@ $(document).on('change', '#fileToUpload', function () {
 //#region *** FUNZIONI  ***
 function ResetHeaderPage(sForm) {
 
-    if (sForm == "ore") 
+    if (sForm == "ore")
         $('#oreToptitle').text('Inserisci spese');
-     else 
+    else
         $('#speseToptitle').text('Inserisci spese');
 
-    $('.backgroundError').removeClass('backgroundError');    
+    $('.backgroundError').removeClass('backgroundError');
 
 }
 
-function SpeseSucceeded(msg) {
+function SpeseAjaxSucceeded(msg) {
 
     // pulisci campi modulo
     init_spese();
 
-    //$.mobile.hidePageLoadingMsg();
+    $.mobile.hidePageLoadingMsg();
 
     // chiamata con successo analizza risposta
-    if (msg == "true" || msg.d == "true") {
-
-        $.mobile.showPageLoadingMsg("a", "Aggiornamento Effettuato", true);
-        setTimeout(function () { $.mobile.hidePageLoadingMsg() }, 600);
-    }
-    else {
-        alert('Errore in aggiornamento: ' + msg); // errore
-    }
+    if (msg.d.Success)
+        BannerMessage('#speseToptitle', 'Aggiornamento Effettuato', 'Inserisci Spese', 'info');
+    else
+        BannerMessage('#speseToptitle', 'Errore in aggiornamento', 'Inserisci Spese', 'error');
 }
 
 function OreAjaxSucceeded(msg) {
 
     init_ore();
-
     $.mobile.hidePageLoadingMsg();
 
     // chiamata con successo analizza risposta
-    if (msg == "true" || msg.d == "true") {
-        $('#oreToptitle').html('Aggiornamento Effettuato');
-        $("#oreToptitle").fadeOut(1000, function () {
-            $(this).text("Inserisci Ore")
+    if (msg.d == true)
+        BannerMessage('#oreToptitle', 'Aggiornamento Effettuato', 'Inserisci Ore', 'info');
+    else
+        aBannerMessage('#oreToptitle', 'Errore in aggiornamento', 'Inserisci Spese', 'error');
+}
+
+function BannerMessage(control, messageIn, messageOut, type) {
+
+    $(control).html(messageIn);
+
+    if (type == "error")
+        $("div[data-role='header']").addClass('backgroundError');
+    else
+        $("div[data-role='header']").addClass('backgroundInfo');
+
+    setTimeout(function () {
+        $(control).fadeOut(100, function () {
+            $('.backgroundError').removeClass('backgroundError');
+            $('.backgroundInfo').removeClass('backgroundInfo');
+            $(this).text(messageOut)
         }).fadeIn();
-    }
-    else {
-        alert('Errore in aggiornamento: ' + msg); // errore
-    }
+    }, 1000); // Ritarda di 1 secondo
+
 }
 
 // *** inizializza i campi ***

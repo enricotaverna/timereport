@@ -99,7 +99,7 @@
 
 
                         <div class="buttons">
-                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                            <div id="valMsg" class="parsley-single-error"></div>
                             <asp:Button ID="btnSalvaModale" runat="server" CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>" CssClass="orangebutton" />
                             <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />
                         </div>

@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Web.Configuration;
 using System.Globalization;
-using System.Activities.Expressions;
 using System.Web;
+using System.Web.Configuration;
 
 /// <summary>
 /// Descrizione di riepilogo per TRSession
@@ -76,7 +75,8 @@ public class TRSession
     public string SalesforceAccount;
     public CultureInfo defaultCulture;
 
-    public TRSession(int inputPersons_id){
+    public TRSession(int inputPersons_id)
+    {
         Persons_id = inputPersons_id;
 
         LoadLocationList();
@@ -102,9 +102,9 @@ public class TRSession
     {
         if (ForcedAccount)
         {
+            LoadProgettiForzati(Persons_id);
             //** A.1 Carica progetti possibili
             // 04/10/24 filtra progetti con data fine > data cutoff
-            dtProgettiForzati = Database.GetData("SELECT DISTINCT v_Projects.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType,ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM ForcedAccounts RIGHT JOIN v_Projects ON ForcedAccounts.Projects_id = v_Projects.Projects_Id WHERE ( ( ForcedAccounts.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR v_Projects.Always_available = 1 ) AND v_Projects.active = 1 AND v_Projects.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " )  ORDER BY v_Projects.ProjectCode", null);
 
             //** A.2 Carica spese possibili				
             //** A.2.1 Prima verifica se il cliente ha un profilo di spesa	
@@ -121,8 +121,36 @@ public class TRSession
         }
 
         //  tutti i progetti, anche inattivi
-        dtProgettiTutti = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects ORDER BY ProjectCode", null);
+        dtProgettiTutti = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id, active  FROM v_Projects ORDER BY ProjectCode", null);
         dtSpeseTutte = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType ORDER BY ExpenseCode", null);
+    }
+
+    public void LoadProgettiForzati(int Persons_id)
+    {
+        if (!ForcedAccount)
+            return;
+
+        string dataOggiDb = ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
+
+        dtProgettiForzati = Database.GetData(
+        "SELECT DISTINCT PV.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id " +
+        "FROM ForcedAccounts AS FA " +
+        "RIGHT JOIN v_Projects AS PV ON FA.Projects_id = PV.Projects_Id " +
+        "WHERE " +
+        "( " +
+            // progetti della persona o sempre disponibili
+            "( FA.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR PV.Always_available = 1 ) " +
+            "AND " +
+            // progetti attivi e con data fine > data cutoff
+            "( PV.active = 1 AND PV.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + ") " +
+            "AND " +
+            // progetto senza budget o con budget disponibile
+            "(" +
+                "( FA.DaysBudget IS NULL OR FA.DaysBudget = 0  ) OR " +
+                "( FA.DataDa <= " + dataOggiDb + " AND FA.DataA >= " + dataOggiDb + " AND FA.DaysBudget > FA.DaysActual ) " +
+            ") " +
+        ")  " +
+        "ORDER BY PV.ProjectCode", null);
     }
 
     public void LoadLocationList()
@@ -193,7 +221,8 @@ public class TRSession
 
         // colore background
         string BkgImg = Utilities.GetCookie("background-image");
-        if (BkgImg != "") {
+        if (BkgImg != "")
+        {
             BackgroundColor = "";
             BackgroundImage = BkgImg;
         }
@@ -244,7 +273,7 @@ public class TRSession
         catch (Exception ex)
         {
             var st = new StackTrace(ex, true);
-            var sf = st.GetFrame(st.FrameCount-1);
+            var sf = st.GetFrame(st.FrameCount - 1);
             string ErrorLine = clsUtility.NullToString(sf.GetFileLineNumber()).ToString();
             string MethodName = clsUtility.NullToString(sf.GetMethod().Name).ToString();
             string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
@@ -295,7 +324,7 @@ public class TRSession
                     newRec = JsonConvert.DeserializeObject<Opportunity>(AllRecord.records[i].ToString());
 
                     maxLung = newRec.OpportunityAccount.AccountName.Length > 12 ? 12 : newRec.OpportunityAccount.AccountName.Length;
-                    
+
                     // se tronca mette i puntini al nome Account
                     if (maxLung < newRec.OpportunityAccount.AccountName.Length)
                         newRec.OpportunityAccount.AccountName = newRec.OpportunityAccount.AccountName.Substring(0, maxLung) + "..";
@@ -308,7 +337,7 @@ public class TRSession
 
                     ListaAllOpportunity.Add(newRec);
 
-                    if (newRec.StageName != "Closed Won" && newRec.StageName != "Closed Lost" && newRec.StageName != "Closed Archived" &&  string.Compare(newRec.OpenDate, sAnnoPrima) == 1 )
+                    if (newRec.StageName != "Closed Won" && newRec.StageName != "Closed Lost" && newRec.StageName != "Closed Archived" && string.Compare(newRec.OpenDate, sAnnoPrima) == 1)
                         ListaOpenOpportunity.Add(newRec);
                 }
             }

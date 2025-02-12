@@ -161,22 +161,8 @@
         }
 
         function confermaCancellazione(dati, riga) {
-            $('#dialog-confirm').dialog({
-                resizable: false,
-                height: "auto",
-                width: 400,
-                modal: true,
-                buttons: {
-                    "Cancella": function () {
-                        $(this).dialog("close");
-                        cancellaRecord(dati, riga);
-                    },
-                    "Annulla": function () {
-                        $(this).dialog("close");
-                        return;
-                    }
-                }
-            });
+            // Valore tasto e funzione da eseguire se confermato
+            ConfirmDialog("Conferma la cancellazione", "Vuoi cancellare la prefattura?", "Cancella", (confirm) => confirm && (cancellaRecord(dati, riga)) );
         }
 
         function cancellaRecord(dati, riga) {

@@ -71,7 +71,7 @@
                     </asp:Table>
 
                     <div class="buttons">
-                        <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                        <div id="valMsg" class="parsley-single-error"></div>
                         <asp:Button ID="BtExec" runat="server" Text="<%$ appSettings: EDIT_TXT %>" CssClass="orangebutton" CommandName="Exec" />
                         <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" OnClientClick="JavaScript:window.location.href='/timereport/report/EstraiRevenue/SpeseImport_select.aspx';return false;" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" />
                     </div>

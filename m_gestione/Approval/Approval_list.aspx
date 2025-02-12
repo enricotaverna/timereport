@@ -130,7 +130,7 @@
                         <asp:TextBox runat="server" ID="TBApprovalRequest_id" Style="visibility: hidden" />
 
                         <div class="buttons">
-                            <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 130px"></div>
+                            <div id="valMsg" class="parsley-single-error"></div>
                             <asp:Button ID="btnApprova" runat="server" CommandName="Insert" Text="<%$ appSettings:APPROVE_TXT %>" CssClass="greenbutton" />
                             <asp:Button ID="btnRifiuta" runat="server" CommandName="Insert" Text="<%$ appSettings:REJECT_TXT %>" CssClass="redbutton" />
                             <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />

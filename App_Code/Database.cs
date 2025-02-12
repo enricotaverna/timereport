@@ -1,13 +1,10 @@
-﻿using Amazon.EC2.Model.Internal.MarshallTransformations;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Web.UI;
 
@@ -15,7 +12,7 @@ public class Database
 {
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static object ExecuteScalar(string cmdText, Page mypage)
+    public static object ExecuteScalar(string cmdText, Page mypage = null)
     {
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
         object oRet;
@@ -34,7 +31,7 @@ public class Database
                 {
                     if (!(mypage == null))
                         mypage.ClientScript.RegisterStartupScript(mypage.GetType(), "MessageBox", "alert('ERRORE ExecuteScalar: " + ex.Message + "');", true);
-                    oRet = 0;
+                    oRet = null;
                 }
             }
         }
@@ -43,7 +40,7 @@ public class Database
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static bool ExecuteSQL(string cmdText, Page mypage)
+    public static bool ExecuteSQL(string cmdText, Page mypage = null)
     {
         string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
 
@@ -74,7 +71,7 @@ public class Database
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static bool RecordEsiste(string cmdText, Page mypage)
+    public static bool RecordEsiste(string cmdText, Page mypage = null)
     {
         // 02-09-2018 FUNZIONE MIGRATA
         bool result = false;
@@ -108,7 +105,7 @@ public class Database
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static DataTable GetData(string cmdText, Page mypage)
+    public static DataTable GetData(string cmdText, Page mypage = null)
     {
         DataTable dt = new DataTable();
 
@@ -138,7 +135,7 @@ public class Database
     }
 
     // 02-09-2018 FUNZIONE MIGRATA
-    public static DataRow GetRow(string cmdText, Page mypage)
+    public static DataRow GetRow(string cmdText, Page mypage = null)
     {
         DataTable dtTable = Database.GetData(cmdText, mypage);
         DataRow drRet;
@@ -207,7 +204,8 @@ public class Database
     }
 
     // 01.2023 : torna query in formato Json
-    public static string FromSQLSelectToJson(string query) {
+    public static string FromSQLSelectToJson(string query)
+    {
         string JsonString;
 
         DataTable dt = new DataTable();
