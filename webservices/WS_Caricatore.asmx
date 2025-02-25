@@ -121,7 +121,8 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("TestoObbligatorio", "boolean", "false" ),
                                            new Record("BloccoCaricoSpese", "boolean", null ),
                                            new Record("ActivityOn", "boolean", null ),
-                                           new Record("Always_available", "boolean", "false" ),
+                                           //new Record("Always_available", "boolean", "false" ),  obsoleto, settato a NULL
+                                           new Record("ProjectVisibility_id", "int",  ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"]) ), // default visibilità con forzature
                                            new Record("CreationDate", "timestamp", "CreationDate" ), // gestite automaticamente
                                            new Record("CreatedBy", "author", "CreatedBy" ) // gestite automaticamente
                         };
@@ -218,7 +219,7 @@ public class WS_Caricatore : System.Web.Services.WebService
         };
 
         object recWithValues = null;
-        int CopiaConsulentiDa_id = 0; // id progetto da cui copiare le forzature consulenti
+        int CopiaConsulentiDa_id = 0; // id progetto da cui copiare le autorizzazioni consulenti
 
         // aggiorna dati TR con valori di SF
         for ( int i = 0; i < arr.Length; i++ )
@@ -280,14 +281,14 @@ public class WS_Caricatore : System.Web.Services.WebService
             SQLInsert = SQLInsert.Substring(0, SQLInsert.Length - 1) + ")";
             ret = Database.ExecuteSQL(SQLInsert, null);
 
-            // memoriza il codice progetto per forzature consulenti da usare dopo l'insert del progetto
+            // memoriza il codice progetto per autorizzazioni consulenti da usare dopo l'insert del progetto
             CopiaConsulentiDa_id = tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues) == null ? 0 : int.Parse(tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues).ToString());
 
             // se qualcosa è andato male esce
             if (ret == false)
                 break;
 
-            // se bisogna copiare le forzature per consulente
+            // se bisogna copiare le autorizzazioni per consulente
             if (type == "PROJECT" && CopiaConsulentiDa_id != 0 ) {
 
                 // recupera il codice progetto creato
@@ -298,7 +299,7 @@ public class WS_Caricatore : System.Web.Services.WebService
                 if (obj == null)
                     return false; //errore progetto non trovato
 
-                // copia le forzature
+                // copia le autorizzazioni
                 int Project_id;
                 if (int.TryParse(obj.ToString(), out Project_id)) {
                     Database.ExecuteScalar("INSERT INTO ForcedAccounts (Persons_id, Projects_id, CreationDate, CreatedBy) SELECT Persons_id, " + ASPcompatility.FormatNumberDB(Project_id) + ", " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + "," + ASPcompatility.FormatStringDb(CurrentSession.UserId) + " FROM ForcedAccounts WHERE Projects_id = " + ASPcompatility.FormatNumberDB(CopiaConsulentiDa_id), null);

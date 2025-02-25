@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Web.UI.WebControls;
 
@@ -24,6 +25,12 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             {
                 FVProgetto.ChangeMode(FormViewMode.Edit);
                 FVProgetto.DefaultMode = FormViewMode.Edit;
+            }
+            else
+            {
+                // Set default value for DDLVisibility
+                DropDownList ddlVisibility = (DropDownList)FVProgetto.FindControl("DDLVisibility");
+                ddlVisibility.SelectedValue = ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"];
             }
         }
     }

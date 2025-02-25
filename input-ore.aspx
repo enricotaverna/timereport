@@ -71,7 +71,6 @@
                             </div>
 
                             <!-- *** DDL Progetto ***  -->
-                            <!-- messaggio parsley di errore disabilitato dropdown-->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
                                 <!-- per stile CSS -->
@@ -94,51 +93,39 @@
 
                             <!-- *** DDL Opportunità ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <div style="position: absolute">
-                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;"></asp:Label>
                                 <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
-                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                    data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                                </div>                               
-                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
-                                <div style="position: absolute">
-                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"  meta:resourcekey="Label2" ></asp:Label>
-                                <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo" meta:resourcekey="Label2"></asp:Label>
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"  Width="270px"
                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                     <asp:ListItem>-- seleziona valore --</asp:ListItem>
                                 </asp:DropDownList>
                                 <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server" Width="270px" Text='<%# Bind("LocationDescription") %>'
                                     data-parsley-errors-container="#valMsg" data-parsley-required="true" />
-                                </div>
-                                <br />
                             </div>
 
                             <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
                             <asp:DropDownList ID="DDLhidden" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
                             <asp:DropDownList ID="DDLHiddenLocation" runat="server" AppendDataBoundItems="True" Enabled="True"></asp:DropDownList>
 
-
                             <!-- *** TB Ore ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
                                 <span class="input2col">
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1"
+                                    <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1"
                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
 
-                                <!-- *** Checkboc Remote ***  -->
-                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
-
                                 <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
-                                <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
+                                <asp:Label ID="CancelFlagLabel" AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
                             </div>
 
@@ -146,10 +133,10 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376"  AutoPostBack="false"
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376" AutoPostBack="false"
                                     meta:resourcekey="DDLTaskName1" data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh"  OnClick="btnRefresh_Click"/>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" OnClick="btnRefresh_Click" />
                             </div>
 
                             <!-- *** TB Comment ***  -->
@@ -213,21 +200,18 @@
 
                             <!-- *** DDL Opportunity ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <div style="position:absolute">
-                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True" 
-                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
+                                    data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                                </div>
-                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
-                                <asp:Label CssClass="inputtext" ID="Label2" runat="server"  Text="Luogo"  meta:resourcekey="Label2"></asp:Label>
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo" meta:resourcekey="Label2"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True"  Width="270px"
                                     data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
                                 <asp:TextBox CssClass="ASPInputcontent" ID="TBLocation" runat="server" Width="270px"
@@ -242,17 +226,13 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
                                 <span class="input2col">
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" AutoPostBack="false" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
+                                    <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" AutoPostBack="false" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
 
-                                <!-- *** Checkboc Remote ***  -->
-                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
-
                                 <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="CancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource2" />
-                                <asp:Label AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
+                                <asp:Label ID="CancelFlagLabel" AssociatedControlID="CancelFlagCheckBox" runat="server" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
                             </div>
 
@@ -260,10 +240,10 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376px"  AutoPostBack="false"
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376px" AutoPostBack="false"
                                     meta:resourcekey="DDLTaskName2" data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" OnClick="btnRefresh_Click"/>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" OnClick="btnRefresh_Click" />
                             </div>
 
                             <!-- *** TB Comment ***  -->
@@ -318,30 +298,25 @@
                             <div class="input nobottomborder" id="lbDDLAttivita">
                                 <asp:Label CssClass="inputtext" ID="Label8" runat="server" Text="Attività" meta:resourcekey="Label8Resource1"></asp:Label>
                                 <asp:DropDownList ID="DDLAttivita" runat="server" AppendDataBoundItems="True"
-                                    Enabled="False"  meta:resourcekey="DDLAttivitaResource3">
+                                    Enabled="False" meta:resourcekey="DDLAttivitaResource3">
                                 </asp:DropDownList>
                             </div>
 
                             <!-- *** DDL Opportunità ***  -->
                             <div class="input nobottomborder" id="lbOpportunityId">
-                                <div style="position: absolute">
-                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
+                                <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;"></asp:Label>
                                 <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
-                                     Enabled="False">
+                                    Enabled="False">
                                 </asp:DropDownList>
-                                </div>                               
-                                <br />
                             </div>
 
                             <!-- *** DDL Location ***  -->
                             <div class="input" id="lbDDLLocation">
-                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo"  meta:resourcekey="Label2"></asp:Label>
-                                <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" Enabled="False">
+                                <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Luogo" meta:resourcekey="Label2"></asp:Label>
+                                <asp:DropDownList ID="DDLLocation" runat="server" AppendDataBoundItems="True" Enabled="False">   
                                 </asp:DropDownList>
                                 <asp:TextBox CssClass="ASPInputcontent" Enabled="False" ID="TBLocation" runat="server" Width="270px" Text='<%# Bind("LocationDescription") %>' />
-
                             </div>
 
                             <!-- *** usato per portare i valori della select sul cliente per poi filtrarli con jquery ***  -->
@@ -352,16 +327,12 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource3"></asp:Label>
                                 <span class="input2col">
-                                    <asp:TextBox CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
+                                    <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
                                 </span>
-
-                                <!-- *** Checkboc Remote ***  -->
-                                <%--                            <asp:CheckBox ID="CBWorkedInRemote" runat="server" Checked='<%# Bind("WorkedInRemote") %>'  />
-                            <asp:Label AssociatedControlID="CBWorkedInRemote" style="padding-right:20px" runat="server" Text="Remoto" meta:resourcekey="CBWorkedInRemote"></asp:Label>--%>
 
                                 <!-- *** Checkboc Storno ***  -->
                                 <asp:CheckBox ID="disCancelFlagCheckBox" runat="server" Checked='<%# Bind("CancelFlag") %>' meta:resourcekey="CancelFlagCheckBoxResource1" />
-                                <asp:Label runat="server" AssociatedControlID="disCancelFlagCheckBox" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
+                                <asp:Label ID="CancelFlagLabel" runat="server" AssociatedControlID="disCancelFlagCheckBox" Text="Storno" meta:resourcekey="Label5Resource1"></asp:Label>
 
                             </div>
 
@@ -369,10 +340,10 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="lblTaskName" runat="server" Text="Task Name"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376"  AutoPostBack="false"
+                                <asp:DropDownList ID="DDLTaskName" runat="server" AppendDataBoundItems="True" Width="376" AutoPostBack="false"
                                     meta:resourcekey="DDLTaskName3" data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh"/>
+                                <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" />
                             </div>
 
                             <div class="input nobottomborder">
@@ -451,7 +422,7 @@
             $('#FVore_DDLLocation').hide();
 
             $('#FVore_TBLocation').hide(); // nasconde il box di testo della Location
-            
+
             $('#FVore_DDLTaskName').hide();
             $('#FVore_lblTaskName').hide();
             $('#FVore_btnRefresh').hide();
@@ -459,9 +430,9 @@
             //controllo se ci sono task attive cosi da riattivare il componente
             $('#FVore_DDLTaskName option').each(function () {
                 if (this.value != "") {
-                    $('#FVore_DDLTaskName').show();  
+                    $('#FVore_DDLTaskName').show();
                     $('#FVore_lblTaskName').show();
-                    $('#FVore_btnRefresh').show();           
+                    $('#FVore_btnRefresh').show();
                     return false;
                 }
             });
@@ -471,8 +442,15 @@
             BindOpportunity();
 
             // Sumo Select
+            $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
+        /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
+            $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            $('.SumoSelect > .optWrapper').css('width', '550px');
+            if ($('#FVore_DDLprogetto')[0].sumo)
+                $('#FVore_DDLprogetto')[0].sumo.optDiv.css('width', '350px'); // fa in modo che la tendina per le opportunità sia larga 550px
+            if ($('#FVore_DDLOpportunity')[0].sumo)
+                $('#FVore_DDLOpportunity')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
+
         });
 
         // Initialize Parsley
@@ -482,7 +460,8 @@
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
         window.Parsley.addValidator('testoObbligatorio', {
-            validateString: function (value) {FVore_DDLLocation
+            validateString: function (value) {
+                FVore_DDLLocation
 
                 var flagObbligatorio = $("#FVore_DDLprogetto option:selected").attr("data-desc-obbligatorio");
                 var messaggio = $("#FVore_DDLprogetto option:selected").attr("data-desc-message");
@@ -559,7 +538,7 @@
             $("#FVore_DDLLocation").children().remove(); // pulisce tutti gli item della  DropDown 
             if (typeof LocationOn == 'undefined') {  // non esiste l'attributo 
                 $("#FVore_DDLLocation").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
-                $('#FVore_DDLLocation').hide();
+                $('#FVore_DDLLocation').show();
             }
             else {
                 // aggiunge selezione vuota
@@ -577,7 +556,7 @@
 
                 $("#FVore_DDLLocation").append($('<option>', { value: 'T:99999', text: '-- Testo Libero --' }));
                 $('#FVore_DDLLocation').show(); // visualizza DropDown
-
+                
                 $('#FVore_TBLocation').val(""); // reset e spegnimento campo
                 $('#FVore_TBLocation').hide();
             }
@@ -586,8 +565,8 @@
         // Mostra box testo in caso della corrispondente selezione della DDL Location
         $("#FVore_DDLLocation").change(function () {
             if ($("#FVore_DDLLocation").val() == 'T:99999') // mostra Box Testo
-            {               
-/*                $('#FVore_DDLLocation').SumoSelect().sumo.unload();*/
+            {
+                /*                $('#FVore_DDLLocation').SumoSelect().sumo.unload();*/
                 $('#FVore_DDLLocation').hide();
                 $('#FVore_TBLocation').show();
             }
@@ -613,8 +592,8 @@
                 var IsExists = false;
                 $('#FVore_DDLprogetto option').each(function () {
                     if (this.value == projID) {
-                        IsExists = true;  
-                    }                                          
+                        IsExists = true;
+                    }
                 });
                 //controllo se esiste progetto reset
                 //NON esiste resetto le selezioni
@@ -625,10 +604,10 @@
                     } else {
                         alert("Non si \u00E8 autorizzati alla commessa " + Projects_Name + " rivolgersi al proprio responsabile per l'autorizzazione");
                     }
-                } 
+                }
                 //imposto il valore e accendo event change
                 $("#FVore_DDLprogetto").val($(this).find("option:selected").attr("data-Projects_Id")).change();
-            } 
+            }
         });
 
         $("#FVore_btnRefresh").on("click", function () {
@@ -645,31 +624,32 @@
             form.validate();
 
             // Check if the form is valid
-            if (!form.isValid()) 
+            if (!form.isValid())
                 return;
 
             // formattazione valori
             var Activity = isNullOrEmpty($('#FVore_DDLAttivita').val()) ? 0 : $('#FVore_DDLAttivita').val();
-            var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val())  ? "" : $('#FVore_DDLTaskName').val();
+            var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val()) ? "" : $('#FVore_DDLTaskName').val();
             var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
             var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
             var hoursId = '<%= String.IsNullOrEmpty(Request.QueryString["hours_id"]) ? "0" : Request.QueryString["hours_id"] %>';
+            var AccountingDate = isNullOrEmpty($('#FVore_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();
 
             // tipo ora sempre defaultato a 1
-            var values = "{ 'Hours_Id': " + hoursId + 
+            var values = "{ 'Hours_Id': " + hoursId +
                 ", 'Date': '" + $('#FVore_LBdate').text() + "'" +
-                ", 'Hours': '" + $('#FVore_HoursTextBox').val().replace(',', '.') + "'"  +
-                ", 'Person_Id': " + <%= CurrentSession.Persons_id %> + 
-                " , 'Project_Id': " + $('#FVore_DDLprogetto').val() + 
-                " , 'Activity_Id': " + Activity + 
+                ", 'Hours': '" + $('#FVore_HoursTextBox').val().replace(',', '.') + "'" +
+                ", 'Person_Id': " + <%= CurrentSession.Persons_id %> +
+                " , 'Project_Id': " + $('#FVore_DDLprogetto').val() +
+                " , 'Activity_Id': " + Activity +
                 " , 'Comment': '" + $('#FVore_TBComment').val() + "'" +
-                " , 'CancelFlag': " + $('#FVore_CancelFlagCheckBox').is(':checked')  +
+                " , 'CancelFlag': " + $('#FVore_CancelFlagCheckBox').is(':checked') +
                 " , 'LocationKey': '" + LocationKey + "'" +
                 " , 'LocationDescription': '" + LocationDescription + "'" +
                 " , 'OpportunityId': '" + ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : '') + "'" +
-                " , 'AccountingDate': '" + $('#FVore_TBAccountingDate').val() + "'" + 
+                " , 'AccountingDate': '" + AccountingDate + "'" +
                 " , 'SalesforceTaskID': '" + TaskName + "'}";
-                 
+
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WS_DBUpdates.asmx/SaveHours",
@@ -680,7 +660,7 @@
 
                     if (msg.d)
                         window.location.href = "/timereport/input.aspx";
-                        //ShowPopup("Aggiornamento effettuato");
+                    //ShowPopup("Aggiornamento effettuato");
                     else
                         ShowPopup('Errore durante aggiornamento');
                 },

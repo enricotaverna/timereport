@@ -19,12 +19,6 @@ public class WS_Projects : System.Web.Services.WebService
 
     public TRSession CurrentSession;
 
-    public class AjaxCallResult
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-    }
-
     public WS_Projects()
     {
 
@@ -40,7 +34,7 @@ public class WS_Projects : System.Web.Services.WebService
         TRSession CurrentSession = (TRSession)Session["CurrentSession"];
         AjaxCallResult result = new AjaxCallResult();
 
-        string SQLProject = " INSERT INTO Projects ( ProjectCode, Name ,ProjectType_Id,Channels_Id,Company_id ,Active ,Always_available " +
+        string SQLProject = " INSERT INTO Projects ( ProjectCode, Name ,ProjectType_Id,Channels_Id,Company_id ,Active ,ProjectVisibility_id " +
                            " ,ClientManager_id,TipoContratto_id,SpeseBudget,SpeseForfait,ImportoSpeseForfait,RevenueFatturate,SpeseFatturate " +
                            " ,Incassato,PianoFatturazione,MetodoPagamento,TerminiPagamento,CodiceCliente,Note,RevenueBudget,ActivityOn,DataInizio " +
                            " ,DataFine,MargineProposta,BudgetABAP,BudgetGGABAP,BloccoCaricoSpese,TestoObbligatorio,MessaggioDiErrore,NoOvertime,AccountManager_id " +
@@ -48,7 +42,7 @@ public class WS_Projects : System.Web.Services.WebService
                            " SELECT " +
                            ASPcompatility.FormatStringDb(ProjectCode) + " , " +
                            ASPcompatility.FormatStringDb(ProjectName) +
-                           " ,ProjectType_Id,Channels_Id,Company_id ,Active ,Always_available " +
+                           " ,ProjectType_Id,Channels_Id,Company_id ,Active ,ProjectVisibility_id " +
                            " ,ClientManager_id,TipoContratto_id,SpeseBudget,SpeseForfait,ImportoSpeseForfait,RevenueFatturate,SpeseFatturate " +
                            " ,Incassato,PianoFatturazione,MetodoPagamento,TerminiPagamento,CodiceCliente,Note,RevenueBudget,ActivityOn,DataInizio " +
                            " ,DataFine,MargineProposta,BudgetABAP,BudgetGGABAP,BloccoCaricoSpese,TestoObbligatorio,MessaggioDiErrore,NoOvertime,AccountManager_id " +
@@ -74,7 +68,7 @@ public class WS_Projects : System.Web.Services.WebService
                 if (obj == null)
                     throw new Exception("Errore in aggiornamento tabella progetti");
 
-                // se deve copiare le forzature
+                // se deve copiare le autorizzazioni
                 if (!forceFlag)
                 {
                     transaction.Commit();
@@ -82,7 +76,7 @@ public class WS_Projects : System.Web.Services.WebService
                     return (result);
                 }
 
-                // copia le forzature
+                // copia le autorizzazioni
                 int Project_id;
                 int.TryParse(obj.ToString(), out Project_id);
                 string SQLForced = " INSERT INTO ForcedAccounts (Persons_id, Projects_id, CreationDate, CreatedBy) " +

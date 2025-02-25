@@ -57,6 +57,7 @@ public class TRSession
     public List<TaskRay> ListaTask = new List<TaskRay>();
     public List<Opportunity> ListaOpenOpportunity = new List<Opportunity>();
     public List<Opportunity> ListaAllOpportunity = new List<Opportunity>();
+    public DataTable dtPersonale;
     // personal setting
     public int Persons_id;
     public int Company_id;
@@ -96,6 +97,11 @@ public class TRSession
 
         LoadSFOpportunity();
 
+        if (UserLevel == MyConstants.AUTH_ADMIN)
+        {
+            dtPersonale = new PersonaleList().BuildListFromRagicAPI();  // carica EmployeeNumber da Ragic
+        }
+
     }
 
     public void LoadProgettieSpese()
@@ -115,13 +121,13 @@ public class TRSession
         {
             //** B.1 tutti i progetti attivi con flag di obbligatorietà messaggio		
             // 04/10/24 filtra progetti con data fine > data cutoff
-            dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 AND v_Projects.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " ORDER BY ProjectCode", null);
+            dtProgettiForzati = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + ProjectName AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id  FROM v_Projects WHERE active = 1 AND v_Projects.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " ORDER BY ProjectCode", null);
             //** B.2 tutte le spese attive 							
             dtSpeseForzate = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType WHERE active = 1 ORDER BY ExpenseCode", null);
         }
 
         //  tutti i progetti, anche inattivi
-        dtProgettiTutti = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id, active  FROM v_Projects ORDER BY ProjectCode", null);
+        dtProgettiTutti = Database.GetData("SELECT DISTINCT Projects_Id, ProjectCode, ProjectCode + ' ' + ProjectName AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id, active  FROM v_Projects ORDER BY ProjectCode", null);
         dtSpeseTutte = Database.GetData("SELECT ExpenseType_Id, ExpenseCode, ExpenseCode + ' ' + left(ExpenseType.Name,20) AS descrizione, TestoObbligatorio, MessaggioDiErrore, TipoBonus_Id, AdditionalCharges, ConversionRate FROM ExpenseType ORDER BY ExpenseCode", null);
     }
 
@@ -133,13 +139,17 @@ public class TRSession
         string dataOggiDb = ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy"));
 
         dtProgettiForzati = Database.GetData(
-        "SELECT DISTINCT PV.Projects_Id, ProjectCode, ProjectCode + ' ' + left(ProjectName,20) AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id " +
+        "SELECT DISTINCT PV.Projects_Id, ProjectCode, ProjectCode + ' ' + ProjectName AS DescProgetto, TestoObbligatorio, MessaggioDiErrore, BloccoCaricoSpese, ActivityOn, WorkflowType, ProjectType_Id, CodiceCliente, ClientManager_id, AccountManager_id " +
         "FROM ForcedAccounts AS FA " +
         "RIGHT JOIN v_Projects AS PV ON FA.Projects_id = PV.Projects_Id " +
         "WHERE " +
         "( " +
             // progetti della persona o sempre disponibili
-            "( FA.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR PV.Always_available = 1 ) " +
+            "( FA.Persons_id=" + ASPcompatility.FormatNumberDB(Persons_id) + " OR " +
+            // " PV.Always_available = 1 ) " + OBSOLETO SOSTITUITO DA VISIBILITY
+            // AEO -> visibile per default ai soli consulenti Aeonvis
+            // EXT -> visibile per default ai soli consulenti Aeonvis
+            " ( PV.visibilityCode = 'ALL' OR ( PV.visibilityCode = 'AEO' AND " + Company_id + " = 1  ) OR ( PV.visibilityCode = 'EXT' AND " + Company_id + " <> 1 ) ) ) " +
             "AND " +
             // progetti attivi e con data fine > data cutoff
             "( PV.active = 1 AND PV.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + ") " +
@@ -342,7 +352,7 @@ public class TRSession
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             //* gestione errore **//
         }

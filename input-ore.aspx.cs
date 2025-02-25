@@ -387,10 +387,14 @@ public partial class input_ore : System.Web.UI.Page
         {
             Label LBAccountingDate = (Label)FVore.FindControl("LBAccountingDate");
             TextBox TBAccountingDate = (TextBox)FVore.FindControl("TBAccountingDate");
+            Label LBCancel = (Label)FVore.FindControl("CancelFlagLabel");
+            CheckBox TBCancel = (CheckBox)FVore.FindControl("CancelFlagCheckBox");
 
             // se display
             LBAccountingDate.Visible = false;
             TBAccountingDate.Visible = false;
+            LBCancel.Visible = false;
+            TBCancel.Visible = false;
 
         }
     }

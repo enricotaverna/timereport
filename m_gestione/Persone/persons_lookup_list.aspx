@@ -34,7 +34,7 @@
             sWhere = sWhere & sC1 & "Persons.Name LIKE '%' + (@TB_Nome) + '%' "
         End If
 
-        PersonsLookUpSqlDataSource.SelectCommand = "SELECT Persons.Persons_id, Persons.Name as Nome, Roles.Name as Ruolo, persons.active, company.name as NomeSocieta, Persons.Attivo_da FROM Persons INNER JOIN Roles ON Persons.Roles_id = Roles.Roles_Id INNER JOIN Company ON persons.company_id = company.company_id " & sWhere & strQueryOrdering
+        PersonsLookUpSqlDataSource.SelectCommand = "SELECT Persons.EmployeeNumber, Persons.Persons_id, Persons.Name as Nome, Roles.Name as Ruolo, persons.active, company.name as NomeSocieta, Persons.Attivo_da FROM Persons INNER JOIN Roles ON Persons.Roles_id = Roles.Roles_Id INNER JOIN Company ON persons.company_id = company.company_id " & sWhere & strQueryOrdering
 
         If Not IsPostBack And Session("GridView1PageNumber") <> Nothing Then
             ' Imposta indice di aginazione
@@ -180,6 +180,7 @@
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <Columns>
+                            <asp:BoundField DataField="EmployeeNumber" HeaderText="EN" SortExpression="EmployeeNumber" />
                             <asp:BoundField DataField="Nome" HeaderText="Nome" SortExpression="Nome" />
                             <asp:BoundField DataField="Ruolo" HeaderText="Ruolo" SortExpression="Ruolo" />
                             <asp:BoundField DataField="NomeSocieta" HeaderText="Società"
@@ -227,7 +228,7 @@
 
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DS_Persone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name,Persons.Active, Persons.Attivo_da FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        SelectCommand="SELECT DISTINCT Persons.EmployeeNumber, Persons.Persons_id, Persons.Name,Persons.Active, Persons.Attivo_da FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
         <SelectParameters>
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Web.Script.Serialization;
 
 // definisce la struttura  da ritornare con GetCourse
-public class ForcedAccount
+public class ForcedAccount 
 {
     public string ForcedAccounts_id { get; set; }
     public string Persons_id { get; set; }
@@ -53,7 +53,9 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
     public string GetForcedProjects(string persons_id)
     {
 
-        String query = "SELECT A.ForcedAccounts_id, A.Persons_id, A.Projects_id, C.Name as PersonName, CONVERT(VARCHAR(10),A.DataDa, 103) as DataDa, CONVERT(VARCHAR(10),A.DataA, 103) as DataA, A.DaysBudget, A.DaysActual, B.ProjectCode + ' ' + B.Name as ProjectName FROM ForcedAccounts as A " +
+        String query = "SELECT A.ForcedAccounts_id, A.Persons_id, A.Projects_id, C.Name as PersonName, CONVERT(VARCHAR(10),A.DataDa, 103) as DataDa, CONVERT(VARCHAR(10),A.DataA, 103) as DataA, A.DaysBudget, A.DaysActual, B.ProjectCode + ' ' + B.Name as ProjectName, " +
+                        " A.CreatedBy, A.CreationDate, A.LastModificationDate, A.LastModifiedBy " +
+                        " FROM ForcedAccounts as A " +
                         " JOIN Projects as B ON B.Projects_id = A.Projects_id " +
                         " JOIN Persons as C ON C.Persons_id = A.Persons_id " +
                         " WHERE B.active = 1 AND C.active = 1 " +
@@ -68,7 +70,9 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
     public string GetForcedExpenses(string persons_id)
     {
 
-        String query = "SELECT A.ForcedExpensesPers_id, A.Persons_id, A.ExpenseType_id, C.Name as PersonName, B.ExpenseCode + ' ' + B.Name as ExpenseTypeName FROM ForcedExpensesPers as A " +
+        String query = "SELECT A.ForcedExpensesPers_id, A.Persons_id, A.ExpenseType_id, C.Name as PersonName, B.ExpenseCode + ' ' + B.Name as ExpenseTypeName, " +
+                        " A.CreatedBy, A.CreationDate, A.LastModificationDate, A.LastModifiedBy " +
+                        " FROM ForcedExpensesPers as A " +
                         " JOIN ExpenseType as B ON B.ExpenseType_id = A.ExpenseType_id " +
                         " JOIN Persons as C ON C.Persons_id = A.Persons_id " +
                         " WHERE C.active = 1 AND B.active = 1 " +
@@ -90,36 +94,76 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
         if (ForcedAccountsTable.Length == 0)
             return true;
 
-        // Costruisci la stringa SQL per tutti i record
+        // Costruisci le stringhe SQL per tutti i record
         string sqlQueryInsert = "INSERT INTO ForcedAccounts (Persons_id, Projects_id, DataDa, DataA, DaysBudget, CreationDate, CreatedBy) VALUES ";
-        string sqlQueryDelete = "DELETE ForcedAccounts WHERE ";
-        int toDelete = 0;
+        string sqlQueryUpdate = "UPDATE ForcedAccounts SET ";
+        string sqlQueryDelete = "DELETE FROM ForcedAccounts WHERE ";
         int toInsert = 0;
+        int toUpdate = 0;
+        int toDelete = 0;
+
+        // Costruisci le parti del comando UPDATE
+        string updatePersonsId = "Persons_id = CASE ";
+        string updateProjectsId = "Projects_id = CASE ";
+        string updateDataDa = "DataDa = CASE ";
+        string updateDataA = "DataA = CASE ";
+        string updateDaysBudget = "DaysBudget = CASE ";
+        string updateLastModificationDate = "LastModificationDate = CASE ";
+        string updateLastModifiedBy = "LastModifiedBy = CASE ";
+        string updateWhereClause = "WHERE ForcedAccounts_id IN (";
 
         for (int i = 0; i < ForcedAccountsTable.Length; i++)
         {
             // array json con l'elenco dei valori da inserire
             record = (ForcedAccount)js.Deserialize(ForcedAccountsTable[i], Type.GetType("ForcedAccount"));
 
-            // gli aggiornamenti sono gestiti come cancellazioni + inserimenti
-            if (record.RecordToUpdate == "I" | record.RecordToUpdate == "U")
+            if (record.RecordToUpdate == "I")
             {
                 toInsert++;
                 sqlQueryInsert += " ('" + record.Persons_id + "', '" + record.Projects_id + "', " + ASPcompatility.FormatDateDb(record.DataDa) + ", " + ASPcompatility.FormatDateDb(record.DataA) + ", " + ASPcompatility.FormatStringDb(record.DaysBudget) + ", " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + ", " + ASPcompatility.FormatStringDb(CurrentSession.UserId) + " ), ";
             }
 
-            if (record.RecordToUpdate == "D" | record.RecordToUpdate == "U")
+            if (record.RecordToUpdate == "U")
+            {
+                toUpdate++;
+                updatePersonsId += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN '" + record.Persons_id + "' ";
+                updateProjectsId += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN '" + record.Projects_id + "' ";
+                updateDataDa += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatDateDb(record.DataDa) + " ";
+                updateDataA += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatDateDb(record.DataA) + " ";
+                updateDaysBudget += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatStringDb(record.DaysBudget) + " ";
+                updateLastModificationDate += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + " ";
+                updateLastModifiedBy += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatStringDb(CurrentSession.UserId) + " ";
+                updateWhereClause += ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + ", ";
+            }
+
+            if (record.RecordToUpdate == "D")
             {
                 toDelete++;
                 if (toDelete > 1)
-                    sqlQueryDelete = sqlQueryDelete + " OR ";
-                sqlQueryDelete = sqlQueryDelete + " ForcedAccounts_id= " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id);
+                    sqlQueryDelete += " OR ";
+                sqlQueryDelete += " ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id);
             }
-
         }
 
-        // toglie la virgola finale            
-        sqlQueryInsert = sqlQueryInsert.Remove(sqlQueryInsert.Length - 2);
+        // Completa le parti del comando UPDATE
+        updatePersonsId += "END, ";
+        updateProjectsId += "END, ";
+        updateDataDa += "END, ";
+        updateDataA += "END, ";
+        updateDaysBudget += "END, ";
+        updateLastModificationDate += "END, ";
+        updateLastModifiedBy += "END ";
+        updateWhereClause = updateWhereClause.Remove(updateWhereClause.Length - 2) + ")";
+
+        // Costruisci il comando UPDATE completo
+        if (toUpdate > 0)
+        {
+            sqlQueryUpdate += updatePersonsId + updateProjectsId + updateDataDa + updateDataA + updateDaysBudget + updateLastModificationDate + updateLastModifiedBy + updateWhereClause;
+        }
+
+        // toglie la virgola finale
+        if (toInsert > 0)
+            sqlQueryInsert = sqlQueryInsert.Remove(sqlQueryInsert.Length - 2);
 
         // Esegui le query SQL in una transazione
         string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
@@ -130,14 +174,23 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
 
             try
             {
-                SqlCommand cmdQueryDelete = new SqlCommand(sqlQueryDelete, connection, transaction);
-                SqlCommand cmdQueryInsert = new SqlCommand(sqlQueryInsert, connection, transaction);
+                if (toInsert > 0)
+                {
+                    SqlCommand cmdQueryInsert = new SqlCommand(sqlQueryInsert, connection, transaction);
+                    cmdQueryInsert.ExecuteNonQuery();
+                }
+
+                if (toUpdate > 0)
+                {
+                    SqlCommand cmdQueryUpdate = new SqlCommand(sqlQueryUpdate, connection, transaction);
+                    cmdQueryUpdate.ExecuteNonQuery();
+                }
 
                 if (toDelete > 0)
+                {
+                    SqlCommand cmdQueryDelete = new SqlCommand(sqlQueryDelete, connection, transaction);
                     cmdQueryDelete.ExecuteNonQuery();
-
-                if (toInsert > 0)
-                    cmdQueryInsert.ExecuteNonQuery(); // Esempio di seconda query
+                }
 
                 transaction.Commit();
             }
@@ -173,6 +226,9 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public bool SaveExpensesTable(string[] ExpensesTable)
     {
+    
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+
         JavaScriptSerializer js = new JavaScriptSerializer();
         ForcedExpense record = null;
 
@@ -180,7 +236,7 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
             return true;
 
         // Costruisci la stringa SQL per tutti i record
-        string sqlQueryInsert = "INSERT INTO ForcedExpensesPers (ExpenseType_id, Persons_id) VALUES ";
+        string sqlQueryInsert = "INSERT INTO ForcedExpensesPers (ExpenseType_id, Persons_id, CreationDate, CreatedBy) VALUES ";
         string sqlQueryDelete = "DELETE FROM ForcedExpensesPers WHERE ";
         int toDelete = 0;
         int toInsert = 0;
@@ -193,7 +249,7 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
             if (record.RecordToUpdate == "I")
             {
                 toInsert++;
-                sqlQueryInsert += "('" + record.ExpenseType_id + "', '" + record.Persons_id + "'), ";
+                sqlQueryInsert += "('" + record.ExpenseType_id + "', '" + record.Persons_id + "', " + ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + ", " + ASPcompatility.FormatStringDb(CurrentSession.UserId) + "), ";
             }
 
             if (record.RecordToUpdate == "D")
@@ -235,6 +291,113 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
         }
         return true;
     }
+
+    public class ExtAjaxCallResult : AjaxCallResult
+    {
+        public bool deleteConfirm { get; set; }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public ExtAjaxCallResult CheckBeforeCopy(int ConsultantFrom, int ConsultantTo)
+    {
+        ExtAjaxCallResult result = new ExtAjaxCallResult();
+        JavaScriptSerializer js = new JavaScriptSerializer();
+
+        try
+        {
+            // Verifica che ConsultantFrom abbia autorizzazioni
+            var res = Database.ExecuteScalar("SELECT COUNT(*) FROM ForcedAccounts as A " +
+                                                     " JOIN Projects as B ON B.projects_id = A.projects_id" +
+                                                     " WHERE B.active = 1 AND A.Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantFrom));
+            if (Convert.ToInt16(res) == 0)
+            {
+                result.Success = result.deleteConfirm = false;
+                result.Message = "Non esistono record di autorizzazione da copiare";
+                return result;
+            }
+
+            // Verifica che ConsultantTo NON abbia autorizzazioni
+            res = Database.ExecuteScalar("SELECT COUNT(*) FROM ForcedAccounts as A " +
+                                             " JOIN Projects as B ON B.projects_id = A.projects_id" +
+                                             " WHERE B.active = 1 AND A.Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantTo));
+            if (Convert.ToInt16(res) != 0)
+            {
+                result.Success = false;
+                result.deleteConfirm = true;
+                result.Message = "Il consulente presenta già autorizzazioni. Confermi la sovrascrittura delle autorizzazioni esistenti ?";
+                return result;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = "Errore: " + ex.Message;
+        }
+
+        result.Success = true;
+        return result;
+    }
+
+    [WebMethod(EnableSession = true)]
+    public AjaxCallResult CopyForcedRecords(int ConsultantFrom, int ConsultantTo)
+    {
+        AjaxCallResult result = new AjaxCallResult();
+        JavaScriptSerializer js = new JavaScriptSerializer();
+
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"];
+
+        string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlTransaction transaction = connection.BeginTransaction();
+
+            try
+            {
+                // Delete existing records for ConsultantTo
+                string sqlDelete = "DELETE FROM ForcedAccounts WHERE Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantTo);
+                SqlCommand cmdDelete = new SqlCommand(sqlDelete, connection, transaction);
+                cmdDelete.ExecuteNonQuery();
+
+                // Insert new records from ConsultantFrom to ConsultantTo
+                string sqlInsert = "INSERT INTO ForcedAccounts (Persons_id, Projects_id, CreationDate, CreatedBy) " +
+                                   "SELECT " + ASPcompatility.FormatNumberDB(ConsultantTo) + ", Projects_id, " +
+                                   ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + ", " +
+                                   ASPcompatility.FormatStringDb(CurrentSession.UserId) +
+                                   " FROM ForcedAccounts WHERE Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantFrom);
+                SqlCommand cmdInsert = new SqlCommand(sqlInsert, connection, transaction);
+                cmdInsert.ExecuteNonQuery();
+
+                // Delete existing records for ConsultantTo in ForcedExpensesPers
+                string sqlDeleteExpenses = "DELETE FROM ForcedExpensesPers WHERE Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantTo);
+                SqlCommand cmdDeleteExpenses = new SqlCommand(sqlDeleteExpenses, connection, transaction);
+                cmdDeleteExpenses.ExecuteNonQuery();
+
+                // Insert new records from ConsultantFrom to ConsultantTo in ForcedExpensesPers
+                string sqlInsertExpenses = "INSERT INTO ForcedExpensesPers (Persons_id, ExpenseType_id, CreationDate, CreatedBy) " +
+                                           "SELECT " + ASPcompatility.FormatNumberDB(ConsultantTo) + ", ExpenseType_id, " +
+                                            ASPcompatility.FormatDatetimeDb(DateTime.Now, true) + ", " +
+                                            ASPcompatility.FormatStringDb(CurrentSession.UserId) +
+                                           " FROM ForcedExpensesPers WHERE Persons_id = " + ASPcompatility.FormatNumberDB(ConsultantFrom);
+                SqlCommand cmdInsertExpenses = new SqlCommand(sqlInsertExpenses, connection, transaction);
+                cmdInsertExpenses.ExecuteNonQuery();
+
+                transaction.Commit();
+                result.Success = true;
+                result.Message = "Record copiati con successo";
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                result.Success = false;
+                result.Message = "Errore: " + ex.Message;
+            }
+        }
+
+        return result;
+    }
+
 
 }
     

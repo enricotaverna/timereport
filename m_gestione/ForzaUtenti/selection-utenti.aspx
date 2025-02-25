@@ -21,7 +21,7 @@
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -43,37 +43,65 @@
     <div class="container MainWindowBackground">
         <form id="FVMain" runat="server">
 
-            <div class="row justify-content-center" >
+            <div class="row justify-content-center">
 
                 <div id="FormWrap" class="col-5 StandardForm">
 
                     <!-- *** TITOLO FORM ***  -->
                     <div class="formtitle">Selezionare</div>
 
-                    <div style="margin-top:40px" ></div>
+                    <div style="margin-top: 40px"></div>
 
                     <!-- *** SELECT ***  -->
                     <div class="input nobottomborder">
                         <div style="position: absolute">
-                        <div class="inputtext">Consulente </div>                             
-                            <asp:DropDownList ID="IdPersonaSelezionata" runat="server" DataTextField="Name" DataValueField="Persons_id" 
-                                AppendDataBoundItems="True" AutoPostBack="False" DataSourceID="DSPersone"  style="width:250px">
-                            <asp:ListItem Text="-- Tutti i consulenti --" Value="" />
+                            <div class="inputtext">Consulente </div>
+                            <asp:DropDownList ID="DDLConsultantTo" runat="server" DataTextField="Name" DataValueField="Persons_id"
+                                AppendDataBoundItems="True" AutoPostBack="False" DataSourceID="DSPersone" Style="width: 250px">
+                                <asp:ListItem Text="-- Tutti i consulenti --" Value="" />
                             </asp:DropDownList>
                         </div>
                     </div>
 
-                    <br /><br /><br />
+                    <br />
+                    <br />
+                    <br />
 
-                    <div class="buttons" >
-                        <asp:Button id="btn_submit" runat="server" class="orangebutton"  Text="<%$ appSettings: EXEC_TXT %>" OnClick="Submit_Click" />
-                        <asp:Button id="btn_back"  runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                    <div class="buttons">
+                        <asp:Button ID="btn_submit" runat="server" class="orangebutton" Text="<%$ appSettings: EXEC_TXT %>" OnClick="Submit_Click" />
+                        <asp:Button ID="btn_copy" runat="server" class="orangebutton" Text="<%$ appSettings: COPY_TXT %>" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
 
                 </div>
                 <!-- END FormWrap  -->
             </div>
             <!-- END Row  -->
+
+            <%--DIALOG--%>
+            <div id="ModalWindow">
+                <div id="dialog" class="window">
+                    <div id="FormWrap1" class="StandardForm">
+                        <div class="formtitle">Copia autorizzazioni da</div>
+
+                        <div class="input nobottomborder" style="height: 60px">
+                            <div style="position: absolute">
+                                <div class="inputtext">Consulente </div>
+                                <asp:DropDownList ID="DDLConsultantFrom" runat="server" DataTextField="Name" DataValueField="Persons_id"
+                                    AppendDataBoundItems="True" AutoPostBack="False" DataSourceID="DSPersone" Style="width: 250px">
+                                </asp:DropDownList>
+                            </div>
+                        </div>
+
+                        <div class="buttons">
+                            <div id="valMsg" class="parsley-single-error"></div>
+                            <button id="btnSalvaModale" class="orangebutton">Salva</button>
+                            <button id="btnCancelModale" class="greybutton">Annulla</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%--DIALOG--%>
         </form>
     </div>
     <!-- *** End container *** -->
@@ -99,8 +127,99 @@
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
-        $('#IdPersonaSelezionata').SumoSelect({ search: true});
-        
+        // *** attiva validazione campi form
+        $('#FVMain').parsley();
+
+        $('#DDLConsulente').SumoSelect({ search: true });
+
+        $("#btn_copy").on("click", function (e) {
+            //Cancel the link behavior
+            e.preventDefault();
+
+            if ($('#DDLConsultantTo').val() == "") {
+                ShowPopup("Selezionare consulente");
+                return false;
+            }   
+
+            //initValue();  // inizializza campi
+            openDialogForm("#dialog", "#FVMain", "#btnCancelModale")
+
+        });
+
+        // Controlla se ci sono le condizioni per copiare le autorizzazioni
+        $("#btnSalvaModale").on("click", function (e) {
+
+            e.preventDefault();
+            ConsultantFrom = $('#DDLConsultantFrom').val();
+            ConsultantTo = $('#DDLConsultantTo').val();
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_ForcedAccounts.asmx/CheckBeforeCopy",
+                data: JSON.stringify({ ConsultantFrom: ConsultantFrom, ConsultantTo: ConsultantTo }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d.Success == true) {
+                        CopiaAutorizzazioni(ConsultantFrom, ConsultantTo);
+                    } else {
+
+                        $('#mask').hide();
+                        $('.window').hide();
+
+                        if (!msg.d.deleteConfirm) // errore generico
+                            ShowPopup(msg.d.Message);
+                        else  // esistono già record, chiede conferma per sovrascrivere
+                            ConfirmDialog("Conferma Copia", msg.d.Message, "Copia", (confirm) => { confirm && CopiaAutorizzazioni(ConsultantFrom, ConsultantTo) });
+                    }
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    $('#mask').hide();
+                    $('.window').hide();
+                    ShowPopup("Errore server in salvataggio tabella");
+                    return false;
+                }
+            });
+        });
+
+        // Chiama la funzione per copiare le autorizzazioni
+        function CopiaAutorizzazioni(ConsultantFrom, ConsultantTo) {
+
+            $.ajax({
+
+                type: "POST",
+                url: "/timereport/webservices/WS_ForcedAccounts.asmx/CopyForcedRecords",
+                data: JSON.stringify({ ConsultantFrom: ConsultantFrom, ConsultantTo: ConsultantTo }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (msg) {
+                    // se call OK inserisce una riga sotto l'elemento 
+                    if (msg.d.Success == true) {
+                        $('#mask').hide();
+                        $('.window').hide();
+                        e.preventDefault();
+                        ShowPopup("Copia autorizzazioni avvenuta");
+                    } else {
+                        $('#mask').hide();
+                        $('.window').hide();
+                        ShowPopup(msg.d.Message);
+                    }
+                },
+
+                error: function (xhr, textStatus, errorThrown) {
+                    $('#mask').hide();
+                    $('.window').hide();
+                    ShowPopup("Errore server in salvataggio tabella");
+                    return false;
+                }
+            });
+        }
+
     </script>
 
 </body>

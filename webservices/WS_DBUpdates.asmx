@@ -125,7 +125,6 @@ public class WS_DBUpdates : System.Web.Services.WebService
             string DaysWithSign = Convert.ToString((CancelFlag == true ? -1 : 1) * Hours / 8).Replace(",", ".");
             SQLUpdateForcedAccountNew = "UPDATE ForcedAccounts SET DaysActual = COALESCE(DaysActual, 0) + " + DaysWithSign + " WHERE Persons_id = " + ASPcompatility.FormatNumberDB(Person_Id) + " AND Projects_id = " + ASPcompatility.FormatNumberDB(Project_Id);
         }
-
         // aggiornamento
         if (Hours_Id != 0)
         {
@@ -218,7 +217,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                string strFileData,
                                string OpportunityId,
                                string AccountingDate, // "DD/MM/AAAA"
-                               string UserId = "") 
+                               string UserId = "")
     {
         SaveExpensesResult result = new SaveExpensesResult();
         int newIdentity = 0;

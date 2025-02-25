@@ -512,7 +512,7 @@
 
                         // visualizza la stringa con il ticket creato
                         var htmlString = "<div class=TRitem id=TRitm" + msg.d + ">";
-                        htmlString = htmlString + "<a id=" + msg.d + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + msg.d + " >ZZ90101:BPA : 1 BP</a>";
+                        htmlString = htmlString + "<a id=" + msg.d + " title=' " + strTooltip + "' class=hours href=input-spese.aspx?action=fetch&expenses_id=" + msg.d + " >ZX40790:BPA : 1 BP</a>";
                         htmlString = htmlString + "<a href=# onclick='DeleteRecord(" + msg.d + ")'><img align=right src=images/icons/16x16/trash.gif width=16 height=14 border=0></a>";
                         htmlString = htmlString + "</div>";
                         $(idItem).html(htmlString);

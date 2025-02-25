@@ -13,12 +13,16 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
 <link href="/timereport/include/newstyle20.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -28,6 +32,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title><asp:Literal runat="server" Text="Anagrafica progetto" /></title>
+    <style>
+        .ui-widget-header {
+            background-color: #F1F1F1 !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -265,17 +274,27 @@
                                     <!-- *** TESTO OBBLIGATORIO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Testo obbl.: </div>
-                                        <asp:TextBox ID="TBMessaggioDiErrore" class="ASPInputcontent" runat="server" Text='<%# Bind("MessaggioDiErrore")%>' />
+                                        <asp:TextBox ID="TBMessaggioDiErrore" class="ASPInputcontent" style="width:270px" runat="server" Text='<%# Bind("MessaggioDiErrore")%>' />
                                         <asp:CheckBox ID="CBTestoObbligatorio" runat="server" Checked='<%# Bind("TestoObbligatorio") %>' />
                                         <asp:Label AssociatedControlID="CBTestoObbligatorio" class="css-label" ID="Label7" runat="server" Text=""></asp:Label>
+                                    </div>
+
+                                    <!-- *** VISIBILITA ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Attivo per:</div>
+                                        <asp:DropDownList ID="DDLVisibility" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="DSVisibility" DataTextField="VisibilityName" data-parsley-errors-container="#valMsg" data-parsley-required="true"
+                                            DataValueField="ProjectVisibility_id" SelectedValue='<%# Bind("ProjectVisibility_id") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
                                     </div>
 
                                     <!-- *** CHECKBOX ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">&nbsp;</div>
 
-                                        <asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
-                                        <asp:Label AssociatedControlID="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>
+                                        <%--<asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />--%>
+                                        <%--<asp:Label AssociatedControlID="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>--%>
 
                                         <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%#Bind("ActivityOn") %>' />
                                         <asp:Label AssociatedControlID="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS" Style="padding-right: 40px"></asp:Label>
@@ -517,11 +536,21 @@
                                         <asp:Label AssociatedControlID="CBTestoObbligatorio" class="css-label" ID="Label7" runat="server" Text=""></asp:Label>
                                     </div>
 
+                                    <!-- *** VISIBILITA ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Attivo per:</div>
+                                        <asp:DropDownList ID="DDLVisibility" runat="server" AppendDataBoundItems="True"
+                                            DataSourceID="DSVisibility" DataTextField="VisibilityName" data-parsley-errors-container="#valMsg" data-parsley-required="true"
+                                            DataValueField="ProjectVisibility_id" SelectedValue='<%# Bind("ProjectVisibility_id") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
+
                                     <!-- *** CHECKBOX ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
-                                        <asp:Label AssociatedControlID="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo" Style="padding-right: 40px"></asp:Label>
+                                        <%--<asp:CheckBox ID="AlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />--%>
+                                        <%--<asp:Label AssociatedControlID="AlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo" Style="padding-right: 40px"></asp:Label>--%>
 
                                         <asp:CheckBox ID="ActivityOn" runat="server" Checked='<%#Bind("ActivityOn") %>' />
                                         <asp:Label AssociatedControlID="ActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>
@@ -670,7 +699,7 @@
                                     </div>
 
                                     <!-- *** data creazione/modifica ***  -->
-                                    <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 30px; position: relative">
+                                    <div class="nobottomborder" style="font-size: 10px; line-height: 14px; top: 10px">
                                         <span>[C]</span>
                                         <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
                                         <span>il </span>
@@ -754,6 +783,16 @@
                                         <asp:Label AssociatedControlID="CBTestoObbligatorio" class="css-label" ID="Label7" runat="server" Text=""></asp:Label>
                                     </div>
 
+                                     <!-- *** VISIBILITA ***  -->
+                                      <div class="input nobottomborder">
+                                          <div class="inputtext">Attivo per:</div>
+                                          <asp:DropDownList ID="DDLVisibility" runat="server" AppendDataBoundItems="True"  Enabled="False"
+                                              DataSourceID="DSVisibility" DataTextField="VisibilityName"
+                                              DataValueField="ProjectVisibility_id" SelectedValue='<%# Bind("ProjectVisibility_id") %>'>
+                                              <asp:ListItem Value="" Text="Selezionare un valore" />
+                                          </asp:DropDownList>
+                                      </div>
+
                                     <!-- *** CHECKBOX ***  -->
                                     <div class="input nobottomborder">
 
@@ -762,8 +801,8 @@
                                             <asp:Label AssociatedControlID="DisActivityOn" class="css-label" ID="Label1" runat="server" Text="Gestione WBS"></asp:Label>
                                         </span>
 
-                                        <asp:CheckBox ID="DisAlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />
-                                        <asp:Label AssociatedControlID="DisAlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>
+                                        <%--<asp:CheckBox ID="DisAlwaysAvailableCheckBox" runat="server" Checked='<%# Bind("Always_available") %>' />--%>
+                                        <%--<asp:Label AssociatedControlID="DisAlwaysAvailableCheckBox" class="css-label" ID="Label2" runat="server" Text="Sempre attivo"></asp:Label>--%>
 
                                         <div class="inputtext">&nbsp;</div>
                                         <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
@@ -825,12 +864,13 @@
     </div>
 
     <!-- *** DATASOURCE *** -->
+    <!-- Always_available non più usato viene defaultato a false -->
     <asp:SqlDataSource ID="projects" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         DeleteCommand="DELETE FROM [Projects] WHERE [Projects_Id] = @Projects_Id"
-        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, SFContractType_Id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy, LOB_Id ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @SFContractType_Id, @Active, @Always_available, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy, @LOB_Id )"
+        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, SFContractType_Id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy, LOB_Id, ProjectVisibility_id ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @SFContractType_Id, @Active, 0, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy, @LOB_Id, @ProjectVisibility_id )"
         SelectCommand="SELECT * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)"
-        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, SFContractType_Id = @SFContractType_Id, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = @Always_available, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, LOB_Id = @LOB_Id  WHERE (Projects_Id = @Projects_Id)"
+        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, SFContractType_Id = @SFContractType_Id, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = 0, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, LOB_Id = @LOB_Id, ProjectVisibility_id = @ProjectVisibility_id  WHERE (Projects_Id = @Projects_Id)"
         OnInserting="DSprojects_Insert" OnUpdating="DSprojects_Update">
         <SelectParameters>
             <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
@@ -875,6 +915,7 @@
             <asp:Parameter Name="LastModifiedBy" />
             <asp:Parameter Name="LastModificationDate" />
             <asp:Parameter Name="LOB_Id" />
+            <asp:Parameter Name="ProjectVisibility_id" />
         </UpdateParameters>
         <InsertParameters>
             <asp:Parameter Name="ProjectCode" Type="String" />
@@ -911,8 +952,12 @@
             <asp:Parameter Name="CreatedBy" />
             <asp:Parameter Name="CreationDate" />
             <asp:Parameter Name="LOB_Id" />
+            <asp:Parameter Name="ProjectVisibility_id" />
         </InsertParameters>
     </asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSVisibility" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [ProjectVisibility]"></asp:SqlDataSource>
     <asp:SqlDataSource ID="tipoprogetto" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [ProjectType]"></asp:SqlDataSource>
@@ -947,6 +992,8 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        $('select').SumoSelect({ search: true, searchText: '' });
 
         // *** attiva validazione campi form
         $('#formProgetto').parsley({
@@ -1034,13 +1081,13 @@
 
             // stile checkbox form in ReadOnly   
             $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
-            $("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");
+            /*$("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");*/
             $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
 
             $("#FVProgetto_DisActivityOn").attr("disabled", true);
-            $("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);
+            /*$("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);*/
             $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
             $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
             $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);

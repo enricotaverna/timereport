@@ -32,7 +32,7 @@
 <%--<script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>--%>
 <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
 <!-- Download excel da Tabulator -->
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" rel="stylesheet">
 <!-- gestione formati data per tabulator -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js"></script>
 
@@ -43,7 +43,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>
-        <asp:Literal runat="server" Text="Forza Ore e Spese" /></title>
+        <asp:Literal runat="server" Text="Autorizza Ore e Spese" /></title>
     <style>
         /* Forza l'altezza a zero per la classe tabulator-header nell'elemento SelectableProjectsTable */
         #SelectableProjectsTable .tabulator-col-title {
@@ -178,8 +178,7 @@
         $("#tabs").tabs(); // abilitate tab view
         $("#tabs").show();
 
-        var mustSavePrj = false;
-        var mustSaveExp = false;
+        var mustSave = false;
 
         $('#LBProgetti, #LBPersone, #LBSpese, #LBPersone2').SumoSelect({ search: true });
 
@@ -196,7 +195,7 @@
         $('#BTCancel').click(function (e) {
             e.preventDefault();
 
-            if (mustSavePrj || mustSaveExp)
+            if (mustSave)
                 ConfirmDialog("Salvataggio", "Ci sono modifiche non salvate, vuoi uscire?", "Esci",
                     (result) => { result && ( window.location.href = "/timereport/m_gestione/ForzaUtenti/selection-utenti.aspx" ) });
             else
@@ -221,13 +220,24 @@
                 { title: "Persons_id", field: "Persons_id", visible: false },
                 { title: "Projects_id", field: "Projects_id", visible: false },
                 { title: "RecordToUpdate", field: "RecordToUpdate", visible: false },
+                { title: "CreationDate", field: "CreationDate", visible: false },
+                { title: "CreatedBy", field: "CreatedBy", visible: false },
+                { title: "LastModificationDate", field: "LastModificationDate", visible: false },
+                { title: "LastModifiedBy", field: "LastModifiedBy", visible: false },
                 { title: "Project Name", width: 300, field: "ProjectName", sorter: "string", headerFilter: true },
                 { title: "Consulente", width: 200, field: "PersonName", sorter: "string", headerFilter: true },
                 { title: "Da", field: "DataDa", editor: "date", editorParams: { format: "dd/MM/yyyy" }, headerFilter: false, cellEdited: function (cell) { CellEdited(cell); } },
                 { title: "A", field: "DataA", editor: "date", editorParams: { format: "dd/MM/yyyy" }, headerFilter: false, cellEdited: function (cell) { CellEdited(cell); } },
                 { title: "Budget", field: "DaysBudget", sorter: "string", editor: "number", editorParams: { min: 0, max: 100, step: 1, }, headerFilter: false, cellEdited: function (cell) { CellEdited(cell); } },
                 { title: "Actual", field: "DaysActual", sorter: "string", headerFilter: false },
-                { formatter: trashIcon, width: 40, cellClick: function (e, cell) { DeletePrjRow(e, cell); } }
+                { formatter: trashIcon, width: 40, cellClick: function (e, cell) { DeletePrjRow(e, cell); } },
+                {
+                    formatter: infoIcon, width: 40, tooltip: function (e, cell) {
+                        var creationDate = cell.getRow().getData().CreationDate != null ?  cell.getRow().getData().CreationDate.toString() : '';
+                        var lastModification = cell.getRow().getData().LastModificationDate != null ? " - Updated by: " + cell.getRow().getData().LastModifiedBy  + " on " + cell.getRow().getData().LastModificationDate.toString() : '' ;
+                        return "Created by: " + cell.getRow().getData().CreatedBy + " on " + creationDate + lastModification;
+                    }
+                }
             ],
         }); // Tabella SelectableProjectsTable
 
@@ -237,7 +247,7 @@
         function DeletePrjRow(e, cell) { 
 
             var ForcedAccounts_id = cell.getRow().getData().ForcedAccounts_id;
-            mustSavePrj = true;
+            mustSave = true;
 
             if ( ForcedAccounts_id == 0)
                 cell.getRow().delete()  // riga ancora non salvata
@@ -249,7 +259,7 @@
 
         // accendo flag di aggiornamento su rige modificate
         function CellEdited(cell) { 
-            mustSavePrj = true;
+            mustSave = true;
             var row = cell.getRow();
             //row - row component
             if (row.getData().RecordToUpdate != 'I')
@@ -261,7 +271,7 @@
             var Project_id = $("#LBProgetti").val();
             var Person_id = $("#LBPersone").val();
 
-            mustSavePrj = true;
+            mustSave = true;
 
             if (isNullOrEmpty(Project_id) | isNullOrEmpty(Person_id)) {
                 ShowPopup("Selezionare progetto e consulente");
@@ -330,7 +340,7 @@
                         if (msg.d == true) {
                             ShowPopup("Salvataggio avvenuto");
                             ForcedAccountsTable.setData(); // reload
-                            mustSavePrj = false;
+                            mustSave = false;
                         } else
                             ShowPopup("Errore in salvataggio tabella");
                     },
@@ -370,7 +380,7 @@
                         if (msg.d == true) {
                             ShowPopup("Salvataggio avvenuto");
                             ForcedExpensesTable.setData(); // reload
-                            mustSaveExp = false;
+                            mustSave = false;
                         } else
                             ShowPopup("Errore in salvataggio tabella");
                     },
@@ -399,9 +409,17 @@
                 { title: "Persons_id", field: "Persons_id", sorter: "number", visible: false },
                 { title: "ExpenseType_id", field: "ExpenseType_id", sorter: "number", visible: false },
                 { title: "RecordToUpdate", field: "RecordToUpdate", visible: false },
+                { title: "CreationDate", field: "CreationDate", visible: false },
+                { title: "CreatedBy", field: "CreatedBy", visible: false },
                 { title: "Spesa", field: "ExpenseTypeName", sorter: "string", headerFilter: true },
                 { title: "Consulente", field: "PersonName", sorter: "string", headerFilter: true },
-                { formatter: trashIcon, width: 40, cellClick: function (e, cell) { DeleteExpRow(e, cell); } }
+                { formatter: trashIcon, width: 40, cellClick: function (e, cell) { DeleteExpRow(e, cell); } },
+                {
+                    formatter: infoIcon, width: 40, tooltip: function (e, cell) {
+                        var creationDate = cell.getRow().getData().CreationDate != null ? "Created by " + cell.getRow().getData().CreatedBy + " on " + cell.getRow().getData().CreationDate.toString() : '';
+                    return  creationDate;
+                    }
+                }
             ],
         }); 
 
@@ -410,7 +428,7 @@
         // cancellazione riga
         function DeleteExpRow(e, cell) {
 
-            mustSaveExp = true;
+            mustSave = true;
             var ForcedExpensesPers_id = cell.getRow().getData().ForcedExpensesPers_id;
 
             if (ForcedExpensesPers_id == 0)
@@ -424,7 +442,7 @@
         // quando viene premuto il bottone BTaddProject aggiunge una riga alla tabella ForcedAccountsTable
         $("#BTaddExpense").click(function () {
 
-            mustSaveExp = true;
+            mustSave = true;
 
             var Expense_id = $("#LBSpese").val();
             var Person_id = $("#LBPersone2").val();
@@ -449,8 +467,7 @@
                 }
             }
             ForcedExpensesTable.addData(row, true);
-            // pulisce input
-            $("#LBSpese").val("");
+
         });
 
         // trigger download of data.xlsx file

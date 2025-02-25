@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 public class MyConstants
 {
@@ -53,7 +50,8 @@ public class TipoParametri
     public string pKey { get; set; }
     public string pValue { get; set; }
 
-    public TipoParametri(string key, string value) {
+    public TipoParametri(string key, string value)
+    {
         pKey = key;
         pValue = value;
     }
@@ -65,4 +63,10 @@ public class ApprovalManager
     public int persons_id;
     public string name;
     public string mail;
+}
+
+public class AjaxCallResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; }
 }

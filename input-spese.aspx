@@ -102,26 +102,21 @@
 
                                 <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <div style="position: absolute">
                                     <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
                                     <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"  
                                          data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                     </asp:DropDownList>
-                                    </div>                               
-                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
                                 <div class="input">
 
                                     <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource2"></asp:Label>
-                                    <span class="input2col">
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6"
+                                        <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6"
                                             meta:resourcekey="TBAmountResource2"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$"/>
-                                    </span>
-
+  
                                 </div>
 
                                 <!-- *** Flag ***  -->
@@ -225,13 +220,9 @@
 
                                 <!-- *** Valore e storno ***  -->
                                 <div class="input">
-
                                     <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource1"></asp:Label>
-                                    <span class="input2col">
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource1"
+                                    <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="TBAmount" runat="server" Text='<%# Bind("Amount") %>' Columns="6" meta:resourcekey="TBAmountResource1"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$"/>
-                                    </span>
-
                                 </div>
 
                                 <!-- *** Flag ***  -->
@@ -334,13 +325,9 @@
 
                                 <!-- *** Valore e storno ***  -->
                                 <div class="input">
-
                                     <asp:Label CssClass="inputtext" ID="Label2" runat="server" Text="Valore / km" meta:resourcekey="Label2Resource3"></asp:Label>
-                                    <span class="input2col">
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAmount" runat="server"
+                                        <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="TBAmount" runat="server"
                                             Text='<%# Bind("Amount") %>' Columns="6" Enabled="False" meta:resourcekey="TBAmountResource3" />
-                                    </span>
-
                                 </div>
 
                                 <!-- *** Flag ***  -->
@@ -511,7 +498,10 @@
 
             // Sumo Select
             $('#FVSpese_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            $('.SumoSelect > .optWrapper').css('width', '550px');
+            $('#FVSpese_DDLprogetto').SumoSelect({ search: true, searchText: '' });
+            $('#FVSpese_DDLTipoSpesa').SumoSelect({ search: true, searchText: '' });
+            $('#FVSpese_DDLOpportunity')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
+            $('#FVSpese_DDLprogetto')[0].sumo.optDiv.css('width', '350px'); // fa in modo che la tendina per le opportunità sia larga 550px
 
             // se in edit chiama Ajax per controllo carico spese sul giorni
             $('#FVSpese_DDLprogetto').change(function () {
@@ -632,6 +622,7 @@
                 return;
 
             var ExpensesId = '<%= String.IsNullOrEmpty(Request.QueryString["expenses_id"]) ? "0" : Request.QueryString["expenses_id"] %>';
+            var AccountingDate = isNullOrEmpty($('#FVSpese_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();
 
             // Submit the form
             var values = "{ 'Expenses_Id' : " + ExpensesId  +
@@ -648,7 +639,7 @@
                 " , 'strFileName': ''" + // non salva il file 
                 " , 'strFileData': ''" +
                 " , 'OpportunityId': '" + ($('#FVSpese_DDLOpportunity').is(':visible') ? $('#FVSpese_DDLOpportunity').val() : '') + "'" +
-                " , 'AccountingDate': '" + $('#FVSpese_TBAccountingDate').val() + "'" + 
+                " , 'AccountingDate': '" + AccountingDate + "'" + 
                 " , 'UserId': ''" +
                 "}";
 

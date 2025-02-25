@@ -191,7 +191,7 @@ public partial class input : System.Web.UI.Page
         // azzera il buffer
         Session["RicevuteBuffer"] = null;
 
-        if (filePaths.Length != null)
+        if (filePaths != null && filePaths.Length > 0)
         {
 
             try

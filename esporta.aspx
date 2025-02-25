@@ -41,6 +41,9 @@
         width: 280px;
     }
 
+    .StandardForm input {
+     margin: 4px; /* per formattazione export spese */
+}
 
 </style>
 
@@ -158,17 +161,13 @@
                     </div>
 
                     <div class="input nobottomborder" id="DivSocieta" runat="server">
-                        <div class="inputtext">
-                            <asp:Literal runat="server" Text="<%$ Resources:societa%>" />
-                        </div>
-
+                        <div class="inputtext"><asp:Literal runat="server" Text="<%$ Resources:societa%>" /></div>
                         <!-- per stile CSS -->
                         <asp:DropDownList ID="DDLsocieta" runat="server" DataSourceID="societa"
                             DataTextField="Name" DataValueField="Company_id"
                             AppendDataBoundItems="True" meta:resourcekey="DDLsocietaResource1">
                             <asp:ListItem Value="" Text="Selezionare un valore" meta:resourcekey="ListItemResource3" />
                         </asp:DropDownList>
-
                     </div>
 
                     <div class="input" style="display: flex;align-items: center;">
@@ -194,17 +193,17 @@
 
                     </div>
 
-                    <div class="input nobottomborder mt-3 mb-4">
+                    <div class="input nobottomborder mt-3 mb-4" style="overflow:hidden">
                         <div class="inputtext">
                             <asp:Literal runat="server" />
                         </div>
 
-                        <span class="Inputcontent"
+                        <span class="Inputcontent" 
                             style="position: relative; padding-top: 15px; border: 1px solid #C7C7C7; border-radius: 6px; margin-top: 10px; float: left; line-height: 24px">
                             <span style="position: absolute; top: -10px; left: 5px; background-color: white; font-size: 10pt"><i class="fas fa-download" style="font-size: 1.2em;"></i>&nbspExport&nbsp</span>
 
 
-                            <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="1" Width="220px">
+                            <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="1" Width="220px" >
                                 <asp:ListItem Value="1" Text="<%$ Resources:exportore%>"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="<%$ Resources:exportspese%>"></asp:ListItem>
                             </asp:RadioButtonList>
@@ -295,6 +294,9 @@
             // imposta css della listbox
             $('#CBLProgetti').SumoSelect({ placeholder: '<%= GetLocalResourceObject("Progetti").ToString()  %> ', search: true, searchText: '<%= GetLocalResourceObject("Codice_progetto").ToString()  %> ' });
             $('#CBLPersone').SumoSelect({ placeholder: 'Persone', search: true, searchText: 'Codice progetto' });
+            $('#DDLClienti').SumoSelect({ placeholder: 'Selezionare un valore', search: true});
+            $('#DDLManager').SumoSelect({ placeholder: 'Selezionare un valore', search: true });
+            $('#DDLsocieta').SumoSelect({ placeholder: 'Selezionare un valore', search: true });
 
             // cancella selezione dei radiobutton in caso sia stato selezionato l'altro gruppo
             $("#RBTipoExport").on('change', function () {

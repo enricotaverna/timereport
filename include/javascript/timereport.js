@@ -79,12 +79,12 @@ function ShowPopup(message, url, titleBox) {
             titleBox = "Messaggio";
 
         // se non c'è la div mask la aggiunge
-        if (document.getElementById("dialog") == null)
-            $("body").append("<div id='dialog'></div>");
+        if (document.getElementById("msgDialog") == null)
+            $("body").append("<div id='msgDialog'></div>");
 
-        $("#dialog").html(message);
+    $("#msgDialog").html(message);
 
-        $("#dialog").dialog({
+    $("#msgDialog").dialog({
             title: titleBox,
             //classes: {
             //    "ui-dialog": "dialogMessage"
@@ -110,29 +110,40 @@ var trashIcon = function (cell, formatterParams, onRendered) { //plain text valu
     return "<i class='fa fa-trash'></i>";
 };
 
+var infoIcon = function (cell, formatterParams, onRendered) { //plain text value
+    return "<i class='fa-solid fa-lg fa-circle-info'></i>";
+};
+
 //custom formatter definition
 var editIcon = function (cell, formatterParams, onRendered) { //plain text value
     return "<i class='fa fa-edit'></i>";
 };
 
 // Apre Form Modale
-function openDialogForm(ModalForm) {
+function openDialogForm(ModalForm, InputForm ="FVForm", backbutton) {
 
     MaskScreen(false);
 
     //Get the window height and width
-    //var winW = 960;
     var winW = $(window).width();
 
     //Set the popup window to center
-    $(ModalForm).css('top', 40);
+    $(ModalForm).css('top', $(window).height() / 3 - $(ModalForm).height() / 2);
     $(ModalForm).css('left', winW / 2 - $(ModalForm).width() / 2);
 
     //transition effect
     $(ModalForm).fadeIn(1);
 
     // reset validations
-    $('#FVForm').parsley().reset();
+    $(InputForm).parsley().reset();
+
+    $(backbutton).click(function (e) {
+        e.preventDefault();
+        $(InputForm).parsley().reset();
+
+        $('#mask').hide();
+        $('.window').hide();
+    }); 
 
 }
 

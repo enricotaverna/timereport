@@ -124,26 +124,26 @@
                         <div class="input nobottomborder">
                             <!-- ** VALIDO DA ** -->
                             <div class="inputtext">Valido da</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataDa" Columns="10"
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataDa" Columns="10" autocomplete="off"
                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-no-focus="true" data-parsley-errors-messages-disabled=""
                                 data-parsley-firstdayofmonth="true"
                                 data-parsley-dateinsequenza="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                             &nbsp;&nbsp;a&nbsp;&nbsp;
-                <asp:TextBox class="ASPInputcontent" runat="server" ID="TBDataA" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-no-focus="true"
+                <asp:TextBox autocomplete="off" class="ASPInputcontent" runat="server" ID="TBDataA" Columns="10" data-parsley-errors-container="#valMsg" data-parsley-no-focus="true"
                     data-parsley-required="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                         </div>
 
                         <div class="input nobottomborder">
                             <!-- ** COST RATE ** -->
                             <div class="inputtext">Cost Rate(€)</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" Columns="10" 
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBCostRate" Columns="10" autocomplete="off"
                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
                         </div>
 
                         <div class="input nobottomborder">
                             <!-- ** BILL RATE ** -->
                             <div class="inputtext">Bill Rate(€)</div>
-                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBBillRate" Columns="10" 
+                            <asp:TextBox class="ASPInputcontent" runat="server" ID="TBBillRate" Columns="10" autocomplete="off"
                                 data-parsley-required="true" data-parsley-errors-container="#valMsg" data-parsley-pattern="/^[0-9]{0,4}$/" />
                         </div>
 

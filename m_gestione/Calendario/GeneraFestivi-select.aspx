@@ -58,29 +58,16 @@
 
                 <!--  *** PERSONE *** -->
                 <div class="input nobottomborder ">
-                    <span style="position: absolute">
-
                         <div class="inputtext">Persone</div>
-
                         <span>
                             <asp:ListBox class="select2-auth" ID="LBPersone" data-parsley-required="true" data-parsley-errors-container="#valMsg" SelectionMode="Multiple" multiple="multiple" runat="server" AppendDataBoundItems="True" DataSourceID="DS_Persone" DataTextField="Name" DataValueField="Persons_id" OnDataBound="LBPersone_DataBinding"></asp:ListBox></span>
-
-                    </span>
                 </div>
-
-                <!-- *** spazio bianco nel form ***  -->
-                <p style="margin-bottom: 50px;"></p>
 
                 <!--  *** LIVELLO  *** -->
                 <div class="input nobottomborder ">
-                    <span style="position: absolute">
-
                         <div class="inputtext">Tipo utente</div>
-
                         <span>
                             <asp:ListBox class="select2-auth" ID="LBLivello" data-parsley-required="true" data-parsley-errors-container="#valMsg" SelectionMode="Multiple" multiple="multiple" runat="server" AppendDataBoundItems="True" DataSourceID="DSLivello" DataTextField="Name" DataValueField="UserLevel_id" OnDataBound="LBLivello_DataBinding"></asp:ListBox></span>
-
-                    </span>
                 </div>
 
                 <!-- *** spazio bianco nel form ***  -->

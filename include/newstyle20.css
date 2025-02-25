@@ -39,7 +39,7 @@ BODY {
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
-    overflow: hidden;
+    overflow: visible;
     padding: 0px;
 }
 
@@ -156,7 +156,7 @@ a, a:visited, a:hover, a:active {
 }
 
 .StandardForm input {
-    margin: 4px;
+     /*margin: 4px;*/ /* per formattazione export spese */
 }
 
 .container form {
@@ -257,9 +257,11 @@ select {
     color: #777;
     margin: 10px 30px 10px 10px;
     /*    padding: 0px 0px 5px 0px;*/
-    overflow: hidden;
+    /*overflow: hidden;*/
     line-height: 36px;
     padding-bottom: 5px;
+    overflow: visible;
+    z-index: 1000;
 }
 
 .nobottomborder {
@@ -414,8 +416,8 @@ select {
 }
 
     .greybutton:hover {
-        background: #BABABA;
-        background: -webkit-linear-gradient(top, #bababa 0%,#e1e1e1 100%);
+        background-color: lightgrey !important;
+        border: 1px solid lightgrey !important;
     }
 
 .orangebutton {
@@ -434,6 +436,11 @@ select {
     cursor: pointer;
     outline: none;
 }
+
+    .orangebutton:hover {
+        background-color: orange !important;
+        border: 1px solid orange !important;
+    }
 
 .SmallOrangeButton {
     background: #FFC339;
@@ -710,7 +717,7 @@ select {
 
 /* per dialog box messaggi START */
 .ui-widget-header {
-    /*background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;*/
+    background: #ffb119 url(images/ui-bg_inset-soft_75_ffb119_1x100.png) 50% 50% repeat-x !important;
     /*  background: #ffbd27;
     background: linear-gradient(top, #ffbd27 0%,#ffb119 50%,#ff9d19 51%,#ff9d19 100%); */
 }
@@ -722,7 +729,7 @@ select {
 }
 
 .ui-widget.ui-widget-content {
-    border: none;
+/*    border: none;*/
 }
 
 .ui-widget-overlay.custom-overlay {
