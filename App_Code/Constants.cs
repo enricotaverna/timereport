@@ -10,6 +10,7 @@ public class MyConstants
     // versioni JSS AND CSS
     public static string CSS_VERSION = "1.1"; // aggiornamenti massivi
     public static string JSS_VERSION = "1.1"; // aggiornamenti massivi
+    public static string SUMO_VERSION = "1.1"; // aggiornamenti massivi
 
     // ------ Auth level --------
     public static int AUTH_ADMIN = 5; // aggiornamenti massivi
