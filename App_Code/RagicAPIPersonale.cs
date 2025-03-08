@@ -111,7 +111,7 @@ public partial class The1
     public string Sede { get; set; }
 
     [JsonProperty("UNITA' ORG.")]
-    public string[] UnitaOrg { get; set; }
+    public string UnitaOrg { get; set; }
 
     [JsonProperty("RUOLO")]
     public string Ruolo { get; set; }

@@ -90,7 +90,7 @@ public class TRSession
 
         LoadPersonalSetting();
 
-        if (SalesforceAccount != "")
+        if (SalesforceAccount.Trim() != "")
         {
             LoadSFTask();
         }
