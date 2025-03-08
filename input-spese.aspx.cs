@@ -369,10 +369,16 @@ public partial class input_spese : System.Web.UI.Page
         {
             Label LBAccountingDate = (Label)FVSpese.FindControl("LBAccountingDate");
             TextBox TBAccountingDate = (TextBox)FVSpese.FindControl("TBAccountingDate");
+            Label LBCancel = (Label)FVSpese.FindControl("LBcancel");
+            CheckBox TBCancel = (CheckBox)FVSpese.FindControl("CBcancel");
 
             // se display
             LBAccountingDate.Visible = false;
             TBAccountingDate.Visible = false;
+            if (LBCancel != null)
+                LBCancel.Visible = false;
+            if (TBCancel != null)
+                TBCancel.Visible = false;
         }
 
     }

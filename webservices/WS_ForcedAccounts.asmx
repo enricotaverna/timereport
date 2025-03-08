@@ -103,8 +103,6 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
         int toDelete = 0;
 
         // Costruisci le parti del comando UPDATE
-        string updatePersonsId = "Persons_id = CASE ";
-        string updateProjectsId = "Projects_id = CASE ";
         string updateDataDa = "DataDa = CASE ";
         string updateDataA = "DataA = CASE ";
         string updateDaysBudget = "DaysBudget = CASE ";
@@ -126,8 +124,6 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
             if (record.RecordToUpdate == "U")
             {
                 toUpdate++;
-                updatePersonsId += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN '" + record.Persons_id + "' ";
-                updateProjectsId += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN '" + record.Projects_id + "' ";
                 updateDataDa += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatDateDb(record.DataDa) + " ";
                 updateDataA += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatDateDb(record.DataA) + " ";
                 updateDaysBudget += "WHEN ForcedAccounts_id = " + ASPcompatility.FormatStringDb(record.ForcedAccounts_id) + " THEN " + ASPcompatility.FormatStringDb(record.DaysBudget) + " ";
@@ -146,8 +142,6 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
         }
 
         // Completa le parti del comando UPDATE
-        updatePersonsId += "END, ";
-        updateProjectsId += "END, ";
         updateDataDa += "END, ";
         updateDataA += "END, ";
         updateDaysBudget += "END, ";
@@ -158,7 +152,7 @@ public class WS_ForcedAccounts : System.Web.Services.WebService
         // Costruisci il comando UPDATE completo
         if (toUpdate > 0)
         {
-            sqlQueryUpdate += updatePersonsId + updateProjectsId + updateDataDa + updateDataA + updateDaysBudget + updateLastModificationDate + updateLastModifiedBy + updateWhereClause;
+            sqlQueryUpdate += updateDataDa + updateDataA + updateDaysBudget + updateLastModificationDate + updateLastModifiedBy + updateWhereClause;
         }
 
         // toglie la virgola finale

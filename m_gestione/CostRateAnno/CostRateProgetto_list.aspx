@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -19,7 +19,7 @@
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="/timereport/include/tabulator/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <!-- Tabulator  -->
 <script type="text/javascript" src="/timereport/include/tabulator/dist/js/tabulator.min.js"></script>
@@ -153,9 +153,9 @@
                             <asp:TextBox class="ASPInputcontent" runat="server" ID="TBComment" Width="260px" />
                         </div>
 
-                        <div class="" style="font-size: 10px; line-height: 14px; margin: 20px 0px -10px 10px; color: dimgrey">
-                            <p style="margin: 0px"><span style="width: 200px">[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
-                            <p style="margin: 0px"><span style="width: 200px">[M]</span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>
+                        <div class="legendaText">
+                            <p><span>[C] </span><span id="LBCreatedBy"></span><span id="LBCreationDate"></span></p>
+                            <p><span>[M] </span><span id="LBLastModifiedBy"></span><span id="LBLastModificationDate"></span></p>
                         </div>
 
                         <asp:TextBox runat="server" ID="TBProjectCostRate_id" Style="visibility: hidden; height: 0px; margin: 0px" />
@@ -383,7 +383,7 @@
 
             $('#TBProjectCostRate_id').val('0'); // attenzione!
             $('#DDLPersons').val('');
-/*          $('#DDLProjects').val('');*/
+            /*          $('#DDLProjects').val('');*/
             $('#TBComment').val('');
             $('#TBCostRate').val('');
             $('#TBBillRate').val('');
@@ -422,10 +422,13 @@
                     $('#TBDataDa').val(objProjectCostRate.DataDa);
                     $('#TBDataA').val(objProjectCostRate.DataA);
                     $('#TBComment').val(objProjectCostRate.Comment);
-                    $('#LBCreatedBy').text(objProjectCostRate.CreatedBy + " il ");
+                    // valorizzazione data/autore di creazione e modifica
+                    var CreatedBy = isNullOrEmpty(objProjectCostRate.CreatedBy) ? "" : objProjectCostRate.CreatedBy + " il ";
+                    $('#LBCreatedBy').text(CreatedBy);
                     $('#LBCreationDate').text(objProjectCostRate.CreationDate);
-                    $('#LBLastModifiedBy').text(objProjectCostRate.LastModifiedBy + " il ");
-                    $('#LBLastModificationDate').text(objProjectCostRate.LastModificationDate);
+                    var LastModifiedBy = isNullOrEmpty(objProjectCostRate.LastModifiedBy) ? "" : objProjectCostRate.LastModifiedBy + " il ";
+                    $('#LBLastModifiedBy').text(LastModifiedBy);
+                    $('#LBLastModificationDate').text(objPersonsCostRate.LastModificationDate);
 
                     openDialogForm("#dialog");
                 },

@@ -169,7 +169,7 @@ public partial class m_utilita_upload_expenses_xls1 : System.Web.UI.Page
             DataRow drExpenseType = Database.GetRow("Select TipoBonus_id, AdditionalCharges from ExpenseType where ExpenseType_id=" + idSpesa.ToString(), this.Page);
             iTipoBonus_id = Convert.ToInt32(drExpenseType["TipoBonus_id"]);
 
-            // Se la spesa è un bonus la quantità deve essere uno
+            // Se la spesa è un tickets la quantità deve essere uno
             if (iTipoBonus_id > 0 && Convert.ToDouble(dr[VALORE]) != 1)
             {
                 messaggio.Text += "\r\nRow " + i + GetLocalResourceObject("msg9").ToString() + dr[TIPOSPESA].ToString().Trim(); // ": Bonus/ticket con quantità diversa da 1 non ammesso "
@@ -184,7 +184,7 @@ public partial class m_utilita_upload_expenses_xls1 : System.Web.UI.Page
 
             if (iTipoBonus_id > 0)
             {
-                // Se sullo stesso giorno esiste già una spesa "Bonus" da errore
+                // Se sullo stesso giorno esiste già una spesa "tickets" da errore
                 if (Database.RecordEsiste("Select Expenses_Id from Expenses INNER JOIN ExpenseType ON ExpenseType.ExpenseType_id = Expenses.ExpenseType_id where ( persons_id = " + CurrentSession.Persons_id + " AND Expenses.Date = " + ASPcompatility.FormatDateDb(dr[DATA].ToString()) + " And ExpenseType.TipoBonus_id > 0 )"))
                 {
                     messaggio.Text += "\r\nRow " + i + GetLocalResourceObject("msg10").ToString() + dr[TIPOSPESA].ToString().Trim() + " - " + dr[DATA].ToString().Substring(1, 10); // ": Bonus/ticket già presente nel DB per lo stesso giorno "

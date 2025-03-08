@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -23,7 +23,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -52,35 +52,24 @@
                         <asp:Literal runat="server" Text="Controllo Progetto" />
                     </div>
 
+                    <div style="margin-top: 30px"></div>
+
                     <!--  *** PROGETTO *** -->
                     <div class="input nobottomborder">
-                        <div style="position: absolute">
                         <div class="inputtext">Progetto</div>
                             <asp:DropDownList ID="DDLProgetti" runat="server"
                                 AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged">
                             </asp:DropDownList>
                        </div>
-                    </div>
-                    <br />
-<%--                    <!--  *** ATTIVITA' *** -->
-                    <div class="input nobottomborder ">
-                        <div class="inputtext">Attività</div>
-                            <asp:DropDownList ID="DDLAttivita" runat="server"
-                                AppendDataBoundItems="True" AutoPostBack="True">
-                            </asp:DropDownList>
-                    </div>--%>
 
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
-                        <div style="position: absolute">
                         <div class="inputtext">Responsabile</div>
                             <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true"
                                 AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Responsabile" >
                                 <asp:ListItem Value="">-- Manager o Account --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
-                    </div>
-                    <br />
                     <br />
 
                     <!--  **** DATA REPORT ** -->

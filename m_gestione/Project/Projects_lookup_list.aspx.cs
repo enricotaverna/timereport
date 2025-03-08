@@ -155,7 +155,15 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
     {
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
         {
-            GVProjects.Columns[13].Visible = false;
+            // Find the column by its HeaderText
+            foreach (DataControlField column in GVProjects.Columns)
+            {
+                if (column.HeaderText == "D")
+                {
+                    column.Visible = false;
+                    break;
+                }
+            }
         }
     }
 

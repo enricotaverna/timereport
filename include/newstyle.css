@@ -511,6 +511,22 @@ select {
     width: 30px;
 }
 
+.legendaText {
+    font-size: 10px;
+    line-height: 14px;
+    margin: 20px 0px -10px 10px;
+    color: dimgrey;
+    position:inherit !important
+}
+
+    .legendaText p {
+        margin: 0px;
+    }
+
+        .legendaText p span {
+            width: 200px
+        }
+
 .SmallGreyButton {
     background: #E1E1E1;
     background: -webkit-linear-gradient(top, #e1e1e1 0%,#bababa 100%);

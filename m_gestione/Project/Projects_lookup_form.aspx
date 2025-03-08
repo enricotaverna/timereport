@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -23,7 +23,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -31,12 +31,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
-    <title><asp:Literal runat="server" Text="Anagrafica progetto" /></title>
-    <style>
-        .ui-widget-header {
-            background-color: #F1F1F1 !important;
-        }
-    </style>
+    <title>
+        <asp:Literal runat="server" Text="Anagrafica progetto" /></title>
 </head>
 
 <body>
@@ -62,12 +58,6 @@
 
                         <EditItemTemplate>
 
-                            <div class="formtitle">
-                                <asp:Literal runat="server" Text="Anagrafica Progetto" />
-                                <a href="/timereport/m_utilita/AuditLog.aspx?RecordId=<%# Eval("Projects_Id") %>&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=<%# Eval("Projects_Id") %>>">
-                                    <asp:Image ID="Image1" runat="server" ImageUrl="/timereport/images/icons/16x16/cog.png" ToolTip="Vedi log modifiche" /></a>
-                            </div>
-
                             <div id="tabs">
 
                                 <ul>
@@ -89,11 +79,22 @@
                                     </div>
 
                                     <!-- *** NOME PROGETTO ***  -->
-                                    <div class="input">
+                                    <div class="input nobottomborder">
                                         <div class="inputtext">Progetto: </div>
                                         <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>'
                                             Columns="26" MaxLength="50" class="ASPInputcontent"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                                    </div>
+
+                                    <!-- *** DATA INIZIO  ***  -->
+                                    <div class="input">
+                                        <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Inizio"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+
+                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">fine</asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' data-parsley-required="true"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                     </div>
 
                                     <!-- *** CODICE CLIENTE ***  -->
@@ -128,28 +129,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-                                    <!-- *** TIPO PROGETTO ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">Tipo progetto:</div>
-                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
-                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                            <asp:ListItem Value="" Text="Selezionare un valore" />
-                                        </asp:DropDownList>
-                                    </div>
-
-                                    <!-- *** LOB ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">LOB:</div>
-                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
-                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("LOB_Id") %>'
-                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
-                                            <asp:ListItem Value="" Text="Selezionare un valore" />
-                                        </asp:DropDownList>
-                                    </div>
-
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
@@ -172,16 +151,16 @@
                                     </div>
 
                                     <!-- *** data creazione/modifica ***  -->
-                                    <div class="input nobottomborder" style="font-size: 10px; line-height: 14px; top: 55px; position: relative">
-                                        <span style="width: 50px; display: inline-block">[C]</span>
-                                        <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
-                                        <span>il </span>
-                                        <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                    <div class="legendaText">
+                                        <span>[C]</span>
+                                        <asp:Label ID="label11" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
+                                        <%# !string.IsNullOrEmpty(Eval("CreatedBy").ToString()) ? "<span>il </span>" : "" %>
+                                        <asp:Label ID="label22" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
                                         <br />
-                                        <span style="width: 50px; display: inline-block">[M]</span>
-                                        <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
+                                        <span>[M]</span>
+                                        <asp:Label ID="label33" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
                                         <span>il </span>
-                                        <asp:Label ID="Label12" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <asp:Label ID="label44" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
                                     </div>
                                 </div>
 
@@ -202,7 +181,7 @@
                                     </div>
 
                                     <!-- *** TIPO CONTRATTO SF ***  -->
-                                    <div class="input ">
+                                    <div class="input nobottomborder">
                                         <div class="inputtext">Contratto SF: </div>
                                         <label style="width: 250px">
                                             <asp:DropDownList ID="DDLTipoContrattoSF" runat="server" AppendDataBoundItems="True"
@@ -212,10 +191,29 @@
                                                 data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
-                                            <div>&nbsp; </div>
                                     </div>
 
-                                    <div class="SeparatoreForm">Budget</div>
+                                    <!-- *** TIPO PROGETTO ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Tipo progetto:</div>
+                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
+                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
+
+                                    <!-- *** LOB ***  -->
+                                    <div class="input">
+                                        <div class="inputtext">LOB:</div>
+                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
+                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("LOB_Id") %>'
+                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
@@ -250,19 +248,6 @@
 
                                     </div>
 
-                                    <div class="SeparatoreForm">Durata Progetto</div>
-
-                                    <!-- *** DATA INIZIO  ***  -->
-                                    <div class="input nobottomborder">
-                                        <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Da"></asp:Label>
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
-                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-
-                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' data-parsley-required="true"
-                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-                                    </div>
-
                                 </div>
                                 <!-- *** TAB 2 ***  -->
 
@@ -274,7 +259,7 @@
                                     <!-- *** TESTO OBBLIGATORIO ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Testo obbl.: </div>
-                                        <asp:TextBox ID="TBMessaggioDiErrore" class="ASPInputcontent" style="width:270px" runat="server" Text='<%# Bind("MessaggioDiErrore")%>' />
+                                        <asp:TextBox ID="TBMessaggioDiErrore" class="ASPInputcontent" Style="width: 270px" runat="server" Text='<%# Bind("MessaggioDiErrore")%>' />
                                         <asp:CheckBox ID="CBTestoObbligatorio" runat="server" Checked='<%# Bind("TestoObbligatorio") %>' />
                                         <asp:Label AssociatedControlID="CBTestoObbligatorio" class="css-label" ID="Label7" runat="server" Text=""></asp:Label>
                                     </div>
@@ -359,10 +344,21 @@
                                     </div>
 
                                     <!-- *** NOME PROGETTO ***  -->
-                                    <div class="input">
+                                    <div class="input nobottomborder">
                                         <div class="inputtext">Progetto: </div>
                                         <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("Name") %>' Columns="26" MaxLength="50" class="ASPInputcontent"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                                    </div>
+
+                                    <!-- *** DATA INIZIO  ***  -->
+                                    <div class="input ">
+                                        <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Inizio"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+
+                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">fine</asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' data-parsley-required="true"
+                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                     </div>
 
                                     <!-- *** CODICE CLIENTE ***  -->
@@ -395,28 +391,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-                                    <!-- *** TIPO PROGETTO ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">Tipo progetto:</div>
-                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
-                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
-                                            <asp:ListItem Value="" Text="Selezionare un valore" />
-                                        </asp:DropDownList>
-                                    </div>
-
-                                    <!-- *** LOB ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">LOB:</div>
-                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
-                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("LOB_Id") %>'
-                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
-                                            <asp:ListItem Value="" Text="Selezionare un valore" />
-                                        </asp:DropDownList>
-                                    </div>
-
                                     <!-- *** CANALE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Canale:</div>
@@ -438,8 +412,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-
-
                                 </div>
                                 <!-- *** TAB 1 ***  -->
 
@@ -459,7 +431,7 @@
                                     </div>
 
                                     <!-- *** TIPO CONTRATTO SF ***  -->
-                                    <div class="input ">
+                                    <div class="input nobottomborder">
                                         <div class="inputtext">Contratto SF: </div>
                                         <label style="width: 250px">
                                             <asp:DropDownList ID="DDLTipoContrattoSF" runat="server" AppendDataBoundItems="True"
@@ -469,10 +441,29 @@
                                                 data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
-                                            <div>&nbsp; </div>
                                     </div>
 
-                                    <div class="SeparatoreForm">Budget</div>
+                                    <!-- *** TIPO PROGETTO ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Tipo progetto:</div>
+                                        <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
+                                            DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
+
+                                    <!-- *** LOB ***  -->
+                                    <div class="input ">
+                                        <div class="inputtext">LOB:</div>
+                                        <asp:DropDownList ID="DDLLOB" runat="server" DataSourceID="lob"
+                                            DataTextField="Description" DataValueField="LOB_Id" AppendDataBoundItems="True"
+                                            SelectedValue='<%# Bind("LOB_Id") %>'
+                                            data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
@@ -505,19 +496,6 @@
                                         <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
                                         <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime"></asp:Label>
 
-                                    </div>
-
-                                    <div class="SeparatoreForm">Durata Progetto</div>
-
-                                    <!-- *** DATA INIZIO  ***  -->
-                                    <div class="input nobottomborder">
-                                        <asp:Label ID="Label8" CssClass="inputtext" runat="server" Text="Da"></asp:Label>
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoDa" runat="server" Text='<%# Bind("DataInizio", "{0:d}") %>' MaxLength="10" Rows="8" Width="100px"
-                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
-
-                                        <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
-                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' data-parsley-required="true"
-                                            data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                     </div>
 
                                 </div>
@@ -695,20 +673,19 @@
                                             SelectedValue='<%# Bind("Company_id") %>' EnableTheming="True" Enabled="False">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
-
                                     </div>
 
                                     <!-- *** data creazione/modifica ***  -->
-                                    <div class="nobottomborder" style="font-size: 10px; line-height: 14px; top: 10px">
+                                    <div class="legendaText">
                                         <span>[C]</span>
-                                        <asp:Label ID="Label13" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
+                                        <asp:Label ID="label11" runat="server" Text='<%# Bind("CreatedBy")%>'></asp:Label>
                                         <span>il </span>
-                                        <asp:Label ID="Label11" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <asp:Label ID="label22" runat="server" Text='<%# Bind("CreationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
                                         <br />
                                         <span>[M]</span>
-                                        <asp:Label ID="Label10" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
+                                        <asp:Label ID="label33" runat="server" Text='<%# Bind("LastModifiedBy")%>'></asp:Label>
                                         <span>il </span>
-                                        <asp:Label ID="Label12" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
+                                        <asp:Label ID="label44" runat="server" Text='<%# Bind("LastModificationDate", "{0:dd/MM/yyyy HH:mm:ss}")%>'></asp:Label>
                                     </div>
 
 
@@ -749,7 +726,7 @@
                                     <!-- *** MARGINE TARGET ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
-                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta") %>' Enabled="False"/>
+                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta") %>' Enabled="False" />
                                     </div>
 
                                     <div class="SeparatoreForm">Durata</div>
@@ -783,15 +760,15 @@
                                         <asp:Label AssociatedControlID="CBTestoObbligatorio" class="css-label" ID="Label7" runat="server" Text=""></asp:Label>
                                     </div>
 
-                                     <!-- *** VISIBILITA ***  -->
-                                      <div class="input nobottomborder">
-                                          <div class="inputtext">Attivo per:</div>
-                                          <asp:DropDownList ID="DDLVisibility" runat="server" AppendDataBoundItems="True"  Enabled="False"
-                                              DataSourceID="DSVisibility" DataTextField="VisibilityName"
-                                              DataValueField="ProjectVisibility_id" SelectedValue='<%# Bind("ProjectVisibility_id") %>'>
-                                              <asp:ListItem Value="" Text="Selezionare un valore" />
-                                          </asp:DropDownList>
-                                      </div>
+                                    <!-- *** VISIBILITA ***  -->
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Attivo per:</div>
+                                        <asp:DropDownList ID="DDLVisibility" runat="server" AppendDataBoundItems="True" Enabled="False"
+                                            DataSourceID="DSVisibility" DataTextField="VisibilityName"
+                                            DataValueField="ProjectVisibility_id" SelectedValue='<%# Bind("ProjectVisibility_id") %>'>
+                                            <asp:ListItem Value="" Text="Selezionare un valore" />
+                                        </asp:DropDownList>
+                                    </div>
 
                                     <!-- *** CHECKBOX ***  -->
                                     <div class="input nobottomborder">
@@ -840,7 +817,7 @@
                             </div>
 
                         </ItemTemplate>
-
+                       
                     </asp:FormView>
 
                 </div>
@@ -1081,13 +1058,11 @@
 
             // stile checkbox form in ReadOnly   
             $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
-            /*$("#FVProgetto_DisAlwaysAvailableCheckBox").addClass("css-checkbox");*/
             $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
             $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
 
             $("#FVProgetto_DisActivityOn").attr("disabled", true);
-            /*$("#FVProgetto_DisAlwaysAvailableCheckBox").attr("disabled", true);*/
             $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
             $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
             $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
@@ -1105,6 +1080,25 @@
                 $("#FVProgetto_TBMargine").val(percentCent);
             }
 
+            // in modifica posizione icona del log modifiche
+            if ($("#FVProgetto_TBProgetto").val() != "" )
+                $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
+
+            // Optional: Add CSS to style the icon
+            $(".icon-link").css({
+                "float": "right",
+                "margin-right": "10px",
+                "color": "white",
+                "font-size": "20px",
+                "text-decoration": "none"
+            });
+
+            // Optional: Add click event handler for the icon
+            $(".icon-link").click(function (event) {
+                event.preventDefault();
+                var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=<%= Session["Projects_Id"].ToString() %>&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=<%=Session["Projects_Id"].ToString() %>>";
+                window.location.href = logUrl;                  
+            });
         });
     </script>
 

@@ -38,7 +38,7 @@ public partial class input : System.Web.UI.Page
         //    ProcessDragDrop(Request["__EVENTARGUMENT"]);
         //}
 
-        if ((string)Session["type"] == "bonus")
+        if ((string)Session["type"] == "tickets")
         {
             BindDDLProjects();
             Bind_DDLOpportunita();
@@ -257,12 +257,12 @@ public partial class input : System.Web.UI.Page
         string sLastDay = ASPcompatility.DaysInMonth(Convert.ToInt16(Session["month"]), Convert.ToInt16(Session["year"])).ToString();
         string sQuery = "";
 
-        // Estrae i record di spesa o bonus a seconda del tipo scheda
+        // Estrae i record di spesa o tickets a seconda del tipo scheda
         if ((string)Session["type"] == "expenses")
             sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId, expenses.CreatedBy, expenses.CreationDate FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id = 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
-        else if ((string)Session["type"] == "bonus")
+        else if ((string)Session["type"] == "tickets")
             sQuery = "SELECT Projects.ProjectCode, expenses.amount, expenses.expenses_id, ExpenseType.ExpenseCode, ExpenseType.UnitOfMeasure, Projects.Name, ExpenseType.Name as NomeSpesa, expenses.date, expenses.comment, expenses.TipoBonus_id, CancelFlag, InvoiceFlag, CreditCardPayed, CompanyPayed, expenses.OpportunityId, expenses.CreatedBy, expenses.CreationDate FROM (expenses INNER JOIN projects ON expenses.projects_id=projects.projects_id) INNER JOIN ExpenseType ON  ExpenseType.ExpenseType_id=Expenses.ExpenseType_id WHERE expenses.Persons_id=" + CurrentSession.Persons_id + " AND expenses.TipoBonus_id <> 0 " +
                      " AND expenses.date >= " + ASPcompatility.FormatDateDb("01/" + Session["month"] + "/" + Session["year"], false) +
                      " AND expenses.date <= " + ASPcompatility.FormatDateDb(sLastDay + "/" + Session["month"] + "/" + Session["year"], false);
@@ -578,8 +578,8 @@ public partial class input : System.Web.UI.Page
                         Response.Write("<a  align=right href=input-spese.aspx?action=new&date=" + sDate + "><img align=right src=images/icons/16x16/nuovo.gif width=16 height=16 border=0></a>");
                         break;
 
-                    case "bonus":  // CALENDARIO SPECIALI
-                                   // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
+                    case "tickets":  // CALENDARIO SPECIALI
+                                     // Stampa ticket solo se non già presente per persona/data un ticket o un buono pasto
                         DataRow[] drFound = dtenses.Select("Date = '" + Convert.ToDateTime(sDate) + "'");
 
                         if (!bHoliday) // giorno on è un festivo

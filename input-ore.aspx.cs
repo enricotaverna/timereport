@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 public partial class input_ore : System.Web.UI.Page
@@ -393,9 +394,15 @@ public partial class input_ore : System.Web.UI.Page
             // se display
             LBAccountingDate.Visible = false;
             TBAccountingDate.Visible = false;
-            LBCancel.Visible = false;
-            TBCancel.Visible = false;
+            if (LBCancel != null)
+                LBCancel.Visible = false;
+            if (TBCancel != null)
+                TBCancel.Visible = false;
 
+            // cancella la classe input2col per mantenere la formattazione del form in assenza del flag di storno
+            var spanHours = (HtmlGenericControl)FVore.FindControl("spanHours");
+            if (spanHours != null)
+                spanHours.Attributes["class"] = spanHours.Attributes["class"].Replace("input2col", "").Trim();
         }
     }
 

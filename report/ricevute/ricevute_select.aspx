@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -21,10 +21,10 @@
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -53,47 +53,38 @@
 
                     <!--  *** PROGETTO *** -->
                     <div class="input nobottomborder absolute">
-                        <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Progetto</div>
                             <asp:DropDownList ID="DDLProject" runat="server" CssClass="SumoDLL"
                                 AppendDataBoundItems="True" AutoPostBack="false" DataSourceID="SqlDSProjects" DataTextField="ProjectName" DataValueField="Projects_id">
                                 <asp:ListItem Value="" Text="--- Tutti i progetti ---" />
                             </asp:DropDownList>
-                        </div>
                     </div>
 
-                    <br />
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <!--  *** SOCIETA *** -->
                     <div class="input nobottomborder">
-                        <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Società</div>
                             <asp:DropDownList ID="DDLSocieta" runat="server" CssClass="SumoDLL"
                                 AppendDataBoundItems="True" AutoPostBack="false" DataSourceID="SQLDSSocieta" DataTextField="Name" DataValueField="Company_id">
                                 <asp:ListItem Value="" Text="--- Tutte le società ---" />
                             </asp:DropDownList>
-                        </div>
                     </div>
 
-                    <br />
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <!--  *** TIPO SPESA *** -->
                     <div class="input nobottomborder">
-                        <div style="position: absolute">
                             <!-- aggiunto per evitare il troncamento della dropdonwlist -->
                             <div class="inputtext">Tipo Spesa</div>
                             <asp:DropDownList ID="DDLTipoSpesa" runat="server" CssClass="SumoDLL"
                                 AppendDataBoundItems="True" AutoPostBack="false" DataSourceID="SQLDSTipoSpesa" DataTextField="NomeSpesa" DataValueField="ExpenseType_Id">
                                 <asp:ListItem Value="" Text="--- Tutte le spese ---" />
                             </asp:DropDownList>
-                        </div>
                     </div>
 
-                    <br />
                     <!-- per tenere formattazione dopo ila div absolute-->
 
                     <!--  *** FLAG FATTURA *** -->

@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -23,7 +23,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -228,9 +228,9 @@
                                     <div class="input nobottomborder ">
                                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                                         <label class="dropdown">
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager"
+                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" OnDataBound="DDLManager_DataBound"
                                                 DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" required="true"
-                                                SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
+                                                AppendDataBoundItems="True">
                                                 <asp:ListItem Value="" Text="Seleziona un valore" />
                                             </asp:DropDownList>
                                         </label>
@@ -458,7 +458,7 @@
                                     <div class="input nobottomborder ">
                                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                                         <label class="dropdown" style="width: 190px">
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager"
+                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" OnDataBound="DDLManager_DataBound"
                                                 DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" required="true"
                                                 SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
                                                 <asp:ListItem Value="" Text="Seleziona un valore" />

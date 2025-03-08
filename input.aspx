@@ -8,7 +8,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -27,7 +27,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 <link href="/timereport/include/jquery/tooltip/jquery.smallipop.css" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -77,14 +77,11 @@
 
                     <!-- *** DDL Opportunità ***  -->
                     <div class="input nobottomborder" id="lbOpportunityId">
-                        <div style="position: absolute">
                             <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;"></asp:Label>
                             <!-- per stile CSS -->
                             <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True" 
                                 data-parsley-required="true" data-parsley-errors-container="#valMsg">
                             </asp:DropDownList>
-                        </div>
-                        <br />
                     </div>
 
                     <div class="input nobottomborder">
@@ -192,7 +189,7 @@
                             ce = "Tab-active";
                             ch = cs = ca = "Tab-noactive";
                             break;
-                        case "bonus":
+                        case "tickets":
                             cs = "Tab-active";
                             ch = ce = ca = "Tab-noactive";
                             break;
@@ -211,7 +208,7 @@
 
                     // solo se dipendente
                     if (Auth.ReturnPermission("DATI", "BUONI"))
-                        Response.Write("<a class=" + cs + " id='buoni' href=input.aspx?type=bonus>" + GetLocalResourceObject("BUONI") + "</a>");
+                        Response.Write("<a class=" + cs + " id='tickets' href=input.aspx?type=tickets>" + GetLocalResourceObject("TICKETS") + "</a>");
 
                     // solo se dipendente
                     if (Auth.ReturnPermission("DATI", "ASSENZE") && ConfigurationManager.AppSettings["LEAVE_ON"] == "true")
@@ -247,7 +244,7 @@
                             // First columns --------------------------------------				
                             if ((string)Session["type"] == "hours")
                                 FindHours(cnt);
-                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "tickets")
                                 FindExpenses(cnt);
                             else
                                 FindAssenze(cnt);
@@ -255,7 +252,7 @@
                             // Second columns --------------------------------------
                             if ((string)Session["type"] == "hours")
                                 FindHours(cnt + 10);
-                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "tickets")
                                 FindExpenses(cnt + 10);
                             else
                                 FindAssenze(cnt + 10);
@@ -263,7 +260,7 @@
                             // Third columns --------------------------------------
                             if ((string)Session["type"] == "hours")
                                 FindHours(cnt + 20);
-                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "tickets")
                                 FindExpenses(cnt + 20);
                             else
                                 FindAssenze(cnt + 20);
@@ -289,7 +286,7 @@
                             Response.Write("<tr><td>&nbsp;</td><td>&nbsp;</td>");
                             if ((string)Session["type"] == "hours")
                                 FindHours(31);
-                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "bonus")
+                            else if ((string)Session["type"] == "expenses" | (string)Session["type"] == "tickets")
                                 FindExpenses(31);
                             else
                                 FindAssenze(31);
@@ -402,7 +399,7 @@
             $('.SumoSelect > .optWrapper').css('width', '550px');
         }
 
-        //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / bonus associato e aggiorna la pagina WEB
+        //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / tickets associato e aggiorna la pagina WEB
         function DeleteRecord(Id) {
 
             // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }

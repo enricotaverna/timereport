@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.UI.WebControls;
@@ -22,7 +25,8 @@ public partial class Esporta : System.Web.UI.Page
         // se non ADMIN o MANAGER spegne il tasto Chargeable e selezioni per società/cliente/manager
         if (!Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
-            btChargeable.Visible = false;
+            //btChargeable.Visible = false;
+            DivOpportunitaSpese.Visible = false;
             DivManager.Visible = false;
             DivCliente.Visible = false;
             DivSocieta.Visible = false;
@@ -55,11 +59,12 @@ public partial class Esporta : System.Web.UI.Page
         btPrjAttivi.CssClass = "btn btn-outline-secondary";
         btPerAll.CssClass = "btn btn-primary";
         btPerAttivi.CssClass = "btn btn-outline-secondary";
-        btChargeAll.CssClass = "btn btn-primary";
-        btCharge.CssClass = "btn btn-outline-secondary";
+        //btChargeAll.CssClass = "btn btn-primary";
+        //btCharge.CssClass = "btn btn-outline-secondary";
 
         CBLProgetti_Load();
         CBLPersone_Load();
+        CBLOpportunita_Load();
 
         // Popola dropdown con i valori          
         ASPcompatility.SelectYears(ref DDLFromYear);
@@ -83,16 +88,26 @@ public partial class Esporta : System.Web.UI.Page
     }
 
     // Costruisce condizione Where
-    protected string Build_where()
+    protected string Build_where(string selType) // selType = "1" ore, "2" spese
     {
         string sWhereClause = "";
 
         string sListaProgettiSel = Utilities.ListSelections(CBLProgetti);
         string sListaProgettiAll = Utilities.ListSelections(CBLProgetti, true);
         string sListaPersoneSel = Utilities.ListSelections(CBLPersone);
+        string sListaOpportunitaSel = Utilities.ListSelections(CBLOpportunita);
+        string sListaTipoSpesaSel = Utilities.ListSelections(CBLTipoSpese);
 
         bool bProgettiSelezionati = !string.IsNullOrEmpty(sListaProgettiSel);
         bool bPersoneSelezionate = !string.IsNullOrEmpty(sListaPersoneSel);
+        bool bOpportunitaSelezionati = !string.IsNullOrEmpty(sListaOpportunitaSel);
+        bool bTipoSpesaSelezionati = !string.IsNullOrEmpty(sListaTipoSpesaSel);
+
+        if (bOpportunitaSelezionati)
+            sWhereClause = Addclause(sWhereClause, "Opportunityid IN (" + sListaOpportunitaSel + " )");
+
+        if (bTipoSpesaSelezionati && selType == "2")
+            sWhereClause = Addclause(sWhereClause, "ExpenseType_id IN (" + sListaTipoSpesaSel + " )");
 
         // *** ADMIN
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
@@ -206,23 +221,24 @@ public partial class Esporta : System.Web.UI.Page
                 btPerAll.CssClass = "btn btn-outline-secondary";
                 break;
 
-            case "btCharge":
-                Session["bChargeableAndOthers"] = false;
-                btCharge.CssClass = "btn btn-primary";
-                btChargeAll.CssClass = "btn btn-outline-secondary";
-                break;
+                //case "btCharge":
+                //    Session["bChargeableAndOthers"] = false;
+                //    btCharge.CssClass = "btn btn-primary";
+                //    btChargeAll.CssClass = "btn btn-outline-secondary";
+                //    break;
 
-            case "btChargeAll":
-                Session["bChargeableAndOthers"] = true;
-                btChargeAll.CssClass = "btn btn-primary";
-                btCharge.CssClass = "btn btn-outline-secondary";
-                break;
+                //case "btChargeAll":
+                //    Session["bChargeableAndOthers"] = true;
+                //    btChargeAll.CssClass = "btn btn-primary";
+                //    btCharge.CssClass = "btn btn-outline-secondary";
+                //    break;
 
         }
 
         // ricarica i progetti e persone
         CBLProgetti_Load();
         CBLPersone_Load();
+        CBLOpportunita_Load();
 
         return;
     }
@@ -263,7 +279,7 @@ public partial class Esporta : System.Web.UI.Page
         // salva i valori in variabili di sessione per non doverli reinserire
         SaveSelectionsValue();
 
-        sWhereClause = Build_where();
+        sWhereClause = Build_where(RBTipoExport.SelectedValue);
 
         switch (RBTipoExport.SelectedValue)
         {
@@ -331,35 +347,87 @@ public partial class Esporta : System.Web.UI.Page
     // Carica DDL progetti - Chiamato da evento OnLoad del DDL
     protected void CBLProgetti_Load()
     {
-        string whereClause = "";
+        DataTable dtProjectsDDL = new DataTable();
+        DataTable dtMerged = new DataTable();
 
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
         {
+            dtMerged = Database.GetData("SELECT Projects_id, ProjectCode + ' ' + Name AS DescProgetto FROM Projects " +
+                                            ((bool)Session["bProgettiAll"] == false ? " WHERE Active = 1 " : "") +
+                                            " ORDER BY DescProgetto");
+        }
+        else
+        // i progetti assegnati + quelli di cui è manager 
+        //if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
+        {
+            // carica progetti di cui la persone è manager o account
+            dtProjectsDDL = Database.GetData("SELECT Projects_id, ProjectCode + ' ' + Name AS DescProgetto FROM Projects " +
+                                             " WHERE AccountManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR ClientManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
+                                             ((bool)Session["bProgettiAll"] == false ? " AND Active = 1 " : "") +
+                                             " ORDER BY DescProgetto");
 
-            if ((bool)Session["bProgettiAll"] == false)
-                whereClause = Addclause(whereClause, "Active = 1");
+            // Unisci dtProjectsDDL con CurrentSession.dtProgettiForzati
+            dtMerged = dtProjectsDDL.Clone(); // Crea una nuova DataTable con la stessa struttura
 
-            if ((bool)Session["bChargeableAndOthers"] == false)
-                whereClause = Addclause(whereClause, "ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"]);
+            foreach (DataRow row in CurrentSession.dtProgettiForzati.Rows)
+            {
+                dtMerged.ImportRow(row);
+            }
 
-            DSProgetti.SelectCommand = "SELECT Projects_id, ProjectCode, ProjectCode + ' ' + Name AS txtcodes FROM Projects " +
-                                        (whereClause != "" ? ("WHERE " + whereClause) : "") +
-                                        " ORDER BY ProjectCode";
+            foreach (DataRow row in dtProjectsDDL.Rows)
+            {
+                // Aggiungi solo se non è già presente nella lista
+                if (!dtMerged.AsEnumerable().Any(r => r.Field<int>("Projects_id") == row.Field<int>("Projects_id")))
+                {
+                    dtMerged.ImportRow(row);
+                }
+            }
         }
 
-        // i progetti assegnati + quelli di cui è manager
-        if (Auth.ReturnPermission("REPORT", "PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL"))
-            DSProgetti.SelectCommand = "SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a" +
-                                       " INNER JOIN ForcedAccounts as b ON a.Projects_id = b.Projects_id " +
-                                       " WHERE b.persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
-                                       ((bool)Session["bProgettiAll"] == false ? " AND a.Active = 1 " : "") +
-                                       ((bool)Session["bChargeableAndOthers"] == false ? " AND a.ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] : "") +
+        // Ordina la lista dei progetti per ProjectCode
+        var sortedRows = dtMerged.AsEnumerable().OrderBy(r => r.Field<string>("DescProgetto"));
 
-                                       " UNION " +
-                                       " SELECT DISTINCT a.Projects_id, a.ProjectCode, a.ProjectCode + ' ' + a.Name AS txtcodes FROM Projects AS a " +
-                                       " WHERE ( a.clientmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR a.Accountmanager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ") " +
-                                       ((bool)Session["bProgettiAll"] == false ? " AND a.Active = 1 " : "") +
-                                        " ORDER BY ProjectCode";
+        // Assegna i progetti al controllo CBLProgetti
+        CBLProgetti.Items.Clear();
+        foreach (var row in sortedRows)
+        {
+            CBLProgetti.Items.Add(new ListItem(row["DescProgetto"].ToString(), row["Projects_id"].ToString()));
+        }
+    }
+
+    protected void CBLOpportunita_Load()
+    {
+        ListBox DDLOpportunity;
+        List<Opportunity> ListaOpportunita = new List<Opportunity>();
+
+        //valorizzazione con valore default
+        DDLOpportunity = CBLOpportunita;
+
+        //DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
+        DDLOpportunity.Items.Clear();
+        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+
+        //if (FVore.CurrentMode == FormViewMode.Insert | FVore.CurrentMode == FormViewMode.Edit)
+        //    ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+        //else
+        ListaOpportunita = CurrentSession.ListaAllOpportunity;
+
+        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+        // di progetti chiusi
+        foreach (Opportunity opp in ListaOpportunita)
+        {
+            ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+            DDLOpportunity.Items.Add(liItem);
+        }
+
+        DDLOpportunity.DataTextField = "OpportunityName";
+        DDLOpportunity.DataValueField = "OpportunityId";
+        DDLOpportunity.DataBind();
+
+        //if (FVore.CurrentMode == FormViewMode.Insert)
+        //    DDLOpportunity.SelectedValue = (string)Session["OpportunityDefault"];
+        //else
+        //    DDLOpportunity.SelectedValue = OpportunityId;
     }
 
     protected override void InitializeCulture()

@@ -7,6 +7,10 @@ public class MyConstants
     public static int Last_year = DateTime.Now.Year + 1;
     public static int First_year = Last_year - 5;
 
+    // versioni JSS AND CSS
+    public static string CSS_VERSION = "1.1"; // aggiornamenti massivi
+    public static string JSS_VERSION = "1.1"; // aggiornamenti massivi
+
     // ------ Auth level --------
     public static int AUTH_ADMIN = 5; // aggiornamenti massivi
     public static int AUTH_MANAGER = 4; // Manager

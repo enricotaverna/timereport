@@ -23,12 +23,12 @@
         CurrentSession = Session("CurrentSession")
 
         ' Imposta il SelectCommand in base al contenuto della lista dropdown
-        If DL_flattivo.SelectedValue <> "all" Or _
+        If DL_flattivo.SelectedValue <> "all" Or
 (Session("Persons_DL_flattivo_val") <> Nothing And Not IsPostBack) Then
             sWhere = " WHERE Persons.Active IN (@DL_flattivo)"
         End If
 
-        If TB_Nome.Text <> Nothing Or _
+        If TB_Nome.Text <> Nothing Or
             (Session("TB_Nome_val") <> Nothing And Not IsPostBack) Then
             sC1 = IIf(sWhere = "", " WHERE ", " AND ")
             sWhere = sWhere & sC1 & "Persons.Name LIKE '%' + (@TB_Nome) + '%' "
@@ -100,7 +100,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -113,8 +113,8 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" >
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -130,7 +130,7 @@
 <body>
 
     <!-- *** APPLICTION MENU *** -->
-	<div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
@@ -188,10 +188,18 @@
                             <asp:CheckBoxField DataField="active" HeaderText="Attivo" />
                             <asp:BoundField DataField="attivo_da" HeaderText="Attivo da"
                                 DataFormatString="{0:dd-MM-yyyy}" SortExpression="attivo_da" />
-                            <asp:CommandField ShowDeleteButton="True" ButtonType="Image"
-                                DeleteImageUrl="/timereport/images/icons/16x16/trash.gif"
-                                SelectImageUrl="/timereport/images/icons/16x16/modifica.gif"
-                                ShowSelectButton="True" />
+
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
 
                         </Columns>
                         <PagerStyle CssClass="GV_footer" />

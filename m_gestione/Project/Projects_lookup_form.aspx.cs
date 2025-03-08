@@ -105,6 +105,11 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 DDLCliente.SelectedValue = cliente;
 
         }
+
+        // usato per valorizzare la chiave del log modifiche
+        if (Request.QueryString["Projectcode"] != null)
+            Session["Projects_Id"] = FVProgetto.DataKey["Projects_Id"].ToString();
+
     }
 
     protected void DSprojects_Insert(object sender, SqlDataSourceCommandEventArgs e)
@@ -160,6 +165,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     protected void CloneButton_Click(object sender, EventArgs e)
     {
         int projectsId = (int)FVProgetto.DataKey["Projects_Id"];
-        Response.Redirect("Project_copy_form.aspx?Project_id=" + projectsId + "&ProjectCode=" + Request.QueryString["Projectcode"]);
+        Response.Redirect("CloneProject.aspx?Project_id=" + projectsId + "&ProjectCode=" + Request.QueryString["Projectcode"]);
     }
 }

@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BUONI" xml:space="preserve">
-    <value>Buoni</value>
+  <data name="TICKETS" xml:space="preserve">
+    <value>Tickets</value>
   </data>
   <data name="chiudi_timereport" xml:space="preserve">
     <value>Chiudi Timereport</value>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class persons_lookup_form : System.Web.UI.Page
@@ -74,5 +75,15 @@ public partial class persons_lookup_form : System.Web.UI.Page
     {
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+    }
+
+    protected void DDLManager_DataBound(object sender, EventArgs e)
+    {
+        DropDownList ddlManager = (DropDownList)sender;
+        object managerId = DataBinder.Eval(FVPersone.DataItem, "Manager_id");
+        string selectedValue = managerId != null ? managerId.ToString() : "";
+
+        // Check if the selected value exists in the list
+        ddlManager.SelectedValue = ddlManager.Items.FindByValue(selectedValue) != null ? selectedValue : "";
     }
 }

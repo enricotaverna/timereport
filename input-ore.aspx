@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -23,7 +23,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -54,8 +54,8 @@
                         OnDataBound="FVore_DataBound"
                         OnModeChanging="FVore_modechanging" CellPadding="0">
 
-                        <%-- EDIT --%>
-                        <EditItemTemplate>
+        <%-- EDIT --%>
+        <EditItemTemplate>
 
                             <div class="formtitle">
                                 <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
@@ -118,7 +118,7 @@
                             <!-- *** TB Ore ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource1"></asp:Label>
-                                <span class="input2col">
+                                <span class="input2col" id="spanHours" runat="server">
                                     <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource1"
                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
@@ -163,8 +163,8 @@
 
                         </EditItemTemplate>
 
-                        <%-- INSERT --%>
-                        <InsertItemTemplate>
+            <%-- INSERT --%>
+            <InsertItemTemplate>
 
                             <div class="formtitle">
                                 <asp:Literal runat="server" Text="<%$ Resources:Titolo%>" />
@@ -225,7 +225,7 @@
                             <!-- *** TB Ore ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource2"></asp:Label>
-                                <span class="input2col">
+                                <span runat="server" id="spanHours" class="input2col">
                                     <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" AutoPostBack="false" Text='<%# Bind("Hours") %>' Columns="5" meta:resourcekey="HoursTextBoxResource2"
                                         data-parsley-errors-container="#valMsg" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true" />
                                 </span>
@@ -245,7 +245,7 @@
                                 </asp:DropDownList>
                                 <asp:Button Text="Refresh" CssClass="greybutton" runat="server" ID="btnRefresh" OnClick="btnRefresh_Click" />
                             </div>
-
+                            
                             <!-- *** TB Comment ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label1" runat="server" Text="Nota" meta:resourcekey="Label1Resource2"></asp:Label>
@@ -268,7 +268,7 @@
                                 <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
                             </div>
 
-                        </InsertItemTemplate>
+            </InsertItemTemplate>
 
                         <%-- DISPLAY --%>
                         <ItemTemplate>
@@ -326,7 +326,7 @@
                             <!-- *** TB Ore ***  -->
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Ore" meta:resourcekey="Label4Resource3"></asp:Label>
-                                <span class="input2col">
+                                <span class="input2col" id="spanHours" runat="server">
                                     <asp:TextBox autocomplete="off" CssClass="ASPInputcontent" ID="HoursTextBox" runat="server" Text='<%# Bind("Hours") %>' Columns="5" Enabled="False" meta:resourcekey="HoursTextBoxResource3" />
                                 </span>
 
@@ -621,11 +621,13 @@
             e.preventDefault();
 
             // Trigger validation without submitting the form
-            form.validate();
-
-            // Check if the form is valid
-            if (!form.isValid())
+            if (!form.validate()) {
+                // in modale la sola applicazione di fogli di stile per nascondere i messaggi di errore non è sufficiente
+                var errorMessages = $('#valMsg .parsley-errors-list.filled');
+                if (errorMessages.length > 1)
+                    errorMessages.not(':first').hide();
                 return;
+            }
 
             // formattazione valori
             var Activity = isNullOrEmpty($('#FVore_DDLAttivita').val()) ? 0 : $('#FVore_DDLAttivita').val();

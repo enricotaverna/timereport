@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -24,7 +24,7 @@
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
 <link href="/timereport/include/jquery/sumoselect/sumoselect.css" rel="stylesheet" />
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <!-- Jquery per Uploader  -->
 <script src="/timereport/include/uploader/jquery.ui.widget.js"></script>
@@ -139,7 +139,7 @@
                                     <span class="inputtext">&nbsp;</span>
                                     <span class="input2col">
                                         <asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' />
-                                        <asp:Label runat="server" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
+                                        <asp:Label ID="LBcancel" runat="server" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
                                     </span>
                                     <asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>' />
                                     <asp:Label runat="server" AssociatedControlID="CBCompanyPayed" meta:resourcekey="Label9Resource1"></asp:Label>
@@ -208,14 +208,11 @@
 
                                 <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <div style="position: absolute">
-                                    <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
+                                             <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
                                     <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"  
                                          data-parsley-required="true" data-parsley-errors-container="#valMsg">
                                     </asp:DropDownList>
-                                    </div>                               
-                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -244,7 +241,7 @@
                                     <!-- *** Flag Storno / Pagato Azienda ***  -->
                                     <span class="input2col">
                                         <asp:CheckBox ID="CBcancel" runat="server" Checked='<%# Bind("CancelFlag") %>' />
-                                        <asp:Label runat="server" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
+                                        <asp:Label runat="server" ID="LBcancel" AssociatedControlID="CBcancel" meta:resourcekey="Label8Resource1"></asp:Label>
                                     </span>
                                     <asp:CheckBox ID="CBCompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed") %>' />
                                     <asp:Label runat="server" AssociatedControlID="CBCompanyPayed" meta:resourcekey="Label9Resource1"></asp:Label>
@@ -313,14 +310,11 @@
 
                                 <!-- *** DDL Opportunità ***  -->
                                 <div class="input nobottomborder" id="lbOpportunityId">
-                                    <div style="position: absolute">
-                                    <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
+                                     <asp:Label CssClass="inputtext" runat="server" Text="Opportunit&agrave;" ></asp:Label>
                                     <!-- per stile CSS -->
                                     <asp:DropDownList ID="DDLOpportunity" runat="server" AppendDataBoundItems="True"
                                          Enabled="False">
                                     </asp:DropDownList>
-                                    </div>                               
-                                    <br />
                                 </div>
 
                                 <!-- *** Valore e storno ***  -->
@@ -585,6 +579,7 @@
                 autoUpload: true,
                 // Allowed file types and size
                 acceptFileTypes: /(jpg)|(jpeg)|(png)|(gif)|(pdf)|(bmp)$/i,
+                maxFileSize: 5000000, // 5 MB
                 // Resize immagini
                 disableImageResize: /Android(?!.*Chrome)|Opera/
                     .test(window.navigator && navigator.userAgent),
@@ -605,7 +600,19 @@
                     $('.bar').width(0);
                 })
                 .bind('fileuploadfail', function (e, data) {
-                    alert(data);
+                    // Cattura e visualizza il messaggio di errore
+                    var errorMessage = "Errore durante il caricamento del file.";
+                    if (data.errorThrown) {
+                        errorMessage += " Dettagli: " + data.errorThrown;
+                    }
+                    ShowPopup(errorMessage);
+                })
+                .bind('fileuploadprocessfail', function (e, data) {
+                    var errorMessage = "Errore durante il caricamento del file.";
+                    if (data.files[0].error) {
+                        errorMessage += " Dettagli: " + data.files[0].error;
+                    }
+                    ShowPopup(errorMessage);
                 })
         });
 
@@ -615,11 +622,13 @@
             e.preventDefault();
 
             // Trigger validation without submitting the form
-            form.validate();
-
-            // Check if the form is valid
-            if (!form.isValid())
+            if (!form.validate()) {
+                // in modale la sola applicazione di fogli di stile per nascondere i messaggi di errore non è sufficiente
+                var errorMessages = $('#valMsg .parsley-errors-list.filled');
+                if (errorMessages.length > 1)
+                    errorMessages.not(':first').hide();
                 return;
+            }
 
             var ExpensesId = '<%= String.IsNullOrEmpty(Request.QueryString["expenses_id"]) ? "0" : Request.QueryString["expenses_id"] %>';
             var AccountingDate = isNullOrEmpty($('#FVSpese_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();

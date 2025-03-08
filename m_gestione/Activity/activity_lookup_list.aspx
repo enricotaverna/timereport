@@ -7,7 +7,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -21,7 +21,7 @@
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <style>
     .inputtext, .ASPInputcontent {
@@ -58,7 +58,7 @@
                             <label class="inputtext">Attivo</label>
                         </div>
                         <div class="col-5">
-                            <asp:DropDownList ID="DL_flattivo" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged" >
+                            <asp:DropDownList ID="DL_flattivo" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged">
                                 <asp:ListItem Value="99">Tutti i valori</asp:ListItem>
                                 <asp:ListItem Selected="True" Value="1">Attivo</asp:ListItem>
                                 <asp:ListItem Value="0">Non attivo</asp:ListItem>
@@ -93,8 +93,7 @@
                             <label class="inputtext">Attività</label>
                         </div>
                         <div class="col-5">
-                            <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"
-                                ></asp:TextBox>
+                            <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"></asp:TextBox>
                             &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
                         </div>
                     </div>
@@ -124,10 +123,16 @@
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
                             <asp:BoundField DataField="NomeManager" HeaderText="Director" SortExpression="NomeManager" />
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Budget(€)" ReadOnly="True" SortExpression="RevenueBudget" DataFormatString="{0:n0}" />
-<%--                            <asp:BoundField DataField="MargineProposta" HeaderText="Margine" ReadOnly="True" SortExpression="MargineProposta" DataFormatString="{0:P1}" />--%>
-                            <asp:CommandField ShowDeleteButton="True" ShowSelectButton="True" ButtonType="Image"
-                                DeleteImageUrl="/timereport/images/icons/16x16/trash.gif" SelectImageUrl="/timereport/images/icons/16x16/modifica.gif" />
-                            <asp:CommandField />
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField>
+                                <ItemTemplate>
+                                    <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:BoundField DataField="Projectsid" HeaderText="Projectsid" Visible="False"
                                 SortExpression="Projectsid" />
                             <asp:BoundField DataField="Phaseid" HeaderText="Phaseid" Visible="False"

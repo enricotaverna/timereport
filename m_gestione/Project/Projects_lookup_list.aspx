@@ -5,7 +5,7 @@
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
-<script src="/timereport/include/javascript/timereport.js?v2.0"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
 
 <!-- Jquery + parsley + datepicker  -->
 <script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
@@ -19,7 +19,7 @@
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
-<link href="/timereport/include/newstyle20.css" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <style>
     .ASPInputcontent {
@@ -100,7 +100,7 @@
                     </div>
                     <!-- Fine Row -->
                 </div>
-            <!-- Fine RoundedBox -->
+                <!-- Fine RoundedBox -->
             </div>
             <!-- *** Fine riquadro navigazione *** -->
 
@@ -121,35 +121,29 @@
                             <asp:BoundField DataField="ProjectName" HeaderText="Nome" SortExpression="ProjectName" />
                             <asp:BoundField DataField="ManagerName" HeaderText="Manager" SortExpression="ManagerName" />
                             <asp:BoundField DataField="AccountName" HeaderText="Account" SortExpression="AccountName" />
-                            <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />  
-                            <asp:BoundField DataField="TipoContrattoDesc" HeaderText="Contratto" SortExpression="TipoContrattoDesc" /> 
+                            <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />
+                            <asp:BoundField DataField="TipoContrattoDesc" HeaderText="Contratto" SortExpression="TipoContrattoDesc" />
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget" DataFormatString="{0:###,###}" />
-                            <asp:BoundField DataField="BudgetABAP" HeaderText="Bdg ABAP" SortExpression="BudgetABAP" DataFormatString="{0:###,###}" />
                             <asp:BoundField DataField="SpeseBudget" HeaderText="Spese Bdg" SortExpression="SpeseBudget" DataFormatString="{0:###,###}" />
                             <asp:BoundField DataField="MargineProposta" HeaderText="Margine Tgt" SortExpression="MargineProposta" DataFormatString="{0:P1}" />
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" SortExpression="Active" />
 
-                            <asp:TemplateField>
+                            <asp:TemplateField HeaderText="M">
                                 <ItemTemplate>
-
-                                    <asp:ImageButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "Projects_lookup_form.aspx?ProjectCode={0}") %>'
-                                        CommandName="Edit" ImageUrl="/timereport/images/icons/16x16/modifica.gif"
-                                        Text="<%$ appSettings: EDIT_TXT %>" />
-                                    &nbsp;
-                        
+                                    <asp:LinkButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "Projects_lookup_form.aspx?ProjectCode={0}") %>' CommandName="Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
 
-                            <asp:TemplateField>
+                            <asp:TemplateField HeaderText="D">
                                 <ItemTemplate>
-
-                                    <asp:ImageButton ID="BT_delete" runat="server" CausesValidation="False"
+                                    <asp:LinkButton ID="BT_delete" runat="server" CausesValidation="False"
                                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
                                         OnClientClick="openDeleteConfirmModal(event, this); return false;"
-                                        CommandName="cancella" ImageUrl="/timereport/images/icons/16x16/trash.gif"
-                                        data-row-index="<%# ((GridViewRow) Container).RowIndex %>"
-                                        Text="<%$ appSettings: DELETE_TXT %>" />
-
+                                        CommandName="cancella" data-row-index="<%# ((GridViewRow) Container).RowIndex %>">
+                                        <i style="margin-right:10px;margin-left:5px" class="fa fa-trash"></i>
+                                    </asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
 
@@ -215,9 +209,9 @@
             var rowIndex = button.getAttribute('data-row-index');
 
             ConfirmDialog("Cancellazione", "Confermi la cancellazione del record?", "Cancella",
-                (result) => { result && (__doPostBack('GVProjects', 'cancella$' + rowIndex)) }  )
+                (result) => { result && (__doPostBack('GVProjects', 'cancella$' + rowIndex)) })
         };
-      
+
     </script>
 
 </body>

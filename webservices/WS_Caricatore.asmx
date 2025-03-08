@@ -122,7 +122,7 @@ public class WS_Caricatore : System.Web.Services.WebService
                                            new Record("BloccoCaricoSpese", "boolean", null ),
                                            new Record("ActivityOn", "boolean", null ),
                                            //new Record("Always_available", "boolean", "false" ),  obsoleto, settato a NULL
-                                           new Record("ProjectVisibility_id", "int",  ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"]) ), // default visibilità con forzature
+                                           new Record("ProjectVisibility_id", "int",  ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"]) , // default visibilità con forzature
                                            new Record("CreationDate", "timestamp", "CreationDate" ), // gestite automaticamente
                                            new Record("CreatedBy", "author", "CreatedBy" ) // gestite automaticamente
                         };

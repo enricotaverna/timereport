@@ -412,7 +412,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
             }
         }
 
-        if (DeletionType == "expenses" | DeletionType == "bonus")
+        if (DeletionType == "expenses" | DeletionType == "tickets")
         {
             string SQLdelete = "DELETE FROM expenses WHERE expenses_id='" + Id + "'";
             string SQLUpdateLog = "INSERT INTO LogDeletedRecords (RecordType, DeletedRecord_id, Timestamp) VALUES ('EXPENSE', " + Id + ", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "')";
@@ -441,7 +441,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                         for (int i = 0; i < filePaths.Length; i++) // cancella file
                             File.Delete(filePaths[i]);
 
-                    if (DeletionType == "bonus")
+                    if (DeletionType == "tickets")
                     {
                         result.Success = true;
                         result.RecordHtmlText = sDate; // serve per accendere l'icona del ticket
@@ -535,7 +535,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                     return result;
 
                 case "expenses":
-                case "bonus":
+                case "tickets":
 
                     // leggi record da copiare
                     dt = Database.GetData("SELECT a.projects_id, persons_id, Amount, a.ExpenseType_id, CancelFlag, CreditCardPayed, CompanyPayed, InvoiceFlag, a.TipoBonus_id, AccountingDate, comment, b.ProjectCode, c.ExpenseCode, c.UnitOfMeasure, a.ClientManager_id, a.AccountManager_id, a.Company_id, a.AdditionalCharges, a.AmountInCurrency, a.OpportunityId " +
