@@ -60,7 +60,7 @@
                                     <li><a href="#tabs-1">Dati anagrafici</a></li>
                                     <li><a href="#tabs-2">Userid</a></li>
                                     <li><a href="#tabs-3">Ruolo</a></li>
-                                    <li><a href="#tabs-4">Tariffa</a></li>
+                                    <li><a href="#tabs-4">Contratto</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 380px; width: 100%">
@@ -75,7 +75,7 @@
                                     <div class="input nobottomborder">
                                             <asp:Label CssClass="inputtext" runat="server" Text="Employee Number:"></asp:Label>
                                             <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL" Enabled="false"
-                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg" >
+                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg"  data-parsley-employee-number="true">
                                                 <asp:ListItem Value="" Text="Non rilevante" />
                                             </asp:DropDownList>
                                     </div
@@ -296,7 +296,7 @@
                                     <li><a href="#tabs-1">Dati anagrafici</a></li>
                                     <li><a href="#tabs-2">Userid</a></li>
                                     <li><a href="#tabs-3">Ruolo</a></li>
-                                    <li><a href="#tabs-4">Tariffa</a></li>
+                                    <li><a href="#tabs-4">Contratto</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 380px; width: 100%">
@@ -311,8 +311,8 @@
                                     <!-- *** Employee Number ***  -->
                                     <div class="input nobottomborder">
                                             <asp:Label CssClass="inputtext" runat="server" Text="Employee Number:"></asp:Label>
-                                            <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL"
-                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg" data-parsley-employee-number="">
+                                            <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL"  data-parsley-validate-if-empty ="true"
+                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg" data-parsley-employee-number="true">
                                                 <asp:ListItem Value="" Text="Non rilevante" />
                                             </asp:DropDownList>
                                     </div>
@@ -377,7 +377,7 @@
                                         <asp:Label ID="Label22" CssClass="inputtext" runat="server" Text="Userd Id:"></asp:Label>
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBUserid" runat="server" Text='<%# Bind("Userid") %>'
                                             data-parsley-errors-container="#valMsg" MinMaxLength="6" MaxLength="20" required
-                                            data-parsley-userid="" data-parsley-trigger-after-failure="focusout" />
+                                            data-parsley-userid="true" data-parsley-trigger-after-failure="focusout" />
                                     </div>
 
                                     <!-- *** PASSWORD ***  -->
@@ -511,7 +511,7 @@
 
                             <!-- *** BOTTONI  ***  -->
                             <div class="buttons">
-                                <div id="valMsg" class="parsley-single-error"></div>
+                                <div id="valMsg" <%--class="parsley-single-error"--%>></div>
                                 <asp:Button ID="InsertButton" runat="server" CommandName="Insert" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
                                 <asp:Button ID="Button1" runat="server" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                             </div>
@@ -664,14 +664,81 @@
         $(".sdatepicker").datepicker($.datepicker.regional['it']);
 
         // disabilita tooltip autocomplete su campi input
-        $(document).ready(function () {
-            $('input').attr('autocomplete', 'off');
-        })
+        $('input').attr('autocomplete', 'off');
 
-        //$('#FVPersone_DDLEmployeeNumberText').parent().hide();
+        // *** controllo che non esista lo stesso codice utente *** //
+        window.Parsley.addValidator('userid', function (value, requirement) {
+            var response = false;
+            var dataAjax = "{ sKey: 'UserId', " +
+                " sValkey: '" + value + "', " +
+                " sTable: 'Persons'  }";
 
-        Parsley.addMessages('it', {
-            required: "Completare i campi obbligatori"
+            $.ajax({
+                url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
+                data: dataAjax,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data) {
+                    if (data.d == true) // esiste, quindi errore
+                        response = false;
+                    else
+                        response = true;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+            return response;
+        }, 32)
+            .addMessage('en', 'userid', 'Username already exists')
+            .addMessage('it', 'userid', 'Username già esistente');
+
+        // Validatore personalizzato per DDLEmployeeNumber
+        window.Parsley.addValidator('employeeNumber', {
+            validateString: function (value) {
+                var societaValue = $('#DDLSocieta').val();
+                if (societaValue === '1') {
+                    return value.trim() !== '';
+                }
+                return true; 
+            },
+            messages: {
+                it: 'Inserire Employee Number'
+            }
+        });
+
+        // *** attiva validazione campi form
+        var form = $('#formPersone').parsley({
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+        });
+
+        // Rimuovi la visualizzazione standard degli errori di Parsley
+        form.on('field:error', function () {
+            // Nasconde i messaggi di errore generati automaticamente da Parsley
+            $('.parsley-errors-list').hide();
+        });
+
+        // Intercetta l'evento di validazione e mostra solo il primo errore
+        form.on('form:error', function () {
+            // Trova il primo campo con errore
+            var firstFieldWithError = form.$element.find('.parsley-error').first();
+
+            // Ottieni il messaggio di errore dal primo campo
+            var firstErrorMessage = firstFieldWithError.parsley().getErrorsMessages()[0];
+
+            // Crea un elemento con le classi standard di Parsley
+            var errorHtml = '<span class="parsley-errors-list filled">' + firstErrorMessage + '</span>';
+
+            // Visualizza il messaggio nella div valMsg
+            $('#valMsg').html(errorHtml).show();
+        });
+
+        // Pulisci i messaggi quando il form è valido
+        form.on('form:success', function () {
+            $('#valMsg').html('').hide();
         });
 
         // quando selezionato visualizza solo l'Employee number e sostituisce i valori nei campi
@@ -741,56 +808,6 @@
                     ShowPopup("Errore nella lettura dati consulente: " + xhr.responseText);
                 }
             });
-
-        });
-
-        // *** controllo che non esista lo stesso codice utente *** //
-        window.Parsley.addValidator('userid', function (value, requirement) {
-            var response = false;
-            var dataAjax = "{ sKey: 'UserId', " +
-                " sValkey: '" + value + "', " +
-                " sTable: 'Persons'  }";
-
-            $.ajax({
-                url: "/timereport/webservices/WStimereport.asmx/CheckExistence",
-                data: dataAjax,
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                type: 'post',
-                async: false,
-                success: function (data) {
-                    if (data.d == true) // esiste, quindi errore
-                        response = false;
-                    else
-                        response = true;
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
-                }
-            });
-            return response;
-        }, 32)
-            .addMessage('en', 'userid', 'Username already exists')
-            .addMessage('it', 'userid', 'Username già esistente');
-
-        // Validatore personalizzato per DDLEmployeeNumber
-        window.Parsley.addValidator('employeeNumber', {
-            validateString: function (value) {
-                var societaValue = $('#DDLSocieta').val();
-                if (societaValue === '1') {
-                    return value.trim() !== '';
-                }
-                return true; 
-            },
-            messages: {
-                it: 'Se società è Aeonvis inserire Employee Number.'
-            }
-        });
-
-        // *** attiva validazione campi form
-        $('#formPersone').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
         });
 
     </script>

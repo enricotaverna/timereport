@@ -62,6 +62,13 @@
         End If
     End Sub
 
+    ' Scarica dettaglio ore
+    Protected Sub Download_persone(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        Utilities.ExportXls("SELECT * FROM TRBI_Persons ORDER BY CONSULTANT")
+
+    End Sub
+
     Protected Sub DL_flattivo_Load(ByVal sender As Object, ByVal e As System.EventArgs)
         ' Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
         If Not IsPostBack And Session("Persons_DL_flattivo_val") <> Nothing Then
@@ -211,7 +218,8 @@
 
                         <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton"
                             PostBackUrl="/timereport/m_gestione/persone/persons_lookup_form.aspx" />
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                        <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" OnClick="Download_persone" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
 
                     </div>
 
