@@ -19,7 +19,6 @@ public partial class persons_lookup_form : System.Web.UI.Page
 
         if (!IsPostBack)
         {
-            Session["PrevPage"] = Request.UrlReferrer.ToString();
             if (Request.QueryString["Persons_Id"] != null)
             {
                 FVPersone.ChangeMode(FormViewMode.Edit);
@@ -45,7 +44,16 @@ public partial class persons_lookup_form : System.Web.UI.Page
         ddlEmployeeNumber.DataValueField = ""; // Adjust this to the correct column name
         ddlEmployeeNumber.DataBind();
 
-        // settare il valore di default
+        // Set the default value if in edit mode
+        if (FVPersone.CurrentMode == FormViewMode.Edit)
+        {
+            object employeeNumber = DataBinder.Eval(FVPersone.DataItem, "EmployeeNumber");
+            if (employeeNumber != null)
+            {
+                ddlEmployeeNumber.SelectedValue = employeeNumber.ToString().Trim();
+            }
+        }
+
     }
 
     protected void FVPersone_ModeChanging(object sender, FormViewModeEventArgs e)
@@ -67,14 +75,20 @@ public partial class persons_lookup_form : System.Web.UI.Page
 
     protected void DSpersons_Insert(object sender, SqlDataSourceCommandEventArgs e)
     {
+        DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
+
         e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+        e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
     }
 
     protected void DSpersons_Update(object sender, SqlDataSourceCommandEventArgs e)
     {
+        DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
+
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+        e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
     }
 
     protected void DDLManager_DataBound(object sender, EventArgs e)

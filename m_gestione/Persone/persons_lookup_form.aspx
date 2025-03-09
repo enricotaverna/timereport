@@ -74,8 +74,8 @@
                                      <!-- *** Employee Number ***  -->
                                     <div class="input nobottomborder">
                                             <asp:Label CssClass="inputtext" runat="server" Text="Employee Number:"></asp:Label>
-                                            <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL" Enabled="false"
-                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg"  data-parsley-employee-number="true">
+                                            <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL" Enabled="false"  
+                                                AppendDataBoundItems="True" data-parsley-errors-container="#valMsg"  data-parsley-employee-number="employeeNumber.ToString()">
                                                 <asp:ListItem Value="" Text="Non rilevante" />
                                             </asp:DropDownList>
                                     </div
