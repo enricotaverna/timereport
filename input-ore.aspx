@@ -444,7 +444,7 @@
             // Sumo Select
             $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
         /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
-            $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });
+           /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
             if ($('#FVore_DDLprogetto')[0].sumo)
                 $('#FVore_DDLprogetto')[0].sumo.optDiv.css('width', '350px'); // fa in modo che la tendina per le opportunità sia larga 550px
