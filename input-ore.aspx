@@ -442,7 +442,7 @@
             BindOpportunity();
 
             // Sumo Select
-            //$('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' }); tolto altrimenti non valorizzava il progetto automaticamente dopo la selezione della task
+            $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
         /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
            /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
@@ -605,8 +605,9 @@
                         alert("Non si \u00E8 autorizzati alla commessa " + Projects_Name + " rivolgersi al proprio responsabile per l'autorizzazione");
                     }
                 }
-                //imposto il valore e accendo event change
+                ////imposto il valore e accendo event change
                 $("#FVore_DDLprogetto").val($(this).find("option:selected").attr("data-Projects_Id")).change();
+                $("#FVore_DDLprogetto")[0].sumo.reload();
             }
         });
 
