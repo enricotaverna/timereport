@@ -442,7 +442,7 @@
             BindOpportunity();
 
             // Sumo Select
-            $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
+            //$('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' }); tolto altrimenti non valorizzava il progetto automaticamente dopo la selezione della task
         /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
            /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
