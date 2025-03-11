@@ -538,7 +538,7 @@
             $("#FVore_DDLLocation").children().remove(); // pulisce tutti gli item della  DropDown 
             if (typeof LocationOn == 'undefined') {  // non esiste l'attributo 
                 $("#FVore_DDLLocation").append($('<option>', { value: '', text: 'nessun valore' })); // pulisce il campo
-                $('#FVore_DDLLocation').show();
+                $('#FVore_DDLLocation').hide();
             }
             else {
                 // aggiunge selezione vuota
