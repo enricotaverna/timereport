@@ -428,7 +428,7 @@
                     $('#LBCreationDate').text(objProjectCostRate.CreationDate);
                     var LastModifiedBy = isNullOrEmpty(objProjectCostRate.LastModifiedBy) ? "" : objProjectCostRate.LastModifiedBy + " il ";
                     $('#LBLastModifiedBy').text(LastModifiedBy);
-                    $('#LBLastModificationDate').text(objPersonsCostRate.LastModificationDate);
+                    $('#LBLastModificationDate').text(objProjectCostRate.LastModificationDate);
 
                     openDialogForm("#dialog");
                 },

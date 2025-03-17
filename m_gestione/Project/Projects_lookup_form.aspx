@@ -1096,8 +1096,12 @@
             // Optional: Add click event handler for the icon
             $(".icon-link").click(function (event) {
                 event.preventDefault();
-                var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=<%= Session["Projects_Id"].ToString() %>&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=<%=Session["Projects_Id"].ToString() %>>";
-                window.location.href = logUrl;                  
+                var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
+                if (projectsId !== '')
+                    {
+                    var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
+                    window.location.href = logUrl;
+                    }                
             });
         });
     </script>
