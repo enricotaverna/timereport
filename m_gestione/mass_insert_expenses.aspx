@@ -585,9 +585,13 @@
                     else
                         ShowPopup('Errore durante aggiornamento');
                 },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    ShowPopup(xhr.responseText);
+                error: function (xhr, textStatus, error) {
+                    if (xhr.responseText.trim() == 0)
+                        window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
+                    else {
+                        UnMaskScreen();
+                        ShowPopup(xhr.responseText);
+                    }
                 }
             }); // ajax
         }

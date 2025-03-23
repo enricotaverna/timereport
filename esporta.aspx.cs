@@ -87,10 +87,17 @@ public partial class Esporta : System.Web.UI.Page
         return strInput + toAdd;
     }
 
-    // Costruisce condizione Where
-    protected string Build_where(string selType) // selType = "1" ore, "2" spese
+    public class WhereClause
     {
-        string sWhereClause = "";
+        public string WhereClauseDays { get; set; }
+        public string WhereClauseMonths { get; set; }
+    }
+
+    // Costruisce condizione Where
+    protected WhereClause Build_where(string selType) // selType = "1" ore, "2" spese
+    {
+        WhereClause wc = new WhereClause();
+        wc.WhereClauseDays = "";
 
         string sListaProgettiSel = Utilities.ListSelections(CBLProgetti);
         string sListaProgettiAll = Utilities.ListSelections(CBLProgetti, true);
@@ -104,19 +111,19 @@ public partial class Esporta : System.Web.UI.Page
         bool bTipoSpesaSelezionati = !string.IsNullOrEmpty(sListaTipoSpesaSel);
 
         if (bOpportunitaSelezionati)
-            sWhereClause = Addclause(sWhereClause, "Opportunityid IN (" + sListaOpportunitaSel + " )");
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "Opportunityid IN (" + sListaOpportunitaSel + " )");
 
         if (bTipoSpesaSelezionati && selType == "2")
-            sWhereClause = Addclause(sWhereClause, "ExpenseType_id IN (" + sListaTipoSpesaSel + " )");
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "ExpenseType_id IN (" + sListaTipoSpesaSel + " )");
 
         // *** ADMIN
         if (Auth.ReturnPermission("REPORT", "PROJECT_ALL") && Auth.ReturnPermission("REPORT", "PEOPLE_ALL"))
         {
             if (bProgettiSelezionati) // sono stati selezionati dei progetti e non è il tipo export Not Chargable
-                sWhereClause = Addclause(sWhereClause, "Projects_id IN (" + sListaProgettiSel + " )");
+                wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "Projects_id IN (" + sListaProgettiSel + " )");
 
             if (bPersoneSelezionate)
-                sWhereClause = Addclause(sWhereClause, "Persons_id IN (" + sListaPersoneSel + " )");
+                wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "Persons_id IN (" + sListaPersoneSel + " )");
         } // *** ADMIN
 
         // *** CONSULENTE / ESTERNO
@@ -126,8 +133,8 @@ public partial class Esporta : System.Web.UI.Page
         {
 
             // solo sue ore e spese su progetti abilitati
-            sWhereClause = "Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
-            sWhereClause = Addclause(sWhereClause, "Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id));
+            wc.WhereClauseDays = "Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id));
 
         } // *** CONSULENTE / ESTERNO
 
@@ -147,48 +154,54 @@ public partial class Esporta : System.Web.UI.Page
 
             // se progetto selezionato estrae solo quello
             if (bProgettiSelezionati)
-                sWhereClause =
+                wc.WhereClauseDays =
                     "  Projects_id IN ( " + sListaProgettiSel + " ) ";
 
             if (!bProgettiSelezionati)
             {
-                sWhereClause = " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
+                wc.WhereClauseDays = " ( ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
                     "   AND Projects_id IN ( " + sListaProgettiAll + " )  ) ";
 
                 if ((bool)Session["bChargeableAndOthers"])
-                    sWhereClause += " OR  ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
+                    wc.WhereClauseDays += " OR  ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] +
                     " AND ( Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
                     " OR Manager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ")" +
                     " ) ) ";
                 else
-                    sWhereClause += " ) ";
+                    wc.WhereClauseDays += " ) ";
             }
 
             if (bPersoneSelezionate)
-                sWhereClause = sWhereClause + " AND Persons_id IN(" + sListaPersoneSel + ")";
+                wc.WhereClauseDays = wc.WhereClauseDays + " AND Persons_id IN(" + sListaPersoneSel + ")";
 
         } // *** MANAGER / TEAM LEADER
 
         if (DDLClienti.SelectedValue != "")
-            sWhereClause = Addclause(sWhereClause, "CodiceCliente = " + ASPcompatility.FormatStringDb(DDLClienti.SelectedValue));
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "CodiceCliente = " + ASPcompatility.FormatStringDb(DDLClienti.SelectedValue));
 
         if (DDLsocieta.SelectedValue != "")
-            sWhereClause = Addclause(sWhereClause, "company_id = " + ASPcompatility.FormatStringDb(DDLsocieta.SelectedValue));
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "company_id = " + ASPcompatility.FormatStringDb(DDLsocieta.SelectedValue));
 
         if (DDLManager.SelectedValue != "")
-            sWhereClause = Addclause(sWhereClause, "( Manager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
+            wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "( Manager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
                                                    " OR AccountManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
                                                    " OR ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + " )");
 
-        if (!string.IsNullOrEmpty(sWhereClause))
-            sWhereClause = sWhereClause + " AND ";
+        if (!string.IsNullOrEmpty(wc.WhereClauseDays))
+            wc.WhereClauseDays = wc.WhereClauseDays + " AND ";
 
-        string fd = ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(DDLFromMonth.SelectedValue), Convert.ToInt16(DDLFromYear.SelectedValue)));
-        string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(DDLToMonth.SelectedValue), Convert.ToInt16(DDLToYear.SelectedValue)));
+        string meseDa = DDLFromMonth.SelectedValue;
+        string meseA = DDLToMonth.SelectedValue;
+        string annoDa = DDLFromYear.SelectedValue;
+        string annoA = DDLToYear.SelectedValue;
 
-        sWhereClause = sWhereClause + " date >= " + fd + " AND date <= " + ld;
+        string fd = ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(meseDa), Convert.ToInt16(annoDa)));
+        string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(meseA), Convert.ToInt16(annoA)));
 
-        return sWhereClause;
+        wc.WhereClauseMonths = wc.WhereClauseDays + " AnnoMese >= '" + annoDa + "-" + meseDa + "' AND AnnoMese  <= '" + annoA + "-" + meseA + "'";
+        wc.WhereClauseDays = wc.WhereClauseDays + " date >= " + fd + " AND date <= " + ld;
+
+        return wc;
 
     }
 
@@ -220,18 +233,6 @@ public partial class Esporta : System.Web.UI.Page
                 btPerAttivi.CssClass = "btn btn-primary";
                 btPerAll.CssClass = "btn btn-outline-secondary";
                 break;
-
-                //case "btCharge":
-                //    Session["bChargeableAndOthers"] = false;
-                //    btCharge.CssClass = "btn btn-primary";
-                //    btChargeAll.CssClass = "btn btn-outline-secondary";
-                //    break;
-
-                //case "btChargeAll":
-                //    Session["bChargeableAndOthers"] = true;
-                //    btChargeAll.CssClass = "btn btn-primary";
-                //    btCharge.CssClass = "btn btn-outline-secondary";
-                //    break;
 
         }
 
@@ -274,21 +275,23 @@ public partial class Esporta : System.Web.UI.Page
     // Lancia report
     protected void Sottometti_Click(object sender, System.EventArgs e)
     {
+        WhereClause wc = new WhereClause();
+
         string sWhereClause = "";
 
         // salva i valori in variabili di sessione per non doverli reinserire
         SaveSelectionsValue();
 
-        sWhereClause = Build_where(RBTipoExport.SelectedValue);
+        wc = Build_where(RBTipoExport.SelectedValue);
 
         switch (RBTipoExport.SelectedValue)
         {
             case "1":
-                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_ore where " + sWhereClause);
+                Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese, WorkedInRemote, LocationDescription, NomeAccountManager, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_ore where " + wc.WhereClauseDays);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
             case "2":
-                Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_spese where " + sWhereClause);
+                Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_spese where " + wc.WhereClauseDays);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
                 //case "3":
@@ -299,22 +302,22 @@ public partial class Esporta : System.Web.UI.Page
         switch (RBTipoReport.SelectedValue)
         {
             case "3":
-                Session["SQL"] = "SELECT nomepersona, nomeprogetto, giorni, annomese FROM v_ore WHERE " + sWhereClause;
+                Session["SQL"] = "SELECT NomePersona, NomeProgetto, Giorni, NomeCliente, AnnoMese FROM v_SummaryHours WHERE " + wc.WhereClauseMonths;
                 Session["ReportPath"] = "OrePerMese.rdlc";
                 Response.Redirect("report/rdlc/ReportExecute.aspx");
                 break;
             case "4":
-                Session["SQL"] = "SELECT persona, nomeprogetto, DescSpesa, importo, annomese FROM v_spese WHERE " + sWhereClause;
+                Session["SQL"] = "SELECT persona, nomeprogetto, nomeCliente, DescSpesa, importo, annomese FROM v_SummaryExpenses WHERE " + wc.WhereClauseMonths;
                 Session["ReportPath"] = "SpesePerMese.rdlc";
                 Response.Redirect("report/rdlc/ReportExecute.aspx");
                 break;
             case "5":
-                Session["SQL"] = "SELECT  * FROM v_ore WHERE " + sWhereClause;
+                Session["SQL"] = "SELECT  * FROM v_ore WHERE " + wc.WhereClauseDays;
                 Session["ReportPath"] = "DettaglioOre.rdlc";
                 Response.Redirect("report/rdlc/ReportExecute.aspx");
                 break;
             case "6":
-                Session["SQL"] = "SELECT  * FROM v_spese WHERE " + sWhereClause;
+                Session["SQL"] = "SELECT  * FROM v_spese WHERE " + wc.WhereClauseDays;
                 Session["ReportPath"] = "DettaglioSpese.rdlc";
                 Response.Redirect("report/rdlc/ReportExecute.aspx");
                 break;

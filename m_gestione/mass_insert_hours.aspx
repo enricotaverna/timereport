@@ -162,7 +162,7 @@
                             </asp:TemplateField>
 
                             <%-- attività --%>
-                            <asp:TemplateField HeaderText="Attività" SortExpression="NomeAttivita">
+                            <asp:TemplateField HeaderText="Attivita" SortExpression="NomeAttivita">
                                 <EditItemTemplate>
                                     <asp:DropDownList ID="DDLActivity_Id" runat="server"
                                         CssClass="TabellaLista activityField" Width="140px">
@@ -538,15 +538,24 @@
                 dataType: "json",
                 success: function (msg) {
                     UnMaskScreen();
-                    if (msg.d)
-                        window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
+                    if (msg.d) {
+                        ShowPopup('tre');
+                        /*window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";*/
+                    }
                     //ShowPopup("Aggiornamento effettuato");
                     else
                         ShowPopup('Errore durante aggiornamento');
                 },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    ShowPopup(xhr.responseText);
+                error: function (xhr, textStatus, error) {
+                    if (xhr.responseText.trim() == 0) {
+                        ShowPopup('uno');
+                        /*window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";*/
+                    }
+                    else {
+                        UnMaskScreen();
+                        ShowPopup('due');
+                        ShowPopup(xhr.responseText);
+                    }
                 }
             }); // ajax
         }

@@ -146,6 +146,39 @@
                 <TablixCornerRow>
                   <TablixCornerCell>
                     <CellContents>
+                      <Textbox Name="Textbox5">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>Nome Cliente</Value>
+                                <Style>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style />
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>Textbox5</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Color>LightGrey</Color>
+                            <Style>Solid</Style>
+                          </Border>
+                          <BackgroundColor>LightBlue</BackgroundColor>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
                       <Textbox Name="Textbox45">
                         <CanGrow>true</CanGrow>
                         <KeepTogether>true</KeepTogether>
@@ -479,7 +512,6 @@
                           <PaddingBottom>2pt</PaddingBottom>
                         </Style>
                       </Textbox>
-                      <rd:Selected>true</rd:Selected>
                     </CellContents>
                   </TablixHeader>
                 </TablixMember>
@@ -539,73 +571,82 @@
             <TablixRowHierarchy>
               <TablixMembers>
                 <TablixMember>
-                  <Group Name="NomeProgetto">
+                  <Group Name="NomeCliente">
                     <GroupExpressions>
-                      <GroupExpression>=Fields!NomeProgetto.Value</GroupExpression>
+                      <GroupExpression>=Fields!NomeCliente.Value</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=Fields!NomeProgetto.Value</Value>
+                      <Value>=Fields!NomeCliente.Value</Value>
                     </SortExpression>
                   </SortExpressions>
+                  <TablixHeader>
+                    <Size>2.5cm</Size>
+                    <CellContents>
+                      <Textbox Name="NomeCliente">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>=Fields!NomeCliente.Value</Value>
+                                <Style>
+                                  <FontWeight>Normal</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style />
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>NomeCliente</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Color>LightGrey</Color>
+                            <Style>Solid</Style>
+                          </Border>
+                          <BackgroundColor>Linen</BackgroundColor>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
                   <TablixMembers>
                     <TablixMember>
-                      <TablixHeader>
-                        <Size>7.37593cm</Size>
-                        <CellContents>
-                          <Textbox Name="Textbox42">
-                            <CanGrow>true</CanGrow>
-                            <KeepTogether>true</KeepTogether>
-                            <Paragraphs>
-                              <Paragraph>
-                                <TextRuns>
-                                  <TextRun>
-                                    <Value>=Left(Fields!NomeProgetto.Value,35)</Value>
-                                    <Style>
-                                      <FontWeight>Bold</FontWeight>
-                                    </Style>
-                                  </TextRun>
-                                </TextRuns>
-                                <Style />
-                              </Paragraph>
-                            </Paragraphs>
-                            <rd:DefaultName>Textbox42</rd:DefaultName>
-                            <Style>
-                              <Border>
-                                <Color>LightGrey</Color>
-                                <Style>Solid</Style>
-                              </Border>
-                              <BackgroundColor>Linen</BackgroundColor>
-                              <PaddingLeft>2pt</PaddingLeft>
-                              <PaddingRight>2pt</PaddingRight>
-                              <PaddingTop>2pt</PaddingTop>
-                              <PaddingBottom>2pt</PaddingBottom>
-                            </Style>
-                          </Textbox>
-                        </CellContents>
-                      </TablixHeader>
+                      <Group Name="NomeProgetto">
+                        <GroupExpressions>
+                          <GroupExpression>=Fields!NomeProgetto.Value</GroupExpression>
+                        </GroupExpressions>
+                      </Group>
+                      <SortExpressions>
+                        <SortExpression>
+                          <Value>=Fields!NomeProgetto.Value</Value>
+                        </SortExpression>
+                      </SortExpressions>
                       <TablixMembers>
                         <TablixMember>
                           <TablixHeader>
-                            <Size>4.41029cm</Size>
+                            <Size>7.37593cm</Size>
                             <CellContents>
-                              <Textbox Name="Textbox43">
+                              <Textbox Name="Textbox42">
+                                <CanGrow>true</CanGrow>
                                 <KeepTogether>true</KeepTogether>
                                 <Paragraphs>
                                   <Paragraph>
                                     <TextRuns>
                                       <TextRun>
-                                        <Value />
-                                        <Style>
-                                          <FontWeight>Bold</FontWeight>
-                                        </Style>
+                                        <Value>=Left(Fields!NomeProgetto.Value,35)</Value>
+                                        <Style />
                                       </TextRun>
                                     </TextRuns>
                                     <Style />
                                   </Paragraph>
                                 </Paragraphs>
-                                <rd:DefaultName>Textbox43</rd:DefaultName>
+                                <rd:DefaultName>Textbox42</rd:DefaultName>
                                 <Style>
                                   <Border>
                                     <Color>LightGrey</Color>
@@ -620,76 +661,66 @@
                               </Textbox>
                             </CellContents>
                           </TablixHeader>
-                        </TablixMember>
-                      </TablixMembers>
-                      <KeepWithGroup>After</KeepWithGroup>
-                    </TablixMember>
-                    <TablixMember>
-                      <Group Name="Persona">
-                        <GroupExpressions>
-                          <GroupExpression>=Fields!Persona.Value</GroupExpression>
-                        </GroupExpressions>
-                      </Group>
-                      <SortExpressions>
-                        <SortExpression>
-                          <Value>=Fields!Persona.Value</Value>
-                        </SortExpression>
-                      </SortExpressions>
-                      <TablixHeader>
-                        <Size>7.37593cm</Size>
-                        <CellContents>
-                          <Textbox Name="Persona">
-                            <KeepTogether>true</KeepTogether>
-                            <Paragraphs>
-                              <Paragraph>
-                                <TextRuns>
-                                  <TextRun>
-                                    <Value>=Fields!Persona.Value</Value>
+                          <TablixMembers>
+                            <TablixMember>
+                              <TablixHeader>
+                                <Size>4.41029cm</Size>
+                                <CellContents>
+                                  <Textbox Name="Textbox43">
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value />
+                                            <Style>
+                                              <FontWeight>Bold</FontWeight>
+                                            </Style>
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style />
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <rd:DefaultName>Textbox43</rd:DefaultName>
                                     <Style>
-                                      <Color>Gray</Color>
+                                      <Border>
+                                        <Color>LightGrey</Color>
+                                        <Style>Solid</Style>
+                                      </Border>
+                                      <BackgroundColor>Linen</BackgroundColor>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                      <PaddingTop>2pt</PaddingTop>
+                                      <PaddingBottom>2pt</PaddingBottom>
                                     </Style>
-                                  </TextRun>
-                                </TextRuns>
-                                <Style />
-                              </Paragraph>
-                            </Paragraphs>
-                            <rd:DefaultName>Persona</rd:DefaultName>
-                            <Style>
-                              <Border>
-                                <Color>LightGrey</Color>
-                                <Style>Solid</Style>
-                              </Border>
-                              <BackgroundColor>Linen</BackgroundColor>
-                              <PaddingLeft>2pt</PaddingLeft>
-                              <PaddingRight>2pt</PaddingRight>
-                              <PaddingTop>2pt</PaddingTop>
-                              <PaddingBottom>2pt</PaddingBottom>
-                            </Style>
-                          </Textbox>
-                        </CellContents>
-                      </TablixHeader>
-                      <TablixMembers>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                            </TablixMember>
+                          </TablixMembers>
+                          <KeepWithGroup>After</KeepWithGroup>
+                        </TablixMember>
                         <TablixMember>
-                          <Group Name="DescSpesa">
+                          <Group Name="Persona">
                             <GroupExpressions>
-                              <GroupExpression>=Fields!DescSpesa.Value</GroupExpression>
+                              <GroupExpression>=Fields!Persona.Value</GroupExpression>
                             </GroupExpressions>
                           </Group>
                           <SortExpressions>
                             <SortExpression>
-                              <Value>=Fields!DescSpesa.Value</Value>
+                              <Value>=Fields!Persona.Value</Value>
                             </SortExpression>
                           </SortExpressions>
                           <TablixHeader>
-                            <Size>4.41029cm</Size>
+                            <Size>7.37593cm</Size>
                             <CellContents>
-                              <Textbox Name="DescSpesa">
+                              <Textbox Name="Persona">
                                 <KeepTogether>true</KeepTogether>
                                 <Paragraphs>
                                   <Paragraph>
                                     <TextRuns>
                                       <TextRun>
-                                        <Value>=Left(Fields!DescSpesa.Value,20)</Value>
+                                        <Value>=Fields!Persona.Value</Value>
                                         <Style>
                                           <Color>Gray</Color>
                                         </Style>
@@ -698,7 +729,7 @@
                                     <Style />
                                   </Paragraph>
                                 </Paragraphs>
-                                <rd:DefaultName>DescSpesa</rd:DefaultName>
+                                <rd:DefaultName>Persona</rd:DefaultName>
                                 <Style>
                                   <Border>
                                     <Color>LightGrey</Color>
@@ -713,27 +744,74 @@
                               </Textbox>
                             </CellContents>
                           </TablixHeader>
+                          <TablixMembers>
+                            <TablixMember>
+                              <Group Name="DescSpesa">
+                                <GroupExpressions>
+                                  <GroupExpression>=Fields!DescSpesa.Value</GroupExpression>
+                                </GroupExpressions>
+                              </Group>
+                              <SortExpressions>
+                                <SortExpression>
+                                  <Value>=Fields!DescSpesa.Value</Value>
+                                </SortExpression>
+                              </SortExpressions>
+                              <TablixHeader>
+                                <Size>4.41029cm</Size>
+                                <CellContents>
+                                  <Textbox Name="DescSpesa">
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value>=Left(Fields!DescSpesa.Value,20)</Value>
+                                            <Style>
+                                              <Color>Gray</Color>
+                                            </Style>
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style />
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <rd:DefaultName>DescSpesa</rd:DefaultName>
+                                    <Style>
+                                      <Border>
+                                        <Color>LightGrey</Color>
+                                        <Style>Solid</Style>
+                                      </Border>
+                                      <BackgroundColor>Linen</BackgroundColor>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                      <PaddingTop>2pt</PaddingTop>
+                                      <PaddingBottom>2pt</PaddingBottom>
+                                    </Style>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                            </TablixMember>
+                          </TablixMembers>
+                          <Visibility>
+                            <Hidden>true</Hidden>
+                            <ToggleItem>Textbox42</ToggleItem>
+                          </Visibility>
                         </TablixMember>
                       </TablixMembers>
-                      <Visibility>
-                        <Hidden>true</Hidden>
-                        <ToggleItem>Textbox42</ToggleItem>
-                      </Visibility>
                     </TablixMember>
                   </TablixMembers>
                 </TablixMember>
                 <TablixMember>
                   <TablixHeader>
-                    <Size>7.37593cm</Size>
+                    <Size>2.5cm</Size>
                     <CellContents>
-                      <Textbox Name="Textbox1">
+                      <Textbox Name="Textbox8">
                         <CanGrow>true</CanGrow>
                         <KeepTogether>true</KeepTogether>
                         <Paragraphs>
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>Totale</Value>
+                                <Value />
                                 <Style>
                                   <FontWeight>Bold</FontWeight>
                                 </Style>
@@ -742,7 +820,7 @@
                             <Style />
                           </Paragraph>
                         </Paragraphs>
-                        <rd:DefaultName>Textbox1</rd:DefaultName>
+                        <rd:DefaultName>Textbox8</rd:DefaultName>
                         <Style>
                           <Border>
                             <Color>LightGrey</Color>
@@ -760,16 +838,16 @@
                   <TablixMembers>
                     <TablixMember>
                       <TablixHeader>
-                        <Size>4.41029cm</Size>
+                        <Size>7.37593cm</Size>
                         <CellContents>
-                          <Textbox Name="Textbox2">
+                          <Textbox Name="Textbox1">
                             <CanGrow>true</CanGrow>
                             <KeepTogether>true</KeepTogether>
                             <Paragraphs>
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value />
+                                    <Value>Totale</Value>
                                     <Style>
                                       <FontWeight>Bold</FontWeight>
                                     </Style>
@@ -778,7 +856,7 @@
                                 <Style />
                               </Paragraph>
                             </Paragraphs>
-                            <rd:DefaultName>Textbox2</rd:DefaultName>
+                            <rd:DefaultName>Textbox1</rd:DefaultName>
                             <Style>
                               <Border>
                                 <Color>LightGrey</Color>
@@ -793,6 +871,44 @@
                           </Textbox>
                         </CellContents>
                       </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <TablixHeader>
+                            <Size>4.41029cm</Size>
+                            <CellContents>
+                              <Textbox Name="Textbox2">
+                                <CanGrow>true</CanGrow>
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value />
+                                        <Style>
+                                          <FontWeight>Bold</FontWeight>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>Textbox2</rd:DefaultName>
+                                <Style>
+                                  <Border>
+                                    <Color>LightGrey</Color>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <BackgroundColor>Linen</BackgroundColor>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                        </TablixMember>
+                      </TablixMembers>
                     </TablixMember>
                   </TablixMembers>
                   <KeepWithGroup>Before</KeepWithGroup>
@@ -803,7 +919,7 @@
             <Top>8.24124cm</Top>
             <Left>0.51541cm</Left>
             <Height>2.4cm</Height>
-            <Width>16.5124cm</Width>
+            <Width>19.0124cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1173,17 +1289,17 @@
                 <ChartCategoryHierarchy>
                   <ChartMembers>
                     <ChartMember>
-                      <Group Name="Chart3_CategoryGroup">
+                      <Group Name="Chart3_CategoryGroup1">
                         <GroupExpressions>
-                          <GroupExpression>=Fields!NomeProgetto.Value</GroupExpression>
+                          <GroupExpression>=Fields!NomeCliente.Value</GroupExpression>
                         </GroupExpressions>
                       </Group>
                       <SortExpressions>
                         <SortExpression>
-                          <Value>=Fields!NomeProgetto.Value</Value>
+                          <Value>=Fields!NomeCliente.Value</Value>
                         </SortExpression>
                       </SortExpressions>
-                      <Label>=Fields!NomeProgetto.Value</Label>
+                      <Label>=Fields!NomeCliente.Value</Label>
                     </ChartMember>
                   </ChartMembers>
                 </ChartCategoryHierarchy>
@@ -1204,6 +1320,7 @@
                           </ChartDataPointValues>
                           <ChartDataLabel>
                             <Style />
+                            <UseValueAsLabel>true</UseValueAsLabel>
                           </ChartDataLabel>
                           <Style />
                           <ChartMarker>
@@ -1484,7 +1601,7 @@
                 </ChartLegends>
                 <ChartTitles>
                   <ChartTitle Name="Default">
-                    <Caption>Distribuzione per progetto</Caption>
+                    <Caption>Distribuzione per cliente</Caption>
                     <Style>
                       <BackgroundGradientType>None</BackgroundGradientType>
                       <FontSize>12pt</FontSize>
