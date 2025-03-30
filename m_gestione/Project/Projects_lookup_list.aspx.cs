@@ -186,5 +186,14 @@ public partial class m_gestione_Projects_lookup_list : System.Web.UI.Page
         Session["GVProjectsPageNumber"] = e.NewPageIndex;
     }
 
+    // Download anagrafica
+    protected void Download(object sender, EventArgs e)
+    {
+        // se manager limita i progetti visibili
+        String Where = !Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL") ? " WHERE ( ClientManager_id=" + CurrentSession.Persons_id + " OR AccountManager_id=" + CurrentSession.Persons_id + ")" : "";
+
+        Utilities.ExportXls("SELECT * FROM TRBI_projects " + Where + " ORDER BY ProjectCode");
+    }
+
 
 }

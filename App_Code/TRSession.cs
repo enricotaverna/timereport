@@ -297,7 +297,7 @@ public class TRSession
     public void LoadSFOpportunity()
     {
 
-        // selezione solo opportunità aperte non più vecchie di 2 anni
+        // selezione solo opportunità aperte non più vecchie di 4 anni
         string sAnnoPrima = (DateTime.Now.Year - 4).ToString() + "-01-01";
         int maxLung;
 

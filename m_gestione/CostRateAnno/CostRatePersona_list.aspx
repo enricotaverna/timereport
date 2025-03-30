@@ -78,7 +78,7 @@
                     <div class="buttons">
                         <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" formnovalidate=""/>
                     </div>
                     <!--End buttons-->
 
@@ -140,7 +140,7 @@
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error" ></div>
                                 <asp:Button ID="btnSalvaModale" runat="server" CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>" CssClass="orangebutton" />
-                                <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />
+                                <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:BACK_TXT %>" CssClass="greybutton" />
                             </div>
 
                         </div>
@@ -308,13 +308,6 @@
 
         // ** TABULATOR **
 
-        var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
-            return "<i class='fa fa-trash'></i>";
-        };  // icona cancella
-        var editIcon = function (cell, formatterParams, onRendered) { //plain text value
-            return "<i class='fa fa-edit'></i>";
-        };  // icona edit
-
         var PersonsCostRateTable = new Tabulator("#PersonsCostRateTable", {
             paginationSize: 12, // this option can take any positive integer value (default = 10)
             pagination: "local", //enable local pagination.
@@ -362,6 +355,7 @@
             $('#LBCreationDate').text('');
             $('#LBLastModifiedBy').text('');
             $('#LBLastModificationDate').text('');
+            $('#valMsg').empty(); // pulisce messaggi di errore precedenti
 
         } // inizilizza form in creazione
 
@@ -369,6 +363,7 @@
 
             // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
             var values = "{'sPersonsCostRate_id': '" + dati.PersonsCostRate_id + "'   } ";
+            $('#valMsg').empty(); // pulisce messaggi di errore precedenti
 
             $.ajax({
 

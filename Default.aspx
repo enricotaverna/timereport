@@ -36,6 +36,16 @@ per disattivare richiesta assenza
     .ASPInputcontent {
         width: 230px;
     }
+
+    #myVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+    }
+
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,8 +61,12 @@ per disattivare richiesta assenza
 
 <body>
 
+    <video autoplay muted loop id="myVideo">
+        <source src="/timereport/images/background/video/Motion_Background_Loop.mp4" type="video/mp4">
+    </video>
+
     <!-- *** MAINWINDOW *** -->
-    <div class="container MainWindowBackground">
+    <div class="container <%--MainWindowBackground--%>" style="margin-top:140px">
         <form id="form_login" runat="server">
 
             <div class="row justify-content-center">

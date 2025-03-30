@@ -97,8 +97,8 @@
                             <div class="buttons">
                                 <div id="valMsg" class="parsley-single-error"></div>
                                 <asp:Button ID="InsertButton" runat="server" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
-                                <asp:Button ID="DownloadMancanti" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: DWNL_MANCANTI %>" style="width:120px" OnClick="DownloadButton_Click" />
-                                <asp:Button ID="CalcolaButton" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" style="width:100px" OnClick="CalcolaButton_Click" />
+                                <asp:Button ID="DownloadMancanti" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: DWNL_MANCANTI %>"   OnClick="DownloadButton_Click" />
+                                <asp:Button ID="CalcolaButton" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>"   OnClick="CalcolaButton_Click" />
                                 <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" OnClick="UpdateCancelButton_Click" />
                             </div>
 

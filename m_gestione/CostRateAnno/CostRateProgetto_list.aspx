@@ -78,7 +78,7 @@
                     <div class="buttons">
                         <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" />
                         <asp:Button ID="btn_download" runat="server" Text="<%$ appSettings: EXPORT_TXT %>" CssClass="orangebutton" />
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
+                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" formnovalidate="" />
                     </div>
                     <!--End buttons-->
 
@@ -163,7 +163,7 @@
                         <div class="buttons">
                             <div id="valMsg" class="parsely-single-error" style="display: inline-block; width: 230px"></div>
                             <asp:Button ID="btnSalvaModale" runat="server" CommandName="Insert" Text="<%$ appSettings:SAVE_TXT %>" CssClass="orangebutton" />
-                            <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:CANCEL_TXT %>" CssClass="greybutton" />
+                            <asp:Button ID="btnCancelModale" runat="server" CausesValidation="False" CommandName="Cancel" Text="<%$ appSettings:BACK_TXT %>" CssClass="greybutton" />
                         </div>
 
                     </div>
@@ -208,7 +208,7 @@
         // ** VALIDAZIONI **
 
         // *** attiva validazione campi form
-        $('#formPersone').parsley({
+        $('#FVForm').parsley({
             excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
         });
 
@@ -334,13 +334,6 @@
 
         // ** TABULATOR **
 
-        var trashIcon = function (cell, formatterParams, onRendered) { //plain text value
-            return "<i class='fa fa-trash'></i>";
-        };  // icona cancella
-        var editIcon = function (cell, formatterParams, onRendered) { //plain text value
-            return "<i class='fa fa-edit'></i>";
-        };  // icona edit
-
         var ProjectCostRateTable = new Tabulator("#ProjectCostRateTable", {
             paginationSize: 15, // this option can take any positive integer value (default = 10)
             pagination: "local", //enable local pagination.
@@ -400,6 +393,7 @@
 
             // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
             var values = "{'sProjectCostRate_id': '" + dati.ProjectCostRate_id + "'   } ";
+            $('#valMsg').empty(); // pulisce messaggi di errore precedenti
 
             $.ajax({
 

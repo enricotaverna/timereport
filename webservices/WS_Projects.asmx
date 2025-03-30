@@ -26,6 +26,59 @@ public class WS_Projects : System.Web.Services.WebService
         //InitializeComponent(); 
     }
 
+    public class AjaxCallResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
+    //  **** CHECK OPPORTUNITY ***** 
+    // Richiamata da modifiche massive 
+    // controlla che: se progetto BD l'opportunità sia valorizzata e presente in SF
+    //                se progetto non BD l'opportunità non è valorizzata
+    [WebMethod(EnableSession = true)]
+    public AjaxCallResult CheckOpportunity(string OpportunityId, string Project_id)
+    {
+        TRSession CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
+
+        if ( Project_id == "" )
+            return new AjaxCallResult { Success = true, Message = "" };
+
+        try
+        {
+
+            // Cerca il progetto nella tabella dtProgettiTutti
+            DataRow[] projectRows = CurrentSession.dtProgettiTutti.Select("Projects_Id = " + Project_id);
+
+            string projectTypeId;
+            if (projectRows.Length > 0)
+                projectTypeId = projectRows[0]["ProjectType_Id"].ToString();
+            else {
+                return new AjaxCallResult { Success = false, Message = "Errore non specificato" };
+            }
+
+            if ( projectTypeId != ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] && OpportunityId != "")
+                return new AjaxCallResult { Success = false, Message = "Opportunita solo su progetti BD" };
+
+            if ( projectTypeId == ConfigurationManager.AppSettings["PROGETTO_BUSINESS_DEVELOPMENT"] && OpportunityId == "")
+                return new AjaxCallResult { Success = false, Message = "Opportunita obbligatoria su progetti BD" };
+
+            // Check if the OpportunityId exists in the ListaAllOpportunity list
+            if (OpportunityId != "")
+            {
+                bool exists = CurrentSession.ListaAllOpportunity.Exists(opportunity => opportunity.OpportunityCode == OpportunityId);
+                if (!exists)
+                    return new AjaxCallResult { Success = false, Message = "Opportunita non presente in Salesforce" };
+            }
+
+            return new AjaxCallResult { Success = true, Message = "" };
+        }
+        catch (Exception)
+        {
+            return new AjaxCallResult { Success = true, Message = "Errore non specificato" };
+        }
+    }
+
     //  **** COPIA PROGETTO ***** 
     [WebMethod(EnableSession = true)]
     public AjaxCallResult CopyProject(int Project_Id, string ProjectCode, string ProjectName, bool forceFlag)

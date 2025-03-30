@@ -55,8 +55,8 @@ public partial class mass_insert_hours : System.Web.UI.Page
                 sWhere + " AND Hours.Date <= @TB_DataA";
         }
 
-        DShours.SelectCommand = "SELECT TOP(200) Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.AccountingDate, Hours.LocationKey, Hours.LocationType, Hours.LocationDescription, Hours.SalesforceTaskId, Hours.CancelFlag, Hours.Comment, Persons.Name AS NomePersona, " +
-                                " Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, Activity.Activity_Id , Activity.ActivityCode + ' ' + Activity.Name AS NomeAttivita FROM Hours INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id" +
+        DShours.SelectCommand = "SELECT TOP(50) Hours.Hours_Id, Hours.Projects_Id, Hours.Persons_id, Hours.Date, Hours.Hours, Hours.AccountingDate, Hours.LocationKey, Hours.LocationType, Hours.LocationDescription, Hours.SalesforceTaskId, Hours.CancelFlag, Hours.Comment, Persons.Name AS NomePersona, " +
+                                " Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, Activity.Activity_Id , Activity.ActivityCode + ' ' + Activity.Name AS NomeAttivita, OpportunityId FROM Hours INNER JOIN Projects ON Hours.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Hours.Persons_id = Persons.Persons_id" +
                                 " LEFT JOIN Activity ON Activity.Activity_id = Hours.Activity_id " + sWhere + " ORDER BY Hours.Date, Hours.Projects_ID, Hours.Persons_Id";
 
     }
