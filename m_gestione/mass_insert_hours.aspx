@@ -1,6 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="mass_insert_hours.aspx.cs" Inherits="mass_insert_hours" EnableEventValidation="False" %>
 
-<!DOCTYPE html>
+<!DOCTYPE html> 
 
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>

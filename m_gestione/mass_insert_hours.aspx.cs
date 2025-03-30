@@ -183,7 +183,7 @@ public partial class mass_insert_hours : System.Web.UI.Page
         DropDownList DDLProjects_Id = (DropDownList)gvrow.FindControl("DDLProjects_Id");
         DropDownList DDLActivity = (DropDownList)gvrow.FindControl("DDLActivity_Id");
 
-        // aggiorna attività collegate al progetto
+        // aggiorna attività collegate al progetto.
         BindDDL(DDLProjects_Id.SelectedValue, DDLActivity, 0);
     }
 }
