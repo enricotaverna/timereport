@@ -1,5 +1,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="mass_insert_expenses.aspx.cs" Inherits="mass_insert_expenses" EnableEventValidation="False" %>
 
+<!DOCTYPE html>
+
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
@@ -18,14 +20,22 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
-<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>"" rel="stylesheet" />
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>" rel="stylesheet" />
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <style>
     .inputtext, .ASPInputcontent {
-        Width: 170px;
+        Width: 120px;
+    }
+
+    .textarea {
+        width: 180px;
+    }
+
+    .datepickclass {
+        width: 100px;
     }
 </style>
 
@@ -47,7 +57,7 @@
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
-        <form id="formSpese" runat="server">
+        <form id="formSpese" runat="server" autocomplete="off">
 
             <!--**** Riquadro navigazione ***-->
             <div class="form-group row justify-content-center">
@@ -59,39 +69,41 @@
                             <label class="inputtext">Persona</label>
                         </div>
                         <div class="col-3">
-                        <div style="position:absolute">
-                        <asp:DropDownList ID="DDL_Persona_Sel" runat="server" AppendDataBoundItems="True" 
-                            AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="DDSPersone" DataTextField="Name"
-                            DataValueField="Persons_id" OnSelectedIndexChanged="DDL_Persona_Sel_SelectedIndexChanged"
-                            OnDataBound="DDL_Persona_Sel_DataBound">
-                            <asp:ListItem Text="Tutti i valori" Value="all" />
-                        </asp:DropDownList>
-                        </div>
+                            <div style="position: absolute">
+                                <asp:DropDownList ID="DDL_Persona_Sel" runat="server" AppendDataBoundItems="True"
+                                    AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="DDSPersone" DataTextField="Name"
+                                    DataValueField="Persons_id" OnSelectedIndexChanged="DDL_Persona_Sel_SelectedIndexChanged"
+                                    OnDataBound="DDL_Persona_Sel_DataBound">
+                                    <asp:ListItem Text="Tutti i valori" Value="all" />
+                                </asp:DropDownList>
+                            </div>
                         </div>
                         <div class="col-1">
                             <label class="inputtext">Progetto</label>
                         </div>
                         <div class="col-3">
-                            <div style="position:absolute">
-                            <asp:DropDownList ID="DDL_Progetti_Sel" runat="server" AppendDataBoundItems="True"
-                                AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="dsProjects" DataTextField="codice" Width="220px"
-                                DataValueField="Projects_Id" OnSelectedIndexChanged="DDL_Progetti_Sel_SelectedIndexChanged"
-                                OnDataBound="DDL_Progetti_Sel_DataBound">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
-                            </asp:DropDownList>
-                        </div></div>
+                            <div style="position: absolute">
+                                <asp:DropDownList ID="DDL_Progetti_Sel" runat="server" AppendDataBoundItems="True"
+                                    AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="dsProjects" DataTextField="codice" Width="220px"
+                                    DataValueField="Projects_Id" OnSelectedIndexChanged="DDL_Progetti_Sel_SelectedIndexChanged"
+                                    OnDataBound="DDL_Progetti_Sel_DataBound">
+                                    <asp:ListItem Text="Tutti i valori" Value="all" />
+                                </asp:DropDownList>
+                            </div>
+                        </div>
                         <div class="col-1">
                             <label class="inputtext">Spese</label>
                         </div>
                         <div class="col-3">
-                            <div style="position:absolute">
-                            <asp:DropDownList ID="DDL_Spesa_Sel" runat="server" AppendDataBoundItems="True"
-                                AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="dsTipoSpese" DataTextField="codiceSpesa" Width="220px"
-                                DataValueField="ExpenseType_Id" OnSelectedIndexChanged="DDL_Spesa_Sel_SelectedIndexChanged"
-                                OnDataBound="DDL_Spesa_Sel_DataBound">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
-                            </asp:DropDownList>
-                        </div></div>
+                            <div style="position: absolute">
+                                <asp:DropDownList ID="DDL_Spesa_Sel" runat="server" AppendDataBoundItems="True"
+                                    AutoPostBack="True" CssClass="ASPInputcontent" DataSourceID="dsTipoSpese" DataTextField="codiceSpesa" Width="220px"
+                                    DataValueField="ExpenseType_Id" OnSelectedIndexChanged="DDL_Spesa_Sel_SelectedIndexChanged"
+                                    OnDataBound="DDL_Spesa_Sel_DataBound">
+                                    <asp:ListItem Text="Tutti i valori" Value="all" />
+                                </asp:DropDownList>
+                            </div>
+                        </div>
 
                     </div>
                     <!-- End row -->
@@ -121,7 +133,7 @@
                 <!-- Fine RoundedBox -->
             </div>
             <!-- *** Fine riquadro navigazione *** -->
-           
+
             <div class="row justify-content-center pt-3">
                 <div class="col-11 px-0">
 
@@ -133,13 +145,13 @@
                         <RowStyle CssClass="GV_row" />
                         <Columns>
                             <%--**** TB_Data ****--%>
-                            <asp:TemplateField HeaderText="Date" SortExpression="Date">
+                            <asp:TemplateField HeaderText="Data" SortExpression="Date">
                                 <EditItemTemplate>
                                     <asp:TextBox ID="TB_Data" data-parsley-required="true" runat="server" Text='<%# Bind("Date", "{0:d}") %>' Columns="10"
-                                        CssClass="datepickclass dataField" MaxLength="10"></asp:TextBox>
+                                        CssClass="datepickclass dataField ASPInputcontent" MaxLength="10"></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Data" data-parsley-required="true" runat="server" Columns="8" CssClass="datepickclass footerForm" MaxLength="10"    
+                                    <asp:TextBox ID="TB_Data" data-parsley-required="true" runat="server" Columns="8" CssClass="datepickclass ASPInputcontent setOnOffValidation" MaxLength="10"
                                         Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
@@ -149,9 +161,9 @@
                             <%--**** DDLProjects_Id ****--%>
                             <asp:TemplateField HeaderText="Progetto" SortExpression="NomeProgetto">
                                 <EditItemTemplate>
-                                    <asp:DropDownList ID="DDLProjects_Id" runat="server" CssClass="TabellaLista projectField" DataSourceID="dsProjects"
+                                    <asp:DropDownList ID="DDLProjects_Id" runat="server" CssClass="TabellaLista  projectField" DataSourceID="dsProjects"
                                         DataTextField="codice" DataValueField="Projects_Id" SelectedValue='<%# Bind("Projects_Id") %>'
-                                        Width="110px">
+                                        Width="140px">
                                     </asp:DropDownList>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
@@ -160,14 +172,30 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:DropDownList ID="DDLProjects_Id" runat="server" AppendDataBoundItems="True"
-                                        CssClass="TabellaLista footerForm" DataSourceID="dsProjects" DataTextField="codice" DataValueField="Projects_Id"
-                                        SelectedValue='<%# Bind("Projects_Id") %>' Width="120px" data-parsley-required="true">
+                                        CssClass="TabellaLista projectField setOnOffValidation" DataSourceID="dsProjects" DataTextField="codice" DataValueField="Projects_Id"
+                                        SelectedValue='<%# Bind("Projects_Id") %>' Width="140px" data-parsley-required="true">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
                                     </asp:DropDownList>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TextBox6" Text='<%# Bind("NomeProgetto") %>' runat="server" CssClass=" GV_row"
                                         ReadOnly="True" BorderWidth="0px"></asp:TextBox>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <%-- Opportunita --%>
+                            <asp:TemplateField HeaderText="Opportunita" SortExpression="OpportunityId">
+                                <EditItemTemplate>
+                                    <asp:TextBox ID="TB_OpportunityId" runat="server" Columns="9" CssClass="ASPInputcontent opportunityField"
+                                        data-parsley-checkopportunity data-parsley-validate-if-empty
+                                        MaxLength="9" Text='<%# Bind("OpportunityId") %>'></asp:TextBox>
+                                </EditItemTemplate>
+                                <FooterTemplate>
+                                    <asp:TextBox ID="TB_OpportunityId" runat="server" Columns="9" CssClass="ASPInputcontent"
+                                        data-parsley-checkopportunity data-parsley-validate-if-empty
+                                        MaxLength="9" Text='<%# Bind("OpportunityId") %>'></asp:TextBox>
+                                </FooterTemplate>
+                                <ItemTemplate>
+                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("OpportunityId") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <%--**** DDL_Persona_Id ****--%>
@@ -183,7 +211,7 @@
                                         ReadOnly="True" Text='<%# Bind("NomePersona") %>' Wrap="False"></asp:TextBox>
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
-                                    <asp:DropDownList ID="DDL_Persona_Id" runat="server" AppendDataBoundItems="True" CssClass="TabellaLista footerForm"
+                                    <asp:DropDownList ID="DDL_Persona_Id" runat="server" AppendDataBoundItems="True" CssClass="TabellaLista setOnOffValidation"
                                         DataSourceID="DDSPersone" DataTextField="Name" DataValueField="Persons_id" data-parsley-required="true" SelectedValue='<%# Bind("Persons_id") %>'
                                         Width="110px">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
@@ -195,13 +223,13 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <%--**** TB_Amount ****--%>
-                            <asp:TemplateField HeaderText="Amount" SortExpression="Amount">
+                            <asp:TemplateField HeaderText="Importo" SortExpression="Amount">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TB_Amount" runat="server" Text='<%# Bind("Amount", "{0:#.##;#.##}")%>' data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
-                                        CssClass="TabellaLista amountField" Columns="6" MaxLength="10"></asp:TextBox>
+                                    <asp:TextBox ID="TB_Amount" runat="server" Width="50px" Text='<%# Bind("Amount", "{0:#.##;#.##}")%>' data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
+                                        CssClass="TabellaLista ASPInputcontent amountField" Columns="6" MaxLength="10"></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Amount" runat="server" Columns="6" CssClass="TabellaLista footerForm" MaxLength="8" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
+                                    <asp:TextBox ID="TB_Amount" runat="server" Columns="6" Width="50px" CssClass="TabellaLista ASPInputcontent setOnOffValidation" MaxLength="8" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
                                         Text='<%# Bind("Amount", "{0:N}") %>' CausesValidation="True"></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
@@ -209,7 +237,7 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <%--**** DDLExpenseType_Id ****--%>
-                            <asp:TemplateField HeaderText="TipoSpesa" SortExpression="TipoSpesa">
+                            <asp:TemplateField HeaderText="Tipo spesa" SortExpression="TipoSpesa">
                                 <EditItemTemplate>
                                     <asp:DropDownList ID="DDLTipoSpesa_Id" runat="server" CssClass="TabellaLista tipoSpesaField" DataSourceID="DStipoSpesa"
                                         DataTextField="codice" DataValueField="ExpenseType_Id" SelectedValue='<%# Bind("ExpenseType_Id") %>'
@@ -221,11 +249,11 @@
                                         ReadOnly="True" Text='<%# Bind("TipoSpesa") %>'></asp:TextBox>
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
-                                    <asp:DropDownList ID="DDLTipoSpesa_Id" runat="server" CssClass="TabellaLista footerForm" DataSourceID="DStipoSpesa" data-parsley-required="true"
+                                    <asp:DropDownList ID="DDLTipoSpesa_Id" runat="server" CssClass="TabellaLista setOnOffValidation" DataSourceID="DStipoSpesa" data-parsley-required="true"
                                         DataTextField="codice" DataValueField="ExpenseType_Id" SelectedValue='<%# Bind("ExpenseType_Id") %>'
                                         Width="110px" AppendDataBoundItems="True">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
-                                    </asp:DropDownList> 
+                                    </asp:DropDownList>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:TextBox ID="TextBox8" Text='<%# Bind("TipoSpesa") %>' runat="server" BorderWidth="0px"
@@ -236,10 +264,10 @@
                             <asp:TemplateField HeaderText="Competenza" SortExpression="AccountingDate">
                                 <EditItemTemplate>
                                     <asp:TextBox ID="TB_AccountingDate" runat="server" Text='<%# Bind("AccountingDate", "{0:d}") %>'
-                                        Columns="10" CssClass="datepickclass accountingDateField" MaxLength="10"></asp:TextBox>
+                                        Columns="10" CssClass="datepickclass ASPInputcontent accountingDateField" MaxLength="10"></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_AccountingDate" runat="server" Columns="8" CssClass="datepickclass"
+                                    <asp:TextBox ID="TB_AccountingDate" runat="server" Columns="8" CssClass="datepickclass ASPInputcontent"
                                         MaxLength="10" Text='<%# Bind("AccountingDate", "{0:d}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
@@ -249,7 +277,7 @@
                             <%--**** CB_storno ****--%>
                             <asp:TemplateField HeaderText="St" SortExpression="CancelFlag">
                                 <EditItemTemplate>
-                                    <asp:CheckBox ID="CB_storno" runat="server" Checked='<%# Bind("CancelFlag") %>' CssClass="cancelFlagField" /> 
+                                    <asp:CheckBox ID="CB_storno" runat="server" Checked='<%# Bind("CancelFlag") %>' CssClass="cancelFlagField" />
                                 </EditItemTemplate>
                                 <FooterTemplate>
                                     <asp:CheckBox ID="CB_storno" runat="server" Checked='<%# Bind("CancelFlag") %>' />
@@ -274,7 +302,7 @@
                             <%--**** CB_CompanyPayed ****--%>
                             <asp:TemplateField HeaderText="PA" SortExpression="CompanyPayed">
                                 <EditItemTemplate>
-                                    <asp:CheckBox ID="CB_CompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed")%>'  CssClass="CB_CompanyPayedFlagField"/>
+                                    <asp:CheckBox ID="CB_CompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed")%>' CssClass="CB_CompanyPayedFlagField" />
                                 </EditItemTemplate>
                                 <FooterTemplate>
                                     <asp:CheckBox ID="CB_CompanyPayed" runat="server" Checked='<%# Bind("CompanyPayed")%>' />
@@ -297,10 +325,10 @@
                                         Enabled="False" />
                                 </ItemTemplate>
                             </asp:TemplateField>
-                             <%--**** Comment ****--%>
-                            <asp:TemplateField HeaderText="Comment" SortExpression="Comment">
+                            <%--**** Comment ****--%>
+                            <asp:TemplateField HeaderText="Nota" SortExpression="Comment">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TextBox3" runat="server" Columns="10" CssClass="TabellaLista commentField" Rows="3"
+                                    <asp:TextBox ID="TextBox3" runat="server" Columns="10" CssClass="textarea commentField" Rows="3"
                                         Text='<%# Bind("Comment") %>' TextMode="MultiLine"></asp:TextBox>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
@@ -308,7 +336,7 @@
                                         Height="18px" ReadOnly="True" Rows="3" Text='<%# Bind("Comment") %>' TextMode="SingleLine"></asp:TextBox>
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TX_comment" runat="server" Columns="10" CssClass="TabellaLista"
+                                    <asp:TextBox ID="TX_comment" runat="server" Columns="10" CssClass="textarea"
                                         Text='<%# Bind("Comment") %>' TextMode="SingleLine"></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
@@ -317,25 +345,31 @@
                                         Height="18px"></asp:TextBox>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                             <%--**** Bottoni ****--%>
+
+                            <%--**** Bottoni ****--%>
                             <asp:TemplateField>
                                 <EditItemTemplate>
                                     <asp:Label ID="Expenses_Id" CssClass="Expenses_idField fieldsToHide" runat="server" Text='<%# Eval("Expenses_Id") %>' />
-                                    <asp:ImageButton ID="BTSave" runat="server" CausesValidation="True" CssClass="EditButtonSave"
-                                        ImageUrl="/timereport/images/icons/16x16/S_F_OKAY.gif" Text="<%$ appSettings: SAVE_TXT %>" /> 
-                                   &nbsp;<asp:ImageButton ID="BTCancel" runat="server" CausesValidation="False"  CssClass="CancelButton"
-                                       ImageUrl="/timereport/images/icons/16x16/S_F_CANC.GIF"  Text="<%$ appSettings: CANCEL_TXT %>" />
+                                    <asp:LinkButton ID="BTSave" runat="server" CausesValidation="True" Style="color: green">
+                                        <i style="font-size:18px" class="fa-solid fa-square-check EditButtonSave"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="BTCancel" runat="server" CausesValidation="False" Style="color: red">
+                                        <i style="margin-right:10px;margin-left:5px;font-size:18px" class="fa-solid fa-rectangle-xmark"></i>
+                                    </asp:LinkButton>
                                 </EditItemTemplate>
+
                                 <FooterTemplate>
                                     <asp:Button ID="BTInsert" runat="server" CommandName="Insert" Text="<%$ appSettings: CREATE_TXT %>" class="SmallOrangeButton" />
                                 </FooterTemplate>
+
                                 <ItemTemplate>
                                     <asp:Label ID="Expenses_Id" CssClass="Expenses_idField fieldsToHide" runat="server" Text='<%# Eval("Expenses_Id") %>' />
-                                    <asp:ImageButton ID="BTUpdate" runat="server" CssClass="EditButtonOpen"  CommandName="Edit"
-                                        ImageUrl="/timereport/images/icons/16x16/modifica.gif" Text="<%$ appSettings: EDIT_TXT %>" />&nbsp;
-                                    <asp:ImageButton ID="BTDelete" runat="server" CausesValidation="False" CssClass=" DeleteButton"
-                                        ImageUrl="/timereport/images/icons/16x16/trash.gif" 
-                                        Text="<%$ appSettings: DELETE_TXT %>" />
+                                    <asp:LinkButton ID="BTEdit" runat="server" CausesValidation="False" CommandName="Edit">
+                                        <i class="fa fa-edit" style="font-size:16px"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="BTDelete" runat="server" CausesValidation="False">
+                                        <i style="margin-right:10px;margin-left:5px;font-size:16px" class="fa fa-trash"></i>
+                                    </asp:LinkButton>
                                 </ItemTemplate>
                                 <ItemStyle Wrap="False" />
                             </asp:TemplateField>
@@ -367,7 +401,7 @@
 
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSExpenses" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="** backend **">
+        SelectCommand="**backend**">
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel" PropertyName="SelectedValue"
                 DefaultValue="%" />
@@ -408,8 +442,10 @@
             $('#DDL_Persona_Sel').SumoSelect({ search: true, searchText: '' });
             $('#DDL_Progetti_Sel').SumoSelect({ search: true, searchText: '' });
             $('#DDL_Spesa_Sel').SumoSelect({ search: true, searchText: '' });
-            
+
             $('.SumoSelect').css('width', '220px');
+
+            UnMaskScreen();
 
         });
 
@@ -418,30 +454,65 @@
             excluded: "input[type=button], input[type=submit], input[type=image], input[type=hidden], [disabled], :hidden"
         });
 
+        // Funzione per chiamare il servizio web e verificare l'opportunità in modo sincrono
+        function checkOpportunity(opportunityId, projectId) {
+            var result = false;
+
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_Projects.asmx/CheckOpportunity",
+                data: JSON.stringify({ OpportunityId: opportunityId, Project_id: projectId }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false, // Chiamata sincrona
+                success: function (response) {
+                    result = response.d; // Assumi che il servizio web restituisca true o false
+                }
+            });
+            return result;
+        }
+
+        // Aggiungi la validazione personalizzata a Parsley
+        window.Parsley.addValidator('checkopportunity', {
+            validateString: function (value, requirement, parsleyInstance) {
+                var projectField = parsleyInstance.$element.closest("tr").find(".projectField").val(); // !! deve essere definita la classe sul campo da controllare
+                var ret = checkOpportunity(value, projectField);
+                if (!ret.Success) {
+                    parsleyInstance.removeError('checkopportunity', { updateClass: true });
+                    parsleyInstance.addError('checkopportunity', { message: ret.Message, updateClass: true });
+                    return false;
+                }
+            },
+            messages: {
+                it: ''
+            }
+        });
+
         // Disabilita temporaneamente la validazione di Parsley quando si preme il tasto edit o filtra
-        $(".EditButtonOpen, .CancelButton, #BT_filtra").on("click", function (e) {
+        $("[id*='BTSave'], [id*='BTCancel'], #BT_filtra").on("click", function (e) {
             $('#formSpese').parsley().destroy();
         });
 
         // Cancella record
-        $(".DeleteButton").on("click", function (e) {
+        $("[id*='BTDelete']").on("click", function (e) {
             e.preventDefault();
             var row = $(this).closest("tr");
             ConfirmDialog("Conferma cancellazione", "Vuoi cancellare il record?", "Cancella", (confirm) => { confirm && DeleteRecord(row) });
         });
 
         // chiude riga di edit
-        $(".CancelButton").on("click", function (e) {
+        $("[id*='BTCancel']").on("click", function (e) {
             e.preventDefault();
             window.location.href = "/timereport/m_gestione/mass_insert_expenses.aspx";
         });
 
         // Aggiorna Spese
-        $(".EditButtonSave").on("click", function (e) {
+        $("[id*='BTSave']").on("click", function (e) {
 
-            $('.footerForm').attr('data-parsley-required', 'false');
+            e.preventDefault();
 
             // Check if the form is valid
+            $('.setOnOffValidation').attr('data-parsley-required', 'false');
             form.validate();
             if (!form.isValid())
                 return;
@@ -466,7 +537,7 @@
 
             var commentField = row.find(".commentField").val();
 
-            var OpportunityId = "";
+            var OpportunityId = row.find(".opportunityField").val();
 
             var values = "{ 'Expenses_Id': " + expensesId +
                 " , 'Date': '" + dataField + "'" +
@@ -475,7 +546,7 @@
                 " , 'Project_Id': " + projectField +
                 " , 'ExpenseType_Id': " + tipoSpesaField +
                 " , 'Comment': '" + commentField + "'" +
-                " , 'CreditCardPayed': " + CB_CCFlagField + 
+                " , 'CreditCardPayed': " + CB_CCFlagField +
                 " , 'CompanyPayed': " + CB_CompanyPayedFlagField +
                 " , 'CancelFlag': " + cancelFlagField +
                 " , 'InvoiceFlag': " + CB_fatturaFlagField +
@@ -505,7 +576,7 @@
 
             // formattazione valori
             var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val()) ? "" : $('#FVore_DDLTaskName').val();
-            var OpportunityId = "";
+            var OpportunityId = isNullOrEmpty($('#GV_Spese_TB_OpportunityId').val()) ? "" : $('#GV_Spese_TB_OpportunityId').val();
             var expensesId = 0;
 
             // tipo ora sempre defaultato a 1
@@ -521,7 +592,7 @@
                 " , 'CancelFlag': " + $('#GV_Spese_CB_storno').is(':checked') +
                 " , 'InvoiceFlag': " + $('#GV_Spese_CB_fattura').is(':checked') +
                 " , 'strFileName': ''" +
-                " , 'strFileData': ''" + 
+                " , 'strFileData': ''" +
                 " , 'OpportunityId': '" + OpportunityId + "'" +
                 " , 'AccountingDate': '" + $('#GV_Spese_TB_AccountingDate').val() + "'" +
                 " , 'UserId': ''" +
@@ -549,7 +620,6 @@
                 dataType: "json",
 
                 success: function (response) {
-                    UnMaskScreen(); 
                     var result = response.d
                     if (result.Success == true)
                         window.location.reload();
@@ -559,7 +629,6 @@
 
                 // in caso di errore
                 error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen(); 
                     ShowPopup(xhr.responseText);
                 }
 
@@ -578,16 +647,18 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    UnMaskScreen();
                     if (msg.d)
                         window.location.href = "/timereport/m_gestione/mass_insert_expenses.aspx";
                     //ShowPopup("Aggiornamento effettuato");
                     else
                         ShowPopup('Errore durante aggiornamento');
                 },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    ShowPopup(xhr.responseText);
+                error: function (xhr, textStatus, error) {
+                    if (xhr.responseText.trim() == 0)
+                        window.location.href = "/timereport/m_gestione/mass_insert_expenses.aspx";
+                    else {
+                        ShowPopup(xhr.responseText);
+                    }
                 }
             }); // ajax
         }

@@ -1,5 +1,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="mass_insert_hours.aspx.cs" Inherits="mass_insert_hours" EnableEventValidation="False" %>
 
+<!DOCTYPE html> 
+
 <!-- Javascript -->
 <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/timereport/include/BTmenu/menukit.js"></script>
@@ -18,14 +20,22 @@
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
 <link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
-<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" rel="stylesheet">
 <!--SUMO select-->
-<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>"" rel="stylesheet" />
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>" rel="stylesheet" />
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <style>
     .inputtext, .ASPInputcontent {
-        Width: 170px;
+        Width: 120px;
+    }
+
+    .textarea {
+        width: 180px;
+    }
+
+    .datepickclass {
+        width: 100px;
     }
 </style>
 
@@ -47,7 +57,7 @@
 
     <!-- *** MAINWINDOW *** -->
     <div class="container MainWindowBackground">
-        <form id="formOre" runat="server">
+        <form id="formOre" runat="server" autocomplete="off">
 
             <!--**** Riquadro navigazione ***-->
             <div class="form-group row justify-content-center">
@@ -59,24 +69,26 @@
                             <label class="inputtext">Persona</label>
                         </div>
                         <div class="col-5">
-                            <div style="position:absolute">
-                            <asp:DropDownList ID="DDL_Persona_Sel" runat="server"
-                                AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
-                                DataSourceID="DDSPersone" DataTextField="Name" DataValueField="Persons_id" OnSelectedIndexChanged="DDL_Persona_Sel_SelectedIndexChanged" OnDataBound="DDL_Persona_Sel_DataBound">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
-                            </asp:DropDownList>
-                        </div></div>
+                            <div style="position: absolute">
+                                <asp:DropDownList ID="DDL_Persona_Sel" runat="server"
+                                    AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
+                                    DataSourceID="DDSPersone" DataTextField="Name" DataValueField="Persons_id" OnSelectedIndexChanged="DDL_Persona_Sel_SelectedIndexChanged" OnDataBound="DDL_Persona_Sel_DataBound">
+                                    <asp:ListItem Text="Tutti i valori" Value="all" />
+                                </asp:DropDownList>
+                            </div>
+                        </div>
                         <div class="col-1">
                             <label class="inputtext">Progetto</label>
                         </div>
                         <div class="col-5">
-                            <div style="position:absolute">
-                            <asp:DropDownList ID="DDL_Progetti_Sel" runat="server"
-                                AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
-                                DataSourceID="dsProjects" DataTextField="codice" DataValueField="Projects_Id" OnSelectedIndexChanged="DDL_Progetti_Sel_SelectedIndexChanged" OnDataBound="DDL_Progetti_Sel_DataBound" Width="220px">
-                                <asp:ListItem Text="Tutti i valori" Value="all" />
-                            </asp:DropDownList>
-                        </div></div>
+                            <div style="position: absolute">
+                                <asp:DropDownList ID="DDL_Progetti_Sel" runat="server"
+                                    AppendDataBoundItems="True" AutoPostBack="True" CssClass="ASPInputcontent"
+                                    DataSourceID="dsProjects" DataTextField="codice" DataValueField="Projects_Id" OnSelectedIndexChanged="DDL_Progetti_Sel_SelectedIndexChanged" OnDataBound="DDL_Progetti_Sel_DataBound" Width="220px">
+                                    <asp:ListItem Text="Tutti i valori" Value="all" />
+                                </asp:DropDownList>
+                            </div>
+                        </div>
 
                     </div>
                     <!-- End row -->
@@ -96,7 +108,7 @@
                         <div class="col-5">
                             <asp:TextBox ID="TB_DataA" class="ASPInputcontent datepickclass" runat="server" Columns="10" MaxLength="10"
                                 OnLoad="TB_DataA_Load" OnTextChanged="TB_DataA_TextChanged"></asp:TextBox>
-                            <asp:Button ID="BT_filtra" runat="server" Text="<%$ appSettings: FILTER_TXT %>" class="SmallOrangeButton"/>
+                            <asp:Button ID="BT_filtra" runat="server" Text="<%$ appSettings: FILTER_TXT %>" class="SmallOrangeButton" />
                         </div>
 
                     </div>
@@ -114,7 +126,7 @@
                     <asp:GridView ID="GV_Ore" runat="server" AllowPaging="True" CssClass="GridView"
                         AllowSorting="True" AutoGenerateColumns="False"
                         DataKeyNames="Hours_Id" PageSize="16" ShowFooter="True"
-                        DataSourceID="DShours" GridLines="None" OnRowDataBound="GV_Ore_OnRowDataBound" EnableModelValidation="True" >
+                        DataSourceID="DShours" GridLines="None" OnRowDataBound="GV_Ore_OnRowDataBound" EnableModelValidation="True">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle CssClass="GV_row" />
                         <Columns>
@@ -122,10 +134,10 @@
                             <%-- data --%>
                             <asp:TemplateField HeaderText="Data" SortExpression="Date">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="dataField datepickclass" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
+                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="dataField ASPInputcontent datepickclass" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="datepickclass footerForm" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
+                                    <asp:TextBox ID="TB_Data" runat="server" data-parsley-required="true" class="datepickclass ASPInputcontent setOnOffValidation" Columns="8" MaxLength="10" Text='<%# Bind("Date", "{0:d}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:Label ID="Label1" runat="server" Text='<%# Bind("Date", "{0:d}") %>'></asp:Label>
@@ -149,7 +161,7 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:DropDownList ID="DDLProjects_Id" runat="server"
-                                        AppendDataBoundItems="True" CssClass="TabellaLista footerForm" DataSourceID="dsProjects"
+                                        AppendDataBoundItems="True" CssClass="TabellaLista setOnOffValidation projectField" DataSourceID="dsProjects"
                                         DataTextField="codice" DataValueField="Projects_Id" data-parsley-required="true"
                                         SelectedValue='<%# Bind("Projects_Id") %>' Width="140px" AutoPostBack="True" OnSelectedIndexChanged="DDLProjects_Id_SelectedIndexChanged">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
@@ -161,11 +173,28 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
+                            <%-- Opportunita --%>
+                            <asp:TemplateField HeaderText="Opportunita" SortExpression="OpportunityId">
+                                <EditItemTemplate>
+                                    <asp:TextBox ID="TB_OpportunityId" runat="server" Columns="9" CssClass="ASPInputcontent opportunityField"
+                                        data-parsley-checkopportunity data-parsley-validate-if-empty
+                                        MaxLength="9" Text='<%# Bind("OpportunityId") %>'></asp:TextBox>
+                                </EditItemTemplate>
+                                <FooterTemplate>
+                                    <asp:TextBox ID="TB_OpportunityId" runat="server" Columns="9" CssClass="ASPInputcontent"
+                                        data-parsley-checkopportunity data-parsley-validate-if-empty
+                                        MaxLength="9" Text='<%# Bind("OpportunityId") %>'></asp:TextBox>
+                                </FooterTemplate>
+                                <ItemTemplate>
+                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("OpportunityId") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
                             <%-- attività --%>
-                            <asp:TemplateField HeaderText="Attività" SortExpression="NomeAttivita">
+                            <asp:TemplateField HeaderText="Attivita" SortExpression="NomeAttivita">
                                 <EditItemTemplate>
                                     <asp:DropDownList ID="DDLActivity_Id" runat="server"
-                                        CssClass="TabellaLista activityField" Width="140px">
+                                        CssClass="TabellaLista activityField">
                                     </asp:DropDownList>
                                 </EditItemTemplate>
                                 <AlternatingItemTemplate>
@@ -175,12 +204,12 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:DropDownList ID="DDLActivity_Id" runat="server" AppendDataBoundItems="True"
-                                        CssClass="TabellaLista" Width="140px" Visible="True">
+                                        CssClass="TabellaLista" Visible="True">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
                                     </asp:DropDownList>
                                 </FooterTemplate>
                                 <ItemTemplate>
-                                    <asp:TextBox ID="TBActivity" runat="server" Width="110px" Text='<%#Bind("NomeAttivita") %>'
+                                    <asp:TextBox ID="TBActivity" runat="server" Text='<%#Bind("NomeAttivita") %>'
                                         BorderWidth="0px" CssClass=" GV_row" ReadOnly="True"></asp:TextBox>
                                 </ItemTemplate>
                             </asp:TemplateField>
@@ -199,7 +228,7 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:DropDownList ID="DDL_Persona_Id" runat="server" AppendDataBoundItems="True"
-                                        CssClass="TabellaLista footerForm" DataSourceID="DDSPersone" DataTextField="Name"
+                                        CssClass="TabellaLista setOnOffValidation" DataSourceID="DDSPersone" DataTextField="Name"
                                         DataValueField="Persons_id" data-parsley-required="true"
                                         SelectedValue='<%# Bind("Persons_id") %>' Width="130px">
                                         <asp:ListItem Value="" Text="Selezionare un valore" />
@@ -214,15 +243,15 @@
                             <%-- ore --%>
                             <asp:TemplateField HeaderText="Ore" SortExpression="Hours">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista hoursField" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
+                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="ASPInputcontent hoursField" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
                                         MaxLength="6" Text='<%# Bind("Hours", "{0:#.##;#.##}") %>'></asp:TextBox>
                                 </EditItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="TabellaLista footerForm" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
+                                    <asp:TextBox ID="TB_Ore" runat="server" Columns="6" CssClass="ASPInputcontent setOnOffValidation" Width="50px" data-parsley-pattern="^(?=.*[1-9])(\d*\,)?\d+$" data-parsley-required="true"
                                         MaxLength="6" Text='<%# Bind("Hours", "{0:N}") %>'></asp:TextBox>
                                 </FooterTemplate>
                                 <ItemTemplate>
-                                    <asp:Label ID="Label2" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>'></asp:Label>
+                                    <asp:Label ID="TB_Ore" runat="server" Width="50px" Text='<%# Bind("Hours", "{0:N}") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
 
@@ -230,7 +259,7 @@
                             <asp:TemplateField HeaderText="Competenza" SortExpression="AccountingDate">
                                 <EditItemTemplate>
                                     <asp:TextBox ID="TB_AccountingDate" runat="server"
-                                        class="datepickclass TabellaLista accountingDateField" Columns="8" MaxLength="10"
+                                        class="datepickclass ASPInputcontent accountingDateField" Columns="8" MaxLength="10"
                                         Text='<%# Bind("AccountingDate", "{0:d}") %>'>
                                     </asp:TextBox>
                                 </EditItemTemplate>
@@ -240,7 +269,7 @@
                                 </AlternatingItemTemplate>
                                 <FooterTemplate>
                                     <asp:TextBox ID="TB_AccountingDate" runat="server"
-                                        class="datepickclass" Columns="8" MaxLength="10"
+                                        class="datepickclass ASPInputcontent" Columns="8" MaxLength="10"
                                         Text='<%# Bind("AccountingDate", "{0:d}") %>'>
                                     </asp:TextBox>
                                 </FooterTemplate>
@@ -269,14 +298,14 @@
                             <%-- commento --%>
                             <asp:TemplateField HeaderText="Nota" SortExpression="Comment">
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="TextBox3" runat="server" Columns="15" CssClass="TabellaLista commentField"
+                                    <asp:TextBox ID="TX_comment" runat="server" Columns="15" CssClass="textarea commentField"
                                         Rows="3" Text='<%# Bind("Comment") %>' TextMode="MultiLine"></asp:TextBox>
                                 </EditItemTemplate>
                                 <ItemTemplate>
-                                    <asp:Label ID="Label3" runat="server" Text='<%# Bind("Comment") %>'></asp:Label>
+                                    <asp:Label ID="TX_comment" runat="server" Text='<%# Bind("Comment") %>'></asp:Label>
                                 </ItemTemplate>
                                 <FooterTemplate>
-                                    <asp:TextBox ID="TX_comment" runat="server" Columns="10" CssClass="TabellaLista"
+                                    <asp:TextBox ID="TX_comment" runat="server" Columns="10" CssClass="textarea"
                                         Text='<%# Bind("Comment") %>' TextMode="SingleLine"></asp:TextBox>
                                 </FooterTemplate>
                             </asp:TemplateField>
@@ -288,26 +317,28 @@
                                     <asp:Label ID="LocationKey" CssClass="LocationKeyField fieldsToHide" runat="server" Text='<%# Eval("LocationType") + ":" + Eval("LocationKey") %>' />
                                     <asp:Label ID="LocationDescription" CssClass="LocationDescriptionField fieldsToHide" runat="server" Text='<%# Eval("LocationDescription") %>' />
                                     <asp:Label ID="SalesforceTaskId" CssClass="TaskNameField fieldsToHide" runat="server" Text='<%# Eval("SalesforceTaskId") %>' />
-                                   <asp:ImageButton ID="BTSave" runat="server" CausesValidation="True" CssClass="EditButtonSave"
-                                        ImageUrl="/timereport/images/icons/16x16/S_F_OKAY.gif"
-                                        Text="<%$ appSettings: SAVE_TXT %>" />
-                                    &nbsp;<asp:ImageButton ID="BTCancel" runat="server" CausesValidation="False" CssClass="CancelButton"
-                                        ImageUrl="/timereport/images/icons/16x16/S_F_CANC.GIF"  Text="<%$ appSettings: CANCEL_TXT %>" />
+                                    <asp:LinkButton ID="BTSave" runat="server" CausesValidation="True" Style="color: green">
+                                        <i style="font-size:18px" class="fa-solid fa-square-check EditButtonSave"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="BTCancel" runat="server" CausesValidation="False" Style="color: red">
+                                        <i style="margin-right:10px;margin-left:5px;font-size:18px" class="fa-solid fa-rectangle-xmark CancelButton"></i>
+                                    </asp:LinkButton>
                                 </EditItemTemplate>
                                 <FooterTemplate>
                                     <asp:Button ID="BTInsert" runat="server" Text="<%$ appSettings: CREATE_TXT %>" class="SmallOrangeButton" />
                                 </FooterTemplate>
                                 <ItemTemplate>
                                     <asp:Label ID="Hours_Id" CssClass="Hours_idField fieldsToHide" runat="server" Text='<%# Eval("Hours_Id") %>' />
-                                    <asp:ImageButton ID="BTUpdate" runat="server" CssClass="EditButtonOpen" CommandName="Edit"
-                                        ImageUrl="/timereport/images/icons/16x16/modifica.gif" Text="<%$ appSettings: EDIT_TXT %>" />&nbsp;                      
-                                    <asp:ImageButton ID="BTDelete" runat="server" CausesValidation="False" CssClass="DeleteButton"
-                                        ImageUrl="/timereport/images/icons/16x16/trash.gif"
-                                        Text="<%$ appSettings: DELETE_TXT %>" />
+                                    <asp:LinkButton ID="BTEdit" runat="server" CausesValidation="False" CommandName="Edit">
+                                        <i class="fa fa-edit" style="font-size:16px"></i>
+                                    </asp:LinkButton>
+                                    <asp:LinkButton ID="BTDelete" runat="server" CausesValidation="False">
+                                        <i style="margin-right:10px;margin-left:5px;font-size:16px" class="fa fa-trash"></i>
+                                    </asp:LinkButton>
                                 </ItemTemplate>
                                 <ItemStyle Wrap="False" />
                             </asp:TemplateField>
-                        
+
                         </Columns>
                         <PagerStyle CssClass="GV_footer" />
                         <HeaderStyle CssClass="GV_header" />
@@ -336,7 +367,7 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DShours" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="** backend **"  >
+        SelectCommand="** backend **">
         <SelectParameters>
             <asp:ControlParameter ControlID="DDL_Persona_Sel" Name="DDL_Persona_Sel"
                 PropertyName="SelectedValue" DefaultValue="%" />
@@ -379,6 +410,8 @@
             $('#DDL_Progetti_Sel').SumoSelect({ search: true, searchText: '' });
             $('.SumoSelect').css('width', '220px');
 
+            UnMaskScreen();
+
         });
 
         // Initialize Parsley
@@ -386,30 +419,65 @@
             excluded: "input[type=button], input[type=submit], input[type=image], input[type=hidden], [disabled], :hidden"
         });
 
+        // Funzione per chiamare il servizio web e verificare l'opportunità in modo sincrono
+        function checkOpportunity(opportunityId, projectId) {
+            var result = false;
+       
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_Projects.asmx/CheckOpportunity",
+                data: JSON.stringify({ OpportunityId: opportunityId, Project_id: projectId }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false, // Chiamata sincrona
+                success: function (response) {
+                    result = response.d; // Assumi che il servizio web restituisca true o false
+                }
+            });
+            return result;
+        }
+
+        // Aggiungi la validazione personalizzata a Parsley
+        window.Parsley.addValidator('checkopportunity', {
+            validateString: function (value, requirement, parsleyInstance) {
+                var projectField = parsleyInstance.$element.closest("tr").find(".projectField").val();  // !! deve essere definita la classe sul campo da controllare
+                var ret = checkOpportunity(value, projectField);
+                if (!ret.Success) {
+                    parsleyInstance.removeError('checkopportunity', { updateClass: true });
+                    parsleyInstance.addError('checkopportunity', { message: ret.Message, updateClass: true });
+                    return false;
+                }
+            },
+            messages: {
+                it: ''
+            }
+        });
+
         // Disabilita temporaneamente la validazione di Parsley quando si preme il tasto edit o filtra
-        $(".EditButtonOpen, .CancelButton, #BT_filtra").on("click", function (e) {
+        $("[id*='BTSave'], [id*='BTCancel'], #BT_filtra").on("click", function (e) {
             $('#formOre').parsley().destroy();
         });
 
         // Cancella record
-        $(".DeleteButton").on("click", function (e) {
+        $("[id*='BTDelete']").on("click", function (e) {
             e.preventDefault();
             var row = $(this).closest("tr");
             ConfirmDialog("Conferma cancellazione", "Vuoi cancellare il record?", "Cancella", (confirm) => { confirm && DeleteRecord(row) });
         });
 
         // chiude riga di edit
-        $(".CancelButton").on("click", function (e) {
+        $("[id*='BTCancel']").on("click", function (e) {
             e.preventDefault();
             window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
         });
 
         // Aggiorna Ore
-        $(".EditButtonSave").on("click", function (e) {
+        $("[id*='BTSave']").on("click", function (e) {
 
-            $('.footerForm').attr('data-parsley-required', 'false');
+            e.preventDefault();
 
-            // Check if the form is valid
+            // disabilita i controlli sui campi del footer
+            $('.setOnOffValidation').attr('data-parsley-required', 'false');
             form.validate();
             if (!form.isValid())
                 return;
@@ -423,7 +491,7 @@
             var LocationDescription = row.find(".LocationDescriptionField").text();
             var TaskName = row.find(".SalesforceTaskIdField").text();
             var dataField = row.find(".dataField").val();
-            var projectField = row.find(".projectField").val();            
+            var projectField = row.find(".projectField").val();
             var activityField = isNullOrEmpty(row.find(".activityField").val()) ? 0 : row.find(".activityField").val();
             var personField = row.find(".personField").val();
             var hoursField = row.find(".hoursField").val().replace(',', '.');
@@ -432,7 +500,7 @@
             var cancelFlagField = row.find(".cancelFlagField > input").is(":checked");
             var commentField = row.find(".commentField").val();
 
-            var OpportunityId = "";
+            var OpportunityId = row.find(".opportunityField").val();
 
             var values = "{ 'Hours_Id': " + hoursId +
                 " , 'Date': '" + dataField + "'" +
@@ -467,10 +535,10 @@
 
             // formattazione valori
             var Activity = isNullOrEmpty($('#GV_Ore_DDLActivity_Id').val()) ? 0 : $('#GV_Ore_DDLActivity_Id').val();
-            var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val()) ? "" : $('#FVore_DDLTaskName').val();
+            var TaskName = isNullOrEmpty($('#GV_Ore_DDLTaskName').val()) ? "" : $('#GV_Ore_DDLTaskName').val();
             var LocationKey = "99999";
             var LocationDescription = "NOT SPECIFIED";
-            var OpportunityId = "";
+            var OpportunityId = isNullOrEmpty($('#GV_Ore_TB_OpportunityId').val()) ? "" : $('#GV_Ore_TB_OpportunityId').val();
             //var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
             //var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
             var hoursId = 0;
@@ -501,6 +569,8 @@
             var hoursId = row.find(".Hours_idField").text();
             var values = "{'Id': '" + hoursId + "', DeletionType : 'hours' }";
 
+            MaskScreen();
+
             $.ajax({
 
                 type: "POST",
@@ -528,6 +598,8 @@
         // Chiamata AJAX
         function PostAjax(values) {
 
+            console.log("PostAjax");
+
             MaskScreen();
 
             $.ajax({
@@ -537,16 +609,18 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    UnMaskScreen();
                     if (msg.d)
                         window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
                     //ShowPopup("Aggiornamento effettuato");
                     else
                         ShowPopup('Errore durante aggiornamento');
                 },
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    ShowPopup(xhr.responseText);
+                error: function (xhr, textStatus, error) {
+                    if (xhr.responseText.trim() == 0)
+                        window.location.href = "/timereport/m_gestione/mass_insert_hours.aspx";
+                    else {
+                        ShowPopup(xhr.responseText);
+                    }
                 }
             }); // ajax
         }

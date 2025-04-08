@@ -7,16 +7,21 @@ public partial class mass_insert_expenses : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+
+        Auth.CheckPermission("ADMIN", "MASSCHANGE");
+        CurrentSession = (TRSession)Session["CurrentSession"];
+
         if (!Page.IsPostBack)
         {
             string currentDate = DateTime.Now.ToString("dd/MM/yyyy");
             TB_Datada.Text = currentDate;
         }
+        BuildWhere();
+    }
 
+    protected void BuildWhere()
+    {
         string sWhere = "";
-
-        Auth.CheckPermission("ADMIN", "MASSCHANGE");
-        CurrentSession = (TRSession)Session["CurrentSession"];
 
         if (DDL_Persona_Sel.SelectedValue != "all" || (Session["DDL_Persona_Sel"] != null && !IsPostBack))
         {
@@ -43,8 +48,7 @@ public partial class mass_insert_expenses : System.Web.UI.Page
             sWhere = string.IsNullOrEmpty(sWhere) ? " WHERE Expenses.Date <= (@TB_DataA)" : sWhere + " AND Expenses.Date <= (@TB_DataA)";
         }
 
-        DSExpenses.SelectCommand = "SELECT TOP(200) Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.Persons_id, Expenses.Date, Expenses.amount, Expenses.ExpenseType_Id, Expenses.CancelFlag, Expenses.creditcardpayed, Expenses.CompanyPayed, Expenses.invoiceFlag, Expenses.Comment, Expenses.AccountingDate, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, ExpenseType.ExpenseCode + ' ' + ExpenseType.Name AS TipoSpesa FROM Expenses INNER JOIN Projects ON Expenses.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id INNER JOIN ExpenseType ON Expenses.ExpenseType_Id = ExpenseType.ExpenseType_Id " + sWhere + " ORDER BY Expenses.Date, Expenses.Projects_ID, Expenses.Persons_Id";
-
+        DSExpenses.SelectCommand = "SELECT TOP(50) Expenses.Expenses_Id, Expenses.Projects_Id, Expenses.Persons_id, Expenses.Date, Expenses.amount, Expenses.ExpenseType_Id, Expenses.CancelFlag, Expenses.creditcardpayed, Expenses.CompanyPayed, Expenses.invoiceFlag, Expenses.Comment, Expenses.AccountingDate, Persons.Name AS NomePersona, Projects.ProjectCode + ' ' + Projects.Name AS NomeProgetto, ExpenseType.ExpenseCode + ' ' + ExpenseType.Name AS TipoSpesa, OpportunityId FROM Expenses INNER JOIN Projects ON Expenses.Projects_Id = Projects.Projects_Id INNER JOIN Persons ON Expenses.Persons_id = Persons.Persons_id INNER JOIN ExpenseType ON Expenses.ExpenseType_Id = ExpenseType.ExpenseType_Id " + sWhere + " ORDER BY Expenses.Date, Expenses.Projects_ID, Expenses.Persons_Id";
     }
 
     protected void DDL_Persona_Sel_SelectedIndexChanged(object sender, EventArgs e)
