@@ -510,6 +510,8 @@ public class WS_DBUpdates : System.Web.Services.WebService
                         strAccountingDate = accountingDate.ToString("dd/MM/yyyy");
                     }
 
+                    string locationKeyValue = dt.Rows[0]["LocationType"] != DBNull.Value ? dt.Rows[0]["LocationType"].ToString() + ":" + dt.Rows[0]["LocationKey"].ToString() : "";                   
+
                     bool ret = SaveHours(0, // Hours_id
                               sInsDate,  //string TbdateForHours,
                               iHours, //double TbHours,
@@ -518,7 +520,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                               Convert.ToInt32(dt.Rows[0]["Activity_id"].ToString()),//int Activity_Id,
                               dt.Rows[0]["comment"].ToString(), //string Comment,
                               CancelFlag, //bool CancelFlag,
-                              dt.Rows[0]["LocationType"].ToString() + ":" + dt.Rows[0]["LocationKey"].ToString(), //string LocationKey,
+                              locationKeyValue, //string LocationKey,
                               dt.Rows[0]["LocationDescription"].ToString(), //string LocationDescription,
                               dt.Rows[0]["OpportunityId"].ToString(), //string OpportunityId,
                               strAccountingDate, //string AccountingDate,
