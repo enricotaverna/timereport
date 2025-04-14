@@ -63,14 +63,16 @@ public class WS_DBUpdates : System.Web.Services.WebService
         // recupera anagrafica progetto
         DataRow drProject = Database.GetRow("SELECT ClientManager_id, AccountManager_id  FROM Projects WHERE Projects_id = " + ASPcompatility.FormatNumberDB(Project_Id), null);
 
-        string LocationType = "";
-        string LocationKeyFormatted = "";
+        string LocationType = null;
+        string LocationKeyFormatted = null;
 
         if (!string.IsNullOrEmpty(LocationKey))
         {
-
             LocationType = LocationKey.Substring(0, 1) == "9" ? "T" : LocationKey.Substring(0, 1);
             LocationKeyFormatted = LocationKey.Substring(0, 1) == "9" ? LocationKey : LocationKey.Substring(2);
+        }
+        else {
+            LocationDescription = LocationDescription == ""  ? null : LocationDescription ; // se il progetto non prevede location rende null anche la descrizione che viene passata a space
         }
 
         string SQLHours = "";
