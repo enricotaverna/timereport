@@ -270,7 +270,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                       dr1["ClientManager_id"] + ", " +
                                       dr1["AccountManager_id"] + ", " +
                                       dr2["Company_id"] + ", " +
-                                      ASPcompatility.FormatNumberDB(ExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
+                                      ASPcompatility.FormatNumberDB(dExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
                                       (string.IsNullOrEmpty(OpportunityId) ? "NULL" : ASPcompatility.FormatStringDb(OpportunityId)) + ", " +
                                       (string.IsNullOrEmpty(AccountingDate) ? "NULL" : ASPcompatility.FormatDateDb(AccountingDate)) + ")";
                 }
@@ -283,7 +283,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                  "ExpenseType_Id = " + ExpenseType_Id + ", " +
                                  "AdditionalCharges = " + AdditionalCharges + ", " +
                                  "TipoBonus_Id = " + dr["TipoBonus_Id"] + ", " +
-                                 "amount = " + ASPcompatility.FormatNumberDB(ExpenseAmount) + ", " +
+                                 "amount = " + ASPcompatility.FormatNumberDB(dExpenseAmount) + ", " +
                                  "comment = '" + Comment + "', " +
                                  "createdBy = " + ASPcompatility.FormatStringDb(UserId) + ", " +
                                  "creationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + ", " +
@@ -294,7 +294,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                  "ClientManager_id = " + dr1["ClientManager_id"] + ", " +
                                  "AccountManager_id = " + dr1["AccountManager_id"] + ", " +
                                  "Company_id = " + dr2["Company_id"] + ", " +
-                                 "AmountInCurrency = " + ASPcompatility.FormatNumberDB(ExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
+                                 "AmountInCurrency = " + ASPcompatility.FormatNumberDB(dExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
                                  "OpportunityId = " + (string.IsNullOrEmpty(OpportunityId) ? "NULL" : ASPcompatility.FormatStringDb(OpportunityId)) + ", " +
                                  "AccountingDate = " + (string.IsNullOrEmpty(AccountingDate) ? "NULL" : ASPcompatility.FormatDateDb(AccountingDate)) +
                                  " WHERE Expenses_Id = " + Expenses_Id;
