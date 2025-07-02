@@ -63,14 +63,16 @@ public class WS_DBUpdates : System.Web.Services.WebService
         // recupera anagrafica progetto
         DataRow drProject = Database.GetRow("SELECT ClientManager_id, AccountManager_id  FROM Projects WHERE Projects_id = " + ASPcompatility.FormatNumberDB(Project_Id), null);
 
-        string LocationType = "";
-        string LocationKeyFormatted = "";
+        string LocationType = null;
+        string LocationKeyFormatted = null;
 
         if (!string.IsNullOrEmpty(LocationKey))
         {
-
             LocationType = LocationKey.Substring(0, 1) == "9" ? "T" : LocationKey.Substring(0, 1);
             LocationKeyFormatted = LocationKey.Substring(0, 1) == "9" ? LocationKey : LocationKey.Substring(2);
+        }
+        else {
+            LocationDescription = LocationDescription == ""  ? null : LocationDescription ; // se il progetto non prevede location rende null anche la descrizione che viene passata a space
         }
 
         string SQLHours = "";
@@ -268,7 +270,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                       dr1["ClientManager_id"] + ", " +
                                       dr1["AccountManager_id"] + ", " +
                                       dr2["Company_id"] + ", " +
-                                      ASPcompatility.FormatNumberDB(ExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
+                                      ASPcompatility.FormatNumberDB(dExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
                                       (string.IsNullOrEmpty(OpportunityId) ? "NULL" : ASPcompatility.FormatStringDb(OpportunityId)) + ", " +
                                       (string.IsNullOrEmpty(AccountingDate) ? "NULL" : ASPcompatility.FormatDateDb(AccountingDate)) + ")";
                 }
@@ -281,7 +283,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                  "ExpenseType_Id = " + ExpenseType_Id + ", " +
                                  "AdditionalCharges = " + AdditionalCharges + ", " +
                                  "TipoBonus_Id = " + dr["TipoBonus_Id"] + ", " +
-                                 "amount = " + ASPcompatility.FormatNumberDB(ExpenseAmount) + ", " +
+                                 "amount = " + ASPcompatility.FormatNumberDB(dExpenseAmount) + ", " +
                                  "comment = '" + Comment + "', " +
                                  "createdBy = " + ASPcompatility.FormatStringDb(UserId) + ", " +
                                  "creationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + ", " +
@@ -292,7 +294,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                  "ClientManager_id = " + dr1["ClientManager_id"] + ", " +
                                  "AccountManager_id = " + dr1["AccountManager_id"] + ", " +
                                  "Company_id = " + dr2["Company_id"] + ", " +
-                                 "AmountInCurrency = " + ASPcompatility.FormatNumberDB(ExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
+                                 "AmountInCurrency = " + ASPcompatility.FormatNumberDB(dExpenseAmount * Convert.ToDouble(dr["ConversionRate"])) + ", " +
                                  "OpportunityId = " + (string.IsNullOrEmpty(OpportunityId) ? "NULL" : ASPcompatility.FormatStringDb(OpportunityId)) + ", " +
                                  "AccountingDate = " + (string.IsNullOrEmpty(AccountingDate) ? "NULL" : ASPcompatility.FormatDateDb(AccountingDate)) +
                                  " WHERE Expenses_Id = " + Expenses_Id;
@@ -508,6 +510,8 @@ public class WS_DBUpdates : System.Web.Services.WebService
                         strAccountingDate = accountingDate.ToString("dd/MM/yyyy");
                     }
 
+                    string locationKeyValue = dt.Rows[0]["LocationType"] != DBNull.Value ? dt.Rows[0]["LocationType"].ToString() + ":" + dt.Rows[0]["LocationKey"].ToString() : "";                   
+
                     bool ret = SaveHours(0, // Hours_id
                               sInsDate,  //string TbdateForHours,
                               iHours, //double TbHours,
@@ -516,7 +520,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                               Convert.ToInt32(dt.Rows[0]["Activity_id"].ToString()),//int Activity_Id,
                               dt.Rows[0]["comment"].ToString(), //string Comment,
                               CancelFlag, //bool CancelFlag,
-                              dt.Rows[0]["LocationType"].ToString() + ":" + dt.Rows[0]["LocationKey"].ToString(), //string LocationKey,
+                              locationKeyValue, //string LocationKey,
                               dt.Rows[0]["LocationDescription"].ToString(), //string LocationDescription,
                               dt.Rows[0]["OpportunityId"].ToString(), //string OpportunityId,
                               strAccountingDate, //string AccountingDate,

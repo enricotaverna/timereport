@@ -633,8 +633,16 @@
             // formattazione valori
             var Activity = isNullOrEmpty($('#FVore_DDLAttivita').val()) ? 0 : $('#FVore_DDLAttivita').val();
             var TaskName = isNullOrEmpty($('#FVore_DDLTaskName').val()) ? "" : $('#FVore_DDLTaskName').val();
-            var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
-            var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
+
+            if (!$('#FVore_DDLLocation').is(':hidden') || !$('#FVore_TBLocation').is(':hidden')) {
+                var LocationKey = $('#FVore_DDLLocation').is(':hidden') ? "99999" : $('#FVore_DDLLocation').val();
+                var LocationDescription = $('#FVore_DDLLocation').is(':hidden') ? $('#FVore_TBLocation').val() : $('#FVore_DDLLocation option:selected').text();
+            }
+            else {
+                var LocationKey = '';
+                var LocationDescription = '';
+            }
+
             var hoursId = '<%= String.IsNullOrEmpty(Request.QueryString["hours_id"]) ? "0" : Request.QueryString["hours_id"] %>';
             var AccountingDate = isNullOrEmpty($('#FVore_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();
 

@@ -563,8 +563,17 @@ $(document).ready(function () {
         var Activity = ($('#ore_Activity_Id').val() == null || $('#ore_Activity_Id').val() == '') ? 0 : $('#ore_Activity_Id').val();
         //var Opportunity = ($('#OpportunityId').val() == null || $('#OpportunityId').val() == '') ? "" : $('#OpportunityId').val();
 
-        var LocationKey = $('#ore_Location_Id').is(':hidden') ? "T:99999" : $('#ore_Location_Id').val();
-        var LocationDescription = $('#ore_Location_Id').is(':hidden') ? $('#TBLocation').val() : $('#ore_Location_Id option:selected').text();
+        if (!$('#ore_Location_Id').is(':hidden') || !$('#TBLocation').is(':hidden')) {
+            var LocationKey = $('#ore_Location_Id').is(':hidden') ? "99999" : $('#ore_Location_Id').val();
+            var LocationDescription = $('#ore_Location_Id').is(':hidden') ? $('#TBLocation').val() : $('#ore_Location_Id option:selected').text();
+        }
+        else {
+            var LocationKey = '';
+            var LocationDescription = '';
+        }
+
+        //var LocationKey = $('#ore_Location_Id').is(':hidden') ? "T:99999" : $('#ore_Location_Id').val();
+        //var LocationDescription = $('#ore_Location_Id').is(':hidden') ? $('#TBLocation').val() : $('#ore_Location_Id option:selected').text();
 
         // trasformo data da YYYY-MM-DD a DD/MM/YYYY
         var dateParts = $('#ore_TbdateForHours').val().split("-");

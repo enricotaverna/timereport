@@ -531,6 +531,7 @@
             var accountingDateField = row.find(".accountingDateField").val();
 
             var cancelFlagField = row.find(".cancelFlagField > input").is(":checked");
+ 
             var CB_CCFlagField = row.find(".CB_CCFlagField > input").is(":checked");
             var CB_CompanyPayedFlagField = row.find(".CB_CompanyPayedFlagField > input").is(":checked");
             var CB_fatturaFlagField = row.find(".CB_fatturaFlagField > input").is(":checked");
