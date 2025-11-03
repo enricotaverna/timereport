@@ -260,7 +260,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                       AdditionalCharges + ", " +
                                       dr["TipoBonus_Id"] + " , " +
                                       ASPcompatility.FormatNumberDB(dExpenseAmount) + ", " +
-                                      "'" + Comment + "', " +
+                                      ASPcompatility.FormatStringDb(Comment) + ", " + 
                                       ASPcompatility.FormatStringDb(UserId) + " , " +
                                       ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + " , " +
                                       (CreditCardPayed ? 1 : 0) + ", " +
@@ -284,7 +284,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                                  "AdditionalCharges = " + AdditionalCharges + ", " +
                                  "TipoBonus_Id = " + dr["TipoBonus_Id"] + ", " +
                                  "amount = " + ASPcompatility.FormatNumberDB(dExpenseAmount) + ", " +
-                                 "comment = '" + Comment + "', " +
+                                 "comment = " + ASPcompatility.FormatStringDb(Comment) + ", " +
                                  "createdBy = " + ASPcompatility.FormatStringDb(UserId) + ", " +
                                  "creationDate = " + ASPcompatility.FormatDateDb(DateTime.Now.ToString("dd/MM/yyyy HH.mm.ss"), true) + ", " +
                                  "CreditCardPayed = " + (CreditCardPayed ? 1 : 0) + ", " +
@@ -313,7 +313,7 @@ public class WS_DBUpdates : System.Web.Services.WebService
                 else
                     newIdentity = Expenses_Id; // lo stesso arrivato in input
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 result.Success = false;
                 return result;

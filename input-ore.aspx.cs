@@ -350,13 +350,6 @@ public partial class input_ore : System.Web.UI.Page
         }
     }
 
-    protected void FVore_modechanging(object sender, FormViewModeEventArgs e)
-    {
-        //      se premuto tasto cancel torna indietro
-        if (e.CancelingEdit)
-            Response.Redirect("input.aspx");
-    }
-
     protected void FVore_DataBound(object sender, EventArgs e)
     {
         //      formattta il campo numerico delle ore, nel DB le ore stornate sono negative

@@ -52,7 +52,7 @@
                     <asp:FormView ID="FVore" runat="server" DataKeyNames="Hours_Id"
                         DataSourceID="DSore" align="center" DefaultMode="Edit"
                         OnDataBound="FVore_DataBound"
-                        OnModeChanging="FVore_modechanging" CellPadding="0">
+                        CellPadding="0">
 
         <%-- EDIT --%>
         <EditItemTemplate>
@@ -158,7 +158,7 @@
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error"></div>
                                 <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
-                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate  />
                             </div>
 
                         </EditItemTemplate>
@@ -265,7 +265,7 @@
                             <div class="buttons">
                                 <div id="valMsg" class="parsely-single-error"></div>
                                 <asp:Button ID="PostButton" runat="server" CssClass="orangebutton" Text="<%$ Resources:timereport,SAVE_TXT %>" />
-                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate  />
                             </div>
 
             </InsertItemTemplate>
@@ -359,7 +359,7 @@
 
                             <!-- *** BOTTONI ***  -->
                             <div class="buttons">
-                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate />
+                                <asp:Button ID="CancelButton" runat="server" CssClass="greybutton" Text="<%$ Resources:timereport,CANCEL_TXT %>" formnovalidate  />
                             </div>
 
                         </ItemTemplate>
@@ -443,8 +443,8 @@
 
             // Sumo Select
             $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
-        /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
-           /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
+            /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
+            /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
             if ($('#FVore_DDLprogetto')[0].sumo)
                 $('#FVore_DDLprogetto')[0].sumo.optDiv.css('width', '350px'); // fa in modo che la tendina per le opportunità sia larga 550px
@@ -556,7 +556,7 @@
 
                 $("#FVore_DDLLocation").append($('<option>', { value: 'T:99999', text: '-- Testo Libero --' }));
                 $('#FVore_DDLLocation').show(); // visualizza DropDown
-                
+
                 $('#FVore_TBLocation').val(""); // reset e spegnimento campo
                 $('#FVore_TBLocation').hide();
             }
@@ -616,6 +616,12 @@
             //$('#FormOre').off('form:validate');
         });
 
+        // Sostituisci FVore_CancelButton con l'ID generato effettivo (verifica nel DOM)
+        $(document).on('click', '#FVore_CancelButton', function (e) {
+            e.preventDefault();
+            window.location.href = "/timereport/input.aspx"; // o altra azione desiderata
+        });
+
         $("#FVore_PostButton").on("click", function (e) {
 
             e.preventDefault();
@@ -645,25 +651,26 @@
             var hoursId = '<%= String.IsNullOrEmpty(Request.QueryString["hours_id"]) ? "0" : Request.QueryString["hours_id"] %>';
             var AccountingDate = isNullOrEmpty($('#FVore_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();
 
-            // tipo ora sempre defaultato a 1
-            var values = "{ 'Hours_Id': " + hoursId +
-                ", 'Date': '" + $('#FVore_LBdate').text() + "'" +
-                ", 'Hours': '" + $('#FVore_HoursTextBox').val().replace(',', '.') + "'" +
-                ", 'Person_Id': " + <%= CurrentSession.Persons_id %> +
-                " , 'Project_Id': " + $('#FVore_DDLprogetto').val() +
-                " , 'Activity_Id': " + Activity +
-                " , 'Comment': '" + $('#FVore_TBComment').val() + "'" +
-                " , 'CancelFlag': " + $('#FVore_CancelFlagCheckBox').is(':checked') +
-                " , 'LocationKey': '" + LocationKey + "'" +
-                " , 'LocationDescription': '" + LocationDescription + "'" +
-                " , 'OpportunityId': '" + ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : '') + "'" +
-                " , 'AccountingDate': '" + AccountingDate + "'" +
-                " , 'SalesforceTaskID': '" + TaskName + "'}";
+            var values = {
+                Hours_Id: parseInt(hoursId),
+                Date: $('#FVore_LBdate').text(),
+                Hours: parseFloat($('#FVore_HoursTextBox').val().replace(',', '.')),
+                Person_Id: <%= CurrentSession.Persons_id %>,
+                Project_Id: parseInt($('#FVore_DDLprogetto').val()),
+                Activity_Id: parseInt(Activity),
+                Comment: $('#FVore_TBComment').val(),
+                CancelFlag: $('#FVore_CancelFlagCheckBox').is(':checked'),
+                LocationKey: LocationKey,
+                LocationDescription: LocationDescription,
+                OpportunityId: ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : ''),
+                AccountingDate: AccountingDate,
+                SalesforceTaskID: TaskName
+            };
 
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WS_DBUpdates.asmx/SaveHours",
-                data: values,
+                data: JSON.stringify(values),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
