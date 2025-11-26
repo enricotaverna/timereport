@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Web.UI.WebControls;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
@@ -126,6 +129,22 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
     protected void BackToList(Object sender, EventArgs e)
     {
+
+        if (FVProgetto.CurrentMode == FormViewMode.Insert)
+        {
+                // 1. Recupera il codice appena inserito
+                string projectCode = GetProjectCodeFromForm();
+
+                // 2. Esegue il calcolo e ottiene la lista dei ratei
+                List<AccrualResult> accrualList = eseguiCalcoloCanone();
+
+                // 3. Salva i ratei nel DB, PASSANDO L'ID
+                InserisciAccrualNelDB(projectCode, accrualList);
+
+                //Response.Redirect("projects_lookup_list.aspx");
+            
+        }
+        
         Response.Redirect("projects_lookup_list.aspx");
     }
 
@@ -160,11 +179,308 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Values["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.Values["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.Values["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
+        
     }
 
     protected void CloneButton_Click(object sender, EventArgs e)
     {
         int projectsId = (int)FVProgetto.DataKey["Projects_Id"];
         Response.Redirect("CloneProject.aspx?Project_id=" + projectsId + "&ProjectCode=" + Request.QueryString["Projectcode"]);
+    }
+
+    /// <summary>
+    /// Calcola i ratei mensili per un progetto in base ai ricavi, ai costi e all’intervallo di date forniti.
+    /// </summary>
+    /// <remarks>
+    /// Questo metodo recupera i valori di input dai controlli del form, li converte nei tipi di dato appropriati
+    /// e calcola i ratei mensili utilizzando il metodo <see cref="AccrualCalculator.CalculateMonthlyAccrual"/>.
+    /// I valori di input devono rispettare il formato italiano (ad esempio, date in formato "dd/MM/yyyy"
+    /// e numeri decimali con la virgola come separatore).
+    /// </remarks>
+    private List<AccrualResult> eseguiCalcoloCanone()
+    {
+        // *** 1. RECUPERO CONTROLLI DAL FORMVIEW ***
+
+        TextBox txtProjectCode = (TextBox)FVProgetto.FindControl("TBProgetto");
+
+        // TextBox per gli importi (RevenueTxt e CostTxt sono nel FormView FVCanoni o FVProgetto, 
+        // userò FVProgetto come nei tuoi file caricati)
+        TextBox txtRevenue = (TextBox)FVProgetto.FindControl("TBRevenueBudget");
+        TextBox txtCost = (TextBox)FVProgetto.FindControl("TextBox4");
+
+        // Campi Data (Questi ID sono un'assunzione basata sul contesto, potrebbero essere diversi)
+        TextBox txtDataInizio = (TextBox)FVProgetto.FindControl("TBAttivoDa");
+        TextBox txtDataFine = (TextBox)FVProgetto.FindControl("TBAttivoA");
+
+        // *** 2. PARSING E CONVERSIONE DEI VALORI ***
+
+        DateTime dataInizio;
+        DateTime dataFine;
+        decimal importoTotale;
+        decimal costoTotale;
+
+        // Per gestire il formato italiano (virgola come separatore decimale)
+        // Se usi la proprietà .Text del controllo, il formato è quello della UI
+        CultureInfo italianCulture = new CultureInfo("it-IT");
+
+        string dataInizioText = (txtDataInizio != null) ? txtDataInizio.Text : string.Empty;
+        // Converto la data. Uso TryParse per sicurezza
+        if (!DateTime.TryParse(dataInizioText, italianCulture, DateTimeStyles.None, out dataInizio))
+        {
+            // Gestione se il parsing fallisce (es. campo vuoto o formato errato)
+            dataInizio = DateTime.MinValue; // Assegna un valore di default o lancia un errore
+        }
+
+        string dataFineText = (txtDataFine != null) ? txtDataFine.Text : string.Empty;
+
+        if (!DateTime.TryParse(dataFineText, italianCulture, DateTimeStyles.None, out dataFine))
+        {
+            // Gestione se il parsing fallisce
+            dataFine = DateTime.MinValue; // Assegna un valore di default o lancia un errore
+        }
+
+        // Converto l'importo. Uso TryParse per sicurezza (gestisce la maschera JS che lascia il formato italiano)       
+        string revenueText = (txtRevenue != null) ? txtRevenue.Text : "0";
+        if (!decimal.TryParse(revenueText.Replace(".", ""), NumberStyles.Currency, italianCulture, out importoTotale))
+        {
+            importoTotale = 0.00M;
+        }
+
+        string costText = (txtCost != null) ? txtCost.Text : "0";
+        // 2. Rimuove il separatore delle migliaia (punto) e tenta la conversione.
+        // Se la conversione fallisce (es. stringa non valida), costoTotale sarà 0.00M
+        if (!decimal.TryParse(costText.Replace(".", ""), NumberStyles.Currency, italianCulture, out costoTotale))
+        {
+            // Se la conversione fallisce, usa 0 (questo è un fallback aggiuntivo, 
+            // ma TryParse gestisce già l'assegnazione se il campo iniziale è "0" o vuoto).
+            costoTotale = 0.00M;
+        }
+
+        List<AccrualResult> accrualList = AccrualCalculator.CalculateMonthlyAccrual(
+            dataInizio,
+            dataFine,
+            importoTotale,
+            costoTotale
+        );
+
+        return accrualList;
+    }
+
+    /// <summary>
+    /// Represents the financial accrual results for a specific year and month, including revenue and cost data.
+    /// </summary>
+    /// <remarks>This class is typically used to store and transfer financial data for a given period. The
+    /// <see cref="Year"/> and <see cref="Month"/> properties identify the period, while <see cref="Revenue"/> and <see
+    /// cref="Cost"/> provide the corresponding financial figures.</remarks>
+    public class AccrualResult
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public decimal Revenue { get; set; }
+        public decimal Cost { get; set; }
+        /// <summary>Costo distribuito per singolo giorno (€/giorno).</summary>
+        public decimal DailyRevenueRate { get; set; }
+        /// <summary>Ricavo distribuito per singolo giorno (€/giorno).</summary>
+        public decimal DailyCostRate { get; set; }
+        /// <summary>Numero di giorni effettivi del mese su cui è stato calcolato il rateo.</summary>
+        public int AccrualDays { get; set; }
+    }
+
+    /// <summary>
+    /// Provides methods for calculating monthly accruals of revenue and cost over a specified date range.
+    /// </summary>
+    /// <remarks>This class is designed to calculate monthly accruals by distributing the total revenue and
+    /// cost  proportionally across the days in the specified date range. The calculation accounts for partial  months
+    /// at the start and end of the range, ensuring accurate allocation.</remarks>
+    public static class AccrualCalculator
+    {
+        public static List<AccrualResult> CalculateMonthlyAccrual(
+    DateTime startDate,
+    DateTime endDate,
+    decimal totalRevenue,
+    decimal totalCost)
+        {
+            var results = new List<AccrualResult>();
+            // ... (Calcolo totalContractDays e tassi giornalieri, rimasto invariato) ...
+
+            int totalContractDays = (int)(endDate - startDate).TotalDays + 1;
+            if (totalContractDays <= 0) return results;
+
+            double dailyRevenueRateDouble = (double)totalRevenue / totalContractDays;
+            double dailyCostRateDouble = (double)totalCost / totalContractDays;
+
+            decimal dailyRevenueRate = Math.Round((decimal)dailyRevenueRateDouble, 4);
+            decimal dailyCostRate = Math.Round((decimal)dailyCostRateDouble, 4);
+
+            DateTime currentMonthStart = new DateTime(startDate.Year, startDate.Month, 1);
+            decimal remainingRevenue = totalRevenue;
+            decimal remainingCost = totalCost;
+            int remainingDays = totalContractDays;
+
+            while (currentMonthStart <= endDate)
+            {
+                // 3. Calcolo Finestra Temporale del Mese Corrente
+
+                // Data di inizio dell'accrual del mese: MAX tra la data di inizio contratto e l'inizio del mese
+                DateTime accrualStart = (currentMonthStart > startDate) ? currentMonthStart : startDate;
+
+                // Data di fine naturale del MESE (es. 30/11/2025)
+                // Uso AddDays(0) per gestire l'inizio/fine mese correttamente.
+                DateTime naturalMonthEnd = currentMonthStart.AddMonths(1).AddDays(-1);
+
+                // Data di fine dell'accrual del mese: MIN tra la fine del contratto e la fine naturale del mese
+                DateTime accrualEnd = (naturalMonthEnd < endDate) ? naturalMonthEnd : endDate;
+
+                // 4. Calcolo Giorni Effettivi di Accrual per il Mese
+                // Se accrualStart > accrualEnd, il risultato è 0
+                int monthlyAccrualDays = (int)(accrualEnd - accrualStart).TotalDays + 1;
+
+                // ... (resto del ciclo e assegnazione dei risultati, rimasto invariato) ...
+
+                if (monthlyAccrualDays > 0)
+                {
+                    decimal monthlyRevenue;
+                    decimal monthlyCost;
+
+                    // Logica per Bilanciare l'Errore di Arrotondamento all'Ultimo Mese
+                    if (currentMonthStart.Year == endDate.Year && currentMonthStart.Month == endDate.Month)
+                    {
+                        monthlyRevenue = remainingRevenue;
+                        monthlyCost = remainingCost;
+                    }
+                    else
+                    {
+                        monthlyRevenue = Math.Round((decimal)(monthlyAccrualDays * dailyRevenueRateDouble), 2);
+                        monthlyCost = Math.Round((decimal)(monthlyAccrualDays * dailyCostRateDouble), 2);
+
+                        remainingRevenue -= monthlyRevenue;
+                        remainingCost -= monthlyCost;
+                        remainingDays -= monthlyAccrualDays;
+                    }
+
+                    results.Add(new AccrualResult
+                    {
+                        Year = currentMonthStart.Year,
+                        Month = currentMonthStart.Month,
+                        Revenue = monthlyRevenue,
+                        Cost = monthlyCost,
+
+                        DailyRevenueRate = dailyRevenueRate,
+                        DailyCostRate = dailyCostRate,
+                        AccrualDays = monthlyAccrualDays
+                    });
+                }
+
+                // Passa al mese successivo
+                currentMonthStart = currentMonthStart.AddMonths(1);
+            }
+
+            return results;
+        }
+    }
+
+    private string GetProjectCodeFromForm()
+    {
+        // Cerca la TextBox del ProjectCode
+        TextBox txtProjectCode = (TextBox)FVProgetto.FindControl("TBProgetto");
+
+        // Recupera il valore, usando sintassi compatibile C# 5
+        string projectCode = (txtProjectCode != null) ? txtProjectCode.Text : string.Empty;
+
+        return projectCode;
+    }
+
+    /// <summary>
+    /// inserimento nel DB dei ratei calcolati
+    /// </summary>
+    /// <param name="projectsId"></param>
+    /// <param name="accrualList"></param>
+    /// <exception cref="ConfigurationErrorsException"></exception>
+    private void InserisciAccrualNelDB(string projectCode, List<AccrualResult> accrualList)
+    {
+        // ... (Logica di recupero Connection String, compatibile C# 5) ...
+        string connectionStringName = "MSSql12155ConnectionString";
+        string tableName = "Monthly_Fee";
+        string createdBy = CurrentSession.UserId.ToString();
+
+        System.Configuration.ConnectionStringSettings connectionSection =
+            ConfigurationManager.ConnectionStrings[connectionStringName];
+
+        string connectionString = (connectionSection != null)
+                                  ? connectionSection.ConnectionString
+                                  : null;
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new ConfigurationErrorsException("La stringa di connessione '" + connectionStringName + "' non è stata trovata.");
+        }
+
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        {
+            conn.Open();
+
+            // *** A. RETRIEVE Projects_id DAL DB USANDO ProjectCode ***
+            string selectQuery = "SELECT Projects_id FROM Projects WHERE ProjectCode = @ProjectCode";
+            int projectsId = 0;
+
+            using (SqlCommand cmdSelect = new SqlCommand(selectQuery, conn))
+            {
+                cmdSelect.Parameters.AddWithValue("@ProjectCode", projectCode);
+                object result = cmdSelect.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    projectsId = Convert.ToInt32(result);
+                }
+            }
+
+            // Se l'ID non è stato trovato, usciamo (non dovrebbe accadere dopo un insert/update)
+            if (projectsId <= 0)
+            {
+                // Potresti voler loggare questo errore
+                return;
+            }
+
+            string Monthly_Fee_Code = "MF_" + projectCode;
+
+            // *** B. ELIMINAZIONE DEI VECCHI RATEI (Usando projectsId) ***
+            string deleteQuery = string.Format("DELETE FROM {0} WHERE Projects_id = @ProjectsId", tableName);
+
+            using (SqlCommand cmdDelete = new SqlCommand(deleteQuery, conn))
+            {
+                cmdDelete.Parameters.AddWithValue("@ProjectsId", projectsId);
+                cmdDelete.ExecuteNonQuery();
+            }
+
+            // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
+            string insertQuery = string.Format(
+                @"INSERT INTO {0} 
+               ([Monthly_Fee_Code],Projects_id, [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+                CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
+             VALUES 
+               (@Monthly_Fee_Code,@ProjectsId, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
+                @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)", tableName);
+
+            foreach (var accrual in accrualList)
+            {
+                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                {
+                    // Mappatura con i parametri SQL
+                    cmd.Parameters.AddWithValue("@ProjectsId", projectsId); // Usa l'ID recuperato!
+                    cmd.Parameters.AddWithValue("@Year", accrual.Year);
+                    cmd.Parameters.AddWithValue("@Month", accrual.Month);
+                    cmd.Parameters.AddWithValue("@Revenue", accrual.Revenue);
+                    cmd.Parameters.AddWithValue("@Cost", accrual.Cost);
+                    cmd.Parameters.AddWithValue("@Days", accrual.AccrualDays);
+                    cmd.Parameters.AddWithValue("@Day_Revenue", accrual.DailyRevenueRate);
+                    cmd.Parameters.AddWithValue("@Day_Cost", accrual.DailyCostRate);
+
+                    cmd.Parameters.AddWithValue("@CreatedBy", createdBy);
+                    cmd.Parameters.AddWithValue("@LastModifiedBy", createdBy);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

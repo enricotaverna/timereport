@@ -117,7 +117,6 @@
                         <HeaderStyle CssClass="GV_header" />
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                         <Columns>
-                            <asp:BoundField DataField="Monthly_Fee_Code" HeaderText="Codice Canone" SortExpression="Monthly_Fee_Code" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
                             <asp:BoundField DataField="NomeManager" HeaderText="Director" SortExpression="NomeManager" />
                             <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
