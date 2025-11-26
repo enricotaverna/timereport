@@ -135,8 +135,8 @@
                                     <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>--%>
-                            <asp:BoundField DataField="Projectsid" HeaderText="Projectsid" Visible="False"
-                                SortExpression="Projectsid" />                            
+                            <asp:BoundField DataField="Projects_id" HeaderText="Projectsid" Visible="True"
+                                SortExpression="Projects_id" />                            
                         </Columns>
                     </asp:GridView>
 

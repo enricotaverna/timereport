@@ -398,7 +398,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     /// <exception cref="ConfigurationErrorsException"></exception>
     private void InserisciAccrualNelDB(string projectCode, List<AccrualResult> accrualList)
     {
-        // ... (Logica di recupero Connection String, compatibile C# 5) ...
+        // ... (Logica di recupero Connection String, compatibile C# 5) ...s
         string connectionStringName = "MSSql12155ConnectionString";
         string tableName = "Monthly_Fee";
         string createdBy = CurrentSession.UserId.ToString();
@@ -441,8 +441,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 return;
             }
 
-            string Monthly_Fee_Code = "MF_" + projectCode;
-
             // *** B. ELIMINAZIONE DEI VECCHI RATEI (Usando projectsId) ***
             string deleteQuery = string.Format("DELETE FROM {0} WHERE Projects_id = @ProjectsId", tableName);
 
@@ -455,10 +453,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
             string insertQuery = string.Format(
                 @"INSERT INTO {0} 
-               ([Monthly_Fee_Code],Projects_id, [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+               (Projects_id, [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
              VALUES 
-               (@Monthly_Fee_Code,@ProjectsId, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
+               (@ProjectsId, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
                 @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)", tableName);
 
             foreach (var accrual in accrualList)
