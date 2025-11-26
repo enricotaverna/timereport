@@ -60,8 +60,8 @@
                         <div class="col-5">
                             <asp:DropDownList ID="DL_flattivo" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DL_flattivo_SelectedIndexChanged">
                                 <asp:ListItem Value="99">Tutti i valori</asp:ListItem>
-                                <asp:ListItem Selected="True" Value="1">Attivo</asp:ListItem>
-                                <asp:ListItem Value="0">Non attivo</asp:ListItem>
+                                <asp:ListItem Selected="True" Value="True">Attivo</asp:ListItem>
+                                <asp:ListItem Value="False">Non attivo</asp:ListItem>
                             </asp:DropDownList>
                         </div>
                         <div class="col-1">
@@ -90,7 +90,7 @@
                             </asp:DropDownList>
                         </div>
                         <div class="col-1">
-                            <label class="inputtext">Attività</label>
+                            <label class="inputtext">Canone</label>
                         </div>
                         <div class="col-5">
                             <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"></asp:TextBox>
@@ -108,8 +108,8 @@
                 <div class="col-9 px-0">
 
                     <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
-                        DataSourceID="DSAttivita" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
-                        AllowPaging="True" PageSize="12" OnRowDeleting="GridView1_RowDeleting" DataKeyNames="Activity_id,Projectsid,Phaseid"
+                        DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                        AllowPaging="True" PageSize="12" DataKeyNames="Monthly_Fee_id,Projects_id"
                         GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
@@ -117,31 +117,32 @@
                         <HeaderStyle CssClass="GV_header" />
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                         <Columns>
-                            <asp:BoundField DataField="ActivityCode" HeaderText="Attività" SortExpression="ActivityCode" />
-                            <asp:BoundField DataField="Name" HeaderText="Descrizione" SortExpression="Name" />
-                            <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
+                            <asp:BoundField DataField="Monthly_Fee_Code" HeaderText="Codice Canone" SortExpression="Monthly_Fee_Code" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
                             <asp:BoundField DataField="NomeManager" HeaderText="Director" SortExpression="NomeManager" />
-                            <asp:BoundField DataField="RevenueBudget" HeaderText="Budget(€)" ReadOnly="True" SortExpression="RevenueBudget" DataFormatString="{0:n0}" />
+                            <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
+                            <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
+                            <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" />
+                            <asp:BoundField DataField="Revenue" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="Revenue" DataFormatString="{0:n0}" />
+                            <asp:BoundField DataField="Cost" HeaderText="Cost(€)" ReadOnly="True" SortExpression="Cost" DataFormatString="{0:n0}" />
+                            <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
                             <asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:TemplateField>
+                            <%--<asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>
+                            </asp:TemplateField>--%>
                             <asp:BoundField DataField="Projectsid" HeaderText="Projectsid" Visible="False"
-                                SortExpression="Projectsid" />
-                            <asp:BoundField DataField="Phaseid" HeaderText="Phaseid" Visible="False"
-                                SortExpression="Phaseid" />
+                                SortExpression="Projectsid" />                            
                         </Columns>
                     </asp:GridView>
 
                     <div class="buttons">
-                        <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" PostBackUrl="/timereport/m_gestione/activity/activity_lookup_form.aspx" />
+                        <%--<asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" PostBackUrl="/timereport/m_gestione/canoni/montly_fee_lookup_form.aspx" />--%>
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
                     <!--End buttons-->
@@ -173,21 +174,24 @@
             <asp:Parameter DefaultValue="true" Name="Active" Type="Boolean" />
         </SelectParameters>
     </asp:SqlDataSource>
-    <asp:SqlDataSource ID="DSAttivita" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+    <asp:SqlDataSource ID="DSCanoni" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="** costruita in page load **"
-        DeleteCommand="DELETE FROM Activity WHERE (Activity_id = @Activity_id)">
+        DeleteCommand="UPDATE Monthly_Fee SET Active = 0, InactiveBy = @persons_Name, LastModificationDate = GETDATE() WHERE (Monthly_Fee_id = @Monthly_Fee_id)">
         <SelectParameters>
             <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue" Type="String" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
             <asp:ControlParameter ControlID="TB_Codice" DefaultValue="%" Name="TB_codice" PropertyName="Text" />
             <asp:ControlParameter ControlID="DDLmanager" Name="persons_id" PropertyName="SelectedValue" />
         </SelectParameters>
+        <UpdateParameters>            
+            <asp:SessionParameter Name="persons_Name" SessionField="persons_Name" Type="String" />
+        </UpdateParameters>
         <DeleteParameters>
-            <asp:Parameter Name="Activity_id" />
+            <asp:Parameter Name="Monthly_Fee_id" />
         </DeleteParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSprogetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @managerid OR @selAll = 1 ) AND (Active = 1) AND (ActivityOn = 1) ORDER BY iProgetto"
+        SelectCommand="SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects WHERE (ClientManager_id = @managerid OR @selAll = 1 ) AND (Active = 1) AND (ProjectType_Id = 8) ORDER BY iProgetto"
         OnSelecting="DSprogetti_Selecting">
         <SelectParameters>
             <asp:SessionParameter Name="managerid" SessionField="persons_id" />

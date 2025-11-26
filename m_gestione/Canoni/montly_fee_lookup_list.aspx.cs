@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.Vbe.Interop;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -10,7 +12,7 @@ using System.Web.UI.WebControls;
 public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Page
 {
     public string strMessage;
-    string strQueryOrdering = " ORDER BY Projects.ProjectCode, Activity.ActivityCode ";
+    string strQueryOrdering = " ORDER BY Projects.ProjectCode,Monthly_Fee.Year ";
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -43,17 +45,17 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             DL_flattivo.SelectedValue = Session["DL_flattivo_val_att"].ToString();
 
         // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
-        if (Session["TB_ActivityCode"] != null)
-            TB_Codice.Text = Session["TB_ActivityCode"].ToString();
+        if (Session["TB_CanoneCode"] != null)
+            TB_Codice.Text = Session["TB_CanoneCode"].ToString();
 
         // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
         if (Session["DL_progetto"] != null)
             DL_progetto.SelectedValue = Session["DL_progetto"].ToString();
 
-        if (!IsPostBack && Session["GridActivityPageNumber"] != null)
+        if (!IsPostBack && Session["GridCanoniPageNumber"] != null)
         {
             // Imposta indice di aginazione
-            GridView1.PageIndex = Convert.ToInt32(Session["GridActivityPageNumber"].ToString());
+            GridView1.PageIndex = Convert.ToInt32(Session["GridCanoniPageNumber"].ToString());
         }
     }
 
@@ -66,14 +68,18 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
         //if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
         //  sWhere = "WHERE Projects.clientmanager_id = " + CurrentSession.Persons_id;    
 
-        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0'  ) " +
-                 " AND ( Activity.Active = @DL_flattivo OR @DL_flattivo = '99' ) AND ( Projects.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
-                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) AND Activity.ActivityCode LIKE '%' + (@TB_Codice) + '%' ";
+        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') " +
+                 " AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
+                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) AND Monthly_Fee.Monthly_Fee_Code LIKE '%' + (@TB_Codice) + '%' ";
 
-        DSAttivita.SelectCommand = "SELECT Activity.ActivityCode, Activity.Name, Activity.Active, Activity.Projects_id as Projectsid, c.name as NomeManager, Activity.Phase_id as Phaseid, Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto, Phase.PhaseCode + '  ' + Phase.name AS Fase, Activity.Activity_id, Activity.RevenueBudget, Activity.MargineProposta FROM Activity " +
-                                   "INNER JOIN Projects ON Activity.Projects_id = Projects.Projects_Id " +
-                                   "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
-                                   "LEFT OUTER JOIN Phase ON Activity.Phase_id = Phase.Phase_id " + sWhere + strQueryOrdering;
+        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
+
+        DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
+                                 "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, "+
+                                 "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager "+
+                                 "FROM Monthly_Fee "+
+                                 "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id "+
+                                 "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " + sWhere + strQueryOrdering;
 
     }
 
@@ -81,11 +87,10 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     //  la fropdonwlist che essendo a cascata non riesce ad utilizzare le normali logiche di binding
     protected void GridView1_SelectedIndexChanged(Object sender, System.EventArgs e)
     {
-        var ActivityId = GridView1.DataKeys[GridView1.SelectedRow.RowIndex].Values[0];
+        var Monthly_Fee_id = GridView1.DataKeys[GridView1.SelectedRow.RowIndex].Values[0];
         var ProjectsId = GridView1.DataKeys[GridView1.SelectedRow.RowIndex].Values[1];
-        var PhaseId = GridView1.DataKeys[GridView1.SelectedRow.RowIndex].Values[2];
 
-        Response.Redirect("activity_lookup_form.aspx?Activity_id=" + ActivityId + "&Projects_Id=" + ProjectsId + "&Phase_Id=" + PhaseId);
+        Response.Redirect("montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
     }
 
     protected void DL_progetto_SelectedIndexChanged(Object sender, System.EventArgs e)
@@ -100,7 +105,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 
     protected void TB_Codice_TextChanged(Object sender, System.EventArgs e)
     {
-        Session["TB_ActivityCode"] = TB_Codice.Text;
+        Session["TB_CanoneCode"] = TB_Codice.Text;
     }
 
     protected void DL_progetto_DataBound(Object sender, System.EventArgs e)
@@ -108,20 +113,6 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
         // Resetta indice di selezione sulle dropdwonlist per non perderlo a seguito passaggio a pagina di dettaglio
         if (!IsPostBack && Session["DL_progetto"] != null)
             DL_progetto.SelectedValue = Session["DL_progetto"].ToString();
-    }
-
-    protected void GridView1_RowDeleting(Object sender, GridViewDeleteEventArgs e)
-    {
-        ValidationClass c = new ValidationClass();
-
-        //  verifica integrità database        
-        if (c.CheckExistence("Activity_id", e.Keys[0].ToString(), "Hours"))
-        {
-            e.Cancel = true;
-            // Call separate class, passing page reference, to register Client Script:
-            Page lPage = this.Page;
-            Utilities.CreateMessageAlert(ref lPage, "Cancellazione non possibile, attività già utilizzata su tabella ore", "strKey1");
-        }
     }
 
     protected void DSprogetti_Selecting(object sender, SqlDataSourceSelectingEventArgs e)
@@ -143,7 +134,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     protected void GridView1_PageIndexChanging(Object sender, GridViewPageEventArgs e)
     {
         GridView1.PageIndex = e.NewPageIndex;
-        Session["GridActivityPageNumber"] = e.NewPageIndex;
+        Session["GridCanoniPageNumber"] = e.NewPageIndex;
     }
 
     // al cambio di DDL salva il valore 

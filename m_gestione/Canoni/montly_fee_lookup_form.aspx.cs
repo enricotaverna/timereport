@@ -30,15 +30,13 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
 
             prevPage = Request.UrlReferrer.ToString();
 
-            if (Request.QueryString["Activity_id"] != null )
+            if (Request.QueryString["Monthly_Fee_id"] != null )
             {
-                FVattivita.ChangeMode(FormViewMode.Edit);
-                FVattivita.DefaultMode = FormViewMode.Edit;
+                FVCanoni.ChangeMode(FormViewMode.Edit);
+                FVCanoni.DefaultMode = FormViewMode.Edit;
             }
 //          popola dropdownlist progetto
             LoadDDLprogetto();
-
-            Bind_ddlFase();
 
         }
 
@@ -51,21 +49,21 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
 
             // visualizza solo progetti del manager
             if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
-                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 and active = 1 AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where active = 1 AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
             else
-                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where ActivityOn = 1 and active = 1  ORDER BY iProgetto";
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Name,20) as iProgetto from Projects where active = 1  ORDER BY iProgetto";
 
             SqlCommand cmd = new SqlCommand(sqlCmd, conn);
         
             SqlDataReader dr = cmd.ExecuteReader();
-            DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLprogetto");
+            DropDownList ddlList = (DropDownList)FVCanoni.FindControl("DDLprogetto");
 
             ddlList.DataSource = dr;
             ddlList.Items.Clear();
             ddlList.Items.Add(new ListItem("--Seleziona progetto--", ""));
             
             ddlList.DataTextField = "iProgetto";
-            ddlList.DataValueField = "Projects_Id";
+            ddlList.DataValueField = "Projects_id";
             if ( Request.QueryString["Projects_id"] != null ) // in caso di update seleziona il valore nella dropdown list
                 ddlList.SelectedValue = Request.QueryString["Projects_id"].ToString();
             ddlList.DataBind();
@@ -73,81 +71,40 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
             
     }
 
-    public void Bind_ddlFase()
-    {
-        conn.Open();
-
-        DropDownList ddlprogetto = (DropDownList)FVattivita.FindControl("DDLProgetto");
-
-        SqlCommand cmd = new SqlCommand("select Phase_id, PhaseCode + '  ' + left(Name,20) AS iFase FROM Phase where Projects_id='" + ddlprogetto.SelectedValue + "' ORDER BY iFase", conn);
-        SqlDataReader dr = cmd.ExecuteReader();
-
-        DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLFase");
-        ddlList.DataSource = dr;
-        ddlList.Items.Clear();
-        ddlList.Items.Add(new ListItem("--Seleziona fase--", ""));
-        ddlList.DataTextField = "iFase";
-        ddlList.DataValueField = "Phase_id";
-        if ( Request.QueryString["Phase_Id"] != null && !IsPostBack ) // in caso di update seleziona il valore nella dropdown list
-            ddlList.SelectedValue = Request.QueryString["Phase_Id"];
-        ddlList.DataBind();
-        conn.Close();
-    }
-
-
-    protected void DDLProgetto_SelectedIndexChanged(object sender, EventArgs e)
-    {
-
-        Bind_ddlFase();
-    }
-
-    protected void ItemUpdating_FVattivita(object sender, FormViewUpdateEventArgs e)
+    protected void ItemUpdating_FVCanoni(object sender, FormViewUpdateEventArgs e)
     {
         //      Forza i valori da passare alla select di insert. essendo le dropdown in
         //      dipendenza non si riesce a farlo tramite un normale bind del controllo
 
-        DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLprogetto");
+        DropDownList ddlList = (DropDownList)FVCanoni.FindControl("DDLprogetto");
         e.NewValues["Projects_id"] = ddlList.SelectedValue;
 
-        DropDownList ddlList1 = (DropDownList)FVattivita.FindControl("DDLFase");
-        e.NewValues["Phase_id"] = ddlList1.SelectedValue;
-
+        // 2. Inserisci il valore della persona loggata nella collezione dei parametri
+        // Assumendo che la tua proprietà sia CurrentSession.UserName
+        DSCanoni.UpdateParameters["persons_Name"].DefaultValue = CurrentSession.UserName;
     }
 
-    protected void ItemInserting_FVattivita(object sender, FormViewInsertEventArgs e)
+    protected void ItemInserting_FVCanoni(object sender, FormViewInsertEventArgs e)
     {
 //      Forza i valori da passare alla select di insert. essendo le dropdown in
 //      dipendenza non si riesce a farlo tramite un normale bind del controllo
 
-        DropDownList ddlList = (DropDownList)FVattivita.FindControl("DDLprogetto");
-        e.Values["Projects_id"] = ddlList.SelectedValue;
-        
-        DropDownList ddlList1 = (DropDownList)FVattivita.FindControl("DDLFase");
-        e.Values["Phase_id"] = ddlList1.SelectedValue;
+        DropDownList ddlList = (DropDownList)FVCanoni.FindControl("DDLprogetto");
+        e.Values["Projects_id"] = ddlList.SelectedValue;        
     }
 
-    protected void ItemInserted_FVattivita(object sender, FormViewInsertedEventArgs e)
+    protected void ItemInserted_FVCanoni(object sender, FormViewInsertedEventArgs e)
     {
-        Response.Redirect("activity_lookup_list.aspx");
+        Response.Redirect("montly_fee_lookup_list.aspx");
     }
-    protected void ItemUpdated_FVattivita(object sender, FormViewUpdatedEventArgs e)
+    protected void ItemUpdated_FVCanoni(object sender, FormViewUpdatedEventArgs e)
     {
         Response.Redirect(prevPage);
     }
-    protected void ItemModeChanging_FVattivita(object sender, FormViewModeEventArgs e)
+    protected void ItemModeChanging_FVCanoni(object sender, FormViewModeEventArgs e)
     {
         if (e.CancelingEdit )
             Response.Redirect(prevPage);        
-    }
-    protected void ValidaAttivita_ServerValidate(object source, ServerValidateEventArgs args)
-    {
-        ValidationClass c = new ValidationClass();
-        //      true se non esiste già il record 
-        args.IsValid = !c.CheckExistence("ActivityCode", args.Value, "Activity");
-
-        //      cambia colore del campo in errore
-        c.SetErrorOnField(args.IsValid, FVattivita, "ActivityCodeTextBox");
-
-    }
+    }   
 }
 
