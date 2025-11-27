@@ -134,17 +134,23 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         if (FVProgetto.CurrentMode == FormViewMode.Insert)
         {
-            // 1. Recupera il codice appena inserito
-            string projectCode = GetProjectCodeFromForm();
+            System.Web.UI.WebControls.CheckBox chkAttivo = (System.Web.UI.WebControls.CheckBox)FVProgetto.FindControl("ActiveCheckBox");
 
-            // 2. Esegue il calcolo e ottiene la lista dei ratei
-            List<AccrualResult> accrualList = eseguiCalcoloCanone();
+            // Se il progetto è attivo, esegue il calcolo e l'inserimento dei ratei
+            if (chkAttivo.Checked)
+            {
 
-            // 3. Salva i ratei nel DB, PASSANDO L'ID
-            InserisciAccrualNelDB(projectCode, accrualList);
+                // 1. Recupera il codice appena inserito
+                string projectCode = GetProjectCodeFromForm();
 
-            //Response.Redirect("projects_lookup_list.aspx");
+                // 2. Esegue il calcolo e ottiene la lista dei ratei
+                List<AccrualResult> accrualList = eseguiCalcoloCanone();
 
+                // 3. Salva i ratei nel DB, PASSANDO L'ID
+                InserisciAccrualNelDB(projectCode, accrualList);
+
+                //Response.Redirect("projects_lookup_list.aspx");
+            }
         }
 
         Response.Redirect("projects_lookup_list.aspx");
@@ -213,23 +219,25 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         gridCanoni.DataBind();
     }
 
+    // Gestisce la selezione di una riga nella GridView dei canoni mensili
+    // Reindirizza alla pagina di dettaglio del canone mensile selezionato
+    // con i parametri Monthly_Fee_id e Projects_Id
+    // ottenuti dai DataKeys della GridView
     protected void GridView1_SelectedIndexChanged(Object sender, System.EventArgs e)
     {
         System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)sender;
-        var Monthly_Fee_id = gridCanoni.DataKeys[gridCanoni.SelectedRow.RowIndex].Values[0];
-        var ProjectsId = gridCanoni.DataKeys[gridCanoni.SelectedRow.RowIndex].Values[1];
 
-        // Mostra l'errore all'utente
-        ClientScript.RegisterStartupScript(
-            this.GetType(),
-            "ErrorScript",
-            "alert('" + errorMessage + "');",
-            true);
+        var dataKeys = gridCanoni.DataKeys[gridCanoni.SelectedRow.RowIndex].Values;
+
+        var Monthly_Fee_id = dataKeys["Monthly_Fee_id"];
+        var ProjectsId = dataKeys["Projects_id"];
 
         Response.Redirect("../Canoni/montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
     }
 
-    // Nel tuo file Projects_lookup_form.aspx.cs
+    /// <summary>
+    /// Gestisce il click sul pulsante "Rigenera Canoni"
+    /// </summary>
     protected void btnRigenera_Click(object sender, EventArgs e)
     {
         // Passaggio A: Recupera il codice del progetto dal FormView
@@ -468,7 +476,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     }
 
     /// <summary>
-    /// 
+    /// Recupera il ProjectCode dalla TextBox nel FormView
     /// </summary>
     /// <returns></returns>
     private string GetProjectCodeFromForm()
