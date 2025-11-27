@@ -36,6 +36,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 // Set default value for DDLVisibility
                 DropDownList ddlVisibility = (DropDownList)FVProgetto.FindControl("DDLVisibility");
                 ddlVisibility.SelectedValue = ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"];
+                ((CheckBox)FVProgetto.FindControl("ActiveCheckBox")).Checked = true;
             }
         }
     }
@@ -187,7 +188,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Values["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.Values["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.Values["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
-
     }
 
     protected void CloneButton_Click(object sender, EventArgs e)
