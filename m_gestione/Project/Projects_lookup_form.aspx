@@ -1191,7 +1191,7 @@
 
                 // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
                 // che deve essere selezionato per mostrare il tab.
-                const testoDesiderato = 'Resale';
+                const testoDesiderato = 'Hardware&Software';
 
                 if (testoSelezionato === testoDesiderato) {
                     // MOSTRA IL TAB
