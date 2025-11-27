@@ -7,6 +7,8 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Drawing;
+using Xceed.Document.NET;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
 {
@@ -241,51 +243,159 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         Response.Redirect("../Canoni/montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
     }
 
-    // Gestisce il calcolo e la visualizzazione dei totali nella GridView dei canoni mensili
+    // Gestisce il calcolo e la visualizzazione dei totali nella GridView dei canoni mensili    
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
     {
-        // 1. Accumula i totali riga per riga
+        // Variabili per il parsing dei valori di riga
+        decimal monthlyRevenue = 0.00M;
+        decimal monthlyCost = 0.00M;
+
+        // Variabili per i budget parsati (valori di riferimento)
+        decimal budgetRevenue = 0.00M;
+        decimal budgetCost = 0.00M;
+
+        // Colori da usare
+        System.Drawing.Color colorIfMismatch = System.Drawing.Color.Red;
+        System.Drawing.Color colorIfCorrect = System.Drawing.ColorTranslator.FromHtml("#228B22");
+
+        // Cultura italiana per il parsing e la formattazione
+        CultureInfo italianCulture = new CultureInfo("it-IT");
+
+        // Costante di tolleranza per i confronti
+        const decimal TOLERANCE = 0.005M;
+
+        // --- 1. ACCUMULO DEI TOTALI (RowType.DataRow) ---
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
             DataRowView drv = (DataRowView)e.Row.DataItem;
 
-            // *** CORREZIONE PER C# 5: DICHIARAZIONE DELLE VARIABILI PRIMA DI USARLE CON out ***
-            decimal monthlyRevenue = 0.00M;
-            decimal monthlyCost = 0.00M;
-            // ********************************************************************************
-
+            // Accumulo Ricavo
             if (decimal.TryParse(drv["Revenue"].ToString(), out monthlyRevenue))
             {
                 TotalRevenue += monthlyRevenue;
             }
 
+            // Accumulo Costo
             if (decimal.TryParse(drv["Cost"].ToString(), out monthlyCost))
             {
                 TotalCost += monthlyCost;
             }
         }
 
-        // 2. Visualizza i totali nella riga Footer
+        // --- 2. CALCOLO, CONFRONTO E FORMATTAZIONE (RowType.Footer) ---
         else if (e.Row.RowType == DataControlRowType.Footer)
         {
-            // ... (Logica per impostare il footer come prima) ...
+            // A. RECUPERO DEI BUDGET E DELLE LABEL
 
-            // Imposta la prima cella come "Totale"
+            // Recupero Budget e Label Ricavo
+            System.Web.UI.WebControls.TextBox txtRevenue =
+                (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBRevenueBudget");
+            System.Web.UI.WebControls.Label lblRevenueAlert =
+                (System.Web.UI.WebControls.Label)FVProgetto.FindControl("LblRevenueAlert");
+
+            if (txtRevenue != null)
+            {
+                decimal.TryParse(txtRevenue.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out budgetRevenue);
+            }
+            if (lblRevenueAlert != null)
+            {
+                lblRevenueAlert.Text = string.Empty;
+            }
+
+            // Recupero Budget e Label Costo
+            System.Web.UI.WebControls.TextBox txtCost =
+                (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("SpeseBudgetTextBox");
+            System.Web.UI.WebControls.Label lblCostAlert =
+                (System.Web.UI.WebControls.Label)FVProgetto.FindControl("LblCostAlert");
+
+            if (txtCost != null)
+            {
+                decimal.TryParse(txtCost.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out budgetCost);
+            }
+            if (lblCostAlert != null)
+            {
+                lblCostAlert.Text = string.Empty;
+            }
+
+
+            // B. CONFRONTI E APPLICAZIONE DEI COLORI E MESSAGGI DI AVVISO (C# 5 COMPATIBILE)
+
+            // --- RICAVO ---
+            decimal revenueDifference = TotalRevenue - budgetRevenue;
+            bool revenueMismatch = Math.Abs(revenueDifference) > TOLERANCE;
+            System.Drawing.Color revenueColor = revenueMismatch ? colorIfMismatch : colorIfCorrect;
+
+            if (revenueMismatch)
+            {
+                string signPrefix;
+                string discrepancyText = string.Format(italianCulture, "{0:N2}", Math.Abs(revenueDifference));
+
+                // Logica per determinare se è in positivo o negativo
+                if (revenueDifference > 0)
+                {
+                    signPrefix = "+ ";
+                }
+                else
+                {
+                    signPrefix = "- ";
+                }
+
+                if (lblRevenueAlert != null)
+                {
+                    // Concatenazione standard (C# 5)
+                    lblRevenueAlert.Text = "ATTENZIONE: Discrepanza Ricavi " + signPrefix + " € " + discrepancyText;
+                    lblRevenueAlert.ForeColor = colorIfMismatch;
+                }
+            }
+
+            // --- COSTO ---
+            decimal costDifference = TotalCost - budgetCost;
+            bool costMismatch = Math.Abs(costDifference) > TOLERANCE;
+            System.Drawing.Color costColor = costMismatch ? colorIfMismatch : colorIfCorrect;
+
+            if (costMismatch)
+            {
+                string signPrefix;
+                string discrepancyText = string.Format(italianCulture, "{0:N2}", Math.Abs(costDifference));
+
+                // Logica per determinare se è in positivo o negativo
+                if (costDifference > 0)
+                {
+                    signPrefix = "+ ";
+                }
+                else
+                {
+                    signPrefix = "- ";
+                }
+
+                if (lblCostAlert != null)
+                {
+                    // Concatenazione standard (C# 5)
+                    lblCostAlert.Text = "ATTENZIONE: Discrepanza Costi " + signPrefix + " € " + discrepancyText;
+                    lblCostAlert.ForeColor = colorIfMismatch;
+                }
+            }
+
+
+            // C. VISUALIZZAZIONE E FORMATTAZIONE DEI TOTALI NELLA GRIDVIEW (Footer)
+
             e.Row.Cells[0].Text = "TOTALE:";
             e.Row.Cells[0].Font.Bold = true;
 
-            // Imposta il totale Revenue (Assumendo che Revenue sia nella colonna con indice 3)
+            // Colonna Ricavo (Indice 3)
             if (e.Row.Cells.Count > 3)
             {
-                e.Row.Cells[3].Text = string.Format("{0:N2}", TotalRevenue);
+                e.Row.Cells[3].Text = string.Format(italianCulture, "{0:N2} €", TotalRevenue);
                 e.Row.Cells[3].Font.Bold = true;
+                e.Row.Cells[3].ForeColor = revenueColor;
             }
 
-            // Imposta il totale Cost (Assumendo che Cost sia nella colonna con indice 4)
+            // Colonna Costo (Indice 4)
             if (e.Row.Cells.Count > 4)
             {
-                e.Row.Cells[4].Text = string.Format("{0:N2}", TotalCost);
+                e.Row.Cells[4].Text = string.Format(italianCulture, "{0:N2} €", TotalCost);
                 e.Row.Cells[4].Font.Bold = true;
+                e.Row.Cells[4].ForeColor = costColor;
             }
         }
     }

@@ -312,9 +312,20 @@
 
                                 <!-- *** TAB 5 ***  -->
                                 <div id="tabs-5" style="height: 460px; width: 100%;">
-                                    <div class="input nobottomborder">
-                                        <asp:Label class="css-label" Style="padding: 0px 5px 0px 20px" AssociatedControlID="TextBox2" ID="Label2" runat="server">Progetto</asp:Label>
+                                    <div class="input nobottomborder" style="display: flex; align-items: center; gap: 10px;">
+                                        <asp:Label class="css-label" Style="padding: 0px 5px 0px 0px;" AssociatedControlID="TextBox2" ID="Label2" runat="server">Progetto</asp:Label>
+
                                         <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("ProjectCode") %>' Width="100" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+
+                                        <div style="flex:auto ; padding: 2px; display: flex; flex-direction: column; min-height: 28px;" id="pnlMessage" runat="server">
+
+                                            <asp:Label class="css-label" ID="LblRevenueAlert" runat="server" Font-Bold="true" Font-Size="X-Small"
+                                                Style="white-space: nowrap; margin: 0; padding: 0; line-height: 1.1;" />
+
+                                            <asp:Label class="css-label" ID="LblCostAlert" runat="server" Font-Bold="true" Font-Size="X-Small"
+                                                Style="white-space: nowrap; margin: 0; padding: 0; line-height: 1.1;" />
+                                        </div>
+
                                         <asp:Button
                                             ID="btnRigenera"
                                             runat="server"
@@ -333,7 +344,7 @@
                                             OnPageIndexChanging="GridView1_PageIndexChanging" 
                                             OnRowDataBound="GridView1_RowDataBound"
                                             ShowFooter="true" >
-                                            <FooterStyle CssClass="GV_footer" Font-Bold="true" ForeColor="#007fff" Font-Size="Medium" />
+                                            <FooterStyle CssClass="GV_footer" Font-Bold="true" ForeColor="#777777" Font-Size="Medium" />
                                             <RowStyle Wrap="False" CssClass="GV_row" />
                                             <PagerStyle CssClass="GV_footer" />
                                             <HeaderStyle CssClass="GV_header" />
