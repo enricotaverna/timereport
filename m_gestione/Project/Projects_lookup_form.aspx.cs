@@ -14,6 +14,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     // recupera oggetto sessione
     public TRSession CurrentSession;
 
+    // Variabili per i totali del Footer
+    private decimal TotalRevenue = 0.00M;
+    private decimal TotalCost = 0.00M;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 
@@ -198,7 +202,9 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
     #region GridView Canoni Mensili
 
-
+    // Gestisce il cambio di pagina nella GridView dei canoni mensili
+    // Salva l'indice di pagina in Session e ricarica i dati
+    // per mantenere la pagina selezionata dopo il postback
     protected void GridView1_PageIndexChanging(Object sender, GridViewPageEventArgs e)
     {
         System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)sender;
@@ -233,6 +239,55 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         var ProjectsId = dataKeys["Projects_id"];
 
         Response.Redirect("../Canoni/montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
+    }
+
+    // Gestisce il calcolo e la visualizzazione dei totali nella GridView dei canoni mensili
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        // 1. Accumula i totali riga per riga
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            DataRowView drv = (DataRowView)e.Row.DataItem;
+
+            // *** CORREZIONE PER C# 5: DICHIARAZIONE DELLE VARIABILI PRIMA DI USARLE CON out ***
+            decimal monthlyRevenue = 0.00M;
+            decimal monthlyCost = 0.00M;
+            // ********************************************************************************
+
+            if (decimal.TryParse(drv["Revenue"].ToString(), out monthlyRevenue))
+            {
+                TotalRevenue += monthlyRevenue;
+            }
+
+            if (decimal.TryParse(drv["Cost"].ToString(), out monthlyCost))
+            {
+                TotalCost += monthlyCost;
+            }
+        }
+
+        // 2. Visualizza i totali nella riga Footer
+        else if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            // ... (Logica per impostare il footer come prima) ...
+
+            // Imposta la prima cella come "Totale"
+            e.Row.Cells[0].Text = "TOTALE:";
+            e.Row.Cells[0].Font.Bold = true;
+
+            // Imposta il totale Revenue (Assumendo che Revenue sia nella colonna con indice 3)
+            if (e.Row.Cells.Count > 3)
+            {
+                e.Row.Cells[3].Text = string.Format("{0:N2}", TotalRevenue);
+                e.Row.Cells[3].Font.Bold = true;
+            }
+
+            // Imposta il totale Cost (Assumendo che Cost sia nella colonna con indice 4)
+            if (e.Row.Cells.Count > 4)
+            {
+                e.Row.Cells[4].Text = string.Format("{0:N2}", TotalCost);
+                e.Row.Cells[4].Font.Bold = true;
+            }
+        }
     }
 
     /// <summary>

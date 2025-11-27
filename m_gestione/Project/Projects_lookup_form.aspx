@@ -325,11 +325,15 @@
                                             OnClientClick="return confirm('Sei sicuro di voler rigenerare i dati? Questa operazione potrebbe sovrascrivere i ratei esistenti.');" />
                                     </div>
                                     <div id="DivScrollableGrid" style="height: 90%; overflow: auto;">
-                                        <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
-                                            DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                        <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" 
+                                            AutoGenerateColumns="False" DataSourceID="DSCanoni" CssClass="GridView" 
                                             AllowPaging="False" auto DataKeyNames="Monthly_Fee_id,Projects_id"
-                                            GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
-                                            <FooterStyle CssClass="GV_footer" />
+                                            GridLines="None" EnableModelValidation="True"
+                                            OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                            OnPageIndexChanging="GridView1_PageIndexChanging" 
+                                            OnRowDataBound="GridView1_RowDataBound"
+                                            ShowFooter="true" >
+                                            <FooterStyle CssClass="GV_footer" Font-Bold="true" ForeColor="#007fff" Font-Size="Medium" />
                                             <RowStyle Wrap="False" CssClass="GV_row" />
                                             <PagerStyle CssClass="GV_footer" />
                                             <HeaderStyle CssClass="GV_header" />
