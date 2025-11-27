@@ -64,6 +64,7 @@
                                     <li><a href="#tabs-1">Progetto</a></li>
                                     <li><a href="#tabs-2">Budget</a></li>
                                     <li><a href="#tabs-4">Altri dati</a></li>
+                                    <li style="display:none"><a href="#tabs-5">Monthly fee</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 460px; width: 100%">
@@ -309,6 +310,62 @@
                                 </div>
                                 <!-- *** TAB 4 ***  -->
 
+                                <!-- *** TAB 5 ***  -->
+                                <div id="tabs-5" style="height: 460px; width: 100%;">
+                                    <div class="input nobottomborder">
+                                        <asp:Label class="css-label" Style="padding: 0px 5px 0px 20px" AssociatedControlID="TextBox2" ID="Label2" runat="server">Progetto</asp:Label>
+                                        <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("ProjectCode") %>' Width="100" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+                                        <asp:Button
+                                            ID="btnRigenera"
+                                            runat="server"
+                                            CausesValidation="False"
+                                            CssClass="orangebutton"
+                                            Text="Rigenera"
+                                            OnClick="btnRigenera_Click"
+                                            OnClientClick="return confirm('Sei sicuro di voler rigenerare i dati? Questa operazione potrebbe sovrascrivere i ratei esistenti.');" />
+                                    </div>
+                                    <div id="DivScrollableGrid" style="height: 90%; overflow: auto;">
+                                        <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
+                                            DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                            AllowPaging="False" auto DataKeyNames="Monthly_Fee_id,Projects_id"
+                                            GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
+                                            <FooterStyle CssClass="GV_footer" />
+                                            <RowStyle Wrap="False" CssClass="GV_row" />
+                                            <PagerStyle CssClass="GV_footer" />
+                                            <HeaderStyle CssClass="GV_header" />
+                                            <AlternatingRowStyle CssClass="GV_row_alt " />
+                                            <Columns>
+                                                <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
+                                                <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
+                                                <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" Visible="false" />
+                                                <asp:BoundField 
+                                                    DataField="Revenue" 
+                                                    HeaderText="Revenue(€)" 
+                                                    ReadOnly="True" 
+                                                    SortExpression="Revenue" 
+                                                    DataFormatString="{0:C}" 
+                                                    ItemStyle-HorizontalAlign="Left" />
+                                                <asp:BoundField 
+                                                    DataField="Cost" 
+                                                    HeaderText="Cost(€)" 
+                                                    ReadOnly="True" 
+                                                    SortExpression="Cost" 
+                                                    DataFormatString="{0:C}"
+                                                    ItemStyle-HorizontalAlign="Left" />
+
+                                                <asp:TemplateField>
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
+                                                    </ItemTemplate>
+                                                </asp:TemplateField>
+                                            </Columns>
+                                        </asp:GridView>
+                                    </div>
+
+                                   
+                                </div>
+                                <!-- *** TAB 5 ***  -->
+
                             </div>
                             <!-- *** TABS ***  -->
 
@@ -476,7 +533,7 @@
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Spese: </div>
-                                        <asp:TextBox ID="TextBox4" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
+                                        <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
@@ -963,6 +1020,16 @@
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT *, WorkflowType + ' : ' + Description as WFDescription FROM [WF_WorkflowType]"></asp:SqlDataSource>
 
+    <asp:SqlDataSource ID="DSCanoni" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [Monthly_Fee] WHERE ProjectCode = @ProjectCode"
+        DeleteCommand="UPDATE Monthly_Fee SET Active = 0, InactiveBy = @persons_Name, LastModificationDate = GETDATE() WHERE (Monthly_Fee_id = @Monthly_Fee_id)">
+        <SelectParameters>
+            <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
+                Type="String" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
 
@@ -1102,6 +1169,50 @@
                     var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
                     window.location.href = logUrl;
                     }                
+            });
+        });
+
+        $(document).ready(function () {
+            // Seleziona la DropDownList usando l'ID che finisce per DDLTipoProgetto
+            const ddlTipoProgetto = $("[id$=DDLTipoProgetto]");
+            // Seleziona l'elemento LI (il link del tab)
+            const tab5Link = ddlTipoProgetto.closest('#tabs').find('ul li a[href="#tabs-5"]').parent('li');
+            // Seleziona l'elemento DIV (il contenuto del tab)
+            const tab5Content = $('#tabs-5');
+
+            // --- FUNZIONE PER CONTROLLARE E MOSTRARE/NASCONDERE IL TAB ---
+            function checkAndToggleTab5() {
+                // *** PUNTO CHIAVE: Ottieni il TESTO dell'opzione selezionata ***
+                const testoSelezionato = ddlTipoProgetto.find('option:selected').text();
+
+                // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
+                // che deve essere selezionato per mostrare il tab.
+                const testoDesiderato = 'Resale';
+
+                if (testoSelezionato === testoDesiderato) {
+                    // MOSTRA IL TAB
+                    tab5Link.show();
+                } else {
+                    // NASCONDI IL TAB
+                    tab5Link.hide();
+                    tab5Content.hide();
+
+                    // Opzionale: se il tab 5 è attivo, forziamo il passaggio al tab 1
+                    // Questo è utile per evitare che si veda la pagina vuota.
+                    if (tab5Link.hasClass('ui-tabs-active')) { // Verifica se il tab era attivo (dipende dalla libreria tabs)
+                        // Solitamente si simula un click sul primo tab, o si usa il metodo della libreria UI
+                        // Esempio per jQuery UI Tabs (ipotizzando sia in uso):
+                        $("#tabs").tabs("option", "active", 0);
+                    }
+                }
+            }
+
+            // 1. Esegui il controllo all'avvio della pagina
+            checkAndToggleTab5();
+
+            // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
+            ddlTipoProgetto.on('change', function () {
+                checkAndToggleTab5();
             });
         });
     </script>

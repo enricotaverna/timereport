@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Amazon.EC2.Model;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
@@ -132,19 +134,19 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         if (FVProgetto.CurrentMode == FormViewMode.Insert)
         {
-                // 1. Recupera il codice appena inserito
-                string projectCode = GetProjectCodeFromForm();
+            // 1. Recupera il codice appena inserito
+            string projectCode = GetProjectCodeFromForm();
 
-                // 2. Esegue il calcolo e ottiene la lista dei ratei
-                List<AccrualResult> accrualList = eseguiCalcoloCanone();
+            // 2. Esegue il calcolo e ottiene la lista dei ratei
+            List<AccrualResult> accrualList = eseguiCalcoloCanone();
 
-                // 3. Salva i ratei nel DB, PASSANDO L'ID
-                InserisciAccrualNelDB(projectCode, accrualList);
+            // 3. Salva i ratei nel DB, PASSANDO L'ID
+            InserisciAccrualNelDB(projectCode, accrualList);
 
-                //Response.Redirect("projects_lookup_list.aspx");
-            
+            //Response.Redirect("projects_lookup_list.aspx");
+
         }
-        
+
         Response.Redirect("projects_lookup_list.aspx");
     }
 
@@ -179,13 +181,99 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Values["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.Values["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.Values["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
-        
+
     }
 
     protected void CloneButton_Click(object sender, EventArgs e)
     {
         int projectsId = (int)FVProgetto.DataKey["Projects_Id"];
         Response.Redirect("CloneProject.aspx?Project_id=" + projectsId + "&ProjectCode=" + Request.QueryString["Projectcode"]);
+    }
+
+    #region GridView Canoni Mensili
+
+
+    protected void GridView1_PageIndexChanging(Object sender, GridViewPageEventArgs e)
+    {
+        System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)sender;
+
+        // 2. Impostiamo il nuovo indice di pagina
+        gridCanoni.PageIndex = e.NewPageIndex;
+
+        // 3. Salviamo l'indice in Session (come stavi facendo)
+        Session["GridCanoniPageNumber"] = e.NewPageIndex;
+
+        // 4. Ri-effettua il data binding della GridView.
+        //    Devi chiamare il metodo che popola la GridView per applicare il cambio di pagina.
+        //    Se il tuo GridView carica i dati nel FVProgetto_DataBound, probabilmente
+        //    dovrai chiamare il tuo metodo di bind, ad esempio:
+        //    BindMonthlyFees(Convert.ToInt32(FVProgetto.DataKey.Value));
+
+        //    Alternativa (se usi un DataSource collegato al FormView):
+        gridCanoni.DataBind();
+    }
+
+    protected void GridView1_SelectedIndexChanged(Object sender, System.EventArgs e)
+    {
+        System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)sender;
+        var Monthly_Fee_id = gridCanoni.DataKeys[gridCanoni.SelectedRow.RowIndex].Values[0];
+        var ProjectsId = gridCanoni.DataKeys[gridCanoni.SelectedRow.RowIndex].Values[1];
+
+        // Mostra l'errore all'utente
+        ClientScript.RegisterStartupScript(
+            this.GetType(),
+            "ErrorScript",
+            "alert('" + errorMessage + "');",
+            true);
+
+        Response.Redirect("../Canoni/montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
+    }
+
+    // Nel tuo file Projects_lookup_form.aspx.cs
+    protected void btnRigenera_Click(object sender, EventArgs e)
+    {
+        // Passaggio A: Recupera il codice del progetto dal FormView
+        System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
+
+        if (txtProjectCode == null)
+        {
+            // Gestisci l'errore se la TextBox non è stata trovata
+            return;
+        }
+
+        string projectCode = txtProjectCode.Text;
+
+        if (!string.IsNullOrEmpty(projectCode))
+        {
+            try
+            {
+                // Passaggio B: Esegue il calcolo dei ratei
+                List<AccrualResult> accrualList = eseguiCalcoloCanone();
+
+                // Passaggio C: Inserisce i nuovi ratei nel DB (che include DELETE dei vecchi)
+                InserisciAccrualNelDB(projectCode, accrualList);
+
+                // 1. Ricarica l'origine dati (SqlDataSource)
+                DSCanoni.DataBind();
+
+                // 2. Ricarica la GridView
+                System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)FVProgetto.FindControl("GridView1");
+                gridCanoni.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+                // Gestione e log dell'errore
+                string errorMessage = "Errore durante la rigenerazione: " + ex.Message.Replace("'", "`"); // Sostituisci l'apice per JS safety
+
+                // Mostra l'errore all'utente
+                ClientScript.RegisterStartupScript(
+                    this.GetType(),
+                    "ErrorScript",
+                    "alert('" + errorMessage + "');",
+                    true);
+            }
+        }
     }
 
     /// <summary>
@@ -201,16 +289,16 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     {
         // *** 1. RECUPERO CONTROLLI DAL FORMVIEW ***
 
-        TextBox txtProjectCode = (TextBox)FVProgetto.FindControl("TBProgetto");
+        System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
 
         // TextBox per gli importi (RevenueTxt e CostTxt sono nel FormView FVCanoni o FVProgetto, 
         // userò FVProgetto come nei tuoi file caricati)
-        TextBox txtRevenue = (TextBox)FVProgetto.FindControl("TBRevenueBudget");
-        TextBox txtCost = (TextBox)FVProgetto.FindControl("TextBox4");
+        System.Web.UI.WebControls.TextBox txtRevenue = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBRevenueBudget");
+        System.Web.UI.WebControls.TextBox txtCost = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("SpeseBudgetTextBox");
 
         // Campi Data (Questi ID sono un'assunzione basata sul contesto, potrebbero essere diversi)
-        TextBox txtDataInizio = (TextBox)FVProgetto.FindControl("TBAttivoDa");
-        TextBox txtDataFine = (TextBox)FVProgetto.FindControl("TBAttivoA");
+        System.Web.UI.WebControls.TextBox txtDataInizio = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoDa");
+        System.Web.UI.WebControls.TextBox txtDataFine = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoA");
 
         // *** 2. PARSING E CONVERSIONE DEI VALORI ***
 
@@ -295,10 +383,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     public static class AccrualCalculator
     {
         public static List<AccrualResult> CalculateMonthlyAccrual(
-    DateTime startDate,
-    DateTime endDate,
-    decimal totalRevenue,
-    decimal totalCost)
+        DateTime startDate,
+        DateTime endDate,
+        decimal totalRevenue,
+        decimal totalCost)
         {
             var results = new List<AccrualResult>();
             // ... (Calcolo totalContractDays e tassi giornalieri, rimasto invariato) ...
@@ -379,10 +467,14 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     private string GetProjectCodeFromForm()
     {
         // Cerca la TextBox del ProjectCode
-        TextBox txtProjectCode = (TextBox)FVProgetto.FindControl("TBProgetto");
+        System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
 
         // Recupera il valore, usando sintassi compatibile C# 5
         string projectCode = (txtProjectCode != null) ? txtProjectCode.Text : string.Empty;
@@ -453,10 +545,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
             string insertQuery = string.Format(
                 @"INSERT INTO {0} 
-               (Projects_id, [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+               (Projects_id,[ProjectCode], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
              VALUES 
-               (@ProjectsId, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
+               (@ProjectsId,@ProjectCode, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
                 @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)", tableName);
 
             foreach (var accrual in accrualList)
@@ -465,6 +557,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 {
                     // Mappatura con i parametri SQL
                     cmd.Parameters.AddWithValue("@ProjectsId", projectsId); // Usa l'ID recuperato!
+                    cmd.Parameters.AddWithValue("@ProjectCode", projectCode); // Usa l'ID recuperato!
                     cmd.Parameters.AddWithValue("@Year", accrual.Year);
                     cmd.Parameters.AddWithValue("@Month", accrual.Month);
                     cmd.Parameters.AddWithValue("@Revenue", accrual.Revenue);
@@ -481,4 +574,5 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             }
         }
     }
+    #endregion
 }

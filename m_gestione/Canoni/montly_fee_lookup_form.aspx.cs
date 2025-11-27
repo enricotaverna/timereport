@@ -28,7 +28,16 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
         if (!IsPostBack )
         {
 
-            prevPage = Request.UrlReferrer.ToString();
+            if (Request.UrlReferrer != null)
+            {
+                // Riga 31 originale corretta
+                prevPage = Request.UrlReferrer.ToString();
+            }
+            else
+            {
+                // Imposta un valore sicuro se l'utente è arrivato direttamente (es. da bookmark)
+                prevPage = string.Empty;
+            }
 
             if (Request.QueryString["Monthly_Fee_id"] != null )
             {
