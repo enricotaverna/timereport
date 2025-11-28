@@ -117,26 +117,39 @@
                         <HeaderStyle CssClass="GV_header" />
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                         <Columns>
+                            <asp:BoundField DataField="Monthly_Fee_Code" HeaderText="Codice" SortExpression="Monthly_Fee_Code" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
                             <asp:BoundField DataField="NomeManager" HeaderText="Manager" SortExpression="NomeManager" />
                             <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
                             <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
                             <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" />
-                            <asp:BoundField DataField="Revenue" HeaderText="Revenue(€)" ReadOnly="True" SortExpression="Revenue" DataFormatString="{0:n0}" />
-                            <asp:BoundField DataField="Cost" HeaderText="Cost(€)" ReadOnly="True" SortExpression="Cost" DataFormatString="{0:n0}" />
+                            <asp:BoundField
+                                DataField="Revenue"
+                                HeaderText="Revenue(€)"
+                                ReadOnly="True"
+                                SortExpression="Revenue"
+                                DataFormatString="{0:C}"
+                                ItemStyle-HorizontalAlign="Left" />
+                            <asp:BoundField
+                                DataField="Cost"
+                                HeaderText="Cost(€)"
+                                ReadOnly="True"
+                                SortExpression="Cost"
+                                DataFormatString="{0:C}"
+                                ItemStyle-HorizontalAlign="Left" />
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
-                            <asp:TemplateField>
+                            <%--<asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>
+                            </asp:TemplateField>--%>
                             <%--<asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>--%>
-                            <asp:BoundField DataField="Projects_id" HeaderText="Projectsid" Visible="True"
-                                SortExpression="Projects_id" />                            
+                            <%--<asp:BoundField DataField="Projects_id" HeaderText="Projectsid" Visible="True"
+                                SortExpression="Projects_id" />  --%>                          
                         </Columns>
                     </asp:GridView>
 

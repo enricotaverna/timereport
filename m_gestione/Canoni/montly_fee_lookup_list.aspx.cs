@@ -65,7 +65,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
                  " AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
                  " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) AND Monthly_Fee.Monthly_Fee_Code LIKE '%' + (@TB_Codice) + '%' ";
 
-        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
+        //sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
 
         DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
                                  "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, "+
