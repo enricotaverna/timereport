@@ -36,6 +36,32 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             {
                 FVProgetto.ChangeMode(FormViewMode.Edit);
                 FVProgetto.DefaultMode = FormViewMode.Edit;
+
+                // INIZIO CORREZIONE: Logica Apertura Tab con Ritardo JS
+                string tabParam = Request.QueryString["tab"];
+                if (tabParam != null)
+                {
+                    // Dichiarazione C# compatibile
+                    int tabIndex = 0;
+
+                    if (int.TryParse(tabParam, out tabIndex))
+                    {
+                        // NUOVO SCRIPT: Aggiunto setTimeout per risolvere il problema di layout.
+                        // Il ritardo (100ms) garantisce che jQuery UI Tabs abbia finito di inizializzare l'HTML.
+                        string script = String.Format("$(function() {{ setTimeout(function() {{ $(\"#tabs\").tabs(\"option\", \"active\", {0}); }}, 100); }});", tabIndex);
+
+                        // Gestione del fallback per ScriptManager NULL (dopo Response.Redirect)
+                        if (ScriptManager.GetCurrent(this) != null)
+                        {
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "AutoOpenTab", script, true);
+                        }
+                        else
+                        {
+                            // Fallback robusto con Page.ClientScript
+                            Page.ClientScript.RegisterStartupScript(this.GetType(), "AutoOpenTab", script, true);
+                        }
+                    }
+                }
             }
             else
             {
@@ -141,14 +167,17 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         if (FVProgetto.CurrentMode == FormViewMode.Insert)
         {
+            string projectCode = GetProjectCodeFromForm();
             System.Web.UI.WebControls.CheckBox chkAttivo = (System.Web.UI.WebControls.CheckBox)FVProgetto.FindControl("ActiveCheckBox");
+            // DDL deve essere accessibile per controllare il tipo di progetto
+            DropDownList ddlTipoProgetto = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
 
             // Se il progetto è attivo, esegue il calcolo e l'inserimento dei ratei
             if (chkAttivo.Checked)
             {
 
                 // 1. Recupera il codice appena inserito
-                string projectCode = GetProjectCodeFromForm();
+                projectCode = GetProjectCodeFromForm();
 
                 // 2. Esegue il calcolo e ottiene la lista dei ratei
                 List<AccrualResult> accrualList = eseguiCalcoloCanone();
@@ -156,7 +185,18 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 // 3. Salva i ratei nel DB, PASSANDO L'ID
                 InserisciAccrualNelDB(projectCode, accrualList);
 
-                //Response.Redirect("projects_lookup_list.aspx");
+            }
+
+            // INIZIO MODIFICA: Logica Redirect condizionale
+            if (ddlTipoProgetto != null && ddlTipoProgetto.SelectedItem.Text == "Resale")
+            {
+                // Indice fisso del tab Monthly Fee (0-based, quindi 4 per il 5° tab)
+                const int MONTHLY_FEE_TAB_INDEX = 3;
+
+                // Reindirizza alla pagina di EDIT del progetto appena creato,
+                // passando il codice e l'indice del tab nella QueryString
+                Response.Redirect(String.Format("Projects_lookup_form.aspx?Projectcode={0}&tab={1}", projectCode, MONTHLY_FEE_TAB_INDEX));
+                return; // Interrompe l'esecuzione e previene il redirect standard
             }
         }
 
@@ -202,7 +242,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         Response.Redirect("CloneProject.aspx?Project_id=" + projectsId + "&ProjectCode=" + Request.QueryString["Projectcode"]);
     }
 
-    #region GridView Canoni Mensili
+    #region GridView Canoni Mensili e gestione ratei
 
     // Gestisce il cambio di pagina nella GridView dei canoni mensili
     // Salva l'indice di pagina in Session e ricarica i dati
@@ -718,10 +758,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
             string insertQuery = string.Format(
                 @"INSERT INTO {0} 
-               (Projects_id,[ProjectCode], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+               (Projects_id,[ProjectCode],[Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
              VALUES 
-               (@ProjectsId,@ProjectCode, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
+               (@ProjectsId,@ProjectCode,@Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
                 @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)", tableName);
 
             foreach (var accrual in accrualList)
@@ -731,6 +771,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                     // Mappatura con i parametri SQL
                     cmd.Parameters.AddWithValue("@ProjectsId", projectsId); // Usa l'ID recuperato!
                     cmd.Parameters.AddWithValue("@ProjectCode", projectCode); // Usa l'ID recuperato!
+                    cmd.Parameters.AddWithValue("@Monthly_Fee_Code", projectCode + "_" + accrual.Month);
                     cmd.Parameters.AddWithValue("@Year", accrual.Year);
                     cmd.Parameters.AddWithValue("@Month", accrual.Month);
                     cmd.Parameters.AddWithValue("@Revenue", accrual.Revenue);
@@ -746,6 +787,61 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 }
             }
         }
+    }
+
+
+    // adattamento dinamico delle etichette Budget in base al Tipo di Progetto
+    protected void DDLTipoProgetto_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        // Recupera la DDL
+        DropDownList ddl = (DropDownList)sender;
+        string selectedValue = ddl.SelectedValue;
+
+        // Trova il DIV del header Ricavi usando la classe HtmlGenericControl
+        // NOTA: Il DIV deve avere runat="server" nel file .aspx
+        System.Web.UI.HtmlControls.HtmlGenericControl divRevenueHeader =
+            (System.Web.UI.HtmlControls.HtmlGenericControl)FVProgetto.FindControl("lbRevenueBudgetTextBox");
+
+
+        // ----------------------------------------------------
+        // LOGICA CAMBIO TESTO DIV RICAVI
+        // ----------------------------------------------------
+
+        if (divRevenueHeader != null)
+        {
+            if (selectedValue == "resale")
+            {
+                // Selezionato "resale", imposta il testo su "Ricavi: "
+                divRevenueHeader.InnerText = "Ricavi: ";
+            }
+            else
+            {
+                // Altrimenti, imposta il testo su "Revenue: "
+                divRevenueHeader.InnerText = "Revenue: ";
+            }
+        }
+
+        // ----------------------------------------------------
+        // LOGICA AGGIUNTIVA PER I COSTI/SPESE (Esempio)
+        // ----------------------------------------------------
+
+        // Se devi modificare anche il DIV delle Spese:
+        System.Web.UI.HtmlControls.HtmlGenericControl divCostHeader =
+            (System.Web.UI.HtmlControls.HtmlGenericControl)FVProgetto.FindControl("lbSpeseBudgetTextBox");
+
+        if (divCostHeader != null)
+        {
+            if (selectedValue == "resale")
+            {
+                divCostHeader.InnerText = "Costi Reali: ";
+            }
+            else
+            {
+                divCostHeader.InnerText = "Spese: ";
+            }
+        }
+
+        // ... (Eventuale altra logica per TextBox, ecc.)
     }
     #endregion
 }

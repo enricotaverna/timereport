@@ -199,7 +199,7 @@
                                         <div class="inputtext">Tipo progetto:</div>
                                         <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
                                             DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>' 
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
@@ -218,7 +218,7 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>€</label>
@@ -226,7 +226,7 @@
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
@@ -245,7 +245,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext"></div>
                                         <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime"></asp:Label>
+                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
 
                                     </div>
 
@@ -370,7 +370,7 @@
 
                                                 <asp:TemplateField>
                                                     <ItemTemplate>
-                                                        <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
+                                                        <asp:LinkButton Visible="false" ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
                                                     </ItemTemplate>
                                                 </asp:TemplateField>
                                             </Columns>
@@ -539,7 +539,7 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>€</label>
@@ -547,7 +547,7 @@
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
@@ -566,7 +566,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext"></div>
                                         <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime"></asp:Label>
+                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
 
                                     </div>
 
@@ -783,13 +783,13 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget") %>' Enabled="False" />
                                     </div>
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget") %>' Enabled="False" />
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
@@ -1070,6 +1070,37 @@
             {
                 $('#FVProgetto_DDLLOB').val('');
             }
+
+            // prendo il valore testo della ddltipoprogetto
+            var selectedText = $("#FVProgetto_DDLTipoProgetto option:selected").text();
+
+            // 2. NUOVA LOGICA: Modifica del testo del DIV
+            // Nota: l'ID del DIV target è FVProgetto_lbRevenueBudgetTextBox
+            var $revenueHeaderDiv = $('#lbRevenueBudget');
+            var $costHeaderDiv = $('#lbSpeseBudgetTextBox');
+
+            // Checkbox e Label Forfait (ID dinamici)
+            var $forfaitLabel = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+            var $CBNoOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+            console.log($CBNoOvertime);
+
+            if ($revenueHeaderDiv.length) { // Controlla che l'elemento esista
+              
+                if (selectedText === "Resale") {
+                    // Se è "resale", imposta il testo su "Ricavi: "
+                    $revenueHeaderDiv.text('Ricavi: ');
+                    $costHeaderDiv.text('Costi: ')
+                    $CBNoOvertime.hide();
+                    $forfaitLabel.hide();
+
+                } else {
+                    // Altrimenti, imposta il testo su "Revenue: "
+                    $revenueHeaderDiv.text('Revenue: ');
+                    $costHeaderDiv.text('Spese: ');
+                    $CBNoOvertime.show();
+                    $forfaitLabel.show();
+                }
+            }
         });
 
         // *** se tipo progetto è Chargeable il cliente è obbligatorio
@@ -1202,7 +1233,7 @@
 
                 // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
                 // che deve essere selezionato per mostrare il tab.
-                const testoDesiderato = 'Hardware&Software';
+                const testoDesiderato = 'Resale';
 
                 if (testoSelezionato === testoDesiderato) {
                     // MOSTRA IL TAB

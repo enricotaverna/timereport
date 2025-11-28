@@ -81,7 +81,7 @@
                     <div class="row mt-2">
                         <!-- margine per separare le righe -->
                         <div class="col-1">
-                            <label class="inputtext">Director</label>
+                            <label class="inputtext">Manager</label>
                         </div>
                         <div class="col-5">
                             <asp:DropDownList ID="DDLManager" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
@@ -118,7 +118,7 @@
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                         <Columns>
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
-                            <asp:BoundField DataField="NomeManager" HeaderText="Director" SortExpression="NomeManager" />
+                            <asp:BoundField DataField="NomeManager" HeaderText="Manager" SortExpression="NomeManager" />
                             <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
                             <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
                             <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" />
