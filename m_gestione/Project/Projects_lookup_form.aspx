@@ -1085,7 +1085,7 @@
             console.log($CBNoOvertime);
 
             if ($revenueHeaderDiv.length) { // Controlla che l'elemento esista
-              
+
                 if (selectedText === "Resale") {
                     // Se è "resale", imposta il testo su "Ricavi: "
                     $revenueHeaderDiv.text('Ricavi: ');
@@ -1194,7 +1194,7 @@
             }
 
             // in modifica posizione icona del log modifiche
-            if ($("#FVProgetto_TBProgetto").val() != "" )
+            if ($("#FVProgetto_TBProgetto").val() != "")
                 $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
 
             // Optional: Add CSS to style the icon
@@ -1210,11 +1210,10 @@
             $(".icon-link").click(function (event) {
                 event.preventDefault();
                 var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
-                if (projectsId !== '')
-                    {
+                if (projectsId !== '') {
                     var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
                     window.location.href = logUrl;
-                    }                
+                }
             });
         });
 
@@ -1261,6 +1260,59 @@
                 checkAndToggleTab5();
             });
         });
+
+        // Funzione globale che accetta un parametro opzionale per il testo iniziale
+        function checkFieldsVisibility(initialSelectedText) {
+
+            // Recupera la DropDownList
+            var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+
+            // Checkbox e Label Forfait (ID dinamici)
+            var divFatturati = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+            var divOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+
+            let selectedText;
+            if (initialSelectedText) {
+                // Se la funzione è stata chiamata dal C# (Edit mode), usa il parametro
+                selectedText = initialSelectedText;
+            } else {
+                // Se la funzione è chiamata dall'evento 'change' o dal ready in Insert mode
+                selectedText = ddlTipoProgetto.find('option:selected').text();
+            }
+
+            // Logica di visibilità: nascondi se è "Resale"
+            const shouldHide = (selectedText === 'Resale');
+
+            if (shouldHide) {
+                divOvertime.hide();
+                divFatturati.hide();
+                // Opzionale: Pulisci i valori
+                divOvertime.find('input, select').val('');
+                divFatturati.find('input, select').val('');
+
+            } else {
+                divOvertime.show();
+                divFatturati.show();
+            }
+        }
+
+        $(function () {
+            // Recupera la DropDownList solo per l'evento change
+            var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+
+        // La chiamata iniziale (necessaria per la modalità Insert, dove il C# non la chiama)
+        if (ddlTipoProgetto.length && ddlTipoProgetto.find('option:selected').text() !== 'Resale') {
+            // Chiama la funzione solo se non è 'Resale', altrimenti sarà chiamata dal C#
+            // o se si è in modalità Insert.
+            checkFieldsVisibility();
+        }
+
+        // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
+        ddlTipoProgetto.on('change', function () {
+            // Chiamata senza parametro, che usa il valore corrente della combo
+            checkFieldsVisibility();
+        });
+    });
     </script>
 
 </body>

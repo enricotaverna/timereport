@@ -142,6 +142,30 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             if (cliente != "")
                 DDLCliente.SelectedValue = cliente;
 
+            // =========================================================
+            // NUOVA LOGICA: INIEZIONE SCRIPT VISIBILITÀ CAMPI
+            // =========================================================
+            DropDownList ddlTipoProgetto = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
+
+            // Assumiamo che il valore di DDLTipoProgetto sia stato caricato
+            // tramite <%# Bind("TipoProgetto") %> nel FormView.
+            if (ddlTipoProgetto != null)
+            {
+                // Legge il testo attualmente selezionato (es. "Resale")
+                string selectedText = ddlTipoProgetto.SelectedItem.Text;
+
+                // Script per chiamare la funzione JS checkFieldsVisibility() con il valore iniziale.
+                // Si usa un piccolo ritardo (100ms) per garantire che il DOM e jQuery siano pronti.
+                // Il valore viene passato come stringa per essere usato dal JS.
+                string script = String.Format("$(function() {{ setTimeout(function() {{ checkFieldsVisibility('{0}'); }}, 100); }});", selectedText.Replace("'", "\\'"));
+
+                // Inietta lo script. Usiamo una chiave univoca.
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "InitialFieldsVisibility", script, true);
+            }
+            // =========================================================
+            // FINE NUOVA LOGICA
+            // =========================================================
+
         }
 
         // usato per valorizzare la chiave del log modifiche
