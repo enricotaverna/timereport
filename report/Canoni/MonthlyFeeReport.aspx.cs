@@ -59,6 +59,10 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         ASPcompatility.SelectYears(ref DDLToYear);
         ASPcompatility.SelectMonths(ref DDLFromMonth, CurrentSession.Language);
         ASPcompatility.SelectMonths(ref DDLToMonth, CurrentSession.Language);
+
+        // default RadioButton
+        if (RBTipoExport.SelectedValue == "" && RBTipoReport.SelectedValue == "")
+            RBTipoExport.SelectedValue = "1";
     }
 
     // Costruisce segmento Where
@@ -156,9 +160,9 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         string fd = ASPcompatility.FormatDateDb(ASPcompatility.FirstDay(Convert.ToInt16(meseDa), Convert.ToInt16(annoDa)));
         string ld = ASPcompatility.FormatDateDb(ASPcompatility.LastDay(Convert.ToInt16(meseA), Convert.ToInt16(annoA)));
 
-        wc.WhereClauseMonths = wc.WhereClauseDays + " AnnoMese >= '" + annoDa + "-" + meseDa + "' AND AnnoMese  <= '" + annoA + "-" + meseA + "'";
-        wc.WhereClauseDays = wc.WhereClauseDays + " DataInizio >= " + fd + " AND DataFine <= " + ld;
-
+        //wc.WhereClauseYear = wc.WhereClauseYear + " Year >= " + annoDa + " AND Year  <= " + annoA + "";
+        wc.WhereClauseMonths = wc.WhereClauseDays + " (Year * 100 + Month) >= "+ annoDa + meseDa + " AND (Year * 100 + Month) <= " + annoA + meseA + "";
+        //wc.WhereClauseDays = wc.WhereClauseDays + " AND Month >= " + meseDa + " AND Month <= " + meseA;
         return wc;
 
     }
@@ -197,7 +201,7 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         Session["DDLToYearValue"] = DDLToYear.SelectedValue;
         Session["DDLClientiValue"] = DDLClienti.SelectedValue;
         Session["DDLsocietaValue"] = DDLsocieta.SelectedValue;
-
+        Session["RBTipoExportValue"] = RBTipoExport.SelectedValue;
 
     }
 
@@ -211,6 +215,7 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         DDLToYear.SelectedValue = Session["DDLToYearValue"] != null ? Session["DDLToYearValue"].ToString() : "";
         DDLClienti.SelectedValue = Session["DDLClientiValue"] != null ? Session["DDLClientiValue"].ToString() : "";
         DDLsocieta.SelectedValue = Session["DDLsocietaValue"] != null ? Session["DDLsocietaValue"].ToString() : "";
+        RBTipoExport.SelectedValue = Session["RBTipoExportValue"] != null ? Session["RBTipoExportValue"].ToString() : "";
     }
 
     // Lancia report
@@ -218,18 +223,35 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
     {
         WhereClause wc = new WhereClause();
 
-        string sWhereClause = "";
-
         // salva i valori in variabili di sessione per non doverli reinserire
         SaveSelectionsValue();
 
         wc = Build_where();
 
-        Utilities.ExportXls("SELECT [Monthly_Fee_id],[ProjectCode],[Name],[Monthly_Fee_Code],[Year],[Month],[Revenue] " +
-                            ", [Cost], [Days], [Day_Revenue], [Day_Cost], [CodiceCliente], [Nome1], [Fornitore], [Manager] " +
-                            ", [Manager_Id], [Descrizione], [DataInizio], [DataFine] FROM [v_Monthly_Fee] WHERE " + wc.WhereClauseDays);
-
         
+
+
+        switch (RBTipoExport.SelectedValue)
+        {
+            case "1":
+                Utilities.ExportXls("SELECT [Monthly_Fee_id],[ProjectCode],[Name],[Monthly_Fee_Code],[Year],[Month],[Revenue] " +
+                            ", [Cost], [Days], [Day_Revenue], [Day_Cost], [CodiceCliente], [Cliente], [Fornitore], [Manager] " +
+                            ", [Manager_Id], [Descrizione], [DataInizio], [DataFine] FROM [v_Monthly_Fee] WHERE " + wc.WhereClauseMonths);
+                break;            
+        }
+
+        switch (RBTipoReport.SelectedValue)
+        {
+            case "3":
+                Session["SQL"] = "SELECT [ProjectCode],[Name],[Cliente],[Fornitore],Descrizione,[Manager],[DataInizio],"+
+                    "[DataFine],SUM([Revenue]) AS TotalRevenue, SUM([Cost]) AS TotalCost "+
+                    "FROM [v_Monthly_Fee] WHERE " + wc.WhereClauseMonths + " "+
+                    "GROUP BY [ProjectCode],[Name],[Cliente],[Fornitore],Descrizione,[Manager], [DataInizio],[DataFine]";
+
+                Session["ReportPath"] = "DettaglioMonthlyFee.rdlc";
+                Response.Redirect("../rdlc/ReportExecute.aspx");
+                break;
+        }
 
     }
 

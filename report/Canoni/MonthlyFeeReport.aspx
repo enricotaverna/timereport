@@ -53,7 +53,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
     <title>
-        <asp:Literal runat="server" Text="Esporta" /></title>
+        <asp:Literal runat="server" Text="Esegui" /></title>
 </head>
 
 <body>
@@ -163,8 +163,32 @@
                         </span>
 
                     </div>
+                    <div class="input nobottomborder mt-3 mb-4" style="overflow: hidden">
+                        <div class="inputtext">
+                            <asp:Literal runat="server" />
+                        </div>
+
+                        <span class="Inputcontent"
+                            style="position: relative; padding-top: 15px; border: 1px solid #C7C7C7; border-radius: 6px; margin-top: 10px; float: left; line-height: 24px">
+                            <span style="position: absolute; top: -10px; left: 5px; background-color: white; font-size: 10pt"><i class="fas fa-download" style="font-size: 1.2em;"></i>&nbspExport&nbsp</span>
+
+
+                            <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="1" Width="220px">
+                                <asp:ListItem Value="1" Text="Export"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </span>
+                        <span class="Inputcontent"
+                            style="position: relative; padding-top: 15px; border: 1px solid #C7C7C7; border-radius: 6px; margin-top: 10px; margin-left: 20px; float: left; line-height: 24px">
+                            <span style="position: absolute; top: -10px; left: 5px; background-color: white; font-size: 10pt"><i class="fas fa-chart-bar" style="font-size: 1.2em;"></i>&nbspReport&nbsp</span>
+
+                            <asp:RadioButtonList ID="RBTipoReport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="2" Width="380px">
+                                <asp:ListItem Value="3" Text="Totali per mese"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </span>
+
+                    </div>
                     <div class="buttons">
-                        <asp:Button ID="BTexec" runat="server" Text="Esporta" CssClass="orangebutton" PostBackUrl="/timereport/report/Canoni/MonthlyFeeReport.aspx" OnClick="Sottometti_Click" CausesValidation="False" />
+                        <asp:Button ID="BTexec" runat="server" Text="Esegui" CssClass="orangebutton" PostBackUrl="/timereport/report/Canoni/MonthlyFeeReport.aspx" OnClick="Sottometti_Click" CausesValidation="False" />
                         <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="Cancella" OnClick="UpdateCancelButton_Click" formnovalidate />
                     </div>
 
@@ -241,13 +265,23 @@
 
             $('#CBLProgetti')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
 
+            // cancella selezione dei radiobutton in caso sia stato selezionato l'altro gruppo
+            $("#RBTipoExport").on('change', function () {
+                $("input[name=RBTipoReport]").prop('checked', false);
+            })
+
+            $("#RBTipoReport").on('change', function () {
+                $("input[name=RBTipoExport]").prop('checked', false);
+            })
+
             $("#BTexec").click(function () {
-                 return;
+
+                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2)
+                    return;
+
                 MaskScreen(true);
 
             });
-
-
         });
 
     </script>
