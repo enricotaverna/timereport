@@ -166,6 +166,48 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // FINE NUOVA LOGICA
             // =========================================================
 
+            // Esegui la logica solo se la FormView è in modalità Edit (o in una modalità in cui i dati sono vincolati)
+            if (FVProgetto.CurrentMode == FormViewMode.Edit && FVProgetto.DataItem != null)
+            {
+                // 1. Trova il bottone "Rigenera"
+                Button btnRigenera = (Button)FVProgetto.FindControl("btnRigenera");                
+
+                if (btnRigenera != null)
+                {
+                    try
+                    {
+                        DataRowView rowView = (DataRowView)FVProgetto.DataItem;
+                        System.Web.UI.WebControls.TextBox txtDataInizio = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoDa");
+
+                        // 2. RECUPERA LA DATA INIZIO PROGETTO DAL DATAITEM
+                        // *** IMPORTANTE: Sostituisci "StartDate" se il tuo campo ha un nome diverso
+                        DateTime startDate = txtDataInizio.Text != "" ? DateTime.Parse(txtDataInizio.Text) : DateTime.MinValue;
+
+                        // 3. Calcola la data limite per la rigenerazione: Data Inizio + 1 mese
+                        DateTime regenerationDeadline = startDate.AddMonths(1);
+
+                        // 4. Esegui la comparazione
+                        // Se la data odierna (DateTime.Now) è successiva alla scadenza, nascondi il bottone.
+                        if (DateTime.Now > regenerationDeadline)
+                        {
+                            // 5. Nascondi il bottone
+                            btnRigenera.Visible = false;
+                        }
+                        else
+                        {
+                            // Se la data odierna è entro 1 mese dalla Data Inizio, il bottone rimane visibile.
+                            btnRigenera.Visible = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // In caso di errore (es. campo StartDate non trovato o non valido), nascondi il bottone per sicurezza
+                        btnRigenera.Visible = false;
+                        // Qui potresti anche loggare l'errore: LogError(ex);
+                    }
+                }
+            }
+
         }
 
         // usato per valorizzare la chiave del log modifiche
@@ -795,7 +837,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                     // Mappatura con i parametri SQL
                     cmd.Parameters.AddWithValue("@ProjectsId", projectsId); // Usa l'ID recuperato!
                     cmd.Parameters.AddWithValue("@ProjectCode", projectCode); // Usa l'ID recuperato!
-                    cmd.Parameters.AddWithValue("@Monthly_Fee_Code", projectCode + "_" + accrual.Month);
+                    cmd.Parameters.AddWithValue("@Monthly_Fee_Code", projectCode + "_" + accrual.Year + "_" + accrual.Month);
                     cmd.Parameters.AddWithValue("@Year", accrual.Year);
                     cmd.Parameters.AddWithValue("@Month", accrual.Month);
                     cmd.Parameters.AddWithValue("@Revenue", accrual.Revenue);

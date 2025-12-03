@@ -226,7 +226,7 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         wc = Build_where();
 
         Utilities.ExportXls("SELECT [Monthly_Fee_id],[ProjectCode],[Name],[Monthly_Fee_Code],[Year],[Month],[Revenue] " +
-                            ", [Cost], [Days], [Day_Revenue], [Day_Cost], [CodiceCliente], [Nome1], [Societa], [Manager] " +
+                            ", [Cost], [Days], [Day_Revenue], [Day_Cost], [CodiceCliente], [Nome1], [Fornitore], [Manager] " +
                             ", [Manager_Id], [Descrizione], [DataInizio], [DataFine] FROM [v_Monthly_Fee] WHERE " + wc.WhereClauseDays);
 
         

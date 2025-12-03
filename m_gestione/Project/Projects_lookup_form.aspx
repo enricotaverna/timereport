@@ -1048,257 +1048,264 @@
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
 
-        // include di snippet html per menu and background color mgt
-        includeHTML();
-        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+    // include di snippet html per menu and background color mgt
+    includeHTML();
+    InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
-        $('select').SumoSelect({ search: true, searchText: '' });
+    $('select').SumoSelect({ search: true, searchText: '' });
 
-        // *** attiva validazione campi form
-        $('#formProgetto').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
-        });
+    // *** attiva validazione campi form
+    $('#formProgetto').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+    });
 
-        // *** messaggio di default
-        Parsley.addMessages('it', {
-            required: "Completare i campi obbligatori"
-        });
+    // *** messaggio di default
+    Parsley.addMessages('it', {
+        required: "Completare i campi obbligatori"
+    });
 
-        // se cambia selezione della DDL e non chargeable resetta il valore della lob
-        $("#FVProgetto_DDLTipoProgetto").change(function () {
-            if ($("#FVProgetto_DDLTipoProgetto option:selected").val() != "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>") // mostra Box Testo
-            {
-                $('#FVProgetto_DDLLOB').val('');
+    // se cambia selezione della DDL e non chargeable resetta il valore della lob
+    $("#FVProgetto_DDLTipoProgetto").change(function () {
+        if ($("#FVProgetto_DDLTipoProgetto option:selected").val() != "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>") // mostra Box Testo
+        {
+            $('#FVProgetto_DDLLOB').val('');
+        }
+
+        // prendo il valore testo della ddltipoprogetto
+        var selectedText = $("#FVProgetto_DDLTipoProgetto option:selected").text();
+
+        // 2. NUOVA LOGICA: Modifica del testo del DIV
+        // Nota: l'ID del DIV target è FVProgetto_lbRevenueBudgetTextBox
+        var $revenueHeaderDiv = $('#lbRevenueBudget');
+        var $costHeaderDiv = $('#lbSpeseBudgetTextBox');
+
+        // Checkbox e Label Forfait (ID dinamici)
+        var $forfaitLabel = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+        var $CBNoOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+        console.log($CBNoOvertime);
+
+        if ($revenueHeaderDiv.length) { // Controlla che l'elemento esista
+
+            if (selectedText === "Resale") {
+                // Se è "resale", imposta il testo su "Ricavi: "
+                $revenueHeaderDiv.text('Ricavi: ');
+                $costHeaderDiv.text('Costi: ')
+                $CBNoOvertime.hide();
+                $forfaitLabel.hide();
+
+            } else {
+                // Altrimenti, imposta il testo su "Revenue: "
+                $revenueHeaderDiv.text('Revenue: ');
+                $costHeaderDiv.text('Spese: ');
+                $CBNoOvertime.show();
+                $forfaitLabel.show();
+            }
+        }
+    });
+
+    // *** se tipo progetto è Chargeable il cliente è obbligatorio
+    window.Parsley.addValidator("checkChargeable", {
+        validateString: function (value, requirement) {
+
+            if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
+                return false;
+            }
+        }
+    }).addMessage('en', 'checkChargeable', 'Please specify a lob and customer code')
+        .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
+
+
+    // *** controllo che non esista lo stesso codice utente *** //
+    window.Parsley.addValidator('codiceunico', {
+        validateString: function (value, requirement) {
+            return CheckCodiceUnico(value, requirement);
+        },
+        messages: {
+            en: 'Project code already exists',
+            it: 'Codice progetto già esistente'
+        }
+    });
+
+    // validazione campo revenue in caso il progetto sia FORFAIT
+    window.Parsley.addValidator("requiredIf", {
+        validateString: function (value, requirement) {
+
+            value = value.toString().replace(',', '.');
+
+            // se inserito deve essere un numero
+            if (isNaN(value) && !!value) {
+                window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                return false;
             }
 
-            // prendo il valore testo della ddltipoprogetto
-            var selectedText = $("#FVProgetto_DDLTipoProgetto option:selected").text();
+            if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
 
-            // 2. NUOVA LOGICA: Modifica del testo del DIV
-            // Nota: l'ID del DIV target è FVProgetto_lbRevenueBudgetTextBox
-            var $revenueHeaderDiv = $('#lbRevenueBudget');
-            var $costHeaderDiv = $('#lbSpeseBudgetTextBox');
-
-            // Checkbox e Label Forfait (ID dinamici)
-            var $forfaitLabel = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
-            var $CBNoOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
-            console.log($CBNoOvertime);
-
-            if ($revenueHeaderDiv.length) { // Controlla che l'elemento esista
-
-                if (selectedText === "Resale") {
-                    // Se è "resale", imposta il testo su "Ricavi: "
-                    $revenueHeaderDiv.text('Ricavi: ');
-                    $costHeaderDiv.text('Costi: ')
-                    $CBNoOvertime.hide();
-                    $forfaitLabel.hide();
-
-                } else {
-                    // Altrimenti, imposta il testo su "Revenue: "
-                    $revenueHeaderDiv.text('Revenue: ');
-                    $costHeaderDiv.text('Spese: ');
-                    $CBNoOvertime.show();
-                    $forfaitLabel.show();
-                }
-            }
-        });
-
-        // *** se tipo progetto è Chargeable il cliente è obbligatorio
-        window.Parsley.addValidator("checkChargeable", {
-            validateString: function (value, requirement) {
-
-                if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
+                // se FIXED verifica obbligatorietà
+                if (!value && requirement != "percent") {
+                    window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
                     return false;
                 }
-            }
-        }).addMessage('en', 'checkChargeable', 'Please specify a lob and customer code')
-            .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
 
-
-        // *** controllo che non esista lo stesso codice utente *** //
-        window.Parsley.addValidator('codiceunico', {
-            validateString: function (value, requirement) {
-                return CheckCodiceUnico(value, requirement);
-            },
-            messages: {
-                en: 'Project code already exists',
-                it: 'Codice progetto già esistente'
-            }
-        });
-
-        // validazione campo revenue in caso il progetto sia FORFAIT
-        window.Parsley.addValidator("requiredIf", {
-            validateString: function (value, requirement) {
-
-                value = value.toString().replace(',', '.');
-
-                // se inserito deve essere un numero
-                if (isNaN(value) && !!value) {
-                    window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                    return false;
-                }
-
-                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
-
-                    // se FIXED verifica obbligatorietà
-                    if (!value && requirement != "percent") {
-                        window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
+                // se number verifica tipo
+                if (requirement == "number")
+                    if (!isNaN(value)) //  compilato e numerico
+                        return true;
+                    else {
+                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
                         return false;
                     }
-
-                    // se number verifica tipo
-                    if (requirement == "number")
-                        if (!isNaN(value)) //  compilato e numerico
-                            return true;
-                        else {
-                            window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                            return false;
-                        }
-                }
-
-                return true;
-            },
-            priority: 33
-        });
-
-        $(function () {
-
-            // abilitate tab view
-            $("#tabs").tabs();
-
-            // stile checkbox form    
-            $(":checkbox").addClass("css-checkbox");
-
-            // stile checkbox form in ReadOnly   
-            $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
-            $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
-
-            $("#FVProgetto_DisActivityOn").attr("disabled", true);
-            $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
-
-            // datepicker
-            $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
-            $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
-
-            // formatta il campo percentuale
-            var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
-
-            if (percentDecimal != "") {
-                var percentCent = Math.round(parseFloat(percentDecimal) * 10000) / 100;
-                percentCent = percentCent.toString().replace(".", ",");
-                $("#FVProgetto_TBMargine").val(percentCent);
             }
 
-            // in modifica posizione icona del log modifiche
-            if ($("#FVProgetto_TBProgetto").val() != "")
-                $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
+            return true;
+        },
+        priority: 33
+    });
 
-            // Optional: Add CSS to style the icon
-            $(".icon-link").css({
-                "float": "right",
-                "margin-right": "10px",
-                "color": "white",
-                "font-size": "20px",
-                "text-decoration": "none"
-            });
+    $(function () {
 
-            // Optional: Add click event handler for the icon
-            $(".icon-link").click(function (event) {
-                event.preventDefault();
-                var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
-                if (projectsId !== '') {
-                    var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
-                    window.location.href = logUrl;
-                }
-            });
+        // abilitate tab view
+        $("#tabs").tabs();
+
+        // stile checkbox form    
+        $(":checkbox").addClass("css-checkbox");
+
+        // stile checkbox form in ReadOnly   
+        $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
+        $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
+        $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
+        $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
+
+        $("#FVProgetto_DisActivityOn").attr("disabled", true);
+        $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
+        $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
+        $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
+
+        // datepicker
+        $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
+        $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
+
+        // formatta il campo percentuale
+        var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
+
+        if (percentDecimal != "") {
+            var percentCent = Math.round(parseFloat(percentDecimal) * 10000) / 100;
+            percentCent = percentCent.toString().replace(".", ",");
+            $("#FVProgetto_TBMargine").val(percentCent);
+        }
+
+        // in modifica posizione icona del log modifiche
+        if ($("#FVProgetto_TBProgetto").val() != "")
+            $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
+
+        // Optional: Add CSS to style the icon
+        $(".icon-link").css({
+            "float": "right",
+            "margin-right": "10px",
+            "color": "white",
+            "font-size": "20px",
+            "text-decoration": "none"
         });
 
-        $(document).ready(function () {
-            // Seleziona la DropDownList usando l'ID che finisce per DDLTipoProgetto
-            const ddlTipoProgetto = $("[id$=DDLTipoProgetto]");
-            // Seleziona l'elemento LI (il link del tab)
-            const tab5Link = ddlTipoProgetto.closest('#tabs').find('ul li a[href="#tabs-5"]').parent('li');
-            // Seleziona l'elemento DIV (il contenuto del tab)
-            const tab5Content = $('#tabs-5');
-
-            // --- FUNZIONE PER CONTROLLARE E MOSTRARE/NASCONDERE IL TAB ---
-            function checkAndToggleTab5() {
-                // *** PUNTO CHIAVE: Ottieni il TESTO dell'opzione selezionata ***
-                const testoSelezionato = ddlTipoProgetto.find('option:selected').text();
-
-                // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
-                // che deve essere selezionato per mostrare il tab.
-                const testoDesiderato = 'Resale';
-
-                if (testoSelezionato === testoDesiderato) {
-                    // MOSTRA IL TAB
-                    tab5Link.show();
-                } else {
-                    // NASCONDI IL TAB
-                    tab5Link.hide();
-                    tab5Content.hide();
-
-                    // Opzionale: se il tab 5 è attivo, forziamo il passaggio al tab 1
-                    // Questo è utile per evitare che si veda la pagina vuota.
-                    if (tab5Link.hasClass('ui-tabs-active')) { // Verifica se il tab era attivo (dipende dalla libreria tabs)
-                        // Solitamente si simula un click sul primo tab, o si usa il metodo della libreria UI
-                        // Esempio per jQuery UI Tabs (ipotizzando sia in uso):
-                        $("#tabs").tabs("option", "active", 0);
-                    }
-                }
+        // Optional: Add click event handler for the icon
+        $(".icon-link").click(function (event) {
+            event.preventDefault();
+            var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
+            if (projectsId !== '') {
+                var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
+                window.location.href = logUrl;
             }
-
-            // 1. Esegui il controllo all'avvio della pagina
-            checkAndToggleTab5();
-
-            // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
-            ddlTipoProgetto.on('change', function () {
-                checkAndToggleTab5();
-            });
         });
+        
+    });
 
-        // Funzione globale che accetta un parametro opzionale per il testo iniziale
-        function checkFieldsVisibility(initialSelectedText) {
+    $(document).ready(function () {
+        // Seleziona la DropDownList usando l'ID che finisce per DDLTipoProgetto
+        const ddlTipoProgetto = $("[id$=DDLTipoProgetto]");
+        // Seleziona l'elemento LI (il link del tab)
+        const tab5Link = ddlTipoProgetto.closest('#tabs').find('ul li a[href="#tabs-5"]').parent('li');
+        // Seleziona l'elemento DIV (il contenuto del tab)
+        const tab5Content = $('#tabs-5');
 
-            // Recupera la DropDownList
-            var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+        // --- FUNZIONE PER CONTROLLARE E MOSTRARE/NASCONDERE IL TAB ---
+        function checkAndToggleTab5() {
+            // *** PUNTO CHIAVE: Ottieni il TESTO dell'opzione selezionata ***
+            const testoSelezionato = ddlTipoProgetto.find('option:selected').text();
 
-            // Checkbox e Label Forfait (ID dinamici)
-            var divFatturati = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
-            var divOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+            // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
+            // che deve essere selezionato per mostrare il tab.
+            const testoDesiderato = 'Resale';
 
-            let selectedText;
-            if (initialSelectedText) {
-                // Se la funzione è stata chiamata dal C# (Edit mode), usa il parametro
-                selectedText = initialSelectedText;
+            if (testoSelezionato === testoDesiderato) {
+                // MOSTRA IL TAB
+                tab5Link.show();
             } else {
-                // Se la funzione è chiamata dall'evento 'change' o dal ready in Insert mode
-                selectedText = ddlTipoProgetto.find('option:selected').text();
-            }
+                // NASCONDI IL TAB
+                tab5Link.hide();
+                tab5Content.hide();
 
-            // Logica di visibilità: nascondi se è "Resale"
-            const shouldHide = (selectedText === 'Resale');
-
-            if (shouldHide) {
-                divOvertime.hide();
-                divFatturati.hide();
-                // Opzionale: Pulisci i valori
-                divOvertime.find('input, select').val('');
-                divFatturati.find('input, select').val('');
-
-            } else {
-                divOvertime.show();
-                divFatturati.show();
+                // Opzionale: se il tab 5 è attivo, forziamo il passaggio al tab 1
+                // Questo è utile per evitare che si veda la pagina vuota.
+                if (tab5Link.hasClass('ui-tabs-active')) { // Verifica se il tab era attivo (dipende dalla libreria tabs)
+                    // Solitamente si simula un click sul primo tab, o si usa il metodo della libreria UI
+                    // Esempio per jQuery UI Tabs (ipotizzando sia in uso):
+                    $("#tabs").tabs("option", "active", 0);
+                }
             }
         }
 
-        $(function () {
-            // Recupera la DropDownList solo per l'evento change
-            var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+        // 1. Esegui il controllo all'avvio della pagina
+        checkAndToggleTab5();
+
+        // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
+        ddlTipoProgetto.on('change', function () {
+            checkAndToggleTab5();
+        });
+    });
+
+    // Funzione globale che accetta un parametro opzionale per il testo iniziale
+    function checkFieldsVisibility(initialSelectedText) {
+
+        // Recupera la DropDownList
+        var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+
+        // Checkbox e Label Forfait (ID dinamici)
+        var divFatturati = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+        var divOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+        const btnCopiaId = '<%= (FVProgetto.FindControl("CloneButton") != null) ? FVProgetto.FindControl("CloneButton").ClientID : "ID_NON_PRESENTE_CLONE_BUTTON" %>';
+
+        // 2. Usiamo jQuery per selezionare l'elemento SOLO SE l'ID non è quello fittizio.
+        // Se l'ID è fittizio (controllo non renderizzato), btnCopia sarà una collezione jQuery vuota.
+        var btnCopia = $('#' + btnCopiaId);
+
+        let selectedText;
+        if (initialSelectedText) {
+            // Se la funzione è stata chiamata dal C# (Edit mode), usa il parametro
+            selectedText = initialSelectedText;
+        } else {
+            // Se la funzione è chiamata dall'evento 'change' o dal ready in Insert mode
+            selectedText = ddlTipoProgetto.find('option:selected').text();
+        }
+
+        // Logica di visibilità: nascondi se è "Resale"
+        const shouldHide = (selectedText === 'Resale');
+
+        if (shouldHide) {
+            divOvertime.hide();
+            divFatturati.hide();
+            // Opzionale: Pulisci i valori
+            divOvertime.find('input, select').val('');
+            divFatturati.find('input, select').val('');
+            btnCopia.hide();
+        } else {
+            divOvertime.show();
+            divFatturati.show();
+            btnCopia.show();
+        }
+    }
+
+    $(function () {
+        // Recupera la DropDownList solo per l'evento change
+        var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
 
         // La chiamata iniziale (necessaria per la modalità Insert, dove il C# non la chiama)
         if (ddlTipoProgetto.length && ddlTipoProgetto.find('option:selected').text() !== 'Resale') {
@@ -1313,6 +1320,91 @@
             checkFieldsVisibility();
         });
     });
+
+    // Definizione delle costanti ID come STRINGHE, come avevi inteso, ma con la corretta sintassi ASP.NET
+    const TBRevenueBudgetId = '<%= FVProgetto.FindControl("TBRevenueBudget").ClientID %>';
+    const SpeseBudgetTextBoxId = '<%= FVProgetto.FindControl("SpeseBudgetTextBox").ClientID %>';
+    const TBMargineId = '<%= FVProgetto.FindControl("TBMargine").ClientID %>';
+    const RESALE_TEXT = 'Resale'; // Costante mancante definita
+
+    console.log(TBRevenueBudgetId);
+    console.log(SpeseBudgetTextBoxId);
+    console.log(TBMargineId);
+    console.log(RESALE_TEXT);
+
+    function calculateMargin() {
+    
+        // Seleziona gli elementi usando gli ID corretti
+        const $revenue = $('#' + TBRevenueBudgetId);
+        const $cost = $('#' + SpeseBudgetTextBoxId);
+        const $margin = $('#' + TBMargineId);
+        
+        console.log($revenue);
+        console.log($cost);
+        console.log($margin);
+
+        if ($revenue.length === 0 || $cost.length === 0 || $margin.length === 0) {
+            return; // Esci se i campi non sono stati renderizzati
+        }
+    
+        // Pulizia e conversione dei valori (sostituisci virgola con punto per parseFloat)
+        // Usiamo 0 in caso di NaN (campo vuoto o non numerico)
+        const revenueVal = parseFloat($revenue.val().replace(',', '.')) || 0;
+        const costVal = parseFloat($cost.val().replace(',', '.')) || 0;
+    
+        // Controlla che Ricavi e Costi siano numeri validi e che Ricavi non sia zero
+        if (revenueVal === 0) {
+            $margin.val('0,00'); 
+            return;
+        }
+
+        // Esegui il calcolo del margine (Formula: (Ricavi - Costi) / Ricavi * 100)
+        const marginRatio = (revenueVal - costVal) / revenueVal;
+    
+        // Formatta il risultato in percentuale con arrotondamento a 2 decimali e virgola
+        let marginPercent = (marginRatio * 100).toFixed(2); 
+    
+        // Scrivi il risultato nel campo Margine, sostituendo il punto decimale con la virgola
+        $margin.val(marginPercent.replace('.', ','));
+    }
+
+    // ***************************************************************
+    // V. BINDING CALCOLO MARGINE (Per il tipo 'resale')
+    // ***************************************************************
+    
+    // Recupera la DropDownList (assumendo sia disponibile dallo scope precedente o globale)
+    var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>'); 
+    
+    // Collega l'evento 'keyup' e 'change' per calcolare il margine in tempo reale
+    const $revenueField = $('#' + TBRevenueBudgetId);
+    const $costField = $('#' + SpeseBudgetTextBoxId);
+
+    // Funzione handler unica per Revenue e Costi
+    const marginCalculatorHandler = function() {
+        // Esegui il calcolo solo se il progetto è di tipo 'Resale'
+        if (ddlTipoProgetto.find('option:selected').text() === RESALE_TEXT) {        
+            console.log('marginCalculatorHandler');
+            calculateMargin();
+        }
+    };
+
+    // Controlla se i campi esistono prima di legare l'evento
+    if ($revenueField.length > 0 && $costField.length > 0) {
+        
+        $revenueField.on('keyup change', marginCalculatorHandler);
+        $costField.on('keyup change', marginCalculatorHandler);
+    }
+    
+    // Aggiorna anche l'handler principale per il cambio DDL, nel caso
+    // si passi da un altro tipo a 'Resale'
+    ddlTipoProgetto.on('change', function () {
+        
+        // Se si passa a 'Resale', esegui subito un primo calcolo
+        if ($(this).find('option:selected').text() === RESALE_TEXT) {
+            calculateMargin();
+        }
+    });
+
     </script>
 
 </body>
