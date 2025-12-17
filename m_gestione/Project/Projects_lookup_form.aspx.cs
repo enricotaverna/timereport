@@ -238,24 +238,25 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // DDL deve essere accessibile per controllare il tipo di progetto
             DropDownList ddlTipoProgetto = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
 
+            // DDL deve essere accessibile per controllare il tipo di progetto
+            DropDownList DDLTipoContratto = (DropDownList)FVProgetto.FindControl("DDLTipoContratto");
+
             // Se il progetto è attivo, esegue il calcolo e l'inserimento dei ratei
             if (chkAttivo.Checked)
             {
-
                 // 1. Recupera il codice appena inserito
                 projectCode = GetProjectCodeFromForm();
+            }
 
+            // INIZIO MODIFICA: Logica Redirect condizionale
+            if (ddlTipoProgetto != null && ddlTipoProgetto.SelectedItem.Text == "Resale" && DDLTipoContratto.SelectedItem.Text.ToLower() == "forfait")
+            {
                 // 2. Esegue il calcolo e ottiene la lista dei ratei
                 List<AccrualResult> accrualList = eseguiCalcoloCanone();
 
                 // 3. Salva i ratei nel DB, PASSANDO L'ID
                 InserisciAccrualNelDB(projectCode, accrualList);
 
-            }
-
-            // INIZIO MODIFICA: Logica Redirect condizionale
-            if (ddlTipoProgetto != null && ddlTipoProgetto.SelectedItem.Text == "Resale")
-            {
                 // Indice fisso del tab Monthly Fee (0-based, quindi 4 per il 5° tab)
                 const int MONTHLY_FEE_TAB_INDEX = 3;
 
