@@ -624,7 +624,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             costoTotale = 0.00M;
         }
 
-        List<AccrualResult> accrualList = AccrualCalculator.CalculateMonthlyAccrual(
+        List<AccrualResult> accrualList = CalculateMonthlyAccrual(
             dataInizio,
             dataFine,
             importoTotale,
@@ -654,98 +654,196 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         public int AccrualDays { get; set; }
     }
 
-    /// <summary>
-    /// Provides methods for calculating monthly accruals of revenue and cost over a specified date range.
-    /// </summary>
-    /// <remarks>This class is designed to calculate monthly accruals by distributing the total revenue and
-    /// cost  proportionally across the days in the specified date range. The calculation accounts for partial  months
-    /// at the start and end of the range, ensuring accurate allocation.</remarks>
-    public static class AccrualCalculator
+    public static List<AccrualResult> CalculateMonthlyAccrual(
+    DateTime startDate,
+    DateTime endDate,
+    decimal totalRevenue,
+    decimal totalCost)
     {
-        public static List<AccrualResult> CalculateMonthlyAccrual(
-        DateTime startDate,
-        DateTime endDate,
-        decimal totalRevenue,
-        decimal totalCost)
+        var results = new List<AccrualResult>();
+
+        int totalContractDays = (int)(endDate - startDate).TotalDays + 1;
+        if (totalContractDays <= 0) return results;
+
+        // Calcolo tassi giornalieri ad alta precisione
+        double dailyRevenueRateDouble = (double)totalRevenue / totalContractDays;
+        double dailyCostRateDouble = (double)totalCost / totalContractDays;
+
+        // Soglia: inizio del mese corrente
+        DateTime today = DateTime.Today;
+        DateTime currentMonthThreshold = new DateTime(today.Year, today.Month, 1);
+
+        decimal remainingRevenue = totalRevenue;
+        decimal remainingCost = totalCost;
+
+        // Accumulo per il pregresso
+        decimal accumulatedRevenue = 0;
+        decimal accumulatedCost = 0;
+
+        DateTime currentMonthStart = new DateTime(startDate.Year, startDate.Month, 1);
+
+        while (currentMonthStart <= endDate)
         {
-            var results = new List<AccrualResult>();
-            // ... (Calcolo totalContractDays e tassi giornalieri, rimasto invariato) ...
+            DateTime accrualStart = (currentMonthStart > startDate) ? currentMonthStart : startDate;
+            DateTime naturalMonthEnd = currentMonthStart.AddMonths(1).AddDays(-1);
+            DateTime accrualEnd = (naturalMonthEnd < endDate) ? naturalMonthEnd : endDate;
 
-            int totalContractDays = (int)(endDate - startDate).TotalDays + 1;
-            if (totalContractDays <= 0) return results;
+            int monthlyAccrualDays = (int)(accrualEnd - accrualStart).TotalDays + 1;
 
-            double dailyRevenueRateDouble = (double)totalRevenue / totalContractDays;
-            double dailyCostRateDouble = (double)totalCost / totalContractDays;
-
-            decimal dailyRevenueRate = Math.Round((decimal)dailyRevenueRateDouble, 4);
-            decimal dailyCostRate = Math.Round((decimal)dailyCostRateDouble, 4);
-
-            DateTime currentMonthStart = new DateTime(startDate.Year, startDate.Month, 1);
-            decimal remainingRevenue = totalRevenue;
-            decimal remainingCost = totalCost;
-            int remainingDays = totalContractDays;
-
-            while (currentMonthStart <= endDate)
+            if (monthlyAccrualDays > 0)
             {
-                // 3. Calcolo Finestra Temporale del Mese Corrente
+                decimal theoreticalMonthlyRevenue;
+                decimal theoreticalMonthlyCost;
 
-                // Data di inizio dell'accrual del mese: MAX tra la data di inizio contratto e l'inizio del mese
-                DateTime accrualStart = (currentMonthStart > startDate) ? currentMonthStart : startDate;
-
-                // Data di fine naturale del MESE (es. 30/11/2025)
-                // Uso AddDays(0) per gestire l'inizio/fine mese correttamente.
-                DateTime naturalMonthEnd = currentMonthStart.AddMonths(1).AddDays(-1);
-
-                // Data di fine dell'accrual del mese: MIN tra la fine del contratto e la fine naturale del mese
-                DateTime accrualEnd = (naturalMonthEnd < endDate) ? naturalMonthEnd : endDate;
-
-                // 4. Calcolo Giorni Effettivi di Accrual per il Mese
-                // Se accrualStart > accrualEnd, il risultato è 0
-                int monthlyAccrualDays = (int)(accrualEnd - accrualStart).TotalDays + 1;
-
-                // ... (resto del ciclo e assegnazione dei risultati, rimasto invariato) ...
-
-                if (monthlyAccrualDays > 0)
+                // 1. Calcolo del valore TEORICO del mese
+                if (currentMonthStart.Year == endDate.Year && currentMonthStart.Month == endDate.Month)
                 {
-                    decimal monthlyRevenue;
-                    decimal monthlyCost;
+                    theoreticalMonthlyRevenue = remainingRevenue;
+                    theoreticalMonthlyCost = remainingCost;
+                }
+                else
+                {
+                    theoreticalMonthlyRevenue = Math.Round((decimal)(monthlyAccrualDays * dailyRevenueRateDouble), 2);
+                    theoreticalMonthlyCost = Math.Round((decimal)(monthlyAccrualDays * dailyCostRateDouble), 2);
+                }
 
-                    // Logica per Bilanciare l'Errore di Arrotondamento all'Ultimo Mese
-                    if (currentMonthStart.Year == endDate.Year && currentMonthStart.Month == endDate.Month)
-                    {
-                        monthlyRevenue = remainingRevenue;
-                        monthlyCost = remainingCost;
-                    }
-                    else
-                    {
-                        monthlyRevenue = Math.Round((decimal)(monthlyAccrualDays * dailyRevenueRateDouble), 2);
-                        monthlyCost = Math.Round((decimal)(monthlyAccrualDays * dailyCostRateDouble), 2);
+                // 2. Gestione visualizzazione vs accumulo
+                if (currentMonthStart < currentMonthThreshold)
+                {
+                    // Accumulo ma non aggiungo alla lista
+                    accumulatedRevenue += theoreticalMonthlyRevenue;
+                    accumulatedCost += theoreticalMonthlyCost;
 
-                        remainingRevenue -= monthlyRevenue;
-                        remainingCost -= monthlyCost;
-                        remainingDays -= monthlyAccrualDays;
+                    // Sottraggo comunque dal residuo per mantenere il calcolo sincronizzato
+                    remainingRevenue -= theoreticalMonthlyRevenue;
+                    remainingCost -= theoreticalMonthlyCost;
+                }
+                else
+                {
+                    decimal displayRevenue = theoreticalMonthlyRevenue;
+                    decimal displayCost = theoreticalMonthlyCost;
+
+                    // Se è la prima riga visibile, aggiungo l'accumulato
+                    if (results.Count == 0)
+                    {
+                        displayRevenue += accumulatedRevenue;
+                        displayCost += accumulatedCost;
                     }
 
                     results.Add(new AccrualResult
                     {
                         Year = currentMonthStart.Year,
                         Month = currentMonthStart.Month,
-                        Revenue = monthlyRevenue,
-                        Cost = monthlyCost,
-
-                        DailyRevenueRate = dailyRevenueRate,
-                        DailyCostRate = dailyCostRate,
+                        Revenue = displayRevenue,
+                        Cost = displayCost,
+                        DailyRevenueRate = Math.Round((decimal)dailyRevenueRateDouble, 4),
+                        DailyCostRate = Math.Round((decimal)dailyCostRateDouble, 4),
                         AccrualDays = monthlyAccrualDays
                     });
+
+                    // Sottraggo dal residuo il valore teorico (l'accumulato è già stato sottratto prima)
+                    remainingRevenue -= theoreticalMonthlyRevenue;
+                    remainingCost -= theoreticalMonthlyCost;
                 }
-
-                // Passa al mese successivo
-                currentMonthStart = currentMonthStart.AddMonths(1);
             }
-
-            return results;
+            currentMonthStart = currentMonthStart.AddMonths(1);
         }
+
+        return results;
     }
+
+    ///// <summary>
+    ///// Provides methods for calculating monthly accruals of revenue and cost over a specified date range.
+    ///// </summary>
+    ///// <remarks>This class is designed to calculate monthly accruals by distributing the total revenue and
+    ///// cost  proportionally across the days in the specified date range. The calculation accounts for partial  months
+    ///// at the start and end of the range, ensuring accurate allocation.</remarks>
+    //public static class AccrualCalculator
+    //{
+    //    public static List<AccrualResult> CalculateMonthlyAccrual(
+    //    DateTime startDate,
+    //    DateTime endDate,
+    //    decimal totalRevenue,
+    //    decimal totalCost)
+    //    {
+    //        var results = new List<AccrualResult>();
+    //        // ... (Calcolo totalContractDays e tassi giornalieri, rimasto invariato) ...
+
+    //        int totalContractDays = (int)(endDate - startDate).TotalDays + 1;
+    //        if (totalContractDays <= 0) return results;
+
+    //        double dailyRevenueRateDouble = (double)totalRevenue / totalContractDays;
+    //        double dailyCostRateDouble = (double)totalCost / totalContractDays;
+
+    //        decimal dailyRevenueRate = Math.Round((decimal)dailyRevenueRateDouble, 4);
+    //        decimal dailyCostRate = Math.Round((decimal)dailyCostRateDouble, 4);
+
+    //        DateTime currentMonthStart = new DateTime(startDate.Year, startDate.Month, 1);
+    //        decimal remainingRevenue = totalRevenue;
+    //        decimal remainingCost = totalCost;
+    //        int remainingDays = totalContractDays;
+
+    //        while (currentMonthStart <= endDate)
+    //        {
+    //            // 3. Calcolo Finestra Temporale del Mese Corrente
+
+    //            // Data di inizio dell'accrual del mese: MAX tra la data di inizio contratto e l'inizio del mese
+    //            DateTime accrualStart = (currentMonthStart > startDate) ? currentMonthStart : startDate;
+
+    //            // Data di fine naturale del MESE (es. 30/11/2025)
+    //            // Uso AddDays(0) per gestire l'inizio/fine mese correttamente.
+    //            DateTime naturalMonthEnd = currentMonthStart.AddMonths(1).AddDays(-1);
+
+    //            // Data di fine dell'accrual del mese: MIN tra la fine del contratto e la fine naturale del mese
+    //            DateTime accrualEnd = (naturalMonthEnd < endDate) ? naturalMonthEnd : endDate;
+
+    //            // 4. Calcolo Giorni Effettivi di Accrual per il Mese
+    //            // Se accrualStart > accrualEnd, il risultato è 0
+    //            int monthlyAccrualDays = (int)(accrualEnd - accrualStart).TotalDays + 1;
+
+    //            // ... (resto del ciclo e assegnazione dei risultati, rimasto invariato) ...
+
+    //            if (monthlyAccrualDays > 0)
+    //            {
+    //                decimal monthlyRevenue;
+    //                decimal monthlyCost;
+
+    //                // Logica per Bilanciare l'Errore di Arrotondamento all'Ultimo Mese
+    //                if (currentMonthStart.Year == endDate.Year && currentMonthStart.Month == endDate.Month)
+    //                {
+    //                    monthlyRevenue = remainingRevenue;
+    //                    monthlyCost = remainingCost;
+    //                }
+    //                else
+    //                {
+    //                    monthlyRevenue = Math.Round((decimal)(monthlyAccrualDays * dailyRevenueRateDouble), 2);
+    //                    monthlyCost = Math.Round((decimal)(monthlyAccrualDays * dailyCostRateDouble), 2);
+
+    //                    remainingRevenue -= monthlyRevenue;
+    //                    remainingCost -= monthlyCost;
+    //                    remainingDays -= monthlyAccrualDays;
+    //                }
+
+    //                results.Add(new AccrualResult
+    //                {
+    //                    Year = currentMonthStart.Year,
+    //                    Month = currentMonthStart.Month,
+    //                    Revenue = monthlyRevenue,
+    //                    Cost = monthlyCost,
+
+    //                    DailyRevenueRate = dailyRevenueRate,
+    //                    DailyCostRate = dailyCostRate,
+    //                    AccrualDays = monthlyAccrualDays
+    //                });
+    //            }
+
+    //            // Passa al mese successivo
+    //            currentMonthStart = currentMonthStart.AddMonths(1);
+    //        }
+
+    //        return results;
+    //    }
+    //}
 
     /// <summary>
     /// Recupera il ProjectCode dalla TextBox nel FormView
