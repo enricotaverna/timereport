@@ -159,4 +159,16 @@
   <data name="ASSENZE" xml:space="preserve">
     <value>Assenze</value>
   </data>
+  <data name="confirm_delete_title" xml:space="preserve">
+    <value>Conferma cancellazione</value>
+  </data>
+  <data name="confirm_delete_record_message" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare questo record?</value>
+  </data>
+  <data name="confirm_delete_leave_message" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare questa richiesta di assenza?</value>
+  </data>
+  <data name="confirm_delete_button" xml:space="preserve">
+    <value>Elimina</value>  
+  </data>
 </root>

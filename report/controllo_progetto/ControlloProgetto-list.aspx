@@ -69,7 +69,7 @@
                             <Columns>
                                 <asp:TemplateField HeaderText="Stato">
                                     <ItemTemplate>
-                                        <asp:Image class="imageClass" ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="32px" ImageAlign="Middle" title='<%# Eval("ToolTip") %>' />
+                                        <asp:Image class="imageClass" ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="26px" ImageAlign="Middle" title='<%# Eval("ToolTip") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 

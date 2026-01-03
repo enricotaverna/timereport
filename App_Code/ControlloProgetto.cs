@@ -278,10 +278,26 @@ public class ControlloProgetto
 
             dr["BurnRate"] = dBurnRate;
 
-            // calcolo EAC
-            // se la data fine progetto è nel passato non lo calcola
-            dr["RevenueEAC"] = Math.Round(dRevenueACT + dBurnRate * giorniLavorativiRestanti, 2);
-            dr["WriteUpEAC"] = Math.Round(dRevenueBDG - dRevenueACT - giorniLavorativiRestanti * Convert.ToDouble(dr["BurnRate"]), 2);
+            // *** CALCOLO EAC CON ETC DA ProjectEconomics ***
+            int projectId = (int)dr["Projects_Id"];
+            string annoMeseReport = TBDataReport.ToString("yyyy-MM");
+            float etcFromDB = GetETCFromProjectEconomics(projectId, annoMeseReport);
+
+            // RevenueEAC: usa ETC se presente, altrimenti BurnRate
+            float revenueEAC;
+            if (etcFromDB > 0)
+            {
+                // Usa ETC da ProjectEconomics
+                revenueEAC = dRevenueACT + etcFromDB;
+            }
+            else
+            {
+                // Usa calcolo tradizionale con BurnRate
+                revenueEAC = dRevenueACT + (dBurnRate * giorniLavorativiRestanti);
+            }
+            
+            dr["RevenueEAC"] = Math.Round(revenueEAC, 2);
+            dr["WriteUpEAC"] = Math.Round(dRevenueBDG - revenueEAC, 2);
             dr["SpeseEAC"] = Math.Round(dSpeseACT + dSpeseBurnRate * giorniLavorativiRestanti, 2);
             dr["CostiEAC"] = Math.Round(dCostiACT + dCostiBurnRate * giorniLavorativiRestanti, 2);
             dr["MargineEAC"] = Math.Round( ( dRevenueBDG - Convert.ToDouble(dr["CostiEAC"]) ) / dRevenueBDG, 2);
@@ -306,6 +322,18 @@ public class ControlloProgetto
         return;
     }
 
+    // *** NUOVO METODO: Recupera ETC da ProjectEconomics per mesi futuri ***
+    private static float GetETCFromProjectEconomics(int projectId, string annoMeseReport)
+    {
+        string query = @"SELECT ISNULL(SUM(ETC), 0) as TotalETC
+                        FROM ProjectEconomics
+                        WHERE Projects_id = " + projectId + 
+                       " AND AnnoMese > '" + annoMeseReport + "'";
+
+        object result = Database.ExecuteScalar(query, null);
+        return result != DBNull.Value && result != null ? Convert.ToSingle(result) : 0f;
+    }
+
     /* lancia procedura di calcolo costi */
     public static DataSet CalcolaCosti( DateTime daData, int project_id, int overwrite) {
 
@@ -319,8 +347,8 @@ public class ControlloProgetto
 
         SqlParameter[] parameters = parametersList.ToArray();
 
-        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        DataSet result = Database.ExecuteStoredProcedure("REV2_HoursCostAndRevenueUpdate", parameters);
+        // Esecuzione della stored procedure con supporto margine mensile da ProjectEconomics
+        DataSet result = Database.ExecuteStoredProcedure("REV3_HoursCostAndRevenueUpdate", parameters);
         
         return result;
     }

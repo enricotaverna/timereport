@@ -48,8 +48,6 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     // salva valori dei controlli
     protected void RipristinaControlli()
     {
-        if (Session["DDLCpProgetto"] != null) DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
-        if (Session["DDLCpManager"] != null) DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
     }
 
     protected void Bind_DDLProgetti()
@@ -80,14 +78,20 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 
         SqlDataReader dr = cmd.ExecuteReader();
 
-        DDLProgetti.DataSource = dr;
         DDLProgetti.Items.Clear();
         DDLProgetti.Items.Add(new ListItem("--Tutti i progetti--", "0"));
         DDLProgetti.DataTextField = "Descrizione";
         DDLProgetti.DataValueField = "Projects_Id";
+        DDLProgetti.DataSource = dr;
         DDLProgetti.DataBind();
 
         conn.Close();
+        
+        // Ripristina il valore selezionato precedentemente dalla sessione
+        if (Session["DDLCpProgetto"] != null && DDLProgetti.Items.FindByValue(Session["DDLCpProgetto"].ToString()) != null)
+        {
+            DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
+        }
     }
 
     protected void DDLProgetti_SelectedIndexChanged(object sender, EventArgs e)
@@ -98,9 +102,11 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
    
     protected void DDLManager_DataBound(object sender, EventArgs e)
     {
-
-        // Cancellata, la selezione viene fatta in base ai progetti forzati
-
+        // Ripristina il valore selezionato precedentemente dalla sessione
+        if (Session["DDLCpManager"] != null && DDLManager.Items.FindByValue(Session["DDLCpManager"].ToString()) != null)
+        {
+            DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
+        }
     }
 
 }
