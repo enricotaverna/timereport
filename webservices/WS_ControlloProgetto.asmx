@@ -1,12 +1,14 @@
-<%@ WebService Language="C#" Class="WS_ControlloProgetto" %>
+﻿<%@ WebService Language="C#" Class="WS_ControlloProgetto" %>
 
 using System;
+using System.Web;
 using System.Web.Services;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json; // ✅ FIX Problema 1: Namespace per JsonConvert
 
 // Struttura dati per singolo mese Economics
 public class EconomicsMonthData 
@@ -21,9 +23,25 @@ public class EconomicsData
 {
     public int Projects_id { get; set; }
     public string AnnoMese { get; set; }
-    public decimal? ETC { get; set; }  // DECIMAL per importi monetari (precisione esatta)
-    public decimal? Margine { get; set; }  // DECIMAL per percentuali (precisione esatta)
+    public decimal? ETC { get; set; }
+    public decimal? Margine { get; set; }
     public string RecordToUpdate { get; set; }
+}
+
+// ✅ Classe per deserializzazione
+public class ProjectEconomicsRecord
+{
+    public int Projects_id { get; set; }
+    public string AnnoMese { get; set; }
+    public decimal? ETC { get; set; }
+    public decimal? Margine { get; set; }
+}
+
+// ✅ Classe per risposta save
+public class SaveResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; }
 }
 
 /// <summary>
@@ -95,14 +113,15 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                     row["AnnoMese"] = annoMese;
                     row["ETC"] = rdr.IsDBNull(rdr.GetOrdinal("ETC")) ? null : (object)rdr.GetDecimal(rdr.GetOrdinal("ETC"));
                     
-                    // Se Margine � NULL nella tabella, usa il default dal progetto
+                    // ✅ Se Margine è NULL nella tabella, usa il default dal progetto
                     if (rdr.IsDBNull(rdr.GetOrdinal("Margine")))
                     {
                         row["Margine"] = margineDefault.HasValue ? (object)margineDefault.Value : null;
                     }
                     else
                     {
-                        row["Margine"] = (object)rdr.GetDecimal(rdr.GetOrdinal("Margine"));
+                        // ✅ Moltiplica per 100 il margine dal DB (0.35 → 35)
+                        row["Margine"] = (object)(rdr.GetDecimal(rdr.GetOrdinal("Margine")) * 100);
                     }
                     
                     economicsData[annoMese] = row;
@@ -141,99 +160,57 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public AjaxCallResult SaveEconomicsData(string[] economicsTable)
+    public SaveResult SaveEconomicsData(string[] economicsTable)
     {
-        AjaxCallResult result = new AjaxCallResult();
-        CurrentSession = (TRSession)Session["CurrentSession"];
-        
-        JavaScriptSerializer js = new JavaScriptSerializer();
-        
-        if (economicsTable == null || economicsTable.Length == 0)
+        try
         {
-            result.Success = true;
-            result.Message = "Nessun dato da salvare";
-            return result;
-        }
-        
-        // Verifica autorizzazioni per Margine
-        bool canEditMargine = Auth.ReturnPermission("REPORT", "PROJECT_ALL");
-        
-        // Estrai Projects_id dal primo record
-        EconomicsData firstRecord = js.Deserialize<EconomicsData>(economicsTable[0]);
-        int projectsId = firstRecord.Projects_id;
-        
-        string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            connection.Open();
-            SqlTransaction transaction = connection.BeginTransaction();
+            CurrentSession = (TRSession)Session["CurrentSession"];
+            string userName = CurrentSession != null ? CurrentSession.UserName : "System";
             
-            try
+            string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
+            
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                // *** STEP 1: CANCELLA TUTTI I RECORD ESISTENTI PER QUESTO PROGETTO ***
-                string deleteQuery = "DELETE FROM ProjectEconomics WHERE Projects_id = @Projects_id";
-                SqlCommand deleteCmd = new SqlCommand(deleteQuery, connection, transaction);
-                deleteCmd.Parameters.AddWithValue("@Projects_id", projectsId);
-                deleteCmd.ExecuteNonQuery();
+                conn.Open();
                 
-                // *** STEP 2: INSERISCI SOLO LE RIGHE CON ALMENO UN VALORE ***
-                foreach (string item in economicsTable)
+                foreach (string jsonRecord in economicsTable)
                 {
-                    EconomicsData record = js.Deserialize<EconomicsData>(item);
+                    // ✅ FIX Problema 1: JsonConvert ora disponibile
+                    var record = JsonConvert.DeserializeObject<ProjectEconomicsRecord>(jsonRecord);
                     
-                    // Validazione formato AnnoMese
-                    if (string.IsNullOrEmpty(record.AnnoMese) || record.AnnoMese.Length != 7 || record.AnnoMese[4] != '-')
+                    string query = @"
+                        MERGE [MSSql12155].[ProjectEconomics] AS target
+                        USING (SELECT @Projects_id AS Projects_id, @AnnoMese AS AnnoMese) AS source
+                        ON target.Projects_id = source.Projects_id AND target.AnnoMese = source.AnnoMese
+                        WHEN MATCHED THEN
+                            UPDATE SET 
+                                ETC = @ETC, 
+                                Margine = @Margine / 100.0, 
+                                LastModificationDate = GETDATE(),
+                                LastModifiedBy = @User
+                        WHEN NOT MATCHED THEN
+                            INSERT (Projects_id, AnnoMese, ETC, Margine, CreationDate, CreatedBy)
+                            VALUES (@Projects_id, @AnnoMese, @ETC, @Margine / 100.0, GETDATE(), @User);";
+                    
+                    // ✅ FIX Problema 3: Usa SqlCommand invece di Database.ExecuteNonQuery
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        throw new Exception("Formato AnnoMese non valido: " + record.AnnoMese);
-                    }
-                    
-                    // Validazione ETC
-                    if (record.ETC.HasValue && (record.ETC.Value < 0 || Math.Round(record.ETC.Value, 2) != record.ETC.Value))
-                    {
-                        throw new Exception("ETC non valido: deve essere >= 0 con max 2 decimali");
-                    }
-                    
-                    // Validazione Margine
-                    if (record.Margine.HasValue && (Math.Round(record.Margine.Value, 2) != record.Margine.Value))
-                    {
-                        throw new Exception("Margine non valido: deve avere max 2 decimali");
-                    }
-                    
-                    // *** INSERISCI SOLO SE C'� ALMENO UN VALORE ***
-                    bool hasETC = record.ETC.HasValue;
-                    bool hasMargine = record.Margine.HasValue && canEditMargine;
-                    
-                    if (hasETC || hasMargine)
-                    {
-                        string insertQuery = @"INSERT INTO ProjectEconomics 
-                                             (Projects_id, AnnoMese, ETC, Margine, CreationDate, CreatedBy) 
-                                             VALUES (@Projects_id, @AnnoMese, @ETC, @Margine, @CreationDate, @CreatedBy)";
+                        cmd.Parameters.AddWithValue("@Projects_id", record.Projects_id);
+                        cmd.Parameters.AddWithValue("@AnnoMese", record.AnnoMese);
+                        cmd.Parameters.AddWithValue("@ETC", (object)record.ETC ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Margine", (object)record.Margine ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@User", userName); // ✅ FIX Problema 2
                         
-                        SqlCommand insertCmd = new SqlCommand(insertQuery, connection, transaction);
-                        insertCmd.Parameters.AddWithValue("@Projects_id", record.Projects_id);
-                        insertCmd.Parameters.AddWithValue("@AnnoMese", record.AnnoMese);
-                        insertCmd.Parameters.Add("@ETC", SqlDbType.Decimal).Value = record.ETC.HasValue ? (object)record.ETC.Value : DBNull.Value;
-                        insertCmd.Parameters.Add("@Margine", SqlDbType.Decimal).Value = (canEditMargine && record.Margine.HasValue) ? (object)record.Margine.Value : DBNull.Value;
-                        insertCmd.Parameters.Add("@CreationDate", SqlDbType.DateTime).Value = DateTime.Now;
-                        insertCmd.Parameters.AddWithValue("@CreatedBy", CurrentSession.UserId);
-                        
-                        insertCmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
-                    // Se entrambi NULL, non inserisce nulla (il mese user� i default)
                 }
-                
-                transaction.Commit();
-                result.Success = true;
-                result.Message = "Salvataggio completato con successo";
             }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                result.Success = false;
-                result.Message = "Errore durante il salvataggio: " + ex.Message;
-            }
+            
+            return new SaveResult { Success = true, Message = "Dati salvati con successo" };
         }
-        
-        return result;
+        catch (Exception ex)
+        {
+            return new SaveResult { Success = false, Message = ex.Message };
+        }
     }
 }

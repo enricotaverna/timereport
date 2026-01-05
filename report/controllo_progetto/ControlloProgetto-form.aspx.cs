@@ -51,7 +51,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
 
         // calcola i dati actual del progetto e popola l'oggeto EconomicsProgettoCorrente
-        ProgettoCorrente = new EconomicsProgetto(Session["DataReport"].ToString(), TProjects_Id.Value);
+        // La data di cutoff viene letta automaticamente dalla sessione all'interno del costruttore
+        ProgettoCorrente = new EconomicsProgetto(TProjects_Id.Value);
 
         // DATA PRIMO CARICO
         TextBox TBAttivoDa = (TextBox)FVProgetto.FindControl("TBAttivoDa");
@@ -97,9 +98,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
 
+        // Usa la data di cutoff dalla sessione
         GVConsulenti.DataSource = Database.GetData("SELECT DISTINCT Consulente, YEAR(Data) as Anno ,FORMAT(SUM(giorni) , 'N1', 'it-IT') as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost " +
                                                    "WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) +
-                                                   " AND Data <= " + ASPcompatility.FormatDateDb(Session["DataReport"].ToString())  +
+                                                   " AND Data <= " + ASPcompatility.FormatDatetimeDb(CurrentSession.dCutoffDate)  +
                                                    " GROUP BY Consulente, YEAR(Data), CostRate, BillRate", null);
 
          GVConsulenti.DataBind();
@@ -119,7 +121,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         GridView GVGGActuals = (GridView)FVProgetto.FindControl("GVGGActuals");
 
         parametersList.Add(new SqlParameter("@Project_id", Projects_id));
-        parametersList.Add(new SqlParameter("@DataReport", DateTime.Now));
+        // Usa la data di cutoff dalla sessione invece di DateTime.Now
+        parametersList.Add(new SqlParameter("@DataReport", CurrentSession.dCutoffDate));
         SqlParameter[] param = parametersList.ToArray();
 
         // Esecuzione della stored procedure e ottenimento del risultato come DataSet
@@ -178,7 +181,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
             //*** Worksheet con sintesi progetti
             parametersList.Add(new SqlParameter("@Project_id", TProjects_Id.Value));
-            parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime( DateTime.Now )));
+            // Usa la data di cutoff dalla sessione
+            parametersList.Add(new SqlParameter("@DataReport", CurrentSession.dCutoffDate));
             SqlParameter[] parameters = parametersList.ToArray();
             // Esecuzione della stored procedure e ottenimento del risultato come DataSet
             DataTable dtSintesi = Database.ExecuteStoredProcedure("SPcontrolloprogetti_giorniACT", parameters).Tables[0];

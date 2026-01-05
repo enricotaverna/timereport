@@ -543,13 +543,13 @@
             $('#FVProgetto_btnAnnulla').click(function () { MaskScreen(true); });
         });
 
-        // *** TABULATOR ECONOMICS ***
+        // *** TABULATOR ECONOMICS - VERSIONE SEMPLIFICATA ***
         var mustSaveEconomics = false;
         var economicsTable = null;
         var currentProjectId = 0;
         var canEditMargine = <%= Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL").ToString().ToLower() %>;
-        
-        // Recupera la data di cutoff dalla sessione
+
+// Recupera la data di cutoff dalla sessione
         var cutoffDate = new Date('<%= CurrentSession.dCutoffDate.ToString("yyyy-MM-dd") %>');
         var cutoffAnnoMese = cutoffDate.getFullYear() + "-" + ("0" + (cutoffDate.getMonth() + 1)).slice(-2);
 
@@ -582,14 +582,14 @@
             }
 
             var monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
-            
+
             // Calcola il mese successivo al cutoff (unico mese editabile)
             var cutoffDateCalc = new Date(cutoffAnnoMese + '-01');
             cutoffDateCalc.setMonth(cutoffDateCalc.getMonth() + 1);
             var nextMonthAfterCutoff = cutoffDateCalc.getFullYear() + '-' + ('0' + (cutoffDateCalc.getMonth() + 1)).slice(-2);
 
             // Filtra solo mesi fino al successivo del cutoff (incluso)
-            var filteredData = data.filter(function(item) {
+            var filteredData = data.filter(function (item) {
                 return item.AnnoMese <= nextMonthAfterCutoff;
             });
 
@@ -608,8 +608,16 @@
                     title: monthNames[monthIndex],
                     field: annoMese,
                     editor: "number",
-                    editorParams: { min: 0, step: 0.01 },
-                    editable: function(cell) {
+                    editorParams: {
+                        min: 0,
+                        max: function (cell) {
+                            // Limita a 100 solo per Margine
+                            return cell.getRow().getData().rowType === "Margine" ? 100 : undefined;
+                        },
+                        step: 0.01,
+                        selectContents: true
+                    },
+                    editable: function (cell) {
                         if (!isEditable) return false;
                         var rowType = cell.getRow().getData().rowType;
                         return rowType === "ETC" || (rowType === "Margine" && canEditMargine);
@@ -617,11 +625,15 @@
                     width: 80,
                     minWidth: 80,
                     headerSort: false,
-                    cellEdited: function (cell) { mustSaveEconomics = true; },
-                    formatter: function(cell) {
+                    cellEdited: function (cell) {
+                        mustSaveEconomics = true;
+                    },
+
+                    // Formatter per visualizzazione
+                    formatter: function (cell) {
                         var value = cell.getValue();
                         var rowType = cell.getRow().getData().rowType;
-                        
+
                         // Stile cella
                         var cellElement = cell.getElement();
                         if (!isEditable || (rowType === "Margine" && !canEditMargine)) {
@@ -631,40 +643,41 @@
                             cellElement.style.backgroundColor = "#ffffff";
                             cellElement.style.color = "#000000";
                         }
-                        
+
                         if (value === null || value === undefined || value === "") return "";
-                        
+
                         var numValue = parseFloat(value);
                         if (isNaN(numValue)) return value;
-                        
-                        // Formattazione
+
+                        // ETC: visualizza come numero normale
                         if (rowType === "ETC") {
                             var decimals = (numValue % 1 === 0) ? 0 : 2;
-                            return numValue.toLocaleString('it-IT', { 
-                                minimumFractionDigits: decimals, 
-                                maximumFractionDigits: decimals 
+                            return numValue.toLocaleString('it-IT', {
+                                minimumFractionDigits: decimals,
+                                maximumFractionDigits: decimals
                             });
                         }
-                        
+
+                        // Margine: visualizza come percentuale (già arriva come percentuale dal WebService)
                         if (rowType === "Margine") {
-                            return numValue.toLocaleString('it-IT', { 
-                                minimumFractionDigits: 2, 
-                                maximumFractionDigits: 2 
+                            return numValue.toLocaleString('it-IT', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
                             }) + " %";
                         }
-                        
+
                         return value;
                     }
                 });
             });
 
-            // Costruisci righe dati
+            // Costruisci righe dati (i valori arrivano già convertiti dal WebService)
             var etcRow = { rowType: "ETC" };
             var margineRow = { rowType: "Margine" };
 
             filteredData.forEach(function (item) {
                 etcRow[item.AnnoMese] = item.ETC;
-                margineRow[item.AnnoMese] = item.Margine;
+                margineRow[item.AnnoMese] = item.Margine; // Arriva già come percentuale (es. 35)
             });
 
             economicsTable = new Tabulator("#EconomicsTable", {
@@ -678,7 +691,6 @@
         }
 
         function SaveEconomicsData() {
-
             if (!mustSaveEconomics) {
                 ShowPopup("Nessuna modifica da salvare");
                 return;
@@ -689,24 +701,45 @@
                 return;
             }
 
-            var dataToPost = [];
+            // Mappa per aggregare ETC e Margine per mese
+            var monthlyData = {};
             var tableData = economicsTable.getData();
 
+            // Aggrega i dati per AnnoMese
             tableData.forEach(function (row) {
                 var rowType = row.rowType;
 
                 for (var key in row) {
                     if (key !== "rowType" && row.hasOwnProperty(key)) {
-                        var record = {
-                            Projects_id: currentProjectId,
-                            AnnoMese: key,
-                            ETC: rowType === "ETC" ? row[key] : null,
-                            Margine: rowType === "Margine" ? row[key] : null
-                        };
-                        dataToPost.push(JSON.stringify(record));
+                        // Inizializza record per questo mese se non esiste
+                        if (!monthlyData[key]) {
+                            monthlyData[key] = {
+                                Projects_id: currentProjectId,
+                                AnnoMese: key,
+                                ETC: null,
+                                Margine: null
+                            };
+                        }
+
+                        // Assegna valore al campo corretto (valori già in formato corretto)
+                        if (rowType === "ETC") {
+                            monthlyData[key].ETC = row[key];
+                        } else if (rowType === "Margine") {
+                            monthlyData[key].Margine = row[key]; // Valore percentuale (es. 35)
+                        }
                     }
                 }
             });
+
+            // Converti in array di stringhe JSON per il WebMethod
+            var dataToPost = [];
+            for (var annoMese in monthlyData) {
+                if (monthlyData.hasOwnProperty(annoMese)) {
+                    dataToPost.push(JSON.stringify(monthlyData[annoMese]));
+                }
+            }
+
+            console.log("Dati da salvare:", dataToPost); // DEBUG
 
             $.ajax({
                 type: "POST",
@@ -718,13 +751,14 @@
                     if (response.d.Success) {
                         ShowPopup(response.d.Message);
                         mustSaveEconomics = false;
-                        loadEconomicsTable();
+                        loadEconomicsTable(); // Ricarica tabella dopo salvataggio
                     } else {
                         ShowPopup("Errore: " + response.d.Message);
                     }
                 },
                 error: function (xhr, textStatus, errorThrown) {
                     ShowPopup("Errore server in salvataggio tabella");
+                    console.error("Dettagli errore:", xhr.responseText);
                 }
             });
         }

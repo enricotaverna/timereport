@@ -27,19 +27,15 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
             // recupera valori selezioni
             RipristinaControlli();
         }
-
-        // Default data
-        if (TBDataReport.Text == "")
-            TBDataReport.Text = CurrentSession.dCutoffDate.ToString("dd/MM/yyyy");
    
     }
 
     protected void sottometti_Click(object sender , System.EventArgs e ) {
 
-        // salva data report utilizzata nella gridview per il drill sulle revenue
-        Session["DataReport"] = TBDataReport.Text;
+        // Salva i parametri di ricerca in sessione per il drill sulle revenue
         Session["DDLCpProgetto"] = DDLProgetti.SelectedValue;
         Session["DDLCpManager"] = DDLManager.SelectedValue;
+        Session["DDLCpTipoContratto"] = DDLTipoContratto.SelectedValue;
         
         Response.Redirect("ControlloProgetto-list.aspx");
 
@@ -106,6 +102,12 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (Session["DDLCpManager"] != null && DDLManager.Items.FindByValue(Session["DDLCpManager"].ToString()) != null)
         {
             DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
+        }
+        
+        // Ripristina il valore tipo contratto dalla sessione
+        if (Session["DDLCpTipoContratto"] != null && DDLTipoContratto.Items.FindByValue(Session["DDLCpTipoContratto"].ToString()) != null)
+        {
+            DDLTipoContratto.SelectedValue = Session["DDLCpTipoContratto"].ToString();
         }
     }
 
