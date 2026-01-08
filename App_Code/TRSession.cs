@@ -152,7 +152,7 @@ public class TRSession
             " ( PV.visibilityCode = 'ALL' OR ( PV.visibilityCode = 'AEO' AND " + Company_id + " = 1  ) OR ( PV.visibilityCode = 'EXT' AND " + Company_id + " <> 1 ) ) ) " +
             "AND " +
             // progetti attivi e con data fine > data cutoff
-            "( PV.active = 1 AND PV.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + ") " +
+            "( PV.active = 1 AND PV.DataFine > " + ASPcompatility.FormatDatetimeDb(dCutoffDate) + " AND PV.DataFine >= " + dataOggiDb + ") " +
             "AND " +
             // progetto senza budget o con budget disponibile
             "(" +
