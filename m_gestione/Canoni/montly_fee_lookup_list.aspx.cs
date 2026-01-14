@@ -69,11 +69,34 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 
         DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
                                  "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, "+
-                                 "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager "+
+                                 "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
                                  "FROM Monthly_Fee "+
                                  "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id "+
-                                 "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " + sWhere + strQueryOrdering;
+                                 "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
+                                 "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " + sWhere + strQueryOrdering;
 
+    }
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            var drv = (System.Data.DataRowView)e.Row.DataItem;
+
+            // Trova i bottoni
+            LinkButton btnEdit = (LinkButton)e.Row.FindControl("SelectButton");
+            LinkButton btnDelete = (LinkButton)e.Row.FindControl("DeleteButton");
+
+            // Legge la descrizione del tipo contratto
+            string tipoContratto = drv["TipoContrattoDesc"] != DBNull.Value ? drv["TipoContrattoDesc"].ToString() : "";
+
+            // Logica: visibili solo se la descrizione contiene "forfait"
+            // Uso Equals o Contains a seconda di quanto vuoi essere restrittivo
+            bool isForfait = tipoContratto.ToLower().Contains("forfait");
+
+            if (btnEdit != null) btnEdit.Visible = isForfait;
+            if (btnDelete != null) btnDelete.Visible = isForfait;
+        }
     }
 
     // invia all form attività, progetto e fase. progetto e fase verranno utiizzati per inizializzare

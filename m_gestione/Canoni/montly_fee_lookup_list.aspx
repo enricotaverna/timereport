@@ -110,7 +110,8 @@
                     <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
                         DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                         AllowPaging="True" PageSize="12" DataKeyNames="Monthly_Fee_id,Projects_id"
-                        GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging">
+                        GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging"
+                        OnRowDataBound="GridView1_RowDataBound">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <PagerStyle CssClass="GV_footer" />
@@ -138,23 +139,23 @@
                                 DataFormatString="{0:C}"
                                 ItemStyle-HorizontalAlign="Left" />
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
-                            <%--<asp:TemplateField>
+                            <asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>--%>
-                            <%--<asp:TemplateField>
+                            </asp:TemplateField>
+                            <asp:TemplateField>
                                 <ItemTemplate>
                                     <asp:LinkButton ID="DeleteButton" runat="server" CommandName="Delete"><i class="fa fa-trash"></i></asp:LinkButton>
                                 </ItemTemplate>
-                            </asp:TemplateField>--%>
+                            </asp:TemplateField>
                             <%--<asp:BoundField DataField="Projects_id" HeaderText="Projectsid" Visible="True"
-                                SortExpression="Projects_id" />  --%>                          
+                                SortExpression="Projects_id" />    --%>                    
                         </Columns>
                     </asp:GridView>
 
                     <div class="buttons">
-                        <%--<asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" PostBackUrl="/timereport/m_gestione/canoni/montly_fee_lookup_form.aspx" />--%>
+                        <asp:Button ID="btn_crea" runat="server" Text="<%$ appSettings: CREATE_TXT %>" CssClass="orangebutton" PostBackUrl="/timereport/m_gestione/canoni/montly_fee_lookup_form.aspx" />
                         <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: CANCEL_TXT %>" CssClass="greybutton" PostBackUrl="/timereport/menu.aspx" />
                     </div>
                     <!--End buttons-->

@@ -51,10 +51,9 @@
                     <asp:FormView ID="FVCanoni" runat="server" DataKeyNames="Monthly_Fee_id" DataSourceID="DSCanoni"
                         DefaultMode="Insert" OnItemInserting="ItemInserting_FVCanoni"
                         OnItemUpdating="ItemUpdating_FVCanoni" OnItemInserted="ItemInserted_FVCanoni" class="StandardForm"
-                        OnItemUpdated="ItemUpdated_FVCanoni" OnModeChanging="ItemModeChanging_FVCanoni">
+                        OnItemUpdated="ItemUpdated_FVCanoni" OnModeChanging="ItemModeChanging_FVCanoni" OnDataBound="FVCanoni_DataBound">
 
-                        <EditItemTemplate>
-
+                        <InsertItemTemplate>
                             <div id="tabs">
 
                                 <ul>
@@ -68,37 +67,48 @@
                                         <div class="inputtext">Codice Canone: </div>
                                         <asp:TextBox ID="MonthlyCodeTextBox" runat="server" Text='<%# Bind("Monthly_Fee_Code") %>' Columns="15" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
                                         <!-- *** CHECK BOX  ***  -->
-                                        <asp:CheckBox ID="CheckBox1" runat="server" Checked='<%# Bind("active") %>' />
+                                        <asp:CheckBox ID="CheckBox1" runat="server" 
+                                            Checked='<%# (Eval("active") == DBNull.Value || Eval("active") == null) ? true : Convert.ToBoolean(Eval("active")) %>' />
                                         <asp:Label AssociatedControlID="CheckBox1" ID="Label3" runat="server">Attivo</asp:Label>
                                     </div>
 
                                     <!-- *** PROGETTO ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Progetto:</div>
-                                            <asp:DropDownList ID="DDLprogetto" Enabled="False" runat="server" AutoPostBack="True"
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" />
+                                        <div class="inputtext">Progetto (forfait):</div>
+                                        <asp:DropDownList ID="DDLprogetto" runat="server"
+                                            DataTextField="NomeProgetto"
+                                            DataValueField="Projects_Id"
+                                            AppendDataBoundItems="true"
+                                            AutoPostBack="False"
+                                            data-parsley-errors-container="#valMsg"
+                                            data-parsley-required="true">
+                                            <asp:ListItem Value="">-- Seleziona Progetto --</asp:ListItem>
+                                        </asp:DropDownList>
                                     </div>
 
                                     <div class="input nobottomborder">
                                         <!-- *** MANAGER ***  -->
-                                        <asp:Label CssClass="inputtext" AssociatedControlID="MangerTxt" ID="MangerLbl" runat="server">Manager:</asp:Label>
-                                        <asp:TextBox ID="MangerTxt" runat="server" Text='<%# Bind("NomeManager") %>' MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Width="270px" />
+                                        <asp:Label CssClass="inputtext" Visible="false" AssociatedControlID="MangerTxt" ID="MangerLbl" runat="server">Manager:</asp:Label>
+                                        <asp:TextBox ID="MangerTxt" runat="server" Visible="false" Text='<%# Bind("NomeManager") %>' MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Width="270px"/>
                                     </div>
 
                                     <div class="input nobottomborder">
                                         <!-- *** ANNO ***  -->
                                         <asp:Label CssClass="inputtext" AssociatedControlID="YearUPD" ID="Year" runat="server">Anno</asp:Label>
-                                        <asp:TextBox ID="YearUPD" runat="server" Text='<%# Bind("Year") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
-                                        
+                                        <asp:TextBox ID="YearUPD" runat="server" Text='<%# Bind("Year") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="True"
+                                            data-parsley-required="true"
+                                            data-parsley-type="digits"
+                                            data-parsley-errors-container="#valMsg" />
+
                                         <!-- *** Mese ***  -->
-                                        <asp:Label class="css-label" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
-                                        <asp:TextBox ID="MonthUPD" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+                                        <asp:Label class="css-label" Visible="false" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
+                                        <asp:TextBox ID="MonthUPD" Visible="false" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
                                     </div>
 
                                     <div class="input nobottomborder">
                                         <%--<!-- *** REVENUE *** --%>
 
-                                        <div class="inputtext" style="display: inline-block;"  AssociatedControlID="RevenueTxt" ID="RevenueLbl" runat="server">Revenue(€): </div>                                                                         
+                                        <div class="inputtext" style="display: inline-block;" associatedcontrolid="RevenueTxt" id="RevenueLbl" runat="server">Revenue(€): </div>
                                         <asp:TextBox
                                             ID="RevenueTxt"
                                             runat="server"
@@ -106,10 +116,12 @@
                                             Text='<%# Bind("Revenue") %>'
                                             Width="80px"
                                             AutoPostBack="False"
-                                            TextMode="SingleLine" 
-                                            style="display: inline-block;" />
+                                            TextMode="SingleLine"
+                                            Style="display: inline-block;"
+                                            data-parsley-required="true" 
+                                            data-parsley-errors-container="#valMsg" />
 
-                                        <div class="css-label" style="display: inline-block; padding: 0 0 0 30px" AssociatedControlID="CostTxt" ID="CostLbl" runat="server">Cost(€): </div>
+                                        <div class="css-label" style="display: inline-block; padding: 0 0 0 30px" associatedcontrolid="CostTxt" id="CostLbl" runat="server">Cost(€): </div>
                                         <asp:TextBox
                                             ID="CostTxt"
                                             runat="server"
@@ -117,18 +129,20 @@
                                             Text='<%# Bind("Cost") %>'
                                             Width="80px"
                                             AutoPostBack="False"
-                                            TextMode="SingleLine" 
-                                            style="display: inline-block;" />
+                                            TextMode="SingleLine"
+                                            Style="display: inline-block;" 
+                                            data-parsley-required="true" 
+                                            data-parsley-errors-container="#valMsg" />
                                     </div>
                                 </div>
-                               
+
                                 <!-- *** BOTTONI  ***  -->
                                 <div class="buttons">
                                     <div id="valMsg" class="parsley-single-error"></div>
-                                    <asp:Button ID="UpdateButton" runat="server" CssClass="orangebutton" CommandName="Update" Text="<%$ appSettings: SAVE_TXT %>" />
+                                    <asp:Button ID="InsertButton" runat="server" CssClass="orangebutton" CommandName="Insert" Text="<%$ appSettings: SAVE_TXT %>" />
                                     <asp:Button ID="UpdateCancelButton" runat="server" CssClass="greybutton" CommandName="Cancel" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                                 </div>
-                        </EditItemTemplate>
+                        </InsertItemTemplate>
 
                         <ItemTemplate>
                         </ItemTemplate>
@@ -157,23 +171,26 @@
         </footer>
     </div>
 
-    <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="DSCanoni" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,Projects.Projects_Id,[Year], [Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, Monthly_Fee.Projects_id as Projects_id, c.name as NomeManager FROM Monthly_Fee INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id WHERE ([Monthly_Fee_id] = @Monthly_Fee_id) ORDER BY Projects.ProjectCode,Monthly_Fee.Year "
-        UpdateCommand="UPDATE Monthly_Fee SET Year = @Year, Month = @Month, Revenue = @Revenue, Cost = @Cost, LastModifiedBy = @persons_Name, LastModificationDate = GETDATE()  WHERE (Monthly_Fee_id = @Monthly_Fee_id)">        
-        <SelectParameters>
-            <asp:QueryStringParameter Name="Monthly_Fee_id" QueryStringField="Monthly_Fee_id" Type="Int32" />
-        </SelectParameters>
-        <UpdateParameters>
+        InsertCommand="INSERT INTO Monthly_Fee (Projects_id, ProjectCode, Monthly_Fee_Code, Year, Month, Revenue, Cost, Active, CreatedBy, CreationDate) 
+                   VALUES (@Projects_id, @ProjectCode, @Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Active, @persons_Name, GETDATE())">
+        <InsertParameters>
+            <asp:Parameter Name="Projects_id" Type="Int32" />
+            <asp:Parameter Name="ProjectCode" Type="String" />
+            <asp:Parameter Name="Monthly_Fee_Code" Type="String" />
             <asp:Parameter Name="Year" Type="Int32" />
             <asp:Parameter Name="Month" Type="Int32" />
             <asp:Parameter Name="Revenue" Type="Decimal" />
             <asp:Parameter Name="Cost" Type="Decimal" />
+            <asp:Parameter Name="Active" Type="Boolean" />
             <asp:SessionParameter Name="persons_Name" SessionField="persons_Name" Type="String" />
-        </UpdateParameters>
+        </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSpersone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT Persons_id, Name, Active FROM Persons ORDER BY Name"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSProgetti" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT Projects_Id, ProjectCode + ' - ' + Name AS NomeProgetto FROM Projects WHERE Active = 1 ORDER BY ProjectCode"></asp:SqlDataSource>
 
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
