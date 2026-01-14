@@ -1,0 +1,291 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="MonthlyFeeReport.aspx.cs" Inherits="MonthlyFeeReport" %>
+
+<!DOCTYPE html>
+
+<!-- Javascript -->
+<script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/timereport/include/BTmenu/menukit.js"></script>
+<script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
+
+<!-- Jquery + parsley + datepicker  -->
+<script src="/timereport/include/jquery/jquery-1.9.0.min.js"></script>
+<script src="/timereport/include/parsley/parsley.min.js"></script>
+<script src="/timereport/include/parsley/it.js"></script>
+<script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
+<script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
+
+<!-- CSS-->
+<link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
+<link href="/timereport/include/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+
+<!-- ** stili per sumo dropdonw ** -->
+<style>
+    .custom-checkboxradio-label {
+        padding: .5em 1em !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+    }
+
+    .input {
+        line-height: 45px !important;
+    }
+
+    .SumoSelect {
+        width: 240px;
+    }
+
+    .StandardForm input {
+        margin: 4px; /* per formattazione export spese */
+    }
+</style>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <title>
+        <asp:Literal runat="server" Text="Esegui" /></title>
+</head>
+
+<body>
+
+    <!-- *** APPLICTION MENU *** -->
+    <div include-html="/timereport/include/BTmenu/BTmenuInclude<%= CurrentSession.UserLevel %>-<%= CurrentSession.Language %>.html"></div>
+
+    <!-- *** MAINWINDOW *** -->
+    <div class="container MainWindowBackground">
+
+        <form id="form1" runat="server">
+
+            <div class="row justify-content-center ">
+
+                <!--**** Riquadro navigazione ***-->
+                <div class="form-group row justify-content-center">
+                    <div class="col-9 RoundedBox" style="height: 110px">
+
+
+                        <div class="row mt-2 ms-2">
+                            <!-- margine per separare le righe -->
+                            <div class="col-3">
+                                <div style="position: absolute">
+                                    <!-- aggiunto per evitare il troncamento della dropdonwlist -->
+                                    <span>
+                                        <asp:ListBox ID="CBLProgetti" runat="server" SelectionMode="Multiple" DataTextField="txtcodes"
+                                            DataValueField="Projects_id"></asp:ListBox>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="btn-group" id="RBProgetti" role="group">
+                                    <asp:Button ID="btPrjAttivi" CommandName="btPrjAttivi" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="Attivi" />
+                                    <asp:Button ID="btPrjAll" CommandName="btPrjAll" runat="server" type="button" OnCommand="BottoniToggle" CausesValidation="False" Text="Tutti" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fine Row -->
+                </div>
+                <!-- Fine RoundedBox -->
+            </div>
+            <!-- *** Fine riquadro navigazione *** -->
+
+            <!--**** tabella principale ***-->
+            <div class="row justify-content-center pt-3">
+
+                <div id="FormWrap" class="StandardForm col-9">
+
+                    <div class="formtitle">Report</div>
+
+                    <div class="input nobottomborder" id="DivCliente" runat="server">
+                        <div class="inputtext">
+                            <asp:Literal runat="server" Text="cliente" />
+                        </div>
+
+                        <!-- per stile CSS -->
+                        <asp:DropDownList ID="DDLClienti" runat="server" DataSourceID="Clienti"
+                            DataTextField="coddes" DataValueField="CodiceCliente"
+                            AppendDataBoundItems="True" meta:resourcekey="DDLClientiResource1">
+                            <asp:ListItem Value="" Text="Selezionare un valore" meta:resourcekey="ListItemResource1" />
+                        </asp:DropDownList>
+
+                    </div>
+
+                    <div class="input nobottomborder" id="DivManager" runat="server">
+                        <div class="inputtext">Mngr o Account</div>
+
+                        <!-- per stile CSS -->
+                        <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="Manager"
+                            DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True" meta:resourcekey="DDLManagerResource1">
+                            <asp:ListItem Value="" Text="Selezionare un valore" meta:resourcekey="ListItemResource2" />
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="input nobottomborder" id="DivSocieta" runat="server">
+                        <div class="inputtext">
+                            <asp:Literal runat="server" Text="societa" />
+                        </div>
+                        <!-- per stile CSS -->
+                        <asp:DropDownList ID="DDLsocieta" runat="server" DataSourceID="societa"
+                            DataTextField="Name" DataValueField="Company_id"
+                            AppendDataBoundItems="True" meta:resourcekey="DDLsocietaResource1">
+                            <asp:ListItem Value="" Text="Selezionare un valore" meta:resourcekey="ListItemResource3" />
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="input" style="display: flex; align-items: center;">
+                        <div class="inputtext">
+                            <asp:Literal runat="server" Text="rangedate" />
+                        </div>
+
+                        <span style="position: relative; float: left">
+                            <asp:DropDownList runat="server" ID="DDLFromMonth" Width="170px"></asp:DropDownList>
+                        </span>
+
+                        <span style="position: relative; left: 10px; float: left; width: 100px">
+                            <asp:DropDownList runat="server" ID="DDLFromYear" Width="100px"></asp:DropDownList>
+                        </span>
+
+                        <span style="position: relative; left: 70px; float: left; width: 170px">
+                            <asp:DropDownList runat="server" ID="DDLToMonth" Width="170px"></asp:DropDownList>
+                        </span>
+
+                        <span style="position: relative; left: 80px; float: left; width: 100px">
+                            <asp:DropDownList runat="server" ID="DDLToYear" Width="100px"></asp:DropDownList>
+                        </span>
+
+                    </div>
+                    <div class="input nobottomborder mt-3 mb-4" style="overflow: hidden">
+                        <div class="inputtext">
+                            <asp:Literal runat="server" />
+                        </div>
+
+                        <span class="Inputcontent"
+                            style="position: relative; padding-top: 15px; border: 1px solid #C7C7C7; border-radius: 6px; margin-top: 10px; float: left; line-height: 24px">
+                            <span style="position: absolute; top: -10px; left: 5px; background-color: white; font-size: 10pt"><i class="fas fa-download" style="font-size: 1.2em;"></i>&nbspExport&nbsp</span>
+
+
+                            <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="1" Width="220px">
+                                <asp:ListItem Value="1" Text="Export"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </span>
+                        <span class="Inputcontent"
+                            style="position: relative; padding-top: 15px; border: 1px solid #C7C7C7; border-radius: 6px; margin-top: 10px; margin-left: 20px; float: left; line-height: 24px">
+                            <span style="position: absolute; top: -10px; left: 5px; background-color: white; font-size: 10pt"><i class="fas fa-chart-bar" style="font-size: 1.2em;"></i>&nbspReport&nbsp</span>
+
+                            <asp:RadioButtonList ID="RBTipoReport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="2" Width="380px">
+                                <asp:ListItem Value="3" Text="Totali per mese"></asp:ListItem>
+                            </asp:RadioButtonList>
+                        </span>
+
+                    </div>
+                    <div class="buttons">
+                        <asp:Button ID="BTexec" runat="server" Text="Esegui" CssClass="orangebutton" PostBackUrl="/timereport/report/Canoni/MonthlyFeeReport.aspx" OnClick="Sottometti_Click" CausesValidation="False" />
+                        <asp:Button ID="UpdateCancelButton" runat="server" CommandName="Cancel" CssClass="greybutton" Text="Cancella" OnClick="UpdateCancelButton_Click" formnovalidate />
+                    </div>
+
+                </div>
+                <%-- END FormWrap  --%>
+            </div>
+            <!-- END Row  -->
+
+        </form>
+
+    </div>
+    <!-- END MainWindow -->
+
+    <!-- *** FOOTER *** -->
+    <div class="container bg-light">
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="row">
+                <div class="col-md-4" id="WindowFooter-L">Aeonvis Spa <%= DateTime.Now.Year %></div>
+                <div class="col-md-4" id="WindowFooter-C">cutoff: <%= CurrentSession.sCutoffDate %></div>
+                <div class="col-md-4" id="WindowFooter-R"><%= CurrentSession.UserName  %></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Mask to cover the whole screen -->
+    <div id="mask"></div>
+
+    <!-- *** DATASOURCE *** -->
+    <asp:SqlDataSource ID="DSProgetti" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="***"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSPersone" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="*"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="DSTipoSpese" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>" SelectCommand="SELECT ExpenseType_Id, ExpenseCode + ' ' + Name AS Name FROM ExpenseType ORDER BY name"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="Clienti" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT [CodiceCliente], ([CodiceCliente] + ' ' + [Nome1]) as coddes FROM [Customers] WHERE ([FlagAttivo] = @FlagAttivo) ORDER BY [CodiceCliente]">
+        <SelectParameters>
+            <asp:Parameter DefaultValue="1" Name="FlagAttivo" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="societa" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT [Company_id], [Name] FROM [Company] ORDER BY [Name]"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="Manager" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT DISTINCT Persons.Persons_id, Persons.Name FROM Persons INNER JOIN Projects ON Persons.Persons_id = Projects.ClientManager_id WHERE (Persons.Active = @Active) ORDER BY Persons.Name">
+        <SelectParameters>
+            <asp:Parameter DefaultValue="1" Name="Active" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+
+    <!-- *** JAVASCRIPT *** -->
+    <script>
+
+        // include di snippet html per menu and background color mgt
+        includeHTML();
+        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        $(window).bind("pageshow", function (event) {
+            if (event.originalEvent.persisted) {
+                window.location.reload()
+            }
+        });
+
+        $(function () {
+
+            // reset cursore e finestra modale
+            //document.body.style.cursor = 'default';
+            //$('#mask').css({ 'width': 0, 'height': 0 });
+
+            // imposta css della listbox
+            $('#CBLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Progetti' });
+            $('#DDLClienti').SumoSelect({ placeholder: 'Selezionare un valore', search: true });
+            $('#DDLManager').SumoSelect({ placeholder: 'Selezionare un valore', search: true });
+            $('#DDLsocieta').SumoSelect({ placeholder: 'Selezionare un valore', search: true });
+
+            $('#CBLProgetti')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
+
+            // cancella selezione dei radiobutton in caso sia stato selezionato l'altro gruppo
+            $("#RBTipoExport").on('change', function () {
+                $("input[name=RBTipoReport]").prop('checked', false);
+            })
+
+            $("#RBTipoReport").on('change', function () {
+                $("input[name=RBTipoExport]").prop('checked', false);
+            })
+
+            $("#BTexec").click(function () {
+
+                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2)
+                    return;
+
+                MaskScreen(true);
+
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

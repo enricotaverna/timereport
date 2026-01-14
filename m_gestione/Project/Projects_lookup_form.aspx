@@ -64,6 +64,7 @@
                                     <li><a href="#tabs-1">Progetto</a></li>
                                     <li><a href="#tabs-2">Budget</a></li>
                                     <li><a href="#tabs-4">Altri dati</a></li>
+                                    <li style="display:none"><a href="#tabs-5">Monthly fee</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 460px; width: 100%">
@@ -198,7 +199,7 @@
                                         <div class="inputtext">Tipo progetto:</div>
                                         <asp:DropDownList ID="DDLTipoProgetto" runat="server" DataSourceID="tipoprogetto"
                                             DataTextField="Name" DataValueField="ProjectType_Id" AppendDataBoundItems="True"
-                                            SelectedValue='<%# Bind("ProjectType_Id") %>'
+                                            SelectedValue='<%# Bind("ProjectType_Id") %>' 
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
@@ -217,7 +218,7 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>€</label>
@@ -225,7 +226,7 @@
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
@@ -244,7 +245,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext"></div>
                                         <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime"></asp:Label>
+                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
 
                                     </div>
 
@@ -309,6 +310,77 @@
                                 </div>
                                 <!-- *** TAB 4 ***  -->
 
+                                <!-- *** TAB 5 ***  -->
+                                <div id="tabs-5" style="height: 460px; width: 100%;">
+                                    <div class="input nobottomborder" style="display: flex; align-items: center; gap: 10px;">
+                                        <asp:Label class="css-label" Style="padding: 0px 5px 0px 0px;" AssociatedControlID="TextBox2" ID="Label2" runat="server">Progetto</asp:Label>
+
+                                        <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("ProjectCode") %>' Width="100" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+
+                                        <div style="flex:auto ; padding: 2px; display: flex; flex-direction: column; min-height: 28px;" id="pnlMessage" runat="server">
+
+                                            <asp:Label class="css-label" ID="LblRevenueAlert" runat="server" Font-Bold="true" Font-Size="X-Small"
+                                                Style="white-space: nowrap; margin: 0; padding: 0; line-height: 1.1;" />
+
+                                            <asp:Label class="css-label" ID="LblCostAlert" runat="server" Font-Bold="true" Font-Size="X-Small"
+                                                Style="white-space: nowrap; margin: 0; padding: 0; line-height: 1.1;" />
+                                        </div>
+
+                                        <asp:Button
+                                            ID="btnRigenera"
+                                            runat="server"
+                                            CausesValidation="False"
+                                            CssClass="orangebutton"
+                                            Text="Rigenera"
+                                            OnClick="btnRigenera_Click"
+                                            OnClientClick="return confirm('Sei sicuro di voler rigenerare i dati? Questa operazione potrebbe sovrascrivere i ratei esistenti.');" />
+                                    </div>
+                                    <div id="DivScrollableGrid" style="height: 90%; overflow: auto;">
+                                        <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" 
+                                            AutoGenerateColumns="False" DataSourceID="DSCanoni" CssClass="GridView" 
+                                            AllowPaging="False" auto DataKeyNames="Monthly_Fee_id,Projects_id"
+                                            GridLines="None" EnableModelValidation="True"
+                                            OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
+                                            OnPageIndexChanging="GridView1_PageIndexChanging" 
+                                            OnRowDataBound="GridView1_RowDataBound"
+                                            ShowFooter="true" >
+                                            <FooterStyle CssClass="GV_footer" Font-Bold="true" ForeColor="#777777" Font-Size="Medium" />
+                                            <RowStyle Wrap="False" CssClass="GV_row" />
+                                            <PagerStyle CssClass="GV_footer" />
+                                            <HeaderStyle CssClass="GV_header" />
+                                            <AlternatingRowStyle CssClass="GV_row_alt " />
+                                            <Columns>
+                                                <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
+                                                <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
+                                                <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" Visible="false" />
+                                                <asp:BoundField 
+                                                    DataField="Revenue" 
+                                                    HeaderText="Revenue(€)" 
+                                                    ReadOnly="True" 
+                                                    SortExpression="Revenue" 
+                                                    DataFormatString="{0:C}" 
+                                                    ItemStyle-HorizontalAlign="Left" />
+                                                <asp:BoundField 
+                                                    DataField="Cost" 
+                                                    HeaderText="Cost(€)" 
+                                                    ReadOnly="True" 
+                                                    SortExpression="Cost" 
+                                                    DataFormatString="{0:C}"
+                                                    ItemStyle-HorizontalAlign="Left" />
+
+                                                <asp:TemplateField>
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton Visible="false" ID="SelectButton" runat="server" CommandName="Select"><i class="fa fa-edit"></i></asp:LinkButton>
+                                                    </ItemTemplate>
+                                                </asp:TemplateField>
+                                            </Columns>
+                                        </asp:GridView>
+                                    </div>
+
+                                   
+                                </div>
+                                <!-- *** TAB 5 ***  -->
+
                             </div>
                             <!-- *** TABS ***  -->
 
@@ -339,7 +411,7 @@
                                         <div class="inputtext">Codice: </div>
                                         <asp:TextBox ID="TBProgetto" runat="server" class="ASPInputcontent" Text='<%# Bind("ProjectCode") %>' Columns="12" MaxLength="10"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-trigger-after-failure="focusout" data-parsley-codiceUnico="" />
-                                        <asp:CheckBox ID="ActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>' />
+                                        <asp:CheckBox ID="ActiveCheckBox" runat="server" Checked='<%# Bind("Active") %>'/>
                                         <asp:Label AssociatedControlID="ActiveCheckBox" class="css-label" ID="Label3" runat="server" Text="attivo"></asp:Label>
                                     </div>
 
@@ -467,7 +539,7 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>€</label>
@@ -475,8 +547,8 @@
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
-                                        <asp:TextBox ID="TextBox4" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
+                                        <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:#####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-type="number" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
@@ -494,7 +566,7 @@
                                     <div class="input nobottomborder">
                                         <div class="inputtext"></div>
                                         <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label9" runat="server" Text="No Overtime"></asp:Label>
+                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
 
                                     </div>
 
@@ -711,13 +783,13 @@
 
                                     <!-- *** IMPORTO REVENUE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Revenue: </div>
+                                        <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget") %>' Enabled="False" />
                                     </div>
 
                                     <!-- *** IMPORTO SPESE ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Spese: </div>
+                                        <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget") %>' Enabled="False" />
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
@@ -963,147 +1035,376 @@
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT *, WorkflowType + ' : ' + Description as WFDescription FROM [WF_WorkflowType]"></asp:SqlDataSource>
 
+    <asp:SqlDataSource ID="DSCanoni" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [Monthly_Fee] WHERE ProjectCode = @ProjectCode"
+        DeleteCommand="UPDATE Monthly_Fee SET Active = 0, InactiveBy = @persons_Name, LastModificationDate = GETDATE() WHERE (Monthly_Fee_id = @Monthly_Fee_id)">
+        <SelectParameters>
+            <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
+                Type="String" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
 
-        // include di snippet html per menu and background color mgt
-        includeHTML();
-        InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+    // include di snippet html per menu and background color mgt
+    includeHTML();
+    InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
-        $('select').SumoSelect({ search: true, searchText: '' });
+    $('select').SumoSelect({ search: true, searchText: '' });
 
-        // *** attiva validazione campi form
-        $('#formProgetto').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
-        });
+    // *** attiva validazione campi form
+    $('#formProgetto').parsley({
+        excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+    });
 
-        // *** messaggio di default
-        Parsley.addMessages('it', {
-            required: "Completare i campi obbligatori"
-        });
+    // *** messaggio di default
+    Parsley.addMessages('it', {
+        required: "Completare i campi obbligatori"
+    });
 
-        // se cambia selezione della DDL e non chargeable resetta il valore della lob
-        $("#FVProgetto_DDLTipoProgetto").change(function () {
-            if ($("#FVProgetto_DDLTipoProgetto option:selected").val() != "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>") // mostra Box Testo
-            {
-                $('#FVProgetto_DDLLOB').val('');
+    // se cambia selezione della DDL e non chargeable resetta il valore della lob
+    $("#FVProgetto_DDLTipoProgetto").change(function () {
+        if ($("#FVProgetto_DDLTipoProgetto option:selected").val() != "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>") // mostra Box Testo
+        {
+            $('#FVProgetto_DDLLOB').val('');
+        }
+
+        // prendo il valore testo della ddltipoprogetto
+        var selectedText = $("#FVProgetto_DDLTipoProgetto option:selected").text();
+
+        // 2. NUOVA LOGICA: Modifica del testo del DIV
+        // Nota: l'ID del DIV target è FVProgetto_lbRevenueBudgetTextBox
+        var $revenueHeaderDiv = $('#lbRevenueBudget');
+        var $costHeaderDiv = $('#lbSpeseBudgetTextBox');
+
+        // Checkbox e Label Forfait (ID dinamici)
+        var $forfaitLabel = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+        var $CBNoOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+        console.log($CBNoOvertime);
+
+        if ($revenueHeaderDiv.length) { // Controlla che l'elemento esista
+
+            if (selectedText === "Resale") {
+                // Se è "resale", imposta il testo su "Ricavi: "
+                $revenueHeaderDiv.text('Ricavi: ');
+                $costHeaderDiv.text('Costi: ')
+                $CBNoOvertime.hide();
+                $forfaitLabel.hide();
+
+            } else {
+                // Altrimenti, imposta il testo su "Revenue: "
+                $revenueHeaderDiv.text('Revenue: ');
+                $costHeaderDiv.text('Spese: ');
+                $CBNoOvertime.show();
+                $forfaitLabel.show();
             }
-        });
+        }
+    });
 
-        // *** se tipo progetto è Chargeable il cliente è obbligatorio
-        window.Parsley.addValidator("checkChargeable", {
-            validateString: function (value, requirement) {
+    // *** se tipo progetto è Chargeable il cliente è obbligatorio
+    window.Parsley.addValidator("checkChargeable", {
+        validateString: function (value, requirement) {
 
-                if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
+            if ($("#FVProgetto_DDLTipoProgetto option:selected").val() == "<%=ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] %>" && value == "") {
+                return false;
+            }
+        }
+    }).addMessage('en', 'checkChargeable', 'Please specify a lob and customer code')
+        .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
+
+
+    // *** controllo che non esista lo stesso codice utente *** //
+    window.Parsley.addValidator('codiceunico', {
+        validateString: function (value, requirement) {
+            return CheckCodiceUnico(value, requirement);
+        },
+        messages: {
+            en: 'Project code already exists',
+            it: 'Codice progetto già esistente'
+        }
+    });
+
+    // validazione campo revenue in caso il progetto sia FORFAIT
+    window.Parsley.addValidator("requiredIf", {
+        validateString: function (value, requirement) {
+
+            value = value.toString().replace(',', '.');
+
+            // se inserito deve essere un numero
+            if (isNaN(value) && !!value) {
+                window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                return false;
+            }
+
+            if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
+
+                // se FIXED verifica obbligatorietà
+                if (!value && requirement != "percent") {
+                    window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
                     return false;
                 }
-            }
-        }).addMessage('en', 'checkChargeable', 'Please specify a lob and customer code')
-            .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
 
-
-        // *** controllo che non esista lo stesso codice utente *** //
-        window.Parsley.addValidator('codiceunico', {
-            validateString: function (value, requirement) {
-                return CheckCodiceUnico(value, requirement);
-            },
-            messages: {
-                en: 'Project code already exists',
-                it: 'Codice progetto già esistente'
-            }
-        });
-
-        // validazione campo revenue in caso il progetto sia FORFAIT
-        window.Parsley.addValidator("requiredIf", {
-            validateString: function (value, requirement) {
-
-                value = value.toString().replace(',', '.');
-
-                // se inserito deve essere un numero
-                if (isNaN(value) && !!value) {
-                    window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                    return false;
-                }
-
-                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
-
-                    // se FIXED verifica obbligatorietà
-                    if (!value && requirement != "percent") {
-                        window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
+                // se number verifica tipo
+                if (requirement == "number")
+                    if (!isNaN(value)) //  compilato e numerico
+                        return true;
+                    else {
+                        window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
                         return false;
                     }
-
-                    // se number verifica tipo
-                    if (requirement == "number")
-                        if (!isNaN(value)) //  compilato e numerico
-                            return true;
-                        else {
-                            window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
-                            return false;
-                        }
-                }
-
-                return true;
-            },
-            priority: 33
-        });
-
-        $(function () {
-
-            // abilitate tab view
-            $("#tabs").tabs();
-
-            // stile checkbox form    
-            $(":checkbox").addClass("css-checkbox");
-
-            // stile checkbox form in ReadOnly   
-            $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
-            $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
-
-            $("#FVProgetto_DisActivityOn").attr("disabled", true);
-            $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
-            $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
-
-            // datepicker
-            $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
-            $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
-
-            // formatta il campo percentuale
-            var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
-
-            if (percentDecimal != "") {
-                var percentCent = Math.round(parseFloat(percentDecimal) * 10000) / 100;
-                percentCent = percentCent.toString().replace(".", ",");
-                $("#FVProgetto_TBMargine").val(percentCent);
             }
 
-            // in modifica posizione icona del log modifiche
-            if ($("#FVProgetto_TBProgetto").val() != "" )
-                $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
+            return true;
+        },
+        priority: 33
+    });
 
-            // Optional: Add CSS to style the icon
-            $(".icon-link").css({
-                "float": "right",
-                "margin-right": "10px",
-                "color": "white",
-                "font-size": "20px",
-                "text-decoration": "none"
-            });
+    $(function () {
 
-            // Optional: Add click event handler for the icon
-            $(".icon-link").click(function (event) {
-                event.preventDefault();
-                var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
-                if (projectsId !== '')
-                    {
-                    var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
-                    window.location.href = logUrl;
-                    }                
-            });
+        // abilitate tab view
+        $("#tabs").tabs();
+
+        // stile checkbox form    
+        $(":checkbox").addClass("css-checkbox");
+
+        // stile checkbox form in ReadOnly   
+        $("#FVProgetto_DisActivityOn").addClass("css-checkbox");
+        $("#FVProgetto_DisSpeseForfaitCheckBox").addClass("css-checkbox");
+        $("#FVProgetto_DisActiveCheckBox").addClass("css-checkbox");
+        $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").addClass("css-checkbox");
+
+        $("#FVProgetto_DisActivityOn").attr("disabled", true);
+        $("#FVProgetto_DisSpeseForfaitCheckBox").attr("disabled", true);
+        $("#FVProgetto_DisActiveCheckBox").attr("disabled", true);
+        $("#FVProgetto_DisBloccoCaricoSpeseCheckBox").attr("disabled", true);
+
+        // datepicker
+        $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
+        $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
+
+        // formatta il campo percentuale
+        var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
+
+        if (percentDecimal != "") {
+            var percentCent = Math.round(parseFloat(percentDecimal) * 10000) / 100;
+            percentCent = percentCent.toString().replace(".", ",");
+            $("#FVProgetto_TBMargine").val(percentCent);
+        }
+
+        // in modifica posizione icona del log modifiche
+        if ($("#FVProgetto_TBProgetto").val() != "")
+            $(".ui-widget-header").append('<a href="#" class="icon-link"><i class="fa fa-cog"></i></a>');
+
+        // Optional: Add CSS to style the icon
+        $(".icon-link").css({
+            "float": "right",
+            "margin-right": "10px",
+            "color": "white",
+            "font-size": "20px",
+            "text-decoration": "none"
         });
+
+        // Optional: Add click event handler for the icon
+        $(".icon-link").click(function (event) {
+            event.preventDefault();
+            var projectsId = '<%= Session["Projects_Id"] != null ? Session["Projects_Id"].ToString() : string.Empty %>';
+            if (projectsId !== '') {
+                var logUrl = "/timereport/m_utilita/AuditLog.aspx?RecordId=" + projectsId + "&TableName=Projects&ProjectCode=<%=Request.QueryString["ProjectCode"] %>&TYPE=U&key=<Projects_id=" + projectsId + ">";
+                window.location.href = logUrl;
+            }
+        });
+        
+    });
+
+    $(document).ready(function () {
+        // Seleziona la DropDownList usando l'ID che finisce per DDLTipoProgetto
+        const ddlTipoProgetto = $("[id$=DDLTipoProgetto]");
+        // Seleziona l'elemento LI (il link del tab)
+        const tab5Link = ddlTipoProgetto.closest('#tabs').find('ul li a[href="#tabs-5"]').parent('li');
+        // Seleziona l'elemento DIV (il contenuto del tab)
+        const tab5Content = $('#tabs-5');
+
+        // --- FUNZIONE PER CONTROLLARE E MOSTRARE/NASCONDERE IL TAB ---
+        function checkAndToggleTab5() {
+            // *** PUNTO CHIAVE: Ottieni il TESTO dell'opzione selezionata ***
+            const testoSelezionato = ddlTipoProgetto.find('option:selected').text();
+
+            // Sostituisci 'TESTO_SPECIFICO' con il testo esatto del tipo di progetto
+            // che deve essere selezionato per mostrare il tab.
+            const testoDesiderato = 'Resale';
+
+            if (testoSelezionato === testoDesiderato) {
+                // MOSTRA IL TAB
+                tab5Link.show();
+            } else {
+                // NASCONDI IL TAB
+                tab5Link.hide();
+                tab5Content.hide();
+
+                // Opzionale: se il tab 5 è attivo, forziamo il passaggio al tab 1
+                // Questo è utile per evitare che si veda la pagina vuota.
+                if (tab5Link.hasClass('ui-tabs-active')) { // Verifica se il tab era attivo (dipende dalla libreria tabs)
+                    // Solitamente si simula un click sul primo tab, o si usa il metodo della libreria UI
+                    // Esempio per jQuery UI Tabs (ipotizzando sia in uso):
+                    $("#tabs").tabs("option", "active", 0);
+                }
+            }
+        }
+
+        // 1. Esegui il controllo all'avvio della pagina
+        checkAndToggleTab5();
+
+        // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
+        ddlTipoProgetto.on('change', function () {
+            checkAndToggleTab5();
+        });
+    });
+
+    // Funzione globale che accetta un parametro opzionale per il testo iniziale
+    function checkFieldsVisibility(initialSelectedText) {
+
+        // Recupera la DropDownList
+        var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+
+        // Checkbox e Label Forfait (ID dinamici)
+        var divFatturati = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
+        var divOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
+        const btnCopiaId = '<%= (FVProgetto.FindControl("CloneButton") != null) ? FVProgetto.FindControl("CloneButton").ClientID : "ID_NON_PRESENTE_CLONE_BUTTON" %>';
+
+        // 2. Usiamo jQuery per selezionare l'elemento SOLO SE l'ID non è quello fittizio.
+        // Se l'ID è fittizio (controllo non renderizzato), btnCopia sarà una collezione jQuery vuota.
+        var btnCopia = $('#' + btnCopiaId);
+
+        let selectedText;
+        if (initialSelectedText) {
+            // Se la funzione è stata chiamata dal C# (Edit mode), usa il parametro
+            selectedText = initialSelectedText;
+        } else {
+            // Se la funzione è chiamata dall'evento 'change' o dal ready in Insert mode
+            selectedText = ddlTipoProgetto.find('option:selected').text();
+        }
+
+        // Logica di visibilità: nascondi se è "Resale"
+        const shouldHide = (selectedText === 'Resale');
+
+        if (shouldHide) {
+            divOvertime.hide();
+            divFatturati.hide();
+            // Opzionale: Pulisci i valori
+            divOvertime.find('input, select').val('');
+            divFatturati.find('input, select').val('');
+            btnCopia.hide();
+        } else {
+            divOvertime.show();
+            divFatturati.show();
+            btnCopia.show();
+        }
+    }
+
+    $(function () {
+        // Recupera la DropDownList solo per l'evento change
+        var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
+
+        // La chiamata iniziale (necessaria per la modalità Insert, dove il C# non la chiama)
+        if (ddlTipoProgetto.length && ddlTipoProgetto.find('option:selected').text() !== 'Resale') {
+            // Chiama la funzione solo se non è 'Resale', altrimenti sarà chiamata dal C#
+            // o se si è in modalità Insert.
+            checkFieldsVisibility();
+        }
+
+        // 2. Esegui il controllo ogni volta che il valore della DropDownList cambia
+        ddlTipoProgetto.on('change', function () {
+            // Chiamata senza parametro, che usa il valore corrente della combo
+            checkFieldsVisibility();
+        });
+    });
+
+    // Definizione delle costanti ID come STRINGHE, come avevi inteso, ma con la corretta sintassi ASP.NET
+    const TBRevenueBudgetId = '<%= FVProgetto.FindControl("TBRevenueBudget").ClientID %>';
+    const SpeseBudgetTextBoxId = '<%= FVProgetto.FindControl("SpeseBudgetTextBox").ClientID %>';
+    const TBMargineId = '<%= FVProgetto.FindControl("TBMargine").ClientID %>';
+    const RESALE_TEXT = 'Resale'; // Costante mancante definita
+
+    console.log(TBRevenueBudgetId);
+    console.log(SpeseBudgetTextBoxId);
+    console.log(TBMargineId);
+    console.log(RESALE_TEXT);
+
+    function calculateMargin() {
+    
+        // Seleziona gli elementi usando gli ID corretti
+        const $revenue = $('#' + TBRevenueBudgetId);
+        const $cost = $('#' + SpeseBudgetTextBoxId);
+        const $margin = $('#' + TBMargineId);
+        
+        console.log($revenue);
+        console.log($cost);
+        console.log($margin);
+
+        if ($revenue.length === 0 || $cost.length === 0 || $margin.length === 0) {
+            return; // Esci se i campi non sono stati renderizzati
+        }
+    
+        // Pulizia e conversione dei valori (sostituisci virgola con punto per parseFloat)
+        // Usiamo 0 in caso di NaN (campo vuoto o non numerico)
+        const revenueVal = parseFloat($revenue.val().replace(',', '.')) || 0;
+        const costVal = parseFloat($cost.val().replace(',', '.')) || 0;
+    
+        // Controlla che Ricavi e Costi siano numeri validi e che Ricavi non sia zero
+        if (revenueVal === 0) {
+            $margin.val('0,00'); 
+            return;
+        }
+
+        // Esegui il calcolo del margine (Formula: (Ricavi - Costi) / Ricavi * 100)
+        const marginRatio = (revenueVal - costVal) / revenueVal;
+    
+        // Formatta il risultato in percentuale con arrotondamento a 2 decimali e virgola
+        let marginPercent = (marginRatio * 100).toFixed(2); 
+    
+        // Scrivi il risultato nel campo Margine, sostituendo il punto decimale con la virgola
+        $margin.val(marginPercent.replace('.', ','));
+    }
+
+    // ***************************************************************
+    // V. BINDING CALCOLO MARGINE (Per il tipo 'resale')
+    // ***************************************************************
+    
+    // Recupera la DropDownList (assumendo sia disponibile dallo scope precedente o globale)
+    var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>'); 
+    
+    // Collega l'evento 'keyup' e 'change' per calcolare il margine in tempo reale
+    const $revenueField = $('#' + TBRevenueBudgetId);
+    const $costField = $('#' + SpeseBudgetTextBoxId);
+
+    // Funzione handler unica per Revenue e Costi
+    const marginCalculatorHandler = function() {
+        // Esegui il calcolo solo se il progetto è di tipo 'Resale'
+        if (ddlTipoProgetto.find('option:selected').text() === RESALE_TEXT) {        
+            console.log('marginCalculatorHandler');
+            calculateMargin();
+        }
+    };
+
+    // Controlla se i campi esistono prima di legare l'evento
+    if ($revenueField.length > 0 && $costField.length > 0) {
+        
+        $revenueField.on('keyup change', marginCalculatorHandler);
+        $costField.on('keyup change', marginCalculatorHandler);
+    }
+    
+    // Aggiorna anche l'handler principale per il cambio DDL, nel caso
+    // si passi da un altro tipo a 'Resale'
+    ddlTipoProgetto.on('change', function () {
+        
+        // Se si passa a 'Resale', esegui subito un primo calcolo
+        if ($(this).find('option:selected').text() === RESALE_TEXT) {
+            calculateMargin();
+        }
+    });
+
     </script>
 
 </body>
