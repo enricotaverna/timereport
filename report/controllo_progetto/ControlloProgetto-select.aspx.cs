@@ -27,19 +27,15 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
             // recupera valori selezioni
             RipristinaControlli();
         }
-
-        // Default data
-        if (TBDataReport.Text == "")
-            TBDataReport.Text = CurrentSession.dCutoffDate.ToString("dd/MM/yyyy");
    
     }
 
     protected void sottometti_Click(object sender , System.EventArgs e ) {
 
-        // salva data report utilizzata nella gridview per il drill sulle revenue
-        Session["DataReport"] = TBDataReport.Text;
+        // Salva i parametri di ricerca in sessione per il drill sulle revenue
         Session["DDLCpProgetto"] = DDLProgetti.SelectedValue;
         Session["DDLCpManager"] = DDLManager.SelectedValue;
+        Session["DDLCpTipoContratto"] = DDLTipoContratto.SelectedValue;
         
         Response.Redirect("ControlloProgetto-list.aspx");
 
@@ -48,8 +44,6 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
     // salva valori dei controlli
     protected void RipristinaControlli()
     {
-        if (Session["DDLCpProgetto"] != null) DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
-        if (Session["DDLCpManager"] != null) DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
     }
 
     protected void Bind_DDLProgetti()
@@ -80,14 +74,20 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
 
         SqlDataReader dr = cmd.ExecuteReader();
 
-        DDLProgetti.DataSource = dr;
         DDLProgetti.Items.Clear();
         DDLProgetti.Items.Add(new ListItem("--Tutti i progetti--", "0"));
         DDLProgetti.DataTextField = "Descrizione";
         DDLProgetti.DataValueField = "Projects_Id";
+        DDLProgetti.DataSource = dr;
         DDLProgetti.DataBind();
 
         conn.Close();
+        
+        // Ripristina il valore selezionato precedentemente dalla sessione
+        if (Session["DDLCpProgetto"] != null && DDLProgetti.Items.FindByValue(Session["DDLCpProgetto"].ToString()) != null)
+        {
+            DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
+        }
     }
 
     protected void DDLProgetti_SelectedIndexChanged(object sender, EventArgs e)
@@ -98,9 +98,17 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
    
     protected void DDLManager_DataBound(object sender, EventArgs e)
     {
-
-        // Cancellata, la selezione viene fatta in base ai progetti forzati
-
+        // Ripristina il valore selezionato precedentemente dalla sessione
+        if (Session["DDLCpManager"] != null && DDLManager.Items.FindByValue(Session["DDLCpManager"].ToString()) != null)
+        {
+            DDLManager.SelectedValue = Session["DDLCpManager"].ToString();
+        }
+        
+        // Ripristina il valore tipo contratto dalla sessione
+        if (Session["DDLCpTipoContratto"] != null && DDLTipoContratto.Items.FindByValue(Session["DDLCpTipoContratto"].ToString()) != null)
+        {
+            DDLTipoContratto.SelectedValue = Session["DDLCpTipoContratto"].ToString();
+        }
     }
 
 }

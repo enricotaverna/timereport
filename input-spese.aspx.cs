@@ -337,13 +337,6 @@ public partial class input_spese : System.Web.UI.Page
             DDLOpportunity.SelectedValue = OpportunityId;
     }
 
-    protected void FVSpese_modechanging(object sender, FormViewModeEventArgs e)
-    {
-        //      se premuto tasto cancel torna indietro
-        if (e.CancelingEdit)
-            Response.Redirect("input.aspx");
-    }
-
     protected void FVSpese_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
     {
         Response.Redirect("input.aspx");

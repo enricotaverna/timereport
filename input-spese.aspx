@@ -64,7 +64,7 @@
                         <asp:FormView ID="FVSpese" runat="server" DataKeyNames="Expenses_Id"
                             DataSourceID="DSspese" align="center" DefaultMode="Edit"
                             OnDataBound="FVSpese_DataBound" CellPadding="0"
-                            OnModeChanging="FVSpese_modechanging" meta:resourcekey="FVSpeseResource1" >
+                            meta:resourcekey="FVSpeseResource1" >
 
                             <%--  INSERT   --%>
                             <InsertItemTemplate>
@@ -449,8 +449,8 @@
 
         // Initialize Parsley
         var form = $('#FormSpese').parsley({
-                excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
-            });
+            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+        });
 
         // ***  Controllo che esista un commento se il progetto lo richiede ***
         window.Parsley.addValidator('testoObbligatorio', {
@@ -616,8 +616,14 @@
                 })
         });
 
+        // Sostituisci FVSpese_CancelButton con l'ID generato effettivo (verifica nel DOM)
+        $(document).on('click', '#FVSpese_CancelButton', function (e) {
+            e.preventDefault();
+            window.location.href = "/timereport/input.aspx"; // o altra azione desiderata
+        });
+
         // *****  SALVA FORM *****
-        $("#FVSpese_PostButton, #FVSpese_RicevuteButton" ).on("click", function (e) {
+        $("#FVSpese_PostButton, #FVSpese_RicevuteButton").on("click", function (e) {
 
             e.preventDefault();
 
@@ -631,32 +637,33 @@
             }
 
             var ExpensesId = '<%= String.IsNullOrEmpty(Request.QueryString["expenses_id"]) ? "0" : Request.QueryString["expenses_id"] %>';
-            var AccountingDate = isNullOrEmpty($('#FVSpese_TBAccountingDate').val()) ? '' : $('#FVore_TBAccountingDate').val();
+            var AccountingDate = isNullOrEmpty($('#FVSpese_TBAccountingDate').val()) ? '' : $('#FVSpese_TBAccountingDate').val();
 
             // Submit the form
-            var values = "{ 'Expenses_Id' : " + ExpensesId  +
-                " , 'Date': '" + $('#FVSpese_LBdate').text() + "'" +
-                " , 'ExpenseAmount': '" + $('#FVSpese_TBAmount').val().replace(',', '.') + "'" +
-                " , 'Person_Id': '" + <%= CurrentSession.Persons_id %> + "'" +
-                " , 'Project_Id': '" + $('#FVSpese_DDLprogetto').val() + "'" +
-                " , 'ExpenseType_Id': '" + $('#FVSpese_DDLTipoSpesa').val() + "'" +
-                " , 'Comment': '" + $('#FVSpese_TBComment').val() + "'" +
-                " , 'CreditCardPayed': " + $('#FVSpese_CBCreditCard').is(':checked') + 
-                " , 'CompanyPayed': " + $('#FVSpese_CBCompanyPayed').is(':checked') + 
-                " , 'CancelFlag': " + $('#FVSpese_CBcancel').is(':checked') + 
-                " , 'InvoiceFlag': " + $('#FVSpese_CBInvoice').is(':checked') + 
-                " , 'strFileName': ''" + // non salva il file 
-                " , 'strFileData': ''" +
-                " , 'OpportunityId': '" + ($('#FVSpese_DDLOpportunity').is(':visible') ? $('#FVSpese_DDLOpportunity').val() : '') + "'" +
-                " , 'AccountingDate': '" + AccountingDate + "'" + 
-                " , 'UserId': ''" +
-                "}";
+            var values = {
+                Expenses_Id: parseInt(ExpensesId),
+                Date: $('#FVSpese_LBdate').text(),
+                ExpenseAmount: parseFloat($('#FVSpese_TBAmount').val().replace(',', '.')),
+                Person_Id: <%= CurrentSession.Persons_id %>,
+                Project_Id: parseInt($('#FVSpese_DDLprogetto').val()),
+                ExpenseType_Id: parseInt($('#FVSpese_DDLTipoSpesa').val()),
+                Comment: $('#FVSpese_TBComment').val(),
+                CreditCardPayed: $('#FVSpese_CBCreditCard').is(':checked'),
+                CompanyPayed: $('#FVSpese_CBCompanyPayed').is(':checked'),
+                CancelFlag: $('#FVSpese_CBcancel').is(':checked'),
+                InvoiceFlag: $('#FVSpese_CBInvoice').is(':checked'),
+                strFileName: '',
+                strFileData: '',
+                OpportunityId: ($('#FVSpese_DDLOpportunity').is(':visible') ? $('#FVSpese_DDLOpportunity').val() : ''),
+                AccountingDate: AccountingDate,
+                UserId: ''
+            };
 
             $.ajax({
 
                 type: "POST",
                 url: "/timereport/webservices/WS_DBUpdates.asmx/SaveExpenses",
-                data: values,
+                data: JSON.stringify(values),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {

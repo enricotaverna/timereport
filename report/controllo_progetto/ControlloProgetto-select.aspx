@@ -54,14 +54,6 @@
 
                     <div style="margin-top: 30px"></div>
 
-                    <!--  *** PROGETTO *** -->
-                    <div class="input nobottomborder">
-                        <div class="inputtext">Progetto</div>
-                            <asp:DropDownList ID="DDLProgetti" runat="server"
-                                AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged">
-                            </asp:DropDownList>
-                       </div>
-
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
                         <div class="inputtext">Responsabile</div>
@@ -70,26 +62,34 @@
                                 <asp:ListItem Value="">-- Manager o Account --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
+
+                    <!--  *** TIPO CONTRATTO *** -->
+                    <div class="input nobottomborder">
+                        <div class="inputtext">Tipo Contratto</div>
+                            <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True">
+                                <asp:ListItem Value="0" Selected="True">-- Tutti --</asp:ListItem>
+                                <asp:ListItem Value="2">FORFAIT</asp:ListItem>
+                                <asp:ListItem Value="1">TM</asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
+
+                    <!--  *** PROGETTO *** -->
+                    <div class="input nobottomborder">
+                        <div class="inputtext">Progetto</div>
+                            <asp:DropDownList ID="DDLProgetti" runat="server"
+                                AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged">
+                            </asp:DropDownList>
+                       </div>
+
                     <br />
 
-                    <!--  **** DATA REPORT ** -->
+                    <!--  **** INFORMAZIONE DATA CUTOFF ** -->
                     <div class="input nobottomborder">
-                        <asp:Label ID="Label5" CssClass="inputtext" runat="server" Text="Data Report:"></asp:Label>
-                        <asp:TextBox CssClass="ASPInputcontent" ID="TBDataReport" runat="server" MaxLength="10" Rows="12" Columns="10"  Enabled="False" />
+                        <div style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007bff; margin-bottom: 10px;">
+                            <i class="fas fa-info-circle" style="color: #007bff;"></i>
+                            <strong>Nota:</strong> Il report viene generato utilizzando la data di cutoff corrente: <strong><%= CurrentSession.sCutoffDate %></strong>
+                        </div>
                     </div>
-
-                    <!--  **** DATA REPORT ** 
-                        
-                       // forzato default calcolo Tipo 0
-
-                       <div class="input nobottomborder">
-                        <asp:Label ID="Label1" CssClass="inputtext" runat="server" Text="Metodo calcolo"></asp:Label>--                        
-                        <asp:RadioButtonList ID="RBTipoCalcolo" runat="server"> 
-                            <asp:ListItem Value="0" Selected="True">Budget Totale</asp:ListItem>
-                            <asp:ListItem Value="1">Budget Netto ABAP</asp:ListItem>
-                        </asp:RadioButtonList>--%>
-
-                    </div> -->
 
                     <div class="buttons">
                         <div id="valMsg" class="parsley-single-error"></div>
@@ -136,23 +136,24 @@
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
-        $('.SumoDLL').SumoSelect({ search: true });
-        $('#DDLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
-        $('#DDLManager').SumoSelect({ placeholder: 'Director', search: true, searchText: 'Director' });
+        $(document).ready(function() {
+            // Inizializza SumoSelect
+            $('.SumoDLL').SumoSelect({ search: true });
+            $('#DDLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
+            $('#DDLManager').SumoSelect({ placeholder: 'Director', search: true, searchText: 'Director' });
+            $('#DDLTipoContratto').SumoSelect({ placeholder: 'Tipo Contratto' });
 
-        //$(function () {
-        //    // datepicker
-        //    $("#TBDataReport").datepicker($.datepicker.regional['it']);
-        //});
+            // *** Esclude i controlli nascosti *** 
+            var parsleyInstance = $('#FVForm').parsley({
+                excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
+            });
 
-        // *** Esclude i controlli nascosti *** 
-        $('#FVForm').parsley({
-            excluded: "input[type=button], input[type=submit], input[type=reset], input[type=hidden], [disabled], :hidden"
-        });
-
-        // Quando il form è valido
-        $('#FVForm').parsley().on('form:success', function () {
-            MaskScreen(true);
+            // Quando il form è valido
+            if (parsleyInstance) {
+                parsleyInstance.on('form:success', function () {
+                    MaskScreen(true);
+                });
+            }
         });
 
     </script>

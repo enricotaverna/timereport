@@ -18,8 +18,16 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        // richima storage procedure per popolare la tabella con i valori degli economics di peogetto
-        DataSet ds = ControlloProgetto.PopolaDataset(Session["DataReport"].ToString(), Session["DDLCpProgetto"].ToString(), Session["DDLCpManager"].ToString());
+        // recupera il tipo contratto dalla sessione, default "0" se non impostato
+        string tipoContratto = Session["DDLCpTipoContratto"] != null ? Session["DDLCpTipoContratto"].ToString() : "0";
+
+        // richima storage procedure per popolare la tabella con i valori degli economics di progetto
+        // La data di cutoff viene letta automaticamente dalla sessione all'interno del metodo PopolaDataset
+        DataSet ds = ControlloProgetto.PopolaDataset(
+            Session["DDLCpProgetto"].ToString(), 
+            Session["DDLCpManager"].ToString(),
+            tipoContratto);
+            
         Session["dataset"] = ds;
 
         // recupera oggetto con variabili di sessione
@@ -83,7 +91,8 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
             wsSintesi.ImportDataTable(dtSintesi, true, 1, 1);
 
             //*** Worksheet con dettaglio ore progetti
-            DataTable dtDettaglio = ControlloProgetto.EstraiGiorniCosti(Session["DataReport"].ToString(), Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
+            // La data di cutoff viene letta automaticamente dalla sessione all'interno del metodo EstraiGiorniCosti
+            DataTable dtDettaglio = ControlloProgetto.EstraiGiorniCosti(Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
             wsDettaglio.ImportDataTable(dtDettaglio, true, 1, 1);
 
             // Formatta il foglio excel con le intestazioni

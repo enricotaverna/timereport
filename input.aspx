@@ -335,7 +335,7 @@
         });
 
         //calcolo delle ore inserite nel giorno
-        //se inferiori ad 8 segnalate in rosso
+        //se inferiori ad 8 segnalo in rosso
         function CalcolaSommaOre() {
             //controllo se sono su TAB ORE
             var ore = document.getElementsByClassName("Tab-active");
@@ -402,82 +402,106 @@
         //CANCELLA_ID : premendo il tasto trash cancella il record ore / spese / tickets associato e aggiorna la pagina WEB
         function DeleteRecord(Id) {
 
-            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-            var values = "{'Id': '" + Id + "', DeletionType : '<%=Session["type"].ToString() %>' }";
-
-            $.ajax({
-
-                type: "POST",
-                url: "/timereport/webservices/WS_DBUpdates.asmx/DeleteRecord",
-                data: values,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-
-                // se tutto va bene
-                success: function (response) {
-                    var result = response.d; // La risposta è contenuta nella proprietà 'd' dell'oggetto JSON
-
-                    if (result.Success) {
-
-                        var elemtohide = document.getElementById("TRitm" + Id);
-                        elemtohide.remove();
-                        CalcolaSommaOre();
-                        if (result.RecordHtmlText != "") {
-                            var hdrIcon = "#hdrIcon" + result.RecordHtmlText; // yyyymmdd in caso di ticket                  
-                            $(hdrIcon).show(); // accende icone travel
-                        }
+            // Chiedi conferma prima di cancellare
+            ConfirmDialog(
+                '<%= GetLocalResourceObject("confirm_delete_title") %>',
+                '<%= GetLocalResourceObject("confirm_delete_record_message") %>',
+                '<%= GetLocalResourceObject("confirm_delete_button") %>',
+                function (confirmed) {
+                    if (!confirmed) {
+                        return; // L'utente ha annullato
                     }
-                    else
-                        ShowPopup(result.Message);
-                },
 
-                // in caso di errore
-                error: function (xhr, textStatus, errorThrown) {
-                    ShowPopup(xhr.responseText);
+                    // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+                    var values = "{'Id': '" + Id + "', DeletionType : '<%=Session["type"].ToString() %>' }";
+
+                    $.ajax({
+
+                        type: "POST",
+                        url: "/timereport/webservices/WS_DBUpdates.asmx/DeleteRecord",
+                        data: values,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+
+                        // se tutto va bene
+                        success: function (response) {
+                            var result = response.d; // La risposta è contenuta nella proprietà 'd' dell'oggetto JSON
+
+                            if (result.Success) {
+
+                                var elemtohide = document.getElementById("TRitm" + Id);
+                                elemtohide.remove();
+                                CalcolaSommaOre();
+                                if (result.RecordHtmlText != "") {
+                                    var hdrIcon = "#hdrIcon" + result.RecordHtmlText; // yyyymmdd in caso di ticket                  
+                                    $(hdrIcon).show(); // accende icone travel
+                                }
+                            }
+                            else
+                                ShowPopup(result.Message);
+                        },
+
+                        // in caso di errore
+                        error: function (xhr, textStatus, errorThrown) {
+                            ShowPopup(xhr.responseText);
+                        }
+
+                    }); // ajax
                 }
-
-            }); // ajax
+            );
         } //CANCELLA_ID 
 
         //CancellaAssenza : premendo il tasto trash cancella il record richiesta assenza
         function CancellaAssenza(Id) {
 
-            // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
-            var values = "{'ApprovalRequest_id': '" + Id + "','UpdateMode': 'DELE', 'ApprovalText1' : '' }";
-
-            MaskScreen(true); // mette in wait a schermo scuro
-
-            $.ajax({
-
-                type: "POST",
-                url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateApprovalRecord",
-                data: values,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-
-                // se tutto va bene
-                success: function (msg) {
-
-                    UnMaskScreen();
-
-                    if (msg.d == true) {
-
-                        var elemtohide = document.getElementById("TRitm" + Id);
-                        elemtohide.remove();
-
+            // Chiedi conferma prima di cancellare
+            ConfirmDialog(
+                '<%= GetLocalResourceObject("confirm_delete_title") %>',
+                '<%= GetLocalResourceObject("confirm_delete_leave_message") %>',
+                '<%= GetLocalResourceObject("confirm_delete_button") %>',
+                function (confirmed) {
+                    if (!confirmed) {
+                        return; // L'utente ha annullato
                     }
-                    else
-                        ShowPopup("Errore in aggiornamento");
-                },
 
-                // in caso di errore
-                error: function (xhr, textStatus, errorThrown) {
-                    UnMaskScreen();
-                    alert(xhr.responseText);
+                    // valori da passare al web service in formato { campo1 : valore1 , campo2 : valore2 }
+                    var values = "{'ApprovalRequest_id': '" + Id + "','UpdateMode': 'DELE', 'ApprovalText1' : '' }";
+
+                    MaskScreen(true); // mette in wait a schermo scuro
+
+                    $.ajax({
+
+                        type: "POST",
+                        url: "/timereport/webservices/WF_ApprovalWorkflow.asmx/UpdateApprovalRecord",
+                        data: values,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+
+                        // se tutto va bene
+                        success: function (msg) {
+
+                            UnMaskScreen();
+
+                            if (msg.d == true) {
+
+                                var elemtohide = document.getElementById("TRitm" + Id);
+                                elemtohide.remove();
+
+                            }
+                            else
+                                ShowPopup("Errore in aggiornamento");
+                        },
+
+                        // in caso di errore
+                        error: function (xhr, textStatus, errorThrown) {
+                            UnMaskScreen();
+                            alert(xhr.responseText);
+                        }
+
+                    }); // ajax
                 }
-
-            }); // ajax
-        } //CANCELLA_ID 
+            );
+        } //CANCELLA_ID
 
         //TICKETREST : inserisce il ticket restaurant ed aggiorna la pagina Web          
         $('.tktRest').on('click', function (e) {

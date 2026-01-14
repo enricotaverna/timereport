@@ -1,12 +1,9 @@
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using System;
 using System.Data;
 using System.Configuration;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml;
-using System.Security.RightsManagement;
-using System.Activities.Expressions;
+using System.Web;
 
 public class EconomicsProgetto
 {
@@ -35,7 +32,7 @@ public class EconomicsProgetto
     public double WriteUpEAC { get; set; }
 
     public double GiorniActual { get; set; }
-    
+
     public string TipoContratto { get; set; }
 
     public double MesiCopertura { get; set; }
@@ -46,272 +43,285 @@ public class EconomicsProgetto
     public DateTime UltimaDataCarico { get; set; }
     public DateTime DataFineProgetto { get; set; }
 
-    /* estrae dati di singolo progetto */
-    public EconomicsProgetto(string DataReport, string ProgettoReport)
+    /* ✅ Estrae dati dalla vista unica v_ProjectEconomicsReport */
+    public EconomicsProgetto(string projectIdOrCode)
     {
-        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        // il codice manager non serve essendo chiamato per il singolo progetto
-        DataSet ds = ControlloProgetto.PopolaDataset(DataReport, ProgettoReport, "0");
+        // Recupera la data di cutoff dalla sessione corrente
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+        DateTime dataCutoff = CurrentSession.dCutoffDate;
+        string annoMeseCutoff = dataCutoff.ToString("yyyy-MM");
 
-        DataRow dr = ds.Tables["Export"].Rows[0]; // record relativo al progetto selezionato
+        // ✅ Query semplice sulla vista unica
+        string query = "SELECT * FROM [MSSql12155].[v_ProjectEconomicsReport] " +
+                      "WHERE AnnoMese = " + ASPcompatility.FormatStringDb(annoMeseCutoff);
 
-        Projects_Id = (int)dr["Projects_Id"];
-        ProjectCode = dr["ProjectCode"].ToString();
-        TipoContratto = dr["TipoContratto"].ToString();
+        // Filtro per Projects_id o ProjectCode
+        int projectId;
+        if (int.TryParse(projectIdOrCode, out projectId))
+            query += " AND Projects_id = " + ASPcompatility.FormatNumberDB(projectId);
+        else
+            query += " AND ProjectCode = " + ASPcompatility.FormatStringDb(projectIdOrCode);
 
-        /** Revenue **/
-        RevenueBDG = InitField("RevenueBDG", ref dr); 
-        RevenueACT = InitField("RevenueACT", ref dr);
-        RevenueEAC = InitField("RevenueEAC", ref dr);
+        DataTable dt = Database.GetData(query);
 
-        /** Spese **/
-        SpeseBDG = InitField("SpeseBDG", ref dr); 
-        SpeseACT = InitField("SpeseACT", ref dr);
-        SpeseEAC = InitField("SpeseEAC", ref dr);
+        if (dt.Rows.Count == 0)
+        {
+            throw new Exception(string.Format(
+                "Nessun dato trovato in ProjectEconomics per il progetto '{0}' nel mese {1}. Eseguire SPcontrolloProgetti_V4.",
+                projectIdOrCode, annoMeseCutoff));
+        }
 
-        /** Costi **/
-        CostiBDG = InitField("CostiBDG", ref dr);
-        CostiACT = InitField("CostiACT", ref dr);
-        CostiEAC = InitField("CostiEAC", ref dr);
+        DataRow dr = dt.Rows[0];
 
-        /** Margine **/
-        MargineBDG = InitField("MargineBDG", ref dr);
-        MargineACT = InitField("MargineACT", ref dr); 
-        MargineEAC = InitField("MargineEAC", ref dr);
+        // ✅ Carica TUTTI i dati dalla vista
+        CaricaDatiDaView(ref dr);
 
-        /** WriteUp **/
-        WriteUpACT = InitField("WriteUpACT", ref dr);
-        WriteUpEAC = InitField("WriteUpEAC", ref dr);
-
-        GiorniActual = InitField("GiorniActual", ref dr);
-        MesiCopertura = InitField("MesiCopertura", ref dr);
-        BurnRate = InitField("BurnRate", ref dr);
-
-        /* Valorizza le date */
-        if (dr["PrimaDataCarico"].ToString() != "")
-            PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
-
-        if (dr["UltimaDataCarico"].ToString() != "")
-            UltimaDataCarico = (DateTime)dr["UltimaDataCarico"];
-
-        if (dr["UltimaDataCarico"].ToString() != "")
-            DataFineProgetto = (DateTime)dr["DataFine"];
-
-        tooltip = dr["tooltip"].ToString();
-
+        // ✅ Calcola status e tooltip
+        int recordWithoutCost = dr["RecordWithoutCost"] != DBNull.Value
+            ? Convert.ToInt32(dr["RecordWithoutCost"]) : 0;
+        CalcolaStatusETooltip(recordWithoutCost, dataCutoff);
     }
 
-    //** inizializza variabile **
+    //** ✅ Carica tutti i dati dalla vista **
+    private void CaricaDatiDaView(ref DataRow dr)
+    {
+        // Identificativi
+        Projects_Id = (int)dr["Projects_id"];
+        ProjectCode = dr["ProjectCode"].ToString();
+        TipoContratto = dr["TipoContratto"] != DBNull.Value ? dr["TipoContratto"].ToString() : "";
+
+        /** Budget **/
+        RevenueBDG = InitField("RevenueBDG", ref dr);
+        SpeseBDG = InitField("SpeseBDG", ref dr);
+        MargineBDG = InitField("MargineBDG", ref dr);
+        CostiBDG = InitField("CostiBDG", ref dr);
+
+        /** Actual **/
+        RevenueACT = InitField("RevenueACT", ref dr);
+        CostiACT = InitField("CostACT", ref dr);
+        SpeseACT = InitField("SpeseACT", ref dr);
+        MargineACT = InitField("MargineACT", ref dr);
+        WriteUpACT = InitField("WriteUpACT", ref dr);
+        GiorniActual = InitField("GiorniActual", ref dr);
+
+        /** EAC **/
+        RevenueEAC = InitField("RevenueEAC", ref dr);
+        CostiEAC = InitField("CostiEAC", ref dr);
+        SpeseEAC = InitField("SpeseEAC", ref dr);
+        MargineEAC = InitField("MargineEAC", ref dr);
+        WriteUpEAC = InitField("WriteUpEAC", ref dr);
+
+        /** Metriche **/
+        BurnRate = InitField("BurnRate", ref dr);
+        MesiCopertura = InitField("MesiCopertura", ref dr);
+
+        /* Date */
+        if (dr["PrimaDataCarico"] != DBNull.Value)
+            PrimaDataCarico = (DateTime)dr["PrimaDataCarico"];
+
+        if (dr["UltimaDataCarico"] != DBNull.Value)
+            UltimaDataCarico = (DateTime)dr["UltimaDataCarico"];
+
+        if (dr["DataFineProgetto"] != DBNull.Value)
+            DataFineProgetto = (DateTime)dr["DataFineProgetto"];
+    }
+
+    //** Inizializza variabile da DataRow **
     private static float InitField(string fieldName, ref DataRow dr)
     {
         return dr[fieldName] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr[fieldName]);
     }
 
+    //** ✅ Calcola Status e Tooltip **
+    private void CalcolaStatusETooltip(int recordWithoutCost, DateTime dataCutoff)
+    {
+        string errMsg = "";
+
+        // Validazioni
+        if (GiorniActual == 0)
+        {
+            errMsg += "<li>Nessun giorno caricato sul progetto</li>";
+        }
+
+        if (MargineBDG == 0)
+        {
+            errMsg += "<li>Margine proposta non specificato</li>";
+        }
+
+        if (DataFineProgetto == DateTime.MinValue)
+        {
+            errMsg += "<li>Data fine progetto non specificata</li>";
+        }
+        else if (dataCutoff > DataFineProgetto)
+        {
+            errMsg += "<li>Data fine progetto scaduta</li>";
+        }
+
+        if (recordWithoutCost > 0)
+        {
+            if (TipoContratto == "FORFAIT")
+                errMsg += "<li>Cost Rate mancante</li>";
+            else
+                errMsg += "<li>Cost Rate e Bill rate consulenti mancanti</li>";
+        }
+
+        // Determina status
+        if (errMsg != "")
+        {
+            status = 2; // Orange
+            tooltip = "Errori da controllare:<ul>" + errMsg + "</ul>";
+        }
+        else if (WriteUpEAC > 0)
+        {
+            status = 0; // Green
+            tooltip = "Writeup positivo!";
+        }
+        else
+        {
+            status = 1; // Red
+            tooltip = "Writeoff negativo!";
+        }
+    }
 }
 
 public class ControlloProgetto
 {
-
-    /* Estrae Dataset risultato lanciando stored procedure dopo aver impostato i parametri */
-    public static DataSet PopolaDataset(string DataReport, string ProgettoReport, string ManagerReport)
+    /* ✅ Estrae Dataset dalla vista unica con filtri WHERE */
+    public static DataSet PopolaDataset(string ProgettoReport, string ManagerReport, string TipoContratto = "0")
     {
+        // Recupera la data di cutoff dalla sessione corrente
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+        DateTime dataCutoff = CurrentSession.dCutoffDate;
+        string annoMeseCutoff = dataCutoff.ToString("yyyy-MM");
 
-        List<SqlParameter> parametersList = new List<SqlParameter>();
+        // ✅ Query semplice sulla vista unica con filtri applicati via WHERE
+        string query = "SELECT * FROM [MSSql12155].[v_ProjectEconomicsReport] " +
+                      "WHERE AnnoMese = " + ASPcompatility.FormatStringDb(annoMeseCutoff) +
+                      " AND Active = 1 " +
+                      " AND TipoContratto_id IN (1, 2)"; // Solo T&M e FIXED
 
-        // Se DDL non valorizzata passa NULL al parametro
+        // Applica filtri opzionali
         if (ProgettoReport != "0")
-            parametersList.Add(new SqlParameter("@Project_id", Convert.ToInt16(ProgettoReport)));
+            query += " AND Projects_id = " + ASPcompatility.FormatStringDb(ProgettoReport);
 
-        // Se DDL non valorizzata passa NULL al parametro
         if (ManagerReport != "0")
-            parametersList.Add(new SqlParameter("@Manager_id", Convert.ToInt16(ManagerReport)));
+            query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(ManagerReport) +
+                     " OR AccountManager_id = " + ASPcompatility.FormatStringDb(ManagerReport) + ")";
 
-        parametersList.Add(new SqlParameter("@DataReport", Convert.ToDateTime(DataReport)));
-        parametersList.Add(new SqlParameter("@TipoCalcolo", 0));
+        if (TipoContratto != "0")
+            query += " AND TipoContratto_id = " + ASPcompatility.FormatStringDb(TipoContratto);
 
-        SqlParameter[] parameters = parametersList.ToArray();
+        query += " ORDER BY ProjectCode";
 
-        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        DataSet ds = Database.ExecuteStoredProcedure("SPcontrolloProgetti", parameters);
+        // Esegue la query
+        DataTable dt = Database.GetData(query);
 
-        // *** Aggiunge colonne calcolate
-        AggiungiColonne(ref ds);
+        // Crea il DataSet
+        DataSet ds = new DataSet();
+        dt.TableName = "Export";
+        ds.Tables.Add(dt);
 
-        // Calcola colonne
-        CalcolaColonne(ref ds, DataReport);
+        if (ds.Tables["Export"].Rows.Count == 0)
+        {
+            return ds;
+        }
 
-        return (ds);
+        // ✅ Aggiunge solo colonne UI (Status, ImgUrl, ToolTip)
+        AggiungiColonneUI(ref ds);
+
+        // ✅ Calcola solo Status e Tooltip
+        CalcolaStatusETooltip(ref ds, dataCutoff);
+
+        return ds;
     }
 
-    //** Aggiunge le colonne che vengono calcolate programmaticamente e non dalla query **//
-    private static void AggiungiColonne(ref DataSet ds)
+    //** ✅ Aggiunge solo colonne per UI **
+    private static void AggiungiColonneUI(ref DataSet ds)
     {
-        ds.Tables["Export"].Columns.Add("BurnRate", typeof(Double));
-        ds.Tables["Export"].Columns.Add("MesiCopertura", typeof(Double));
-        ds.Tables["Export"].Columns.Add("RevenueEAC", typeof(Double));
-        ds.Tables["Export"].Columns.Add("SpeseEAC", typeof(Double));
-        ds.Tables["Export"].Columns.Add("MargineACT", typeof(Double));
-        ds.Tables["Export"].Columns.Add("MargineEAC", typeof(Double));
-        ds.Tables["Export"].Columns.Add("CostiBDG", typeof(Double));
-        ds.Tables["Export"].Columns.Add("CostiEAC", typeof(Double));
-        ds.Tables["Export"].Columns.Add("WriteUpACT", typeof(Double));
-        ds.Tables["Export"].Columns.Add("WriteUpEAC", typeof(Double));
         ds.Tables["Export"].Columns.Add("Status", typeof(Char)); // G = Green R = Red O = Orange
-        ds.Tables["Export"].Columns.Add("ImgUrl", typeof(string)); // Url Immagine
-        ds.Tables["Export"].Columns.Add("ToolTip", typeof(string)); // Commento
-        ds.Tables["Export"].Columns.Add("TooltipDataFine", typeof(string)); // ToolTip sfondo data fine
-
-        return;
+        ds.Tables["Export"].Columns.Add("ImgUrl", typeof(string));
+        ds.Tables["Export"].Columns.Add("ToolTip", typeof(string));
+        ds.Tables["Export"].Columns.Add("TooltipDataFine", typeof(string));
     }
 
-    // Calcola colonne aggiuntive report non valorizzate dalla storage procedure
-    public static void CalcolaColonne(ref DataSet ds, string DataReport)
+    //** ✅ Calcola solo Status e Tooltip **
+    private static void CalcolaStatusETooltip(ref DataSet ds, DateTime dataCutoff)
     {
-        Boolean flabort = false;
-
         foreach (DataRow dr in ds.Tables["Export"].Rows)
         {
-
-            flabort = false;
-
-            //*** Inizio controllo dati ** //
-            float RecordWithoutCost = dr["RecordWithoutCost"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RecordWithoutCost"]);
-            DateTime TBDataReport = Convert.ToDateTime(DataReport);
-            DateTime dataFineProgetto = dr["DataFine"] != DBNull.Value ? (DateTime)dr["DataFine"] : new DateTime(2001, 1, 1);
-            DateTime primaDataCarico = dr["PrimaDataCarico"] != DBNull.Value ? (DateTime)dr["PrimaDataCarico"] : new DateTime(2001, 1, 1);
-            DateTime ultimaDataCarico = dr["UltimaDataCarico"] != DBNull.Value ? (DateTime)dr["UltimaDataCarico"] : new DateTime(2001, 1, 1);
-
             string errMsg = "";
+            bool hasErrors = false;
 
-            // se giorni di carico sono zero cancella il record
-            if (dr["GiorniActual"].ToString() == "")
+            // Validazioni
+            float giorniActual = dr["GiorniActual"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["GiorniActual"]);
+            int recordWithoutCost = dr["RecordWithoutCost"] == DBNull.Value ? 0 : Convert.ToInt32(dr["RecordWithoutCost"]);
+            DateTime dataFine = dr["DataFine"] != DBNull.Value ? (DateTime)dr["DataFine"] : DateTime.MinValue;
+
+            if (giorniActual == 0)
             {
                 errMsg += "<li>Nessun giorno caricato sul progetto</li>";
-                flabort = true;
+                hasErrors = true;
             }
 
             if (dr["MargineBDG"] == DBNull.Value)
             {
                 errMsg += "<li>Margine proposta non specificato</li>";
-                flabort = true;
+                hasErrors = true;
             }
 
-            if (dr["DataFine"] == DBNull.Value)
+            if (dataFine == DateTime.MinValue)
             {
                 errMsg += "<li>Data fine progetto non specificata</li>";
-                flabort = true;
+                hasErrors = true;
             }
-            else if (DateTime.Now > (DateTime)dr["DataFine"])
+            else if (dataCutoff > dataFine)
             {
                 errMsg += "<li>Data fine progetto scaduta</li>";
             }
 
-            if (RecordWithoutCost != 0)
+            if (recordWithoutCost > 0)
             {
-                flabort = true;
-                if (dr["TipoContratto"].ToString() == "FORFAIT")
-                    errMsg += "<li>Cost Rate</li>";
+                hasErrors = true;
+                string tipoContratto = dr["TipoContratto"].ToString();
+                if (tipoContratto == "FORFAIT")
+                    errMsg += "<li>Cost Rate mancante</li>";
                 else
-                    errMsg += "<li>Cost Rate e Bill rate consulenti</li>";
+                    errMsg += "<li>Cost Rate e Bill rate consulenti mancanti</li>";
             }
 
-            if (errMsg != "")
+            // Imposta Status
+            if (hasErrors)
             {
-                errMsg = "Errori da controllare:<ul>" + errMsg + "</ul>";
-            }
-
-            // se true mancano dati obbligatori per calcolo ACT, abortisce
-            if (flabort)
-            {
-                // annulla valori calcolati perch� non tutti i dati sono presenti
-                dr["RevenueACT"] = 0;
-                dr["BurnRate"] = 0;
-                dr["MesiCopertura"] = 0;
-                dr["WriteUpEAC"] = 0;
-                dr["GiorniActual"] = 0;
-                dr["SpeseACT"] = 0;
-
                 dr["Status"] = "O";
                 dr["ImgUrl"] = "/timereport/images/icons/other/question-mark.png";
-                dr["ToolTip"] = errMsg;
-                continue;
-            }
-
-            //*** Fine controllo dati ** //
-
-            //*** calcola valori dalla query
-            int giorniLavorativi = CommonFunction.NumeroGiorniLavorativi(primaDataCarico, TBDataReport);
-            int giorniLavorativiRestanti=0;
-
-            //*** calcola ACTUALS
-            float dRevenueACT = dr["RevenueACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueACT"]);
-            float dSpeseACT = dr["SpeseACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["SpeseACT"]);
-            float dCostiACT = dr["CostiACT"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["CostiACT"]);
-
-            //*** calcola BUDGET
-            float dRevenueBDG = dr["RevenueBDG"] == DBNull.Value ? 0 : (float)Convert.ToDouble(dr["RevenueBDG"]);
-            dr["CostiBDG"] = Math.Round((dRevenueBDG) * (1 - Convert.ToDouble(dr["MargineBDG"])), 2);
-
-            dr["MargineACT"] = Math.Round((dRevenueACT - dCostiACT) / dRevenueACT, 2);
-            //dr["WriteUpACT"] = Math.Round(dRevenueBDG - dRevenueACT, 2);
-
-            // i giorni per calcolo EAC sono 
-            // se la data fine progetto � > data ultimo carico -> EAC = ACT + BR * ( data fine progetto - data report )
-            // se la data fine progetto � < data ultimo carico e data report < data ultimo carico -> EAC = ACT + BR * ( data ultimo carico - data report ) con WARNING
-            // se la data fine progetto � < data ultimo carico e data report > data ultimo carico -> EAC = ACT
-
-            if (dataFineProgetto >= ultimaDataCarico)
-                if (dataFineProgetto > TBDataReport)
-                    giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, dataFineProgetto); 
-                else
-                    giorniLavorativiRestanti = 0;
-
-            if (dataFineProgetto < ultimaDataCarico)
-               if (ultimaDataCarico > TBDataReport)
-                    giorniLavorativiRestanti = CommonFunction.NumeroGiorniLavorativi(TBDataReport, ultimaDataCarico);
-                else
-                    giorniLavorativiRestanti = 0;
-
-            float dBurnRate = (float)Math.Round(dRevenueACT / giorniLavorativi, 2);
-            float dSpeseBurnRate = (float)Math.Round(dSpeseACT / giorniLavorativi, 2);
-            float dCostiBurnRate = (float)Math.Round(dCostiACT / giorniLavorativi, 2);
-
-            dr["BurnRate"] = dBurnRate;
-
-            // calcolo EAC
-            // se la data fine progetto � nel passato non lo calcola
-            dr["RevenueEAC"] = Math.Round(dRevenueACT + dBurnRate * giorniLavorativiRestanti, 2);
-            dr["WriteUpEAC"] = Math.Round(dRevenueBDG - dRevenueACT - giorniLavorativiRestanti * Convert.ToDouble(dr["BurnRate"]), 2);
-            dr["SpeseEAC"] = Math.Round(dSpeseACT + dSpeseBurnRate * giorniLavorativiRestanti, 2);
-            dr["CostiEAC"] = Math.Round(dCostiACT + dCostiBurnRate * giorniLavorativiRestanti, 2);
-            dr["MargineEAC"] = Math.Round( ( dRevenueBDG - Convert.ToDouble(dr["CostiEAC"]) ) / dRevenueBDG, 2);
-
-            // Se writeup positivo calcola mesi di copertura altrimenti li forza a zero
-            dr["MesiCopertura"] = Math.Round(((dRevenueBDG - dRevenueACT) / Convert.ToDouble(dr["BurnRate"])) / 20, 2);
-
-            if (Convert.ToDouble(dr["WriteUpEAC"]) > 0)
-            {
-                dr["status"] = "G";
-                dr["ImgUrl"] = "/timereport/images/icons/other/ok_icon.png";
-                dr["ToolTip"] = "Writeup positivo!";
+                dr["ToolTip"] = "Errori da controllare:<ul>" + errMsg + "</ul>";
             }
             else
             {
-                dr["status"] = "R";
-                dr["ImgUrl"] = "/timereport/images/icons/other/warning.png";
-                dr["ToolTip"] = "Writeoff negativo!";
+                double writeUpEAC = dr["WriteUpEAC"] == DBNull.Value ? 0 : Convert.ToDouble(dr["WriteUpEAC"]);
+
+                if (writeUpEAC > 0)
+                {
+                    dr["Status"] = "G";
+                    dr["ImgUrl"] = "/timereport/images/icons/other/ok_icon.png";
+                    dr["ToolTip"] = "Writeup positivo!";
+                }
+                else
+                {
+                    dr["Status"] = "R";
+                    dr["ImgUrl"] = "/timereport/images/icons/other/warning.png";
+                    dr["ToolTip"] = "Writeoff negativo!";
+                }
             }
         }
-
-        return;
     }
 
-    /* lancia procedura di calcolo costi */
-    public static DataSet CalcolaCosti( DateTime daData, int project_id, int overwrite) {
-
+    /* ✅ INVARIATO: Lancia procedura di calcolo costi */
+    public static DataSet CalcolaCosti(DateTime daData, int project_id, int overwrite)
+    {
         List<SqlParameter> parametersList = new List<SqlParameter>();
-        
-        if (project_id !=0 )
+
+        if (project_id != 0)
             parametersList.Add(new SqlParameter("@Project_id", project_id));
 
         parametersList.Add(new SqlParameter("@fromDate", daData));
@@ -319,18 +329,37 @@ public class ControlloProgetto
 
         SqlParameter[] parameters = parametersList.ToArray();
 
-        // Esecuzione della stored procedure e ottenimento del risultato come DataSet
-        DataSet result = Database.ExecuteStoredProcedure("REV2_HoursCostAndRevenueUpdate", parameters);
-        
+        // Esecuzione della stored procedure per calcolo costi Hours
+        DataSet result = Database.ExecuteStoredProcedure("REV3_HoursCostAndRevenueUpdate", parameters);
+
+        // ✅ Dopo aver calcolato i costi, aggiorna ProjectEconomics
+        AggiornaDatiEconomics(project_id);
+
         return result;
     }
 
-    /* numero record non valorizzati da una certa data */
-    public static int NumeroRecorSenzaCosti(DateTime dataDa, int Projects_id) {
+    /* ✅ Aggiorna ProjectEconomics dopo calcolo costi */
+    private static void AggiornaDatiEconomics(int? projectId = null)
+    {
+        List<SqlParameter> parametersList = new List<SqlParameter>();
 
+        if (projectId.HasValue && projectId.Value != 0)
+            parametersList.Add(new SqlParameter("@Project_id", projectId.Value));
+
+        SqlParameter[] parameters = parametersList.ToArray();
+
+        // Esegue la stored procedure che calcola e salva tutti i valori
+        Database.ExecuteStoredProcedure("SPcontrolloProgetti_V4", parameters);
+    }
+
+    /* ✅ INVARIATO: Numero record non valorizzati */
+    public static int NumeroRecorSenzaCosti(DateTime dataDa, int Projects_id)
+    {
         int numRec;
-        string sQuery = "SELECT COUNT(*) FROM v_oreWithCost where ( hours > 0 and ( OreRicavi = 0 or OreRicavi is null ) ) AND data >" + ASPcompatility.FormatDatetimeDb(dataDa) +
-                        " AND ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
+        string sQuery = "SELECT COUNT(*) FROM v_oreWithCost " +
+                       "WHERE (hours > 0 AND (OreRicavi = 0 OR OreRicavi IS NULL)) " +
+                       "AND data > " + ASPcompatility.FormatDatetimeDb(dataDa) +
+                       " AND ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
 
         if (Projects_id != 0)
             sQuery += " AND Projects_id = " + ASPcompatility.FormatNumberDB(Projects_id);
@@ -340,24 +369,29 @@ public class ControlloProgetto
         return numRec;
     }
 
-    /* Estrae giorni con costi */
-    public static DataTable EstraiGiorniCosti(string DataReport, string ProgettoReport, string ManagerReport) {
+    /* ✅ INVARIATO: Estrae giorni con costi */
+    public static DataTable EstraiGiorniCosti(string ProgettoReport, string ManagerReport)
+    {
         string sQuery;
 
-        /* Salva dataset in cache e lancia pagina con ListView per visualizzare risultati */
-        sQuery = "SELECT * FROM v_oreWithCost WHERE Active = 1 AND Data <= " + ASPcompatility.FormatDatetimeDb(Convert.ToDateTime(DataReport)) +
-                                         " AND ProjectType_id = '" + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + "'";
+        // Recupera la data di cutoff dalla sessione corrente
+        TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+        DateTime dataCutoff = CurrentSession.dCutoffDate;
+
+        sQuery = "SELECT * FROM v_oreWithCost " +
+                "WHERE Active = 1 " +
+                "AND Data <= " + ASPcompatility.FormatDatetimeDb(dataCutoff) +
+                " AND ProjectType_id = '" + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + "'";
 
         if (ProgettoReport != "0")
             sQuery += " AND Projects_id = " + ProgettoReport;
 
         if (ManagerReport != "0")
-            sQuery += " AND ( ClientManager_id = " + ManagerReport + " OR AccountManager_id = " + ManagerReport + ")";
+            sQuery += " AND (ClientManager_id = " + ManagerReport +
+                     " OR AccountManager_id = " + ManagerReport + ")";
 
         sQuery += " ORDER BY Consulente, Data";
 
-        return (Database.GetData(sQuery, null));
-
+        return Database.GetData(sQuery, null);
     }
-
 }
