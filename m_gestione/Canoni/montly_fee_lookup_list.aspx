@@ -189,7 +189,7 @@
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSCanoni" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="** costruita in page load **"
-        DeleteCommand="UPDATE Monthly_Fee SET Active = 0, InactiveBy = @persons_Name, LastModificationDate = GETDATE() WHERE (Monthly_Fee_id = @Monthly_Fee_id)">
+        DeleteCommand="DELETE FROM Monthly_Fee WHERE Monthly_Fee_id = @Monthly_Fee_id">
         <SelectParameters>
             <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue" Type="String" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
@@ -197,7 +197,7 @@
             <asp:ControlParameter ControlID="DDLmanager" Name="persons_id" PropertyName="SelectedValue" />
         </SelectParameters>
         <UpdateParameters>            
-            <asp:SessionParameter Name="persons_Name" SessionField="persons_Name" Type="String" />
+            <asp:SessionParameter Name="CreatedBy" SessionField="CreatedBy" Type="String" />
         </UpdateParameters>
         <DeleteParameters>
             <asp:Parameter Name="Monthly_Fee_id" />

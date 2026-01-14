@@ -12,8 +12,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
 {
 
     private SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
-    static string prevPage = String.Empty;
-
+    
     // recupera oggetto sessione
     public TRSession CurrentSession;
 
@@ -28,65 +27,74 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
         if (!IsPostBack )
         {
 
+            // Memorizza l'URL di provenienza nel ViewState
             if (Request.UrlReferrer != null)
-            {
-                // Riga 31 originale corretta
-                prevPage = Request.UrlReferrer.ToString();
-            }
+                ViewState["prevPage"] = Request.UrlReferrer.ToString();
             else
-            {
-                // Imposta un valore sicuro se l'utente è arrivato direttamente (es. da bookmark)
-                prevPage = string.Empty;
-            }
+                ViewState["prevPage"] = "montly_fee_lookup_list.aspx"; // Ritorno di sicurezza
 
-            FVCanoni.ChangeMode(FormViewMode.Insert);
-            FVCanoni.DefaultMode = FormViewMode.Insert;
-            
-//          popola dropdownlist progetto
-            //LoadDDLprogetto();
+            // Logica per il cambio modalità (Insert/Edit)
+            if (!string.IsNullOrEmpty(Request.QueryString["Monthly_Fee_id"]))
+                FVCanoni.DefaultMode = FormViewMode.Edit;
+            else
+                FVCanoni.DefaultMode = FormViewMode.Insert;
 
         }
 
+        //popola dropdownlist progetto
+        LoadDDLprogetto();
     }
 
     protected void FVCanoni_DataBound(object sender, EventArgs e)
     {
-        // Eseguiamo il popolamento solo se siamo in modalità Insert
-        if (FVCanoni.CurrentMode == FormViewMode.Insert)
+        // 1. Cerchiamo la DropDown in qualsiasi modalità (Insert o Edit)
+        DropDownList ddlList = (DropDownList)FVCanoni.FindControl("DDLprogetto");
+
+        if (ddlList != null)
         {
-            DropDownList ddl = (DropDownList)FVCanoni.FindControl("DDLprogetto");
-            if (ddl != null)
+            // 1. Pulizia totale per evitare duplicati
+            ddlList.Items.Clear();
+
+            // 2. Carichiamo i dati dal Database
+            conn.Open();
+            string sqlCmd;
+
+            if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
+                        "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
+                        "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
+                        "WHERE active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
+            else
+                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
+                        "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
+                        "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
+                        "where active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' ORDER BY iProgetto";
+
+            SqlCommand cmd = new SqlCommand(sqlCmd, conn);
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            // 3. Popoliamo la lista
+            ddlList.DataSource = dr;
+            ddlList.DataTextField = "iProgetto";
+            ddlList.DataValueField = "Projects_id";
+            ddlList.DataBind();
+            conn.Close();
+
+            // 4. Inseriamo l'elemento vuoto in posizione 0 (SOLO UNA VOLTA)
+            ddlList.Items.Insert(0, new ListItem("--Seleziona progetto--", ""));
+
+            // 5. Gestione selezione in modalità Edit
+            if (FVCanoni.CurrentMode == FormViewMode.Edit)
             {
-                conn.Open();
-                string sqlCmd;
-
-                // visualizza solo progetti del manager
-                if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
-                    sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
-                    "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
-                    "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
-                    "WHERE active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
-                else
-                    sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
-                    "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
-                    "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
-                    "where active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' ORDER BY iProgetto";
-
-                SqlCommand cmd = new SqlCommand(sqlCmd, conn);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-                DropDownList ddlList = (DropDownList)FVCanoni.FindControl("DDLprogetto");
-
-                ddlList.DataSource = dr;
-                ddlList.Items.Clear();
-                ddlList.Items.Add(new ListItem("--Seleziona progetto--", ""));
-
-                ddlList.DataTextField = "iProgetto";
-                ddlList.DataValueField = "Projects_id";
-                if (Request.QueryString["Projects_id"] != null) // in caso di update seleziona il valore nella dropdown list
-                    ddlList.SelectedValue = Request.QueryString["Projects_id"].ToString();
-                ddlList.DataBind();
-                conn.Close();
+                DataRowView drv = (DataRowView)FVCanoni.DataItem;
+                if (drv != null && drv["Projects_id"] != DBNull.Value)
+                {
+                    string currentProjectId = drv["Projects_id"].ToString();
+                    if (ddlList.Items.FindByValue(currentProjectId) != null)
+                    {
+                        ddlList.SelectedValue = currentProjectId;
+                    }
+                }
             }
         }
     }
@@ -136,7 +144,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
 
         // 2. Inserisci il valore della persona loggata nella collezione dei parametri
         // Assumendo che la tua proprietà sia CurrentSession.UserName
-        DSCanoni.UpdateParameters["persons_Name"].DefaultValue = CurrentSession.UserName;
+        DSCanoni.UpdateParameters["CreatedBy"].DefaultValue = CurrentSession.UserName;
     }
 
     protected void ItemInserting_FVCanoni(object sender, FormViewInsertEventArgs e)
@@ -171,6 +179,8 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
         }
         CheckBox chk = (CheckBox)FVCanoni.FindControl("CheckBox1");
         e.Values["active"] = (chk != null) ? chk.Checked : true;
+
+        e.Values["CreatedBy"] = CurrentSession.UserId;
 
         // 5. Gestione dei campi decimali con maschera (1.250,00 -> 1250.00)
         HandleDecimalFields(e);
@@ -233,12 +243,52 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
     }
     protected void ItemUpdated_FVCanoni(object sender, FormViewUpdatedEventArgs e)
     {
-        Response.Redirect(prevPage);
+        // 1. Controlla se ci sono state eccezioni (errori SQL) durante l'update
+        if (e.Exception == null)
+        {
+            // 2. Recupera l'URL dal ViewState. Se è nullo, usa la pagina della lista come default
+            string targetUrl = ViewState["prevPage"] != null ? ViewState["prevPage"].ToString() : "montly_fee_lookup_list.aspx";
+
+            // 3. Esegui il redirect
+            Response.Redirect(targetUrl);
+        }
+        else
+        {
+            // Se c'è un errore, l'utente resta sulla pagina per vedere il messaggio
+            // Impedisce che l'eccezione blocchi l'applicazione
+            e.ExceptionHandled = true;
+        }
     }
     protected void ItemModeChanging_FVCanoni(object sender, FormViewModeEventArgs e)
     {
-        if (e.CancelingEdit )
-            Response.Redirect(prevPage);        
-    }   
+        if (e.CancelingEdit)
+        {
+            string targetUrl = ViewState["prevPage"] != null ? ViewState["prevPage"].ToString() : "montly_fee_lookup_list.aspx";
+
+            // Se targetUrl è la pagina stessa, forza il ritorno alla lista per evitare loop
+            if (targetUrl.Contains(Request.Url.AbsolutePath))
+            {
+                targetUrl = "montly_fee_lookup_list.aspx";
+            }
+
+            Response.Redirect(targetUrl);
+        }
+    }
+
+    protected void ItemDeleted_FVCanoni(object sender, FormViewDeletedEventArgs e)
+    {
+        if (e.Exception == null)
+        {
+            // Successo: torna alla lista
+            Response.Redirect("montly_fee_lookup_list.aspx");
+        }
+        else
+        {
+            // Errore (ad esempio se il record è collegato ad altre tabelle)
+            Response.Write("<script>alert('Errore durante l'eliminazione: " + e.Exception.Message.Replace("'", "") + "');</script>");
+            e.ExceptionHandled = true;
+        }
+    }
+
 }
 

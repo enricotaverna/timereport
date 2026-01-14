@@ -109,6 +109,22 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
         Response.Redirect("montly_fee_lookup_form.aspx?Monthly_Fee_id=" + Monthly_Fee_id + "&Projects_Id=" + ProjectsId);
     }
 
+    // Questo evento intercetta l'errore o conferma il successo DOPO la cancellazione
+    protected void GridView1_RowDeleted(object sender, GridViewDeletedEventArgs e)
+    {
+        if (e.Exception != null)
+        {
+            // Se c'è un errore (es: vincolo di integrità nel DB), avvisa l'utente
+            ScriptManager.RegisterStartupScript(this, GetType(), "showalert", "alert('Errore: impossibile eliminare il record. Potrebbe essere collegato ad altri dati.');", true);
+            e.ExceptionHandled = true;
+        }
+        else
+        {
+            // Opzionale: un messaggio di conferma successo
+            // GridView1.DataBind(); // La grid si aggiorna già da sola se collegata allo SqlDataSource
+        }
+    }
+
     protected void DL_progetto_SelectedIndexChanged(Object sender, System.EventArgs e)
     {
         Session["DL_progetto"] = DL_progetto.SelectedValue;
