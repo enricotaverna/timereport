@@ -26,7 +26,7 @@ public partial class persons_lookup_form : System.Web.UI.Page
             }
 
             // Populate DDLEmployeeNumber
-            PopulateDDLEmployeeNumber();
+            //PopulateDDLEmployeeNumber();
 
         }
     }
@@ -75,29 +75,57 @@ public partial class persons_lookup_form : System.Web.UI.Page
 
     protected void DSpersons_Insert(object sender, SqlDataSourceCommandEventArgs e)
     {
+        DropDownList ddlManager = (DropDownList)FVPersone.FindControl("DDLManager");
         DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
 
         e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
         e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
+
+        // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
+        if (ddlManager != null)
+        {
+            e.Command.Parameters["@Manager_id"].Value = ddlManager.SelectedValue;
+        }
     }
 
     protected void DSpersons_Update(object sender, SqlDataSourceCommandEventArgs e)
     {
+        DropDownList ddlManager = (DropDownList)FVPersone.FindControl("DDLManager");
         DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
 
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
+
+        // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
+        if (ddlManager != null)
+        {
+            e.Command.Parameters["@Manager_id"].Value = ddlManager.SelectedValue;
+        }
     }
 
     protected void DDLManager_DataBound(object sender, EventArgs e)
     {
-        DropDownList ddlManager = (DropDownList)sender;
-        object managerId = DataBinder.Eval(FVPersone.DataItem, "Manager_id");
-        string selectedValue = managerId != null ? managerId.ToString() : "";
+        DropDownList ddl = (DropDownList)sender;
 
-        // Check if the selected value exists in the list
-        ddlManager.SelectedValue = ddlManager.Items.FindByValue(selectedValue) != null ? selectedValue : "";
+        // Recuperiamo il valore dal database tramite il DataItem del FormView
+        object valObj = DataBinder.Eval(FVPersone.DataItem, "Manager_id");
+
+        if (valObj != null && valObj != DBNull.Value)
+        {
+            string val = valObj.ToString().Trim();
+            if (string.IsNullOrEmpty(val)) return;
+
+            // Se il valore non è in lista, aggiungiamo l'item mancante
+            if (ddl.Items.FindByValue(val) == null)
+            {
+                ddl.Items.Add(new ListItem("Manager non attivo (ID: " + val + ")", val));
+            }
+
+            // Selezioniamo il valore
+            ddl.SelectedValue = val;
+        }
     }
+
 }

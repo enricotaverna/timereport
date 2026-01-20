@@ -228,9 +228,13 @@
                                     <div class="input nobottomborder ">
                                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                                         <label class="dropdown">
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" OnDataBound="DDLManager_DataBound" SelectedValue='<%# Bind("Manager_id") %>'
-                                                DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" required="true"
-                                                AppendDataBoundItems="True">
+                                            <asp:DropDownList
+                                                ID="DDLManager" runat="server"
+                                                DataSourceID="DSManager"
+                                                OnDataBound="DDLManager_DataBound"
+                                                DataTextField="Name"
+                                                DataValueField="Persons_id"
+                                                AppendDataBoundItems="true">
                                                 <asp:ListItem Value="" Text="Seleziona un valore" />
                                             </asp:DropDownList>
                                         </label>
@@ -458,9 +462,13 @@
                                     <div class="input nobottomborder ">
                                         <asp:Label CssClass="inputtext" runat="server" Text="Manager:"></asp:Label>
                                         <label class="dropdown" style="width: 190px">
-                                            <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="DSManager" OnDataBound="DDLManager_DataBound"
-                                                DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" required="true"
-                                                SelectedValue='<%# Bind("Manager_id") %>' AppendDataBoundItems="True">
+                                            <asp:DropDownList
+                                                ID="DDLManager" runat="server"
+                                                DataSourceID="DSManager"
+                                                OnDataBound="DDLManager_DataBound"
+                                                DataTextField="Name"
+                                                DataValueField="Persons_id"
+                                                AppendDataBoundItems="true">
                                                 <asp:ListItem Value="" Text="Seleziona un valore" />
                                             </asp:DropDownList>
                                         </label>
