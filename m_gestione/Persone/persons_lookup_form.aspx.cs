@@ -26,7 +26,7 @@ public partial class persons_lookup_form : System.Web.UI.Page
             }
 
             // Populate DDLEmployeeNumber
-            //PopulateDDLEmployeeNumber();
+            PopulateDDLEmployeeNumber();
 
         }
     }
