@@ -282,7 +282,19 @@ public class WS_Caricatore : System.Web.Services.WebService
             ret = Database.ExecuteSQL(SQLInsert, null);
 
             // memoriza il codice progetto per autorizzazioni consulenti da usare dopo l'insert del progetto
-            CopiaConsulentiDa_id = tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues) == null ? 0 : int.Parse(tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues).ToString());
+            // disabilitato perche in errore
+            //CopiaConsulentiDa_id = tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues) == null ? 0 : int.Parse(tipo.GetProperty("CopiaConsulentiDa_id").GetValue(recWithValues).ToString());
+
+            var propCopiaConsulenti = tipo.GetProperty("CopiaConsulentiDa_id");
+
+            if (propCopiaConsulenti == null || propCopiaConsulenti.GetValue(recWithValues) == null)
+            {
+                CopiaConsulentiDa_id = 0;
+            }
+            else
+            {
+                CopiaConsulentiDa_id = int.Parse(propCopiaConsulenti.GetValue(recWithValues).ToString());
+}        
 
             // se qualcosa è andato male esce
             if (ret == false)
