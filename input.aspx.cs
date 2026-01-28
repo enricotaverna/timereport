@@ -659,6 +659,8 @@ public partial class input : System.Web.UI.Page
         // refresh buffer spese
         CaricaBufferSpese();
 
+        // AGGIUNGI QUESTA RIGA:
+        Response.Redirect(Request.RawUrl);
     }
 
     protected override void InitializeCulture()
