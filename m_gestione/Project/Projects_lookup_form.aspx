@@ -220,7 +220,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
                                         <label>€</label>
                                     </div>
 
@@ -228,7 +228,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-type="number" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
@@ -541,7 +541,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
                                         <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%# Bind("RevenueBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-pattern="^[0-9]+([,.][0-9]{1,2})?$" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
                                         <label>€</label>
                                     </div>
 
@@ -549,7 +549,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-pattern="^[0-9]+([,.][0-9]{1,2})?$" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
