@@ -21,7 +21,7 @@
     <script src="/timereport/include/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/timereport/include/BTmenu/menukit.js"></script>
     <script src="/timereport/include/javascript/timereport.js?v=<%=MyConstants.JSS_VERSION %>"></script>
-    
+
     <script src="/timereport/include/parsley/parsley.min.js"></script>
     <script src="/timereport/include/parsley/it.js"></script>
 
@@ -43,7 +43,7 @@
     <div class="container MainWindowBackground">
         <form id="formCanoni" runat="server">
 
-            <div class="row justify-content-center" >
+            <div class="row justify-content-center">
 
                 <div id="FormWrap" class="StandardForm col-5">
 
@@ -65,9 +65,9 @@
                                     <!-- *** CODICE ATTIVITA ***  -->
                                     <div class="input">
                                         <div class="inputtext">Codice Canone: </div>
-                                        <asp:TextBox ID="MonthlyCodeTextBox" runat="server" Text='<%# Bind("Monthly_Fee_Code") %>' Columns="15" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Style="width:200px" />
+                                        <asp:TextBox ID="MonthlyCodeTextBox" runat="server" Text='<%# Bind("Monthly_Fee_Code") %>' Columns="15" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Style="width: 200px" />
                                         <!-- *** CHECK BOX  ***  -->
-                                        <asp:CheckBox ID="CheckBox1" runat="server" 
+                                        <asp:CheckBox ID="CheckBox1" runat="server"
                                             Checked='<%# (Eval("active") == DBNull.Value || Eval("active") == null) ? true : Convert.ToBoolean(Eval("active")) %>' />
                                         <asp:Label AssociatedControlID="CheckBox1" ID="Label3" runat="server">Attivo</asp:Label>
                                     </div>
@@ -89,7 +89,7 @@
                                     <div class="input nobottomborder">
                                         <!-- *** MANAGER ***  -->
                                         <asp:Label CssClass="inputtext" Visible="false" AssociatedControlID="MangerTxt" ID="MangerLbl" runat="server">Manager:</asp:Label>
-                                        <asp:TextBox ID="MangerTxt" runat="server" Visible="false" Text='<%# Bind("NomeManager") %>' MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Width="270px"/>
+                                        <asp:TextBox ID="MangerTxt" runat="server" Visible="false" Text='<%# Bind("NomeManager") %>' MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Width="270px" />
                                     </div>
 
                                     <div class="input nobottomborder">
@@ -101,8 +101,8 @@
                                             data-parsley-errors-container="#valMsg" />
 
                                         <!-- *** Mese ***  -->
-                                        <asp:Label class="css-label" Visible="false" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
-                                        <asp:TextBox ID="MonthUPD" Visible="false" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+                                        <asp:Label class="css-label" Visible="true" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
+                                        <asp:TextBox ID="MonthUPD" Visible="true" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="True" />
                                     </div>
 
                                     <div class="input nobottomborder">
@@ -118,7 +118,7 @@
                                             AutoPostBack="False"
                                             TextMode="SingleLine"
                                             Style="display: inline-block;"
-                                            data-parsley-required="true" 
+                                            data-parsley-required="true"
                                             data-parsley-errors-container="#valMsg" />
 
                                         <div class="css-label" style="display: inline-block; padding: 0 0 0 30px" associatedcontrolid="CostTxt" id="CostLbl" runat="server">Cost(€): </div>
@@ -130,9 +130,13 @@
                                             Width="80px"
                                             AutoPostBack="False"
                                             TextMode="SingleLine"
-                                            Style="display: inline-block;" 
-                                            data-parsley-required="true" 
+                                            Style="display: inline-block;"
+                                            data-parsley-required="true"
                                             data-parsley-errors-container="#valMsg" />
+                                    </div>
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Note</div>
+                                        <asp:TextBox ID="TextBox22" runat="server" Columns="30" Rows="5" Text='<%# Bind("Note") %>' TextMode="MultiLine" CssClass="textarea" />
                                     </div>
                                 </div>
 
@@ -156,7 +160,7 @@
                                     <!-- *** CODICE ATTIVITA ***  -->
                                     <div class="input">
                                         <div class="inputtext">Codice Canone: </div>
-                                        <asp:TextBox ID="MonthlyCodeTextBox" runat="server" Text='<%# Bind("Monthly_Fee_Code") %>' Columns="15" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Style="width:200px" />
+                                        <asp:TextBox ID="MonthlyCodeTextBox" runat="server" Text='<%# Bind("Monthly_Fee_Code") %>' Columns="15" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" Style="width: 200px" />
                                         <!-- *** CHECK BOX  ***  -->
                                         <asp:CheckBox ID="CheckBox1" runat="server" Checked='<%# Bind("Active") %>' />
                                         <asp:Label AssociatedControlID="CheckBox1" ID="Label3" runat="server">Attivo</asp:Label>
@@ -191,8 +195,8 @@
                                             data-parsley-errors-container="#valMsg" />
 
                                         <!-- *** Mese ***  -->
-                                        <asp:Label class="css-label" Visible="false" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
-                                        <asp:TextBox ID="MonthUPD" Visible="false" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="False" />
+                                        <asp:Label class="css-label" Visible="true" Style="padding: 0px 5px 0px 65px" AssociatedControlID="MonthUPD" ID="Label2" runat="server">Mese</asp:Label>
+                                        <asp:TextBox ID="MonthUPD" Visible="true" runat="server" Text='<%# Bind("Month") %>' Width="50" MaxLength="15" CssClass="ASPInputcontent" Enabled="True" />
                                     </div>
 
                                     <div class="input nobottomborder">
@@ -223,6 +227,11 @@
                                             Style="display: inline-block;"
                                             data-parsley-required="true"
                                             data-parsley-errors-container="#valMsg" />
+                                    </div>
+
+                                    <div class="input nobottomborder">
+                                        <div class="inputtext">Note</div>
+                                        <asp:TextBox ID="TextBox22" runat="server" Columns="30" Rows="5" Text='<%# Bind("Note") %>' TextMode="MultiLine" CssClass="textarea" />
                                     </div>
                                 </div>
 
@@ -267,10 +276,10 @@
                    INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id 
                    INNER JOIN Persons ON Persons.persons_id = Projects.ClientManager_id
                    WHERE Monthly_Fee.Monthly_Fee_id = @Monthly_Fee_id"
-        InsertCommand="INSERT INTO Monthly_Fee (Projects_id, ProjectCode, Monthly_Fee_Code, Year, Month, Revenue, Cost, Active, CreatedBy, CreationDate) 
-                   VALUES (@Projects_id, @ProjectCode, @Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Active, @CreatedBy, GETDATE())"
+        InsertCommand="INSERT INTO Monthly_Fee (Projects_id, ProjectCode, Monthly_Fee_Code, Year, Month, Revenue, Cost, Active, CreatedBy, CreationDate, Note) 
+                   VALUES (@Projects_id, @ProjectCode, @Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Active, @CreatedBy, GETDATE(), @Note)"
         UpdateCommand="UPDATE Monthly_Fee SET Projects_id=@Projects_id, Year=@Year, Revenue=@Revenue, Cost=@Cost, Active=@Active, 
-                   LastModifiedBy=@CreatedBy, LastModificationDate=GETDATE() 
+                   LastModifiedBy=@CreatedBy, LastModificationDate=GETDATE(), Note=@Note
                    WHERE Monthly_Fee_id=@Monthly_Fee_id">
 
         <SelectParameters>
@@ -285,6 +294,7 @@
             <asp:Parameter Name="Revenue" Type="Decimal" />
             <asp:Parameter Name="Cost" Type="Decimal" />
             <asp:Parameter Name="Active" Type="Boolean" />
+            <asp:Parameter Name="Note" Type="String" />
             <asp:Parameter Name="CreatedBy" />
             <asp:Parameter Name="CreationDate" />
         </InsertParameters>
@@ -294,6 +304,7 @@
             <asp:Parameter Name="Revenue" Type="Decimal" />
             <asp:Parameter Name="Cost" Type="Decimal" />
             <asp:Parameter Name="Active" Type="Boolean" />
+            <asp:Parameter Name="Note" Type="String" />
             <asp:SessionParameter Name="CreatedBy" SessionField="CreatedBy" Type="String" />
             <asp:Parameter Name="Monthly_Fee_id" Type="Int32" />
         </UpdateParameters>
@@ -339,7 +350,7 @@
         $(document).ready(function () {
             // Selettore robusto: trova l'ID che finisce con 'RevenueTxt'
             var $importoField = $('[id$="RevenueTxt"],[id$="CostTxt"]');
-          
+
             if ($importoField.length) {
                 // Esegui la maschera solo se il campo è trovato nel DOM
                 $importoField.mask('000.000.000,00', { reverse: true });
