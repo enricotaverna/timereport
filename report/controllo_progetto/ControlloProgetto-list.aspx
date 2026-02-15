@@ -28,6 +28,47 @@
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 <link href="/timereport/include/jquery/tooltip/jquery.smallipop.css" rel="stylesheet" />
 
+<!-- ✅ STILI LEGENDA AGGIORNATI -->
+<style>
+    .legend-container {
+        background-color: transparent; /* ✅ Rimosso sfondo grigio */
+        border: none;                  /* ✅ Rimosso bordo */
+        border-radius: 0;
+        padding: 0;                    /* ✅ Rimosso padding */
+        margin-bottom: 0;              /* ✅ Rimosso margine */
+        font-size: 11px;               /* ✅ Font più piccolo */
+        display: flex;
+        align-items: center;
+        gap: 10px;                     /* ✅ Gap ridotto */
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .legend-title {
+        font-weight: bold;
+        color: #333;
+        white-space: nowrap;
+        margin-right: 5px;             /* ✅ Margine ridotto */
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;                      /* ✅ Gap ridotto */
+        white-space: nowrap;
+    }
+
+    .legend-icon {
+        height: 16px;                  /* ✅ Icone più piccole */
+        flex-shrink: 0;
+    }
+
+    .legend-text {
+        color: #666;
+        font-size: 11px;               /* ✅ Testo più piccolo */
+    }
+</style>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head runat="server">
@@ -86,8 +127,6 @@
                                 <asp:BoundField DataField="MargineBDG" HeaderText="Margine BDG" SortExpression="MargineBDG" DataFormatString="{0:#.#%;-#.#%;}" />
                                 <asp:BoundField DataField="MargineEAC" HeaderText="Margine EAC" SortExpression="MargineEAC" DataFormatString="{0:#.##%;-#.##%;}" />
 
-                                <%--<asp:BoundField DataField="SpeseActual" HeaderText="Spese Actual" SortExpression="SpeseActual" DataFormatString="{0:###,###.00;-; }" />                          --%>
-
                                 <asp:BoundField DataField="WriteUpEAC" HeaderText="Write Up/Off" SortExpression="WriteUpEAC" DataFormatString="{0:###,###;-###,###; }" />
                                 <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" DataFormatString="{0:###,###.0;-###,###.0; }" />
 
@@ -98,18 +137,37 @@
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
-
                             </Columns>
 
                         </asp:GridView>
                     </div>
 
-                    <div class="buttons">
+                    <!-- ✅ FOOTER CON LEGENDA E BOTTONI SULLA STESSA RIGA -->
+                    <div class="buttons" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+    
+                        <!-- Legenda a sinistra -->
+                        <div class="legend-container" style="margin-bottom: 0; flex: 1; min-width: 400px;">
+                            <span class="legend-title">Legenda:</span>
+                            <div class="legend-item">
+                                <img src="/timereport/images/icons/other/question-mark.png" alt="Warning" class="legend-icon" />
+                                <span class="legend-text">Impossibile calcolare</span>
+                            </div>
+                            <div class="legend-item">
+                                <img src="/timereport/images/icons/other/ok_icon.png" alt="OK" class="legend-icon" />
+                                <span class="legend-text">Progetto OK</span>
+                            </div>
+                            <div class="legend-item">
+                                <img src="/timereport/images/icons/other/warning.png" alt="Warning" class="legend-icon" />
+                                <span class="legend-text">EAC fuori Budget</span>
+                            </div>
+                        </div>
 
-                        <%--Messaggio se nessun dato selezionato --%>
-                        <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
-                        <asp:Button ID="btn_ExportDettagli" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
-                        <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
+                        <!-- Bottoni a destra -->
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;">
+                            <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
+                            <asp:Button ID="btn_ExportDettagli" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
+                            <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
+                        </div>
 
                     </div>
                     <!--End buttons-->

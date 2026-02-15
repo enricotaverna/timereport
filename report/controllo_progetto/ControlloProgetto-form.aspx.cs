@@ -13,7 +13,6 @@ using System.Web.UI.WebControls;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
 {
-
     // recupera oggetto sessione
     public TRSession CurrentSession;
     public EconomicsProgetto ProgettoCorrente;
@@ -26,7 +25,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
         //	Autorizzazione su tutti o sui progetti assegnati
         if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
             Auth.CheckPermission("MASTERDATA", "PROJECT_FORCED");
@@ -41,13 +39,11 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             LoadFormData();
 
             Session["ProgettoCorrente"] = ProgettoCorrente;
-
         }
     }
 
     protected void LoadFormData()
     {
-
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
 
         // calcola i dati actual del progetto e popola l'oggeto EconomicsProgettoCorrente
@@ -94,22 +90,23 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // MESI COPERTURA
         TextBox TBMesiCopertura = (TextBox)FVProgetto.FindControl("TBMesiCopertura");
         TBMesiCopertura.Text = ProgettoCorrente.MesiCopertura.ToString("#,##0.#;-#,##0.#;0");
-           
+
         // popola tabella costi e billrate            
         GridView GVConsulenti = (GridView)FVProgetto.FindControl("GVConsulenti");
 
         // Usa la data di cutoff dalla sessione
         GVConsulenti.DataSource = Database.GetData("SELECT DISTINCT Consulente, YEAR(Data) as Anno ,FORMAT(SUM(giorni) , 'N1', 'it-IT') as Giorni, FORMAT(CostRate, 'N0') + ' €' as CostRate , FORMAT(BillRate, 'N0') + ' €' as BillRate FROM v_oreWithCost " +
                                                    "WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) +
-                                                   " AND Data <= " + ASPcompatility.FormatDatetimeDb(CurrentSession.dCutoffDate)  +
+                                                   " AND Data <= " + ASPcompatility.FormatDatetimeDb(CurrentSession.dCutoffDate) +
                                                    " GROUP BY Consulente, YEAR(Data), CostRate, BillRate", null);
 
-         GVConsulenti.DataBind();
+        GVConsulenti.DataBind();
 
-        CalcolaActuals( TProjects_Id.Value);
+        CalcolaActuals(TProjects_Id.Value);
     }
 
-    private void OutputLabel(string controllo, string testo ) {
+    private void OutputLabel(string controllo, string testo)
+    {
         Label label = (Label)FVProgetto.FindControl(controllo);
         label.Text = testo;
     }
@@ -138,7 +135,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         {
             columnNames[i] = tabData.Columns[i].ColumnName;
         }
-       
+
         // somma per mesi
         decimal[] columnSums = new decimal[tabData.Columns.Count];
         // Itera su ogni riga del DataTable per calcolare le somme totali
@@ -154,7 +151,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         Session["columnNamesJson"] = Newtonsoft.Json.JsonConvert.SerializeObject(columnNames);
         Session["columnSumsJson"] = Newtonsoft.Json.JsonConvert.SerializeObject(columnSums);
-
     }
 
     // Scarica dettaglio ore
@@ -162,7 +158,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
         DataTable dtDettaglio = Database.GetData("SELECT * FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente", null);
-        bool ret = Utilities.ExporXlsxWorkbook(dtDettaglio,"export.xlsx");
+        bool ret = Utilities.ExporXlsxWorkbook(dtDettaglio, "export.xlsx");
         // Avvio download dopo che è stato prodotto il file
         if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
     }
@@ -201,20 +197,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         }
     }
 
-    protected void DSprojects_Update(object sender, SqlDataSourceCommandEventArgs e)
+    protected void FormattaTabellaOutput(GridViewRowEventArgs tab, string formato)
     {
-        e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
-        e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
-    }
-
-    protected void FVProgetto_ItemUpdated(Object sender, System.Web.UI.WebControls.FormViewUpdatedEventArgs e)
-    {
-        Response.Redirect("ControlloProgetto-list.aspx");
-    }
-
-    protected void FormattaTabellaOutput(GridViewRowEventArgs tab, string formato) 
-    {
-
         decimal value;
 
         if (tab.Row.RowType == DataControlRowType.DataRow)
@@ -277,5 +261,4 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         Response.Redirect("/timereport/report/controllo_progetto/ControlloProgetto-form.aspx?ProjectCode=" + ProgettoCorrente.ProjectCode);
     }
-
 }

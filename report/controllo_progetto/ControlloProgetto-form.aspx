@@ -28,62 +28,62 @@
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
 
 <style>
-/* Add border only to table and its cells */
-.table-border-only {
-    border: 1px solid grey;
-}
+    /* Add border only to table and its cells */
+    .table-border-only {
+        border: 1px solid grey;
+    }
 
-/* forzatura stile per form economics  */
-.nobottomborder {
-    margin: 0px 30px 5px 10px;
-}
+    /* forzatura stile per form economics  */
+    .nobottomborder {
+        margin: 0px 30px 5px 10px;
+    }
 
-/* Stile Tabulator per Economics - sovrascrive stili globali */
-#EconomicsTable.tabulator {
-    border: 1px solid grey;
-    font-size: 14px;
-    font-family: OpenSans-Regular, Arial, sans-serif;
-    border-radius: 0 !important;
-}
+    /* Stile Tabulator per Economics - sovrascrive stili globali */
+    #EconomicsTable.tabulator {
+        border: 1px solid grey;
+        font-size: 14px;
+        font-family: OpenSans-Regular, Arial, sans-serif;
+        border-radius: 0 !important;
+    }
 
-#EconomicsTable .tabulator-header {
-    background-color: #212529 !important;
-    color: white !important;
-    font-weight: 600;
-    border-radius: 0 !important;
-    border: none !important;
-}
+    #EconomicsTable .tabulator-header {
+        background-color: #212529 !important;
+        color: white !important;
+        font-weight: 600;
+        border-radius: 0 !important;
+        border: none !important;
+    }
 
-#EconomicsTable .tabulator-col {
-    background: #212529 !important;
-    border-left: 1px solid grey !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: 1px solid grey !important;
-    border-radius: 0 !important;
-}
+    #EconomicsTable .tabulator-col {
+        background: #212529 !important;
+        border-left: 1px solid grey !important;
+        border-right: none !important;
+        border-top: none !important;
+        border-bottom: 1px solid grey !important;
+        border-radius: 0 !important;
+    }
 
-#EconomicsTable .tabulator-row {
-    min-height: 31px;
-    border-bottom: 1px solid grey !important;
-    background: white !important;
-}
+    #EconomicsTable .tabulator-row {
+        min-height: 31px;
+        border-bottom: 1px solid grey !important;
+        background: white !important;
+    }
 
-#EconomicsTable .tabulator-row:hover {
-    background-color: rgba(0,0,0,.075) !important;
-}
+        #EconomicsTable .tabulator-row:hover {
+            background-color: rgba(0,0,0,.075) !important;
+        }
 
-#EconomicsTable .tabulator-cell {
-    padding: 0.3rem;
-    border: none !important;
-}
+    #EconomicsTable .tabulator-cell {
+        padding: 0.3rem;
+        border: none !important;
+    }
 
-/* Altezza fissa per tab pages */
-.tab-content .tab-pane {
-    min-height: 460px;
-    height: 460px;
-    overflow-y: auto;
-}
+    /* Altezza fissa per tab pages */
+    .tab-content .tab-pane {
+        min-height: 460px;
+        height: 460px;
+        overflow-y: auto;
+    }
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -110,8 +110,7 @@
                 <div id="FormWrap" runat="server" class="StandardForm col-7" style="max-width: 58.333333%; overflow: hidden;">
 
                     <asp:FormView ID="FVProgetto" runat="server" DataKeyNames="Projects_Id"
-                        DataSourceID="projects" OnItemUpdated="FVProgetto_ItemUpdated"
-                        DefaultMode="Edit" Width="100%">
+                        DataSourceID="projects" DefaultMode="Edit" Width="100%">
 
                         <EditItemTemplate>
 
@@ -147,7 +146,7 @@
                                                 Columns="50" MaxLength="50" class="ASPInputcontent"
                                                 data-parsley-errors-container="#valMsg" data-parsley-required="true" Enabled="False" />
                                         </div>
-  
+
 
                                         <!-- *** CODICE CLIENTE ***  -->
                                         <div class="input nobottomborder">
@@ -197,7 +196,7 @@
                                         </div>
 
                                         <br />
-                                        
+
                                         <!-- *** IMPORTO REVENUE ***  -->
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Revenue: </div>
@@ -231,7 +230,7 @@
                                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" Enabled="False" />
 
                                             <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
-                                            <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>' 
+                                            <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>'
                                                 data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                         </div>
 
@@ -243,108 +242,129 @@
 
                                     <div class="tab-pane fade" id="tabs-2" role="tabpanel" aria-labelledby="tab-economics" style="font-size: 14px; font-family: OpenSans-Regular;">
 
-                                    <br />
+                                        <br />
 
-                                    <!-- *** TABELLA ECONOMICS CALCOLATA ***  -->
-                                    <table id="ProjectEconomicsCalculated" class="table table-sm table-hover table-border-only" style="border-collapse:collapse;width:95%; margin: 0 auto 20px auto;">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th scope="col">Indicatore</th>
-                                                <th scope="col">Budget</th>
-                                                <th scope="col">Actual</th>
-                                                <th scope="col">EAC</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <th scope="row" style="color:grey;font-weight:normal">Revenue</th>
-                                                <td><asp:Label ID="lbRevenueBDG" runat="server" /></td>
-                                                <td><asp:Label ID="lbRevenueACT" runat="server" /></td>
-                                                <td><asp:Label ID="lbRevenueEAC" runat="server" /></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="color:grey;font-weight:normal">Costi</th>
-                                                <td><asp:Label ID="lbCostiBDG" runat="server" /></td>
-                                                <td><asp:Label ID="lbCostiACT" runat="server" /></td>
-                                                <td><asp:Label ID="lbCostiEAC" runat="server" /></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="color:grey;font-weight:normal">Spese</th>
-                                                <td><asp:Label ID="lbSpeseBDG" runat="server" /></td>
-                                                <td><asp:Label ID="lbSpeseACT" runat="server" /></td>
-                                                <td><asp:Label ID="lbSpeseEAC" runat="server" /></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="color:grey;font-weight:normal">Margine</th>
-                                                <td><asp:Label ID="lbMargineBDG" runat="server" /></td>
-                                                <td><asp:Label ID="lbMargineACT" runat="server" /></td>
-                                                <td><asp:Label ID="lbMargineEAC" runat="server" /></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="color:grey;font-weight:normal">Writeup</th>
-                                                <td></td>
-                                                <td><asp:Label ID="lbWriteUpACT" runat="server" /></td>
-                                                <td><asp:Label ID="lbWriteUpEAC" runat="server" /></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                        <!-- *** TABELLA ECONOMICS CALCOLATA ***  -->
+                                        <table id="ProjectEconomicsCalculated" class="table table-sm table-hover table-border-only" style="border-collapse: collapse; width: 95%; margin: 0 auto 20px auto;">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">Indicatore</th>
+                                                    <th scope="col">Budget</th>
+                                                    <th scope="col">Actual</th>
+                                                    <th scope="col">EAC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row" style="color: grey; font-weight: normal">Revenue</th>
+                                                    <td>
+                                                        <asp:Label ID="lbRevenueBDG" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbRevenueACT" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbRevenueEAC" runat="server" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" style="color: grey; font-weight: normal">Costi</th>
+                                                    <td>
+                                                        <asp:Label ID="lbCostiBDG" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbCostiACT" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbCostiEAC" runat="server" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" style="color: grey; font-weight: normal">Spese</th>
+                                                    <td>
+                                                        <asp:Label ID="lbSpeseBDG" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbSpeseACT" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbSpeseEAC" runat="server" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" style="color: grey; font-weight: normal">Margine</th>
+                                                    <td>
+                                                        <asp:Label ID="lbMargineBDG" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbMargineACT" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbMargineEAC" runat="server" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" style="color: grey; font-weight: normal">Writeup</th>
+                                                    <td></td>
+                                                    <td>
+                                                        <asp:Label ID="lbWriteUpACT" runat="server" /></td>
+                                                    <td>
+                                                        <asp:Label ID="lbWriteUpEAC" runat="server" /></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                                    <br />
+                                        <br />
 
-                                    <!-- *** TABELLA ECONOMICS MENSILE ***  -->
-                                    <div style="width:95%; margin: 0 auto 10px auto; display: flex; align-items: center;">
-                                        <div style="max-width:730px;" id="EconomicsTable"></div>
-                                    </div>
-                                    <br />
-                                    <br />
+                                        <!-- *** TABELLA ECONOMICS MENSILE ***  -->
+                                        <div style="width: 95%; margin: 0 auto 10px auto; display: flex; align-items: center;">
+                                            <div style="max-width: 730px;" id="EconomicsTable"></div>
+                                        </div>
+                                        <br />
+                                        <br />
 
-                                    <!-- *** MESI COPERTURA ***  -->
-                                    <div style="width:95%; margin: 0 auto 10px auto; display: flex; align-items: center;">
-                                        <span style="margin-right: 10px;">Copertura:</span>
-                                        <asp:TextBox ID="TBMesiCopertura" runat="server" Enabled="False" style="width: 80px; margin-right: 5px;" />
-                                        <span>mesi</span>
-                                    </div>
-                                 
+                                        <!-- *** MESI COPERTURA ***  -->
+                                        <div style="width: 95%; margin: 0 auto 10px auto; display: flex; align-items: center;">
+                                            <span style="margin-right: 10px;">Copertura:</span>
+                                            <asp:TextBox ID="TBMesiCopertura" runat="server" Enabled="False" Style="width: 80px; margin-right: 5px;" />
+                                            <span>mesi</span>
+                                        </div>
 
-                                </div>
 
-                                <!-- *** TAB 2 ***  -->
-                                
-
-                                <!-- *** TAB 3 ***  -->
-
-                                <div class="tab-pane fade" id="tabs-3" role="tabpanel" aria-labelledby="tab-risorse" style="font-size: 14px; font-family: OpenSans-Regular;">
-                                    <br />
-                                    <asp:GridView ID="GVConsulenti" runat="server" OnRowDataBound="GVConsulenti_RowDataBound" AllowPaging="False" class="table table-sm table-hover table-border-only" style="width:95%; margin: 0 auto 20px auto;" HeaderStyle-CssClass="table-dark">
-                                    </asp:GridView>
-                                </div>
-
-                                <!-- *** TAB 3 ***  -->
-
-                                <div class="tab-pane fade" id="tabs-4" role="tabpanel" aria-labelledby="tab-actuals" style="font-size: 14px; font-family: OpenSans-Regular; max-width: 766px; overflow-x: auto;">
-
-                                    <div style="margin: 0 auto; width: 70%;">
-                                        <canvas style="max-width: 480px; max-height: 250px;" id="myChart"></canvas>
                                     </div>
 
-                                <br />
-
-                                    <asp:GridView ID="GVGGActuals" runat="server" OnRowDataBound="GVGGActuals_RowDataBound" AllowPaging="False" class="table table-sm table-hover table-border-only" style="width:95%; margin: 0 auto 20px auto;" HeaderStyle-CssClass="table-dark"  >
-                                    </asp:GridView>
-                                </div>
+                                    <!-- *** TAB 2 ***  -->
 
 
-                            <!-- *** BOTTONI  ***  -->
-                            <div class="buttons">
-                                <div id="valMsg" class="parsley-single-error"></div>
-                                <asp:Button ID="btn_save" runat="server" CausesValidation="True" CommandName="Update" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" />
-                                <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
-                                <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
-                                <asp:Button ID="btn_calc" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" Style="width: 120px" OnClick="btn_calc_Click" />
-                                <asp:Button ID="btn_SaveEconomics" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClientClick="SaveEconomicsData(); return false;" />
-                                <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" PostBackUrl="/timereport/report/controllo_progetto/ControlloProgetto-list.aspx" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
-                            </div>
+                                    <!-- *** TAB 3 ***  -->
 
+                                    <div class="tab-pane fade" id="tabs-3" role="tabpanel" aria-labelledby="tab-risorse" style="font-size: 14px; font-family: OpenSans-Regular;">
+                                        <br />
+                                        <asp:GridView ID="GVConsulenti" runat="server" OnRowDataBound="GVConsulenti_RowDataBound" AllowPaging="False" class="table table-sm table-hover table-border-only" Style="width: 95%; margin: 0 auto 20px auto;" HeaderStyle-CssClass="table-dark">
+                                        </asp:GridView>
+
+                                        <!-- ✅ NUOVA ISTRUZIONE -->
+                                        <div style="width: 95%; margin: 0 auto; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007bff; font-size: 13px; color: #666;">
+                                            <i class="fas fa-info-circle" style="margin-right: 8px; color: #007bff;"></i>
+                                            <strong>Nota:</strong> Utilizzare <strong>Calcola</strong> per valorizzare eventuali giornate senza costi.
+   
+                                        </div>
+
+                                    </div>
+
+                                    <!-- *** TAB 3 ***  -->
+
+                                    <div class="tab-pane fade" id="tabs-4" role="tabpanel" aria-labelledby="tab-actuals" style="font-size: 14px; font-family: OpenSans-Regular; max-width: 766px; overflow-x: auto;">
+
+                                        <div style="margin: 0 auto; width: 70%;">
+                                            <canvas style="max-width: 480px; max-height: 250px;" id="myChart"></canvas>
+                                        </div>
+
+                                        <br />
+
+                                        <asp:GridView ID="GVGGActuals" runat="server" OnRowDataBound="GVGGActuals_RowDataBound" AllowPaging="False" class="table table-sm table-hover table-border-only" Style="width: 95%; margin: 0 auto 20px auto;" HeaderStyle-CssClass="table-dark">
+                                        </asp:GridView>
+                                    </div>
+
+
+                                    <!-- *** BOTTONI  ***  -->
+                                    <div class="buttons">
+                                        <div id="valMsg" class="parsley-single-error"></div>
+                                        <asp:Button ID="btn_save" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClientClick="SaveProgettoData(); return false;" />
+                                        <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                        <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                        <asp:Button ID="btn_calc" runat="server" CausesValidation="True" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" Style="width: 120px" OnClick="btn_calc_Click" />
+                                        <asp:Button ID="btn_SaveEconomics" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClientClick="SaveEconomicsData(); return false;" />
+                                        <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" PostBackUrl="/timereport/report/controllo_progetto/ControlloProgetto-list.aspx" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
+                                    </div>
                         </EditItemTemplate>
 
                     </asp:FormView>
@@ -372,28 +392,11 @@
     <!-- *** DATASOURCE *** -->
     <asp:SqlDataSource ID="projects" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
-        SelectCommand="SELECT ProjectCode + ' ' + Name as ProjectName, * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)"
-        UpdateCommand="UPDATE Projects SET RevenueBudget = @RevenueBudget, SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, NoOvertime = @NoOvertime, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy  WHERE (Projects_Id = @Projects_Id)"
-        OnUpdating="DSprojects_Update">
+        SelectCommand="SELECT ProjectCode + ' ' + Name as ProjectName, * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)">
         <SelectParameters>
             <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
                 Type="String" />
         </SelectParameters>
-        <DeleteParameters>
-            <asp:Parameter Name="Projects_Id" Type="Int32" />
-        </DeleteParameters>
-        <UpdateParameters>
-            <asp:Parameter Name="RevenueBudget" Type="Decimal" />
-            <asp:Parameter Name="SpeseBudget" Type="Decimal" />
-            <asp:Parameter Name="MargineProposta" Type="Decimal" />
-            <asp:Parameter Name="DataFine" Type="DateTime" />
-            <asp:Parameter Name="DataInizio" Type="DateTime" />
-            <asp:Parameter Name="SpeseForfait" Type="Boolean" />
-            <asp:Parameter Name="NoOvertime" />
-            <asp:Parameter Name="LastModifiedBy" />
-            <asp:Parameter Name="LastModificationDate" />
-        </UpdateParameters>
-
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="cliente" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
@@ -541,6 +544,19 @@
             }
             $('#FVProgetto_btn_calc').click(function () { MaskScreen(true); });
             $('#FVProgetto_btnAnnulla').click(function () { MaskScreen(true); });
+
+            var activeTab = sessionStorage.getItem('activeTab');
+            if (activeTab) {
+                sessionStorage.removeItem('activeTab'); // Pulisci subito
+                $('a[href="' + activeTab + '"]').tab('show'); // Attiva il tab
+            }
+
+            // Imposta il tab corretto all'avvio, basato su activeTab
+            var tabIndex = 1;
+            if (activeTab === "#tabs-2") tabIndex = 2;
+            else if (activeTab === "#tabs-3") tabIndex = 3;
+            else if (activeTab === "#tabs-4") tabIndex = 4;
+            showTabButtons(tabIndex);
         });
 
         // *** TABULATOR ECONOMICS - VERSIONE SEMPLIFICATA ***
@@ -549,7 +565,7 @@
         var currentProjectId = 0;
         var canEditMargine = <%= Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL").ToString().ToLower() %>;
 
-// Recupera la data di cutoff dalla sessione
+        // Recupera la data di cutoff dalla sessione
         var cutoffDate = new Date('<%= CurrentSession.dCutoffDate.ToString("yyyy-MM-dd") %>');
         var cutoffAnnoMese = cutoffDate.getFullYear() + "-" + ("0" + (cutoffDate.getMonth() + 1)).slice(-2);
 
@@ -620,7 +636,7 @@
                     editable: function (cell) {
                         if (!isEditable) return false;
                         var rowType = cell.getRow().getData().rowType;
-                        return rowType === "ETC" || (rowType === "Margine" && canEditMargine);
+                        return rowType === "CostETC" || (rowType === "Margine" && canEditMargine);  // Era: "ETC"
                     },
                     width: 80,
                     minWidth: 80,
@@ -650,7 +666,7 @@
                         if (isNaN(numValue)) return value;
 
                         // ETC: visualizza come numero normale
-                        if (rowType === "ETC") {
+                        if (rowType === "CostETC") {  // Era: "ETC"
                             var decimals = (numValue % 1 === 0) ? 0 : 2;
                             return numValue.toLocaleString('it-IT', {
                                 minimumFractionDigits: decimals,
@@ -672,16 +688,16 @@
             });
 
             // Costruisci righe dati (i valori arrivano già convertiti dal WebService)
-            var etcRow = { rowType: "ETC" };
+            var costETCRow = { rowType: "CostETC" };  // Era: etcRow con "ETC"
             var margineRow = { rowType: "Margine" };
 
             filteredData.forEach(function (item) {
-                etcRow[item.AnnoMese] = item.ETC;
-                margineRow[item.AnnoMese] = item.Margine; // Arriva già come percentuale (es. 35)
+                costETCRow[item.AnnoMese] = item.CostETC;  // Era: etcRow[item.AnnoMese] = item.ETC
+                margineRow[item.AnnoMese] = item.Margine;
             });
 
             economicsTable = new Tabulator("#EconomicsTable", {
-                data: [etcRow, margineRow],
+                data: [costETCRow, margineRow],  // Era: [etcRow, margineRow]
                 layout: "fitDataTable",
                 columns: columns,
                 responsiveLayout: false,
@@ -711,21 +727,19 @@
 
                 for (var key in row) {
                     if (key !== "rowType" && row.hasOwnProperty(key)) {
-                        // Inizializza record per questo mese se non esiste
                         if (!monthlyData[key]) {
                             monthlyData[key] = {
                                 Projects_id: currentProjectId,
                                 AnnoMese: key,
-                                ETC: null,
+                                CostETC: null,
                                 Margine: null
                             };
                         }
 
-                        // Assegna valore al campo corretto (valori già in formato corretto)
-                        if (rowType === "ETC") {
-                            monthlyData[key].ETC = row[key];
+                        if (rowType === "CostETC") {
+                            monthlyData[key].CostETC = row[key];
                         } else if (rowType === "Margine") {
-                            monthlyData[key].Margine = row[key]; // Valore percentuale (es. 35)
+                            monthlyData[key].Margine = row[key];
                         }
                     }
                 }
@@ -741,6 +755,9 @@
 
             console.log("Dati da salvare:", dataToPost); // DEBUG
 
+            // ✅ Mostra loading PRIMA della chiamata AJAX
+            MaskScreen(true);
+
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WS_ControlloProgetto.asmx/SaveEconomicsData",
@@ -749,18 +766,87 @@
                 dataType: "json",
                 success: function (response) {
                     if (response.d.Success) {
-                        ShowPopup(response.d.Message);
-                        mustSaveEconomics = false;
-                        loadEconomicsTable(); // Ricarica tabella dopo salvataggio
+                        // ✅ RIMOSSO ShowPopup - vai direttamente al reload
+                        sessionStorage.setItem('activeTab', '#tabs-2');
+                        location.reload(); // Reload immediato, loading resta attivo
                     } else {
+                        UnMaskScreen();
                         ShowPopup("Errore: " + response.d.Message);
                     }
                 },
                 error: function (xhr, textStatus, errorThrown) {
+                    UnMaskScreen();
                     ShowPopup("Errore server in salvataggio tabella");
                     console.error("Dettagli errore:", xhr.responseText);
                 }
             });
+        }
+
+        function SaveProgettoData() {
+            // Valida il form prima di salvare
+            var parsleyForm = $('#MainForm').parsley();
+            if (!parsleyForm.validate()) {
+                return false;
+            }
+
+            // Recupera i valori dal FormView
+            var projectsId = parseInt($("#FVProgetto_TBProjects_id").val());
+            var revenueBudget = $("#FVProgetto_TBRevenueBudget").val().replace(/\./g, '').replace(',', '.');
+            var speseBudget = $("#FVProgetto_SpeseBudgetTextBox").val().replace(/\./g, '').replace(',', '.');
+            var speseForfait = $("#FVProgetto_SpeseForfaitCheckBox").is(':checked');
+            var margineProposta = $("#FVProgetto_TBMargine").val().replace(',', '.');
+            var dataFine = $("#FVProgetto_TBAttivoA").val();
+            var dataInizio = $("#FVProgetto_TBAttivoDa").val();
+            var noOvertime = $("#FVProgetto_CBNoOvertime").is(':checked');
+
+            // Validazioni
+            if (isNaN(projectsId) || projectsId === 0) {
+                ShowPopup("Impossibile recuperare l'ID del progetto");
+                return false;
+            }
+
+            // Prepara i dati da inviare
+            var projectData = {
+                Projects_Id: projectsId,
+                RevenueBudget: parseFloat(revenueBudget) || 0,
+                SpeseBudget: parseFloat(speseBudget) || 0,
+                SpeseForfait: speseForfait,
+                MargineProposta: parseFloat(margineProposta) || 0,
+                DataFine: dataFine,
+                DataInizio: dataInizio,
+                NoOvertime: noOvertime
+            };
+
+            console.log("Dati progetto da salvare:", projectData); // DEBUG
+
+            // ✅ Mostra loading PRIMA della chiamata AJAX
+            MaskScreen(true);
+
+            // Chiamata AJAX al WebService
+            $.ajax({
+                type: "POST",
+                url: "/timereport/webservices/WS_ControlloProgetto.asmx/SaveProjectData",
+                data: JSON.stringify({ projectData: projectData }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d.Success) {
+                        // ✅ RIMOSSO ShowPopup e setTimeout - vai direttamente al reload
+                        sessionStorage.setItem('activeTab', '#tabs-1');
+                        location.reload(); // Reload immediato, loading resta attivo
+                    } else {
+                        UnMaskScreen();
+                        ShowPopup("Errore: " + response.d.Message);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    UnMaskScreen();
+                    ShowPopup("Errore server nel salvataggio dei dati del progetto");
+                    console.error("Dettagli errore:", xhr.responseText);
+                }
+            });
+
+            return false;
         }
 
     </script>

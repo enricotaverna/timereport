@@ -332,6 +332,14 @@ public class ControlloProgetto
         // Esecuzione della stored procedure per calcolo costi Hours
         DataSet result = Database.ExecuteStoredProcedure("REV3_HoursCostAndRevenueUpdate", parameters);
 
+        // se richiamato con progetto ricalcola gli economics (valorizza ProjectEconomics) 
+        if (project_id != 0) {
+            parametersList.Clear();
+            parametersList.Add(new SqlParameter("@Project_id", project_id));
+            parameters = parametersList.ToArray();
+            result = Database.ExecuteStoredProcedure("SPcontrolloProgetti", parameters);
+        }
+
         // ✅ Dopo aver calcolato i costi, aggiorna ProjectEconomics
         AggiornaDatiEconomics(project_id);
 
@@ -349,7 +357,7 @@ public class ControlloProgetto
         SqlParameter[] parameters = parametersList.ToArray();
 
         // Esegue la stored procedure che calcola e salva tutti i valori
-        Database.ExecuteStoredProcedure("SPcontrolloProgetti_V4", parameters);
+        Database.ExecuteStoredProcedure("SPcontrolloProgetti", parameters);
     }
 
     /* ✅ INVARIATO: Numero record non valorizzati */
