@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Amazon;
+using Syncfusion.XlsIO;
+using System;
+using System.Configuration;
+using System.Data;
+using System.Data.Entity.Infrastructure;
+using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
-using System.Data.SqlClient;
-using System.Configuration;
-using Amazon;
-using System.IO;
-using System.Data.Entity.Infrastructure;
-using Syncfusion.XlsIO;
 
 public partial class report_ControlloProgettoList : System.Web.UI.Page
 {
@@ -106,5 +107,48 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
 
     }
+
+    // Export in excel la lista delle ore
+    protected void BtnExportHistory_Click(object sender, EventArgs e)
+    {
+        bool ret;
+
+        using (ExcelEngine excelEngine = new ExcelEngine())
+        {
+            IApplication application = excelEngine.Excel;
+            application.DefaultVersion = ExcelVersion.Excel2013;
+            IWorkbook workbook = application.Workbooks.Create(0);
+            IWorksheet wsEconomics = workbook.Worksheets.Create("Storico Economics");
+
+            //*** Recupera il dataset dalla sessione
+            DataSet ds = (DataSet)Session["dataset"];
+            DataTable dtProgetti = ds.Tables[0];
+
+            // Estrae gli ID progetti unici dal dataset
+            var projectIds = dtProgetti.AsEnumerable()
+                .Select(row => row.Field<int>("projects_id")) // o il tipo corretto della colonna
+                .Distinct()
+                .ToList();
+
+            // Crea la condizione IN per la query
+            string projectIdsList = string.Join(",", projectIds);
+
+            //*** Worksheet con storico economics filtrato per i progetti estratti
+            DataTable dtSintesi = Database.GetData(
+                "SELECT * FROM v_ProjectEconomicsReport " +
+                "WHERE projects_id IN (" + projectIdsList + ") " );
+
+            wsEconomics.ImportDataTable(dtSintesi, true, 1, 1);
+
+            // Formatta il foglio excel con le intestazioni
+            Utilities.FormatWorkbook(ref workbook);
+
+            ret = Utilities.ExporXlsxWorkbook(workbook, "export.xlsx");
+        }
+
+        // Avvio download dopo che è stato prodotto il file
+        if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
+    }
+
 
 }

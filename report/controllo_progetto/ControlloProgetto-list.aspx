@@ -165,6 +165,7 @@
                         <!-- Bottoni a destra -->
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;">
                             <asp:Label ID="lbMessage" runat="server" Text=""></asp:Label>
+                            <asp:Button ID="btn_ExportHistory" runat="server" CssClass="orangebutton" Text="Storico" OnClick="BtnExportHistory_Click" />
                             <asp:Button ID="btn_ExportDettagli" runat="server" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" OnClick="BtnExport_Click" />
                             <asp:Button ID="btn_back" runat="server" Text="<%$ appSettings: BACK_TXT %>" CssClass="greybutton" />
                         </div>
