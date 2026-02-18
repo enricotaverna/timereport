@@ -133,7 +133,7 @@
                                 <asp:TemplateField>
                                     <ItemTemplate>
                                         <asp:LinkButton ID="BT_edit" runat="server" CausesValidation="False" PostBackUrl='<%# Eval("ProjectCode", "ControlloProgetto-form.aspx?ProjectCode={0}") %>'
-                                            CommandName="Edit" CssClass="fa fa-edit" Font-Size="Large" ForeColor="#333333" />
+                                            CommandName="Edit" CssClass="fa fa-edit edit-link" Font-Size="Large" ForeColor="#333333" />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
@@ -203,6 +203,11 @@
 
         $("#btn_ExportDettagli").click(function (e) {
             MaskScreen(true); // cursore e finestra modale
+        });
+
+        // NUOVO: Spinner al click su edit
+        $(document).on('click', '.edit-link', function (e) {
+            MaskScreen(true); // Mostra spinner durante navigazione
         });
 
         $("#BtnExport_Sintesi_Click").click(function (e) {

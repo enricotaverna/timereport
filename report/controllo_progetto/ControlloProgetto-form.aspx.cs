@@ -117,7 +117,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // popola tabella gg actuals          
         GridView GVGGActuals = (GridView)FVProgetto.FindControl("GVGGActuals");
 
-        parametersList.Add(new SqlParameter("@Project_id", Projects_id));
+        parametersList.Add(new SqlParameter("@Project_id", Convert.ToInt16(Projects_id)));
         // Usa la data di cutoff dalla sessione invece di DateTime.Now
         parametersList.Add(new SqlParameter("@DataReport", CurrentSession.dCutoffDate));
         SqlParameter[] param = parametersList.ToArray();
@@ -176,7 +176,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             IWorksheet wsDettaglio = workbook.Worksheets.Create("Dettaglio Ore");
 
             //*** Worksheet con sintesi progetti
-            parametersList.Add(new SqlParameter("@Project_id", TProjects_Id.Value));
+            parametersList.Add(new SqlParameter("@Project_id", Convert.ToInt16(TProjects_Id.Value)));
             // Usa la data di cutoff dalla sessione
             parametersList.Add(new SqlParameter("@DataReport", CurrentSession.dCutoffDate));
             SqlParameter[] parameters = parametersList.ToArray();
