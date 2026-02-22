@@ -7,6 +7,7 @@ using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -19,16 +20,15 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
 
-        // recupera il tipo contratto dalla sessione, default "0" se non impostato
-        string tipoContratto = Session["DDLCpTipoContratto"] != null ? Session["DDLCpTipoContratto"].ToString() : "0";
+        var filtri = ControlloProgettoFiltri.FromSession(Session);
 
-        // richima storage procedure per popolare la tabella con i valori degli economics di progetto
-        // La data di cutoff viene letta automaticamente dalla sessione all'interno del metodo PopolaDataset
-        DataSet ds = ControlloProgetto.PopolaDataset(
-            Session["DDLCpProgetto"].ToString(), 
-            Session["DDLCpManager"].ToString(),
-            tipoContratto);
-            
+        if (!filtri.IsValid())
+        {
+            Response.Redirect("/timereport/menu.aspx");
+            return;
+        }
+
+        DataSet ds = ControlloProgetto.PopolaDataset(filtri);
         Session["dataset"] = ds;
 
         // recupera oggetto con variabili di sessione
@@ -92,8 +92,8 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
             wsSintesi.ImportDataTable(dtSintesi, true, 1, 1);
 
             //*** Worksheet con dettaglio ore progetti
-            // La data di cutoff viene letta automaticamente dalla sessione all'interno del metodo EstraiGiorniCosti
-            DataTable dtDettaglio = ControlloProgetto.EstraiGiorniCosti(Session["ProgettoReport"].ToString(), Session["ManagerReport"].ToString());
+            var filtri = ControlloProgettoFiltri.FromSession(Session);
+            DataTable dtDettaglio = ControlloProgetto.EstraiGiorniCosti(filtri);
             wsDettaglio.ImportDataTable(dtDettaglio, true, 1, 1);
 
             // Formatta il foglio excel con le intestazioni
@@ -150,5 +150,25 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
     }
 
+    protected void GVAttivita_Sorting(object sender, GridViewSortEventArgs e)
+    {
+        DataSet ds = (DataSet)Session["dataset"];
+        DataTable dt = ds.Tables[0];
+        DataView dv = new DataView(dt);
+
+        // Gestisce l'alternanza ASC/DESC
+        string sortDirection = "ASC";
+        if (ViewState["SortExpression"] != null && ViewState["SortExpression"].ToString() == e.SortExpression)
+        {
+            sortDirection = ViewState["SortDirection"] != null && ViewState["SortDirection"].ToString() == "ASC" ? "DESC" : "ASC";
+        }
+
+        dv.Sort = e.SortExpression + " " + sortDirection;
+        ViewState["SortExpression"] = e.SortExpression;
+        ViewState["SortDirection"] = sortDirection;
+
+        GVAttivita.DataSource = dv;
+        GVAttivita.DataBind();
+    }
 
 }

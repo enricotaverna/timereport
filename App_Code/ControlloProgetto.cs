@@ -1,9 +1,38 @@
-﻿using System.Data.SqlClient;
+﻿using Amazon.EC2.Model;
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web;
+using System.Web.SessionState;
+
+public class ControlloProgettoFiltri
+{
+    public string Progetto { get; set; }
+    public string Manager { get; set; }
+    public string LOB { get; set; }
+    public string ContractType { get; set; }
+
+    public static ControlloProgettoFiltri FromSession(HttpSessionState session)
+    {
+        return new ControlloProgettoFiltri
+        {
+            Progetto = session["DDLCpProgetto"] != null ? session["DDLCpProgetto"].ToString() : null,
+            Manager = session["DDLCpManager"] != null ? session["DDLCpManager"].ToString() : null,
+            LOB = session["DDLCpLOB"] != null ? session["DDLCpLOB"].ToString() : null,
+            ContractType = session["DDLCpSFContractType"] != null ? session["DDLCpSFContractType"].ToString() : null
+        };
+    }
+
+    public bool IsValid()
+    {
+        return !string.IsNullOrEmpty(Progetto) &&
+               !string.IsNullOrEmpty(Manager) &&
+               !string.IsNullOrEmpty(LOB) &&
+               !string.IsNullOrEmpty(ContractType);
+    }
+}
 
 public class EconomicsProgetto
 {
@@ -187,7 +216,7 @@ public class EconomicsProgetto
 public class ControlloProgetto
 {
     /* ✅ Estrae Dataset dalla vista unica con filtri WHERE */
-    public static DataSet PopolaDataset(string ProgettoReport, string ManagerReport, string TipoContratto = "0")
+    public static DataSet PopolaDataset(ControlloProgettoFiltri filtri)
     {
         // Recupera la data di cutoff dalla sessione corrente
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
@@ -201,15 +230,12 @@ public class ControlloProgetto
                       " AND TipoContratto_id IN (1, 2)"; // Solo T&M e FIXED
 
         // Applica filtri opzionali
-        if (ProgettoReport != "0")
-            query += " AND Projects_id = " + ASPcompatility.FormatStringDb(ProgettoReport);
-
-        if (ManagerReport != "0")
-            query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(ManagerReport) +
-                     " OR AccountManager_id = " + ASPcompatility.FormatStringDb(ManagerReport) + ")";
-
-        if (TipoContratto != "0")
-            query += " AND TipoContratto_id = " + ASPcompatility.FormatStringDb(TipoContratto);
+        query = filtri.Progetto != "0" ? query += " AND Projects_id = " + ASPcompatility.FormatStringDb(filtri.Progetto) : query;
+        query = filtri.Manager != "0" ? query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) +
+                                                 " OR AccountManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) + ")" 
+                                                 : query;
+        query = filtri.LOB != "0" ? query += " AND LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
+        query = filtri.ContractType != "0" ? query += " AND SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
 
         query += " ORDER BY ProjectCode";
 
@@ -378,28 +404,29 @@ public class ControlloProgetto
     }
 
     /* ✅ INVARIATO: Estrae giorni con costi */
-    public static DataTable EstraiGiorniCosti(string ProgettoReport, string ManagerReport)
+    public static DataTable EstraiGiorniCosti(ControlloProgettoFiltri filtri)
     {
-        string sQuery;
+        string query;
 
         // Recupera la data di cutoff dalla sessione corrente
         TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
         DateTime dataCutoff = CurrentSession.dCutoffDate;
 
-        sQuery = "SELECT * FROM v_oreWithCost " +
+        query = "SELECT * FROM v_oreWithCost " +
                 "WHERE Active = 1 " +
                 "AND Data <= " + ASPcompatility.FormatDatetimeDb(dataCutoff) +
                 " AND ProjectType_id = '" + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"] + "'";
 
-        if (ProgettoReport != "0")
-            sQuery += " AND Projects_id = " + ProgettoReport;
+        // Applica filtri opzionali
+        query = filtri.Progetto != "0" ? query += " AND Projects_id = " + ASPcompatility.FormatStringDb(filtri.Progetto) : query;
+        query = filtri.Manager != "0" ? query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) +
+                                                 " OR AccountManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) + ")"
+                                                 : query;
+        query = filtri.LOB != "0" ? query += " AND LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
+        query = filtri.ContractType != "0" ? query += " AND SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
 
-        if (ManagerReport != "0")
-            sQuery += " AND (ClientManager_id = " + ManagerReport +
-                     " OR AccountManager_id = " + ManagerReport + ")";
+        query += " ORDER BY Consulente, Data";
 
-        sQuery += " ORDER BY Consulente, Data";
-
-        return Database.GetData(sQuery, null);
+        return Database.GetData(query, null);
     }
 }

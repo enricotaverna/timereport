@@ -144,14 +144,14 @@
                                             <div class="inputtext">Progetto: </div>
                                             <asp:TextBox ID="NameTextBox" runat="server" Text='<%# Bind("ProjectName") %>'
                                                 Columns="50" MaxLength="50" class="ASPInputcontent"
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" Enabled="False" />
+                                                Enabled="False" />
                                         </div>
 
 
                                         <!-- *** CODICE CLIENTE ***  -->
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Cliente:</div>
-                                            <asp:DropDownList ID="DDLCliente" runat="server" DataSourceID="cliente" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true"
+                                            <asp:DropDownList ID="DDLCliente" runat="server" DataSourceID="cliente" data-parsley-check-chargeable="true" 
                                                 DataTextField="Nome1" DataValueField="CodiceCliente" AppendDataBoundItems="True"
                                                 SelectedValue='<%# Bind("CodiceCliente") %>' Enabled="False">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
@@ -164,7 +164,7 @@
                                             <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="manager"
                                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
                                                 SelectedValue='<%# Bind("ClientManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" Enabled="False">
+                                                Enabled="False">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
                                         </div>
@@ -175,7 +175,7 @@
                                             <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
                                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
                                                 SelectedValue='<%# Bind("AccountManager_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" Enabled="False">
+                                                Enabled="False">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
                                         </div>
@@ -187,7 +187,7 @@
                                                 DataSourceID="TipoContratto" DataTextField="Descrizione"
                                                 DataValueField="TipoContratto_id"
                                                 SelectedValue='<%# Bind("TipoContratto_id") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" Enabled="False">
+                                                Enabled="False">
                                                 <asp:ListItem Value="" Text="Selezionare un valore" />
                                             </asp:DropDownList>
 
@@ -201,7 +201,7 @@
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Revenue: </div>
                                             <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%#  Bind("RevenueBudget", "{0:#,####}") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
+                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
                                             <label>€</label>
                                         </div>
 
@@ -219,7 +219,7 @@
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Margine: </div>
                                             <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
+                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
                                             <label>%</label>
                                         </div>
 
@@ -231,7 +231,7 @@
 
                                             <asp:Label class="css-label" Style="padding: 0px 20px 0px 20px" runat="server">a</asp:Label>
                                             <asp:TextBox CssClass="ASPInputcontent" ID="TBAttivoA" runat="server" Width="100px" Text='<%# Bind("DataFine", "{0:d}") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
+                                                data-parsley-errors-container="#valMsg" data-parsley-required="true" data-parsley-pattern="/^([12]\d|0[1-9]|3[01])\D?(0[1-9]|1[0-2])\D?(\d{4})$/" />
                                         </div>
 
                                     </div>
@@ -359,10 +359,11 @@
                                     <div class="buttons">
                                         <div id="valMsg" class="parsley-single-error"></div>
                                         <asp:Button ID="btn_save" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClientClick="SaveProgettoData(); return false;" />
-                                        <asp:Button ID="btn1" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
-                                        <asp:Button ID="btn2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
-                                        <asp:Button ID="btn_calc" runat="server" CausesValidation="True" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" Style="width: 120px" OnClick="btn_calc_Click" />
                                         <asp:Button ID="btn_SaveEconomics" runat="server" CausesValidation="False" CssClass="orangebutton" Text="<%$ appSettings: SAVE_TXT %>" OnClientClick="SaveEconomicsData(); return false;" />
+                                        <asp:Button ID="btn_downl_tab2" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_storico" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                        <asp:Button ID="btn_downl_tab3" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_ore_costi" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                        <asp:Button ID="btn_downl_tab4" runat="server" CausesValidation="True" CommandName="download" OnClick="Download_GGActuals" CssClass="orangebutton" Text="<%$ appSettings: EXPORT_TXT %>" />
+                                        <asp:Button ID="btn_calc" runat="server" CausesValidation="True" CssClass="orangebutton" Text="<%$ appSettings: CALC_COST %>" OnClick="btn_calc_Click" />                                       
                                         <asp:Button ID="btnAnnulla" runat="server" CausesValidation="False" PostBackUrl="/timereport/report/controllo_progetto/ControlloProgetto-list.aspx" CommandName="Cancel" CssClass="greybutton" Text="<%$ appSettings: CANCEL_TXT %>" formnovalidate="" />
                                     </div>
                         </EditItemTemplate>
@@ -429,14 +430,14 @@
         });
 
         // validazione campo revenue in caso il progetto sia FORFAIT
-        window.Parsley.addValidator("requiredIf", {
+        window.Parsley.addValidator("requiredIfFixed", {
             validateString: function (value, requirement) {
 
                 value = value.toString().replace(',', '.');
 
                 // se inserito deve essere un numero
                 if (isNaN(value) && !!value) {
-                    window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                    window.Parsley.addMessage('it', 'requiredIfFixed', "Inserire un numero");
                     return false;
                 }
 
@@ -444,7 +445,7 @@
 
                     // se FIXED verifica obbligatorietà
                     if (!value && requirement != "percent") {
-                        window.Parsley.addMessage('it', 'requiredIf', "Verificare i campi obbligatori");
+                        window.Parsley.addMessage('it', 'requiredIfFixed', "Verificare i campi obbligatori");
                         return false;
                     }
 
@@ -453,7 +454,7 @@
                         if (!isNaN(value)) //  compilato e numerico
                             return true;
                         else {
-                            window.Parsley.addMessage('it', 'requiredIf', "Inserire un numero");
+                            window.Parsley.addMessage('it', 'requiredIfFixed', "Inserire un numero");
                             return false;
                         }
                 }
@@ -500,14 +501,16 @@
 
             // Gestione bottoni con Bootstrap Tabs
             function showTabButtons(tabIndex) {
-                $("#FVProgetto_btn1").hide();
-                $("#FVProgetto_btn2").hide();
+                $("#FVProgetto_btn_downl_tab2").hide();
+                $("#FVProgetto_btn_downl_tab3").hide();
+                $("#FVProgetto_btn_downl_tab4").hide();
                 $("#FVProgetto_btn_save").hide();
                 $("#FVProgetto_btn_calc").hide();
                 $("#FVProgetto_btn_SaveEconomics").hide();
                 if (tabIndex === 1) {
                     $("#FVProgetto_btn_save").show();
                 } else if (tabIndex === 2) {
+                    $("#FVProgetto_btn_downl_tab2").show();
                     $("#FVProgetto_btn_SaveEconomics").show();
                     // Recupera Projects_id dall'hidden field nel FormView
                     currentProjectId = parseInt($("#FVProgetto_TBProjects_id").val());
@@ -517,10 +520,10 @@
                     }
                     loadEconomicsTable();
                 } else if (tabIndex === 3) {
-                    $("#FVProgetto_btn1").show();
+                    $("#FVProgetto_btn_downl_tab3").show();
                     $("#FVProgetto_btn_calc").show();
                 } else if (tabIndex === 4) {
-                    $("#FVProgetto_btn2").show();
+                    $("#FVProgetto_btn_downl_tab4").show();
                 }
             }
             // Bootstrap tab event
@@ -609,6 +612,9 @@
                 return item.AnnoMese <= nextMonthAfterCutoff;
             });
 
+            // ✅ INVERSIONE: dal più recente al più lontano
+            filteredData.reverse();
+
             // Costruisci colonne dinamiche
             var columns = [
                 { title: "Tipo", field: "rowType", frozen: true, width: 100, headerSort: false }
@@ -617,11 +623,12 @@
             filteredData.forEach(function (item) {
                 var annoMese = item.AnnoMese;
                 var parts = annoMese.split('-');
+                var year = parts[0].substring(2);  
                 var monthIndex = parseInt(parts[1]) - 1;
                 var isEditable = annoMese === nextMonthAfterCutoff;
 
                 columns.push({
-                    title: monthNames[monthIndex],
+                    title: monthNames[monthIndex] + "-" + year,
                     field: annoMese,
                     editor: "number",
                     editorParams: {

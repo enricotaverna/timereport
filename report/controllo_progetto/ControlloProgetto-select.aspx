@@ -57,37 +57,45 @@
                     <!--  *** MANAGER *** -->
                     <div class="input nobottomborder">
                         <div class="inputtext">Responsabile</div>
-                            <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true"
+                            <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true" CssClass="SumoDLL" 
                                 AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Responsabile" >
-                                <asp:ListItem Value="">-- Manager o Account --</asp:ListItem>
-                            </asp:DropDownList>
-                        </div>
-
-                    <!--  *** TIPO CONTRATTO *** -->
-                    <div class="input nobottomborder">
-                        <div class="inputtext">Tipo Contratto</div>
-                            <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True">
-                                <asp:ListItem Value="0" Selected="True">-- Tutti --</asp:ListItem>
-                                <asp:ListItem Value="2">FORFAIT</asp:ListItem>
-                                <asp:ListItem Value="1">TM</asp:ListItem>
+                                <asp:ListItem Value="0">-- Manager o Account --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
 
                     <!--  *** PROGETTO *** -->
                     <div class="input nobottomborder">
                         <div class="inputtext">Progetto</div>
-                            <asp:DropDownList ID="DDLProgetti" runat="server"
-                                AppendDataBoundItems="True" AutoPostBack="True" OnSelectedIndexChanged="DDLProgetti_SelectedIndexChanged">
+                            <asp:DropDownList ID="DDLProgetti" runat="server" CssClass="SumoDLL" 
+                                AppendDataBoundItems="True" AutoPostBack="True" >
                             </asp:DropDownList>
                        </div>
+
+                    <!--  *** LOB *** -->
+                    <div ID="LBLOB" class="input nobottomborder" runat="server">
+                        <div class="inputtext">LOB</div>
+                            <asp:DropDownList ID="DDLLOB" runat="server" DataTextField="LOBCode" DataValueField="LOB_Id" CssClass="SumoDLL" 
+                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_LOB">
+                                <asp:ListItem Value="0">-- LOB --</asp:ListItem>
+                            </asp:DropDownList>
+                    </div>
+
+                    <!--  *** TIPO CONTRATTO SF *** -->
+                    <div ID="LBSFContractType" class="input nobottomborder" runat="server">
+                        <div class="inputtext">Contratto SF</div>
+                            <asp:DropDownList ID="DDLSFContractType" runat="server" DataTextField="Descrizione" DataValueField="SFContractType_id" CssClass="SumoDLL" 
+                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_SFContractType">
+                                <asp:ListItem Value="0">-- Contratto SF --</asp:ListItem>
+                            </asp:DropDownList>
+                    </div>
 
                     <br />
 
                     <!--  **** INFORMAZIONE DATA CUTOFF ** -->
                     <div class="input nobottomborder">
-                        <div style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007bff; margin-bottom: 10px;">
+                        <div style="background-color: #f8f9fa; border-left: 4px solid #007bff; margin-bottom: 10px;">
                             <i class="fas fa-info-circle" style="color: #007bff;"></i>
-                            <strong>Nota:</strong> Il report viene generato utilizzando la data di cutoff corrente: <strong><%= CurrentSession.sCutoffDate %></strong>
+                            <strong>Nota:</strong> Il report viene generato solo per progetti attivi, gli economici sono calcolati all'ultima data di cutoff.
                         </div>
                     </div>
 
@@ -129,6 +137,14 @@
         </SelectParameters>
     </asp:SqlDataSource>
 
+    <asp:SqlDataSource ID="DS_LOB" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT DISTINCT LOB_id, LOBCode FROM LOB ORDER BY LOBCode">
+    </asp:SqlDataSource> 
+
+    <asp:SqlDataSource ID="DS_SFContractType" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT DISTINCT SFContractType_id, Descrizione FROM SFContractType ORDER BY Descrizione">
+    </asp:SqlDataSource> 
+    
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
 
@@ -139,9 +155,6 @@
         $(document).ready(function() {
             // Inizializza SumoSelect
             $('.SumoDLL').SumoSelect({ search: true });
-            $('#DDLProgetti').SumoSelect({ placeholder: 'Progetti', search: true, searchText: 'Codice progetto' });
-            $('#DDLManager').SumoSelect({ placeholder: 'Director', search: true, searchText: 'Director' });
-            $('#DDLTipoContratto').SumoSelect({ placeholder: 'Tipo Contratto' });
 
             // *** Esclude i controlli nascosti *** 
             var parsleyInstance = $('#FVForm').parsley({

@@ -305,6 +305,7 @@ public class Utilities
 
             //Import DataTable to the worksheet
             worksheet.ImportDataTable(dt, true, 1, 1);
+            FormatWorkbook(ref workbook);
 
             return Utilities.ExporXlsxWorkbook(workbook, filename);
 

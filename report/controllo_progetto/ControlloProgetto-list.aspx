@@ -93,13 +93,13 @@
 
             <div class="row justify-content-center">
 
-                <div class="StandardForm col-9">
+                <div class="StandardForm col-10">
 
-                    <div id="wrapper" style="font-size: 14px; font-family: OpenSans-Regular; max-width: 1000px; max-height: 600px; overflow-y: scroll;">
+                    <div id="wrapper" style="font-size: 14px; font-family: OpenSans-Regular; max-width: 1200px; max-height: 600px; overflow-y: scroll;">
 
                         <asp:GridView ID="GVAttivita" runat="server" AllowPaging="False" CssClass="GridView"
-                            OnRowDataBound="GVAttivita_RowDataBound"
-                            AllowSorting="false" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5">
+                            OnRowDataBound="GVAttivita_RowDataBound"  OnSorting="GVAttivita_Sorting"
+                            AllowSorting="true" PageSize="15" AutoGenerateColumns="False" EnableModelValidation="True" CellPadding="5">
 
                             <FooterStyle CssClass="GV_footer" />
                             <RowStyle Wrap="False" CssClass="GV_row" />
@@ -108,7 +108,7 @@
                             <AlternatingRowStyle CssClass="GV_row_alt " />
 
                             <Columns>
-                                <asp:TemplateField HeaderText="Stato">
+                                <asp:TemplateField HeaderText="Stato" SortExpression="status">
                                     <ItemTemplate>
                                         <asp:Image class="imageClass" ID="ImgStato" runat="Server" ImageUrl='<%# Eval("ImgUrl") %>' Height="26px" ImageAlign="Middle" title='<%# Eval("ToolTip") %>' />
                                     </ItemTemplate>
@@ -117,7 +117,7 @@
                                 <asp:BoundField DataField="status" HeaderText="status" SortExpression="status" Visible="false" />
 
                                 <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />
-                                <asp:BoundField DataField="Director" HeaderText="Director" SortExpression="Director" />
+                                <asp:BoundField DataField="Director" HeaderText="Manager" SortExpression="Director" />
                                 <asp:BoundField DataField="TipoContratto" HeaderText="Contratto" SortExpression="TipoContratto" />
                                 <asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" DataFormatString="{0:dd/MM/yyyy}" />
 
@@ -211,7 +211,7 @@
             MaskScreen(true); // Mostra spinner durante navigazione
         });
 
-        $("#BtnExport_Sintesi_Click").click(function (e) {
+        $("#BtnExport_Sintesi_Click, #btn_ExportHistory").click(function (e) {
             MaskScreen(true); // cursore e finestra modale
         });
 

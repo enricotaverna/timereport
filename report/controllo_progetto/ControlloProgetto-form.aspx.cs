@@ -10,6 +10,7 @@ using System.IO;
 using System.Web.DynamicData;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Windows;
 
 public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Page
 {
@@ -160,6 +161,17 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         DataTable dtDettaglio = Database.GetData("SELECT * FROM v_oreWithCost  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY Data, Consulente", null);
         bool ret = Utilities.ExporXlsxWorkbook(dtDettaglio, "export.xlsx");
         // Avvio download dopo che è stato prodotto il file
+        if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
+    }
+
+    // Scarica storico economics
+    protected void Download_storico(object sender, EventArgs e)
+    {
+        HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
+        bool ret;
+
+        DataTable dtDettaglio = Database.GetData("SELECT * FROM v_ProjectEconomicsReport  WHERE Projects_id = " + ASPcompatility.FormatStringDb(TProjects_Id.Value) + " ORDER BY AnnoMese", null);
+        ret = Utilities.ExporXlsxWorkbook(dtDettaglio, "export.xlsx");
         if (ret) ScriptManager.RegisterStartupScript(this, GetType(), "pushButton", "window.onload = function() { triggeFileExport('export.xlsx'); };", true);
     }
 

@@ -19,6 +19,12 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
+        // se non è amministratore nasconde i controlli LOB e contrattoSF
+        if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL")) {
+            LBLOB.Visible = false;
+            LBSFContractType.Visible = false;
+        }
+
         // Popola Drop Down con lista progetti
         if (!IsPostBack) {
             // Popola dropdown con i valori          
@@ -35,8 +41,9 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         // Salva i parametri di ricerca in sessione per il drill sulle revenue
         Session["DDLCpProgetto"] = DDLProgetti.SelectedValue;
         Session["DDLCpManager"] = DDLManager.SelectedValue;
-        Session["DDLCpTipoContratto"] = DDLTipoContratto.SelectedValue;
-        
+        Session["DDLCpLOB"] = DDLLOB.SelectedValue;
+        Session["DDLCpSFContractType"] = DDLSFContractType.SelectedValue;
+
         Response.Redirect("ControlloProgetto-list.aspx");
 
     }
@@ -89,13 +96,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
             DDLProgetti.SelectedValue = Session["DDLCpProgetto"].ToString();
         }
     }
-
-    protected void DDLProgetti_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        // al cambio di valore del progetto fa il bind con le relative attività
-        //Bind_DDLAttivita();
-    }
-   
+ 
     protected void DDLManager_DataBound(object sender, EventArgs e)
     {
         // Ripristina il valore selezionato precedentemente dalla sessione
@@ -105,9 +106,15 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         }
         
         // Ripristina il valore tipo contratto dalla sessione
-        if (Session["DDLCpTipoContratto"] != null && DDLTipoContratto.Items.FindByValue(Session["DDLCpTipoContratto"].ToString()) != null)
+        if (Session["DDLCpLOB"] != null && DDLLOB.Items.FindByValue(Session["DDLCpLOB"].ToString()) != null)
         {
-            DDLTipoContratto.SelectedValue = Session["DDLCpTipoContratto"].ToString();
+            DDLLOB.SelectedValue = Session["DDLCpLOB"].ToString();
+        }
+
+        // Ripristina il valore tipo contratto dalla sessione
+        if (Session["DDLCpSFContractType"] != null && DDLLOB.Items.FindByValue(Session["DDLCpSFContractType"].ToString()) != null)
+        {
+            DDLSFContractType.SelectedValue = Session["DDLCpSFContractType"].ToString();
         }
     }
 
