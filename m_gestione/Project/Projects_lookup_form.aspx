@@ -228,7 +228,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-resale-forfait="true" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
@@ -549,7 +549,7 @@
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
                                         <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%# Bind("SpeseBudget", "{0:0.00}") %>'
-                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-resale-forfait="true" />
                                         <label>€</label>
                                         <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                         <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="forfait"></asp:Label>
@@ -1159,6 +1159,38 @@
             return true;
         },
         priority: 33
+    });
+
+    
+    // validazione campo spese in caso il progetto sia FORFAIT RESELL
+    // logica: se il tipo progetto è resale E il tipo contratto è forfait allora spese è obbligatorio e deve essere un numero > 0
+    window.Parsley.addValidator('resaleForfait', {
+        validateString: function(value) {
+            // Selettori per le dropdown di Contratto e Tipo Progetto
+            var $ddlContratto = $('select[id*="DDLTipoContratto"]');
+            var $ddlProgetto = $('select[id*="DDLTipoProgetto"]');
+
+            // Se i campi non sono in pagina, non validare
+            if ($ddlContratto.length === 0 || $ddlProgetto.length === 0) return true;
+
+            var txtContratto = $ddlContratto.find('option:selected').text().toLowerCase();
+            var txtProgetto = $ddlProgetto.find('option:selected').text().toLowerCase();
+
+            // CONDIZIONE: Obbligatorio SOLO se Contratto è "forfait" E Tipo Progetto è "resale"
+            var isForfait = txtContratto.indexOf('forfait') !== -1;
+            var isResale = txtProgetto.indexOf('resale') !== -1;
+
+            if (isForfait && isResale) {
+                // In questo caso, il valore NON può essere vuoto o 0.00
+                return value.trim() !== "" && value.trim() !== "0.00" && value.trim() !== "0,00";
+            }
+
+            // In tutti gli altri casi ("altrimenti mai"), la validazione passa sempre
+            return true;
+        },
+        messages: {
+            it: 'Spese obbligatorie per contratti forfait di tipo resale.'
+        }
     });
 
     $(function () {
