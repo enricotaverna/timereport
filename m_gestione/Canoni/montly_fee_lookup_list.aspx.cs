@@ -7,6 +7,9 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     public string strMessage;
     string strQueryOrdering = " ORDER BY Projects.ProjectCode,Monthly_Fee.Year ";
 
+    private decimal _totaleRevenue = 0;
+    private decimal _totaleCost = 0;
+
     // recupera oggetto sessione
     public TRSession CurrentSession;
 
@@ -83,6 +86,11 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
         {
             var drv = (System.Data.DataRowView)e.Row.DataItem;
 
+            if (drv["Revenue"] != DBNull.Value)
+                _totaleRevenue += Convert.ToDecimal(drv["Revenue"]);
+            if (drv["Cost"] != DBNull.Value)
+                _totaleCost += Convert.ToDecimal(drv["Cost"]);
+
             // Trova i bottoni
             LinkButton btnEdit = (LinkButton)e.Row.FindControl("SelectButton");
             LinkButton btnDelete = (LinkButton)e.Row.FindControl("DeleteButton");
@@ -96,6 +104,19 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 
             if (btnEdit != null) btnEdit.Visible = isForfait;
             if (btnDelete != null) btnDelete.Visible = isForfait;
+        }
+    }
+
+    protected void GridView1_DataBound(object sender, EventArgs e)
+    {
+        GridViewRow footerRow = GridView1.FooterRow;
+        if (footerRow != null)
+        {
+            Label lblRev = (Label)footerRow.FindControl("lblTotaleRevenue");
+            Label lblCst = (Label)footerRow.FindControl("lblTotaleCost");
+
+            if (lblRev != null) lblRev.Text = _totaleRevenue.ToString("C");
+            if (lblCst != null) lblCst.Text = _totaleCost.ToString("C");
         }
     }
 

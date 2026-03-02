@@ -111,7 +111,8 @@
                         DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                         AllowPaging="True" PageSize="12" DataKeyNames="Monthly_Fee_id,Projects_id"
                         GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging"
-                        OnRowDataBound="GridView1_RowDataBound">
+                        OnRowDataBound="GridView1_RowDataBound"
+                        ShowFooter="True" OnDataBound="GridView1_DataBound">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <PagerStyle CssClass="GV_footer" />
@@ -124,20 +125,25 @@
                             <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
                             <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
                             <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" Visible="false" />
-                            <asp:BoundField
-                                DataField="Revenue"
-                                HeaderText="Revenue(€)"
-                                ReadOnly="True"
-                                SortExpression="Revenue"
-                                DataFormatString="{0:C}"
-                                ItemStyle-HorizontalAlign="Left" />
-                            <asp:BoundField
-                                DataField="Cost"
-                                HeaderText="Cost(€)"
-                                ReadOnly="True"
-                                SortExpression="Cost"
-                                DataFormatString="{0:C}"
-                                ItemStyle-HorizontalAlign="Left" />
+                            <asp:TemplateField HeaderText="Revenue(€)" SortExpression="Revenue">
+                                <ItemTemplate>
+                                    <asp:Label runat="server" Text='<%# Eval("Revenue", "{0:C}") %>'></asp:Label>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:Label ID="lblTotaleRevenue" runat="server" Style="font-weight: bold; font-size:14px;"></asp:Label>
+                                </FooterTemplate>
+                                <ItemStyle HorizontalAlign="Left" />
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Cost(€)" SortExpression="Cost">
+                                <ItemTemplate>
+                                    <asp:Label runat="server" Text='<%# Eval("Cost", "{0:C}") %>'></asp:Label>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:Label ID="lblTotaleCost" runat="server" Style="font-weight: bold; font-size:14px;"></asp:Label>
+                                </FooterTemplate>
+                                <ItemStyle HorizontalAlign="Left" />
+                            </asp:TemplateField>
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
                             <asp:TemplateField>
                                 <ItemTemplate>
