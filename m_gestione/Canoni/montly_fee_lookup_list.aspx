@@ -88,21 +88,16 @@
                                 DataSourceID="DSManager" DataTextField="Name" DataValueField="Persons_id" OnDataBound="DDLManager_DataBound">
                                 <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
                             </asp:DropDownList>
-                        </div>                        
-                        <div class="col-5">
-                            &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
-                        </div>
-                    </div>
-
-                    <div class="row mt-2">
+                        </div>   
+                        
                         <div class="col-1">
                             <label class="inputtext">Anno\Mese</label>
                         </div>
-                        <div class="col-5" style="display: flex; gap: 6px; align-items: center;">
-                            <asp:TextBox ID="TB_Anno" runat="server" TextMode="Number" placeholder="Tutti" Style="width: 60px;" />
+                        <div class="col-5" style="display: flex; gap: 6px; align-items: center;" >
+                            <asp:TextBox ID="TB_Anno" runat="server" TextMode="Number" placeholder="Tutti" class="ASPInputcontent" Style="width: 60px;" />
 
                             <div style="position: relative; display: inline-block;">
-                                <div id="mesi-toggle" style="cursor: pointer; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; width: 120px;">
+                                <div id="mesi-toggle" class="ASPInputcontent" style="cursor: pointer; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; width: 120px;">
                                     <span id="mesi-label">Tutti i mesi</span>
                                     <span style="margin-left: 6px;">&#9660;</span>
                                 </div>
@@ -143,11 +138,13 @@
                                     <label class="d-block">
                                         <input type="checkbox" class="mese-cb" value="12" />
                                         Dicembre</label>
-                                </div>
+                                </div> 
                                 <asp:HiddenField ID="HF_Mesi" runat="server" />
                             </div>
-                        </div>
+                            &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
+                        </div>                       
                     </div>
+
                     <!-- Fine Row -->
                 </div>
                 <!-- Fine RoundedBox -->
