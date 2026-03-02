@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -54,26 +55,39 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     // Imposta query selezione
     protected void ImpostaQuery()
     {
-        string sWhere = "";
+        string sWhere = " WHERE ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) ";
 
-        // limita ai suoi progetti in caso di manager
-        //if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
-        //  sWhere = "WHERE Projects.clientmanager_id = " + CurrentSession.Persons_id;    
+        if (!string.IsNullOrEmpty(TB_Anno.Text))
+        {
+            int anno;
+            if (int.TryParse(TB_Anno.Text, out anno))
+                sWhere += " AND Monthly_Fee.[Year] = " + anno;
+        }
 
-        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') " +
-                 " AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
-                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) ";
-
-        //sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
+        if (!string.IsNullOrEmpty(HF_Mesi.Value))
+        {
+            var mesi = HF_Mesi.Value.Split(',')
+                                    .Select(m => m.Trim())
+                                    .Where(m => !string.IsNullOrEmpty(m));
+            sWhere += " AND Monthly_Fee.[Month] IN (" + string.Join(",", mesi) + ") ";
+        }
 
         DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
-                                 "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, "+
-                                 "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
-                                 "FROM Monthly_Fee "+
-                                 "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id "+
-                                 "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
-                                 "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " + sWhere + strQueryOrdering;
+                         "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, " +
+                         "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
+                         "FROM Monthly_Fee " +
+                         "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id " +
+                         "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
+                         "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
+                         " " + sWhere;
 
+        // ✅ FIX: aggiorna il parametro @DL_flattivo
+        DSCanoni.SelectParameters.Clear();
+        DSCanoni.SelectParameters.Add("DL_flattivo", DL_flattivo.SelectedValue);
+
+        strMessage = DSCanoni.SelectCommand;
+
+        GridView1.DataBind();
     }
 
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)

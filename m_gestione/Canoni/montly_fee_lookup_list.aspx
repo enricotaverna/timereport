@@ -93,6 +93,61 @@
                             &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
                         </div>
                     </div>
+
+                    <div class="row mt-2">
+                        <div class="col-1">
+                            <label class="inputtext">Anno\Mese</label>
+                        </div>
+                        <div class="col-5" style="display: flex; gap: 6px; align-items: center;">
+                            <asp:TextBox ID="TB_Anno" runat="server" TextMode="Number" placeholder="Tutti" Style="width: 60px;" />
+
+                            <div style="position: relative; display: inline-block;">
+                                <div id="mesi-toggle" style="cursor: pointer; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; width: 120px;">
+                                    <span id="mesi-label">Tutti i mesi</span>
+                                    <span style="margin-left: 6px;">&#9660;</span>
+                                </div>
+                                <div id="mesi-dropdown" style="display: none; position: fixed; z-index: 9999; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 6px 10px; min-width: 140px; box-shadow: 2px 4px 10px rgba(0,0,0,0.2);">
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="1" />
+                                        Gennaio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="2" />
+                                        Febbraio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="3" />
+                                        Marzo</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="4" />
+                                        Aprile</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="5" />
+                                        Maggio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="6" />
+                                        Giugno</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="7" />
+                                        Luglio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="8" />
+                                        Agosto</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="9" />
+                                        Settembre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="10" />
+                                        Ottobre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="11" />
+                                        Novembre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="12" />
+                                        Dicembre</label>
+                                </div>
+                                <asp:HiddenField ID="HF_Mesi" runat="server" />
+                            </div>
+                        </div>
+                    </div>
                     <!-- Fine Row -->
                 </div>
                 <!-- Fine RoundedBox -->
@@ -102,7 +157,7 @@
             <!--**** tabella principale ***-->
             <div class="row justify-content-center pt-3">
                 <div class="col-9 px-0">
-
+                    <asp:Label ID="lblDebug" runat="server" Text='<%# strMessage %>' ForeColor="Red" />
                     <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
                         DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                         AllowPaging="True" PageSize="12" DataKeyNames="Monthly_Fee_id,Projects_id"
@@ -220,6 +275,46 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        $(document).ready(function () {
+
+            // Inizializza anno corrente
+            if ($('#<%=TB_Anno.ClientID%>').val() === '')
+                $('#<%=TB_Anno.ClientID%>').val(new Date().getFullYear());
+
+            // Ripristina mesi selezionati dall'hidden field (dopo postback)
+            var salvati = $('#<%=HF_Mesi.ClientID%>').val();
+            if (salvati) {
+                salvati.split(',').forEach(function (v) {
+                    $('.mese-cb[value="' + v + '"]').prop('checked', true);
+                });
+                aggiornaLabelMesi();
+            }
+
+            // Apri/chiudi
+            $('#mesi-toggle').click(function (e) {
+                e.stopPropagation();
+                var rect = this.getBoundingClientRect();
+                $('#mesi-dropdown').css({
+                    top: (rect.bottom + window.scrollY) + 'px',
+                    left: (rect.left + window.scrollX) + 'px'
+                }).toggle();
+            });
+
+            $(document).click(function () { $('#mesi-dropdown').hide(); });
+            $('#mesi-dropdown').click(function (e) { e.stopPropagation(); });
+            $('.mese-cb').change(function () { aggiornaLabelMesi(); });
+
+            function aggiornaLabelMesi() {
+                var selezionati = [], nomi = [];
+                $('.mese-cb:checked').each(function () {
+                    selezionati.push($(this).val());
+                    nomi.push($(this).closest('label').text().trim());
+                });
+                $('#<%=HF_Mesi.ClientID%>').val(selezionati.join(','));
+                $('#mesi-label').text(nomi.length === 0 ? 'Tutti i mesi' : nomi.join(', '));
+            }
+        });
     </script>
 
 </body>
