@@ -88,12 +88,8 @@
                                 DataSourceID="DSManager" DataTextField="Name" DataValueField="Persons_id" OnDataBound="DDLManager_DataBound">
                                 <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
                             </asp:DropDownList>
-                        </div>
-                        <div class="col-1">
-                            <label class="inputtext">Canone</label>
-                        </div>
+                        </div>                        
                         <div class="col-5">
-                            <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"></asp:TextBox>
                             &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
                         </div>
                     </div>
@@ -199,7 +195,6 @@
         <SelectParameters>
             <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue" Type="String" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
-            <asp:ControlParameter ControlID="TB_Codice" DefaultValue="%" Name="TB_codice" PropertyName="Text" />
             <asp:ControlParameter ControlID="DDLmanager" Name="persons_id" PropertyName="SelectedValue" />
         </SelectParameters>
         <UpdateParameters>            

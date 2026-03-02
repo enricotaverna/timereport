@@ -41,10 +41,6 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             DL_flattivo.SelectedValue = Session["DL_flattivo_val_att"].ToString();
 
         // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
-        if (Session["TB_CanoneCode"] != null)
-            TB_Codice.Text = Session["TB_CanoneCode"].ToString();
-
-        // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
         if (Session["DL_progetto"] != null)
             DL_progetto.SelectedValue = Session["DL_progetto"].ToString();
 
@@ -66,7 +62,7 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 
         sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') " +
                  " AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
-                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) AND Monthly_Fee.Monthly_Fee_Code LIKE '%' + (@TB_Codice) + '%' ";
+                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) ";
 
         //sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
 
@@ -154,11 +150,6 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     protected void DL_flattivo_SelectedIndexChanged(Object sender, System.EventArgs e)
     {
         Session["DL_flattivo_val_att"] = DL_flattivo.SelectedValue;
-    }
-
-    protected void TB_Codice_TextChanged(Object sender, System.EventArgs e)
-    {
-        Session["TB_CanoneCode"] = TB_Codice.Text;
     }
 
     protected void DL_progetto_DataBound(Object sender, System.EventArgs e)
