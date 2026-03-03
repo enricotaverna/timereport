@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -50,6 +51,26 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             // Imposta indice di aginazione
             GridView1.PageIndex = Convert.ToInt32(Session["GridCanoniPageNumber"].ToString());
         }
+        DL_Progetti_Load();
+    }
+
+    // Carica DDL progetti - Chiamato da evento OnLoad del DDL
+    protected void DL_Progetti_Load()
+    {
+        DataTable dtProjectsDDL = new DataTable();
+       
+        
+        // carica progetti di cui la persone è manager o account
+        dtProjectsDDL = Database.GetData("SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects "+
+                                        "WHERE (ProjectType_Id = 9) ORDER BY iProgetto");
+
+        
+        // Assegna i progetti al controllo CBLProgetti
+        DL_progetto.Items.Clear();
+        foreach (DataRow row in dtProjectsDDL.Rows)
+        {
+            DL_progetto.Items.Add(new ListItem(row["iProgetto"].ToString(), row["Projects_id"].ToString()));
+        }
     }
 
     // Imposta query selezione
@@ -72,14 +93,28 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             sWhere += " AND Monthly_Fee.[Month] IN (" + string.Join(",", mesi) + ") ";
         }
 
+        string sListaProgettiSel = Utilities.ListSelections(DL_progetto);
+        string sListaProgettiAll = Utilities.ListSelections(DL_progetto, true);
+
+        bool bProgettiSelezionati = !string.IsNullOrEmpty(sListaProgettiSel);
+        
+        sWhere += " AND Monthly_Fee.Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
+
+        /*MANAGER*/
+        if (DDLManager.SelectedValue != "0")
+        {
+            sWhere += " AND Projects.ClientManager_id IN (" + DDLManager.SelectedValue + " )";
+        }
+
+
         DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
-                         "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, " +
-                         "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
-                         "FROM Monthly_Fee " +
-                         "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id " +
-                         "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
-                         "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
-                         " " + sWhere;
+                        "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, " +
+                        "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
+                        "FROM Monthly_Fee " +
+                        "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id " +
+                        "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
+                        "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
+                        " " + sWhere;
 
         // ✅ FIX: aggiorna il parametro @DL_flattivo
         DSCanoni.SelectParameters.Clear();

@@ -15,6 +15,8 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
@@ -22,6 +24,10 @@
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+
 
 <style>
     .inputtext, .ASPInputcontent {
@@ -68,11 +74,17 @@
                             <label class="inputtext">Progetto</label>
                         </div>
                         <div class="col-5">
-                            <asp:DropDownList ID="DL_progetto" runat="server" class="ASPInputcontent" AutoPostBack="True" AppendDataBoundItems="True"
+                            <div style="position: absolute">
+                                <span>
+                                    <asp:ListBox ID="DL_progetto" runat="server" SelectionMode="Multiple" DataTextField="txtcodes"
+                                        DataValueField="Projects_id"></asp:ListBox>
+                                </span>
+                            </div>
+                            <%--<asp:DropDownList ID="DL_progetto" runat="server" class="ASPInputcontent" AutoPostBack="True" AppendDataBoundItems="True"
                                 DataSourceID="DSprogetti" DataTextField="iProgetto" DataValueField="Projects_Id"
                                 OnSelectedIndexChanged="DL_progetto_SelectedIndexChanged" OnDataBound="DL_progetto_DataBound">
                                 <asp:ListItem Text="Tutti i valori" Value="0" />
-                            </asp:DropDownList>
+                            </asp:DropDownList>--%>
                         </div>
 
                     </div>
@@ -274,6 +286,9 @@
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
 
         $(document).ready(function () {
+
+            $('#DL_progetto').SumoSelect({ placeholder: 'seleziona i progetti', search: true, searchText: 'Codice progetto' });
+            $('#DL_progetto')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
 
             // Inizializza anno corrente
             if ($('#<%=TB_Anno.ClientID%>').val() === '')
