@@ -60,12 +60,12 @@ public partial class m_gestione_Canoni_montly_fee_lookup_form : System.Web.UI.Pa
             string sqlCmd;
 
             if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
-                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
+                sqlCmd = "Select Projects_id, ProjectCode + '-' + left(Projects.Name,20) as iProgetto from Projects " +
                         "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
                         "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
                         "WHERE active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' AND ClientManager_id = " + CurrentSession.Persons_id + " ORDER BY iProgetto";
             else
-                sqlCmd = "Select Projects_id, ProjectCode + ' ' + left(Projects.Name,20) as iProgetto from Projects " +
+                sqlCmd = "Select Projects_id, ProjectCode + '-' + left(Projects.Name,20) as iProgetto from Projects " +
                         "LEFT JOIN ProjectType ON ProjectType.ProjectType_Id = Projects.ProjectType_Id " +
                         "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
                         "where active = 1 AND TipoContratto.Descrizione = 'FORFAIT' AND ProjectType.Name = 'Resale' ORDER BY iProgetto";

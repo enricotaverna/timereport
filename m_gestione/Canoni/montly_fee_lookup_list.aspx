@@ -15,6 +15,8 @@
 <script src="/timereport/include/parsley/it.js"></script>
 <script type="text/javascript" src="/timereport/include/jquery/jquery.ui.datepicker-it.js"></script>
 <script src="/timereport/include/jquery/jquery-ui.min.js"></script>
+<!--SUMO select-->
+<script src="/timereport/include/jquery/sumoselect/jquery.sumoselect.js"></script>
 
 <!-- CSS-->
 <link href="/timereport/include/jquery/jquery-ui.min.css" rel="stylesheet" />
@@ -22,6 +24,10 @@
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+<!--SUMO select-->
+<link href="/timereport/include/jquery/sumoselect/sumoselect.css?v=<%=MyConstants.SUMO_VERSION %>" rel="stylesheet" />
+<link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+
 
 <style>
     .inputtext, .ASPInputcontent {
@@ -68,11 +74,17 @@
                             <label class="inputtext">Progetto</label>
                         </div>
                         <div class="col-5">
-                            <asp:DropDownList ID="DL_progetto" runat="server" class="ASPInputcontent" AutoPostBack="True" AppendDataBoundItems="True"
+                            <div style="position: absolute">
+                                <span>
+                                    <asp:ListBox ID="DL_progetto" runat="server" SelectionMode="Multiple" DataTextField="txtcodes"
+                                        DataValueField="Projects_id"></asp:ListBox>
+                                </span>
+                            </div>
+                            <%--<asp:DropDownList ID="DL_progetto" runat="server" class="ASPInputcontent" AutoPostBack="True" AppendDataBoundItems="True"
                                 DataSourceID="DSprogetti" DataTextField="iProgetto" DataValueField="Projects_Id"
                                 OnSelectedIndexChanged="DL_progetto_SelectedIndexChanged" OnDataBound="DL_progetto_DataBound">
                                 <asp:ListItem Text="Tutti i valori" Value="0" />
-                            </asp:DropDownList>
+                            </asp:DropDownList>--%>
                         </div>
 
                     </div>
@@ -88,15 +100,63 @@
                                 DataSourceID="DSManager" DataTextField="Name" DataValueField="Persons_id" OnDataBound="DDLManager_DataBound">
                                 <asp:ListItem Value="0">Tutti i valori</asp:ListItem>
                             </asp:DropDownList>
-                        </div>
+                        </div>   
+                        
                         <div class="col-1">
-                            <label class="inputtext">Canone</label>
+                            <label class="inputtext">Anno\Mese</label>
                         </div>
-                        <div class="col-5">
-                            <asp:TextBox ID="TB_Codice" runat="server" CssClass="ASPInputcontent" OnTextChanged="TB_Codice_TextChanged"></asp:TextBox>
+                        <div class="col-5" style="display: flex; gap: 6px; align-items: center;" >
+                            <asp:TextBox ID="TB_Anno" runat="server" TextMode="Number" placeholder="Tutti" class="ASPInputcontent" Style="width: 60px;" />
+
+                            <div style="position: relative; display: inline-block;">
+                                <div id="mesi-toggle" class="ASPInputcontent" style="cursor: pointer; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; width: 120px;">
+                                    <span id="mesi-label">Tutti i mesi</span>
+                                    <span style="margin-left: 6px;">&#9660;</span>
+                                </div>
+                                <div id="mesi-dropdown" style="display: none; position: fixed; z-index: 9999; background: white; border: 1px solid #ced4da; border-radius: 4px; padding: 6px 10px; min-width: 140px; box-shadow: 2px 4px 10px rgba(0,0,0,0.2);">
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="1" />
+                                        Gennaio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="2" />
+                                        Febbraio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="3" />
+                                        Marzo</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="4" />
+                                        Aprile</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="5" />
+                                        Maggio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="6" />
+                                        Giugno</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="7" />
+                                        Luglio</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="8" />
+                                        Agosto</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="9" />
+                                        Settembre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="10" />
+                                        Ottobre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="11" />
+                                        Novembre</label>
+                                    <label class="d-block">
+                                        <input type="checkbox" class="mese-cb" value="12" />
+                                        Dicembre</label>
+                                </div> 
+                                <asp:HiddenField ID="HF_Mesi" runat="server" />
+                            </div>
                             &nbsp;<asp:Button ID="BTFiltra" runat="server" class="SmallOrangeButton" Text="<%$ appSettings: FILTER_TXT %>" />
-                        </div>
+                        </div>                       
                     </div>
+
                     <!-- Fine Row -->
                 </div>
                 <!-- Fine RoundedBox -->
@@ -106,38 +166,44 @@
             <!--**** tabella principale ***-->
             <div class="row justify-content-center pt-3">
                 <div class="col-9 px-0">
-
+                    <asp:Label ID="lblDebug" runat="server" Text='<%# strMessage %>' ForeColor="Red" />
                     <asp:GridView ID="GridView1" runat="server" AllowSorting="True" AutoGenerateColumns="False"
                         DataSourceID="DSCanoni" CssClass="GridView" OnSelectedIndexChanged="GridView1_SelectedIndexChanged"
                         AllowPaging="True" PageSize="12" DataKeyNames="Monthly_Fee_id,Projects_id"
                         GridLines="None" EnableModelValidation="True" OnPageIndexChanging="GridView1_PageIndexChanging"
-                        OnRowDataBound="GridView1_RowDataBound">
+                        OnRowDataBound="GridView1_RowDataBound"
+                        ShowFooter="True" OnDataBound="GridView1_DataBound">
                         <FooterStyle CssClass="GV_footer" />
                         <RowStyle Wrap="False" CssClass="GV_row" />
                         <PagerStyle CssClass="GV_footer" />
                         <HeaderStyle CssClass="GV_header" />
                         <AlternatingRowStyle CssClass="GV_row_alt " />
                         <Columns>
-                            <asp:BoundField DataField="Monthly_Fee_Code" HeaderText="Codice" SortExpression="Monthly_Fee_Code" />
+                            <asp:BoundField DataField="Monthly_Fee_Code" HeaderText="Codice" SortExpression="Monthly_Fee_Code" Visible="false" />
                             <asp:BoundField DataField="NomeProgetto" HeaderText="Nome progetto" SortExpression="NomeProgetto" />
                             <asp:BoundField DataField="NomeManager" HeaderText="Manager" SortExpression="NomeManager" />
                             <asp:BoundField DataField="Year" HeaderText="Year" SortExpression="Year" />
                             <asp:BoundField DataField="Month" HeaderText="Month" SortExpression="Month" />
-                            <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" />
-                            <asp:BoundField
-                                DataField="Revenue"
-                                HeaderText="Revenue(€)"
-                                ReadOnly="True"
-                                SortExpression="Revenue"
-                                DataFormatString="{0:C}"
-                                ItemStyle-HorizontalAlign="Left" />
-                            <asp:BoundField
-                                DataField="Cost"
-                                HeaderText="Cost(€)"
-                                ReadOnly="True"
-                                SortExpression="Cost"
-                                DataFormatString="{0:C}"
-                                ItemStyle-HorizontalAlign="Left" />
+                            <asp:BoundField DataField="Days" HeaderText="Days" SortExpression="Days" Visible="false" />
+                            <asp:TemplateField HeaderText="Revenue(€)" SortExpression="Revenue">
+                                <ItemTemplate>
+                                    <asp:Label runat="server" Text='<%# Eval("Revenue", "{0:C}") %>'></asp:Label>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:Label ID="lblTotaleRevenue" runat="server" Style="font-weight: bold; font-size:14px;"></asp:Label>
+                                </FooterTemplate>
+                                <ItemStyle HorizontalAlign="Left" />
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Cost(€)" SortExpression="Cost">
+                                <ItemTemplate>
+                                    <asp:Label runat="server" Text='<%# Eval("Cost", "{0:C}") %>'></asp:Label>
+                                </ItemTemplate>
+                                <FooterTemplate>
+                                    <asp:Label ID="lblTotaleCost" runat="server" Style="font-weight: bold; font-size:14px;"></asp:Label>
+                                </FooterTemplate>
+                                <ItemStyle HorizontalAlign="Left" />
+                            </asp:TemplateField>
                             <asp:CheckBoxField DataField="Active" HeaderText="Attivo" ReadOnly="True" SortExpression="Active" />
                             <asp:TemplateField>
                                 <ItemTemplate>
@@ -193,7 +259,6 @@
         <SelectParameters>
             <asp:ControlParameter ControlID="DL_flattivo" Name="DL_flattivo" PropertyName="SelectedValue" Type="String" />
             <asp:ControlParameter ControlID="DL_progetto" Name="DL_progetto" PropertyName="SelectedValue" />
-            <asp:ControlParameter ControlID="TB_Codice" DefaultValue="%" Name="TB_codice" PropertyName="Text" />
             <asp:ControlParameter ControlID="DDLmanager" Name="persons_id" PropertyName="SelectedValue" />
         </SelectParameters>
         <UpdateParameters>            
@@ -219,6 +284,49 @@
         // include di snippet html per menu and background color mgt
         includeHTML();
         InitPage("<%=CurrentSession.BackgroundColor%>", "<%=CurrentSession.BackgroundImage%>");
+
+        $(document).ready(function () {
+
+            $('#DL_progetto').SumoSelect({ placeholder: 'seleziona i progetti', search: true, searchText: 'Codice progetto' });
+            $('#DL_progetto')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
+
+            // Inizializza anno corrente
+            if ($('#<%=TB_Anno.ClientID%>').val() === '')
+                $('#<%=TB_Anno.ClientID%>').val(new Date().getFullYear());
+
+            // Ripristina mesi selezionati dall'hidden field (dopo postback)
+            var salvati = $('#<%=HF_Mesi.ClientID%>').val();
+            if (salvati) {
+                salvati.split(',').forEach(function (v) {
+                    $('.mese-cb[value="' + v + '"]').prop('checked', true);
+                });
+                aggiornaLabelMesi();
+            }
+
+            // Apri/chiudi
+            $('#mesi-toggle').click(function (e) {
+                e.stopPropagation();
+                var rect = this.getBoundingClientRect();
+                $('#mesi-dropdown').css({
+                    top: (rect.bottom + window.scrollY) + 'px',
+                    left: (rect.left + window.scrollX) + 'px'
+                }).toggle();
+            });
+
+            $(document).click(function () { $('#mesi-dropdown').hide(); });
+            $('#mesi-dropdown').click(function (e) { e.stopPropagation(); });
+            $('.mese-cb').change(function () { aggiornaLabelMesi(); });
+
+            function aggiornaLabelMesi() {
+                var selezionati = [], nomi = [];
+                $('.mese-cb:checked').each(function () {
+                    selezionati.push($(this).val());
+                    nomi.push($(this).closest('label').text().trim());
+                });
+                $('#<%=HF_Mesi.ClientID%>').val(selezionati.join(','));
+                $('#mesi-label').text(nomi.length === 0 ? 'Tutti i mesi' : nomi.join(', '));
+            }
+        });
     </script>
 
 </body>

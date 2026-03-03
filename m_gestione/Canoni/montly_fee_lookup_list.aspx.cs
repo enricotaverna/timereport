@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -6,6 +8,9 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 {
     public string strMessage;
     string strQueryOrdering = " ORDER BY Projects.ProjectCode,Monthly_Fee.Year ";
+
+    private decimal _totaleRevenue = 0;
+    private decimal _totaleCost = 0;
 
     // recupera oggetto sessione
     public TRSession CurrentSession;
@@ -38,10 +43,6 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             DL_flattivo.SelectedValue = Session["DL_flattivo_val_att"].ToString();
 
         // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
-        if (Session["TB_CanoneCode"] != null)
-            TB_Codice.Text = Session["TB_CanoneCode"].ToString();
-
-        // Resetta valore textbox per non perderlo a seguito passaggio a pagina di dettaglio
         if (Session["DL_progetto"] != null)
             DL_progetto.SelectedValue = Session["DL_progetto"].ToString();
 
@@ -50,31 +51,78 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
             // Imposta indice di aginazione
             GridView1.PageIndex = Convert.ToInt32(Session["GridCanoniPageNumber"].ToString());
         }
+        DL_Progetti_Load();
+    }
+
+    // Carica DDL progetti - Chiamato da evento OnLoad del DDL
+    protected void DL_Progetti_Load()
+    {
+        DataTable dtProjectsDDL = new DataTable();
+       
+        
+        // carica progetti di cui la persone è manager o account
+        dtProjectsDDL = Database.GetData("SELECT Projects_Id, ProjectCode + N'  ' + Name AS iProgetto, ClientManager_id, Active FROM Projects "+
+                                        "WHERE (ProjectType_Id = 9) ORDER BY iProgetto");
+
+        
+        // Assegna i progetti al controllo CBLProgetti
+        DL_progetto.Items.Clear();
+        foreach (DataRow row in dtProjectsDDL.Rows)
+        {
+            DL_progetto.Items.Add(new ListItem(row["iProgetto"].ToString(), row["Projects_id"].ToString()));
+        }
     }
 
     // Imposta query selezione
     protected void ImpostaQuery()
     {
-        string sWhere = "";
+        string sWhere = " WHERE ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) ";
 
-        // limita ai suoi progetti in caso di manager
-        //if (!Auth.ReturnPermission("MASTERDATA", "PROJECT_ALL"))
-        //  sWhere = "WHERE Projects.clientmanager_id = " + CurrentSession.Persons_id;    
+        if (!string.IsNullOrEmpty(TB_Anno.Text))
+        {
+            int anno;
+            if (int.TryParse(TB_Anno.Text, out anno))
+                sWhere += " AND Monthly_Fee.[Year] = " + anno;
+        }
 
-        sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') " +
-                 " AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' ) " +
-                 " AND ( Projects.Projects_id = (@DL_progetto) OR @DL_progetto = '0' ) AND Monthly_Fee.Monthly_Fee_Code LIKE '%' + (@TB_Codice) + '%' ";
+        if (!string.IsNullOrEmpty(HF_Mesi.Value))
+        {
+            var mesi = HF_Mesi.Value.Split(',')
+                                    .Select(m => m.Trim())
+                                    .Where(m => !string.IsNullOrEmpty(m));
+            sWhere += " AND Monthly_Fee.[Month] IN (" + string.Join(",", mesi) + ") ";
+        }
 
-        //sWhere = " WHERE ( Projects.ClientManager_id = @Persons_id OR @Persons_id = '0') AND ( Monthly_Fee.Active = @DL_flattivo OR @DL_flattivo = '99' )   ";
+        string sListaProgettiSel = Utilities.ListSelections(DL_progetto);
+        string sListaProgettiAll = Utilities.ListSelections(DL_progetto, true);
+
+        bool bProgettiSelezionati = !string.IsNullOrEmpty(sListaProgettiSel);
+        
+        sWhere += " AND Monthly_Fee.Projects_id IN (" + (bProgettiSelezionati ? sListaProgettiSel : sListaProgettiAll) + " )";
+
+        /*MANAGER*/
+        if (DDLManager.SelectedValue != "0")
+        {
+            sWhere += " AND Projects.ClientManager_id IN (" + DDLManager.SelectedValue + " )";
+        }
+
 
         DSCanoni.SelectCommand = "SELECT [Monthly_Fee_id],[Monthly_Fee_Code],Projects.ProjectCode + '  ' + Projects.Name AS NomeProgetto,[Year], " +
-                                 "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, "+
-                                 "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
-                                 "FROM Monthly_Fee "+
-                                 "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id "+
-                                 "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
-                                 "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " + sWhere + strQueryOrdering;
+                        "[Month],[Revenue],[Cost],[Days],[Day_Revenue],[Day_Cost], Monthly_Fee.Active, " +
+                        "Monthly_Fee.Projects_id as Projects_Id, c.name as NomeManager, TipoContratto.Descrizione AS TipoContrattoDesc " +
+                        "FROM Monthly_Fee " +
+                        "INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id " +
+                        "INNER JOIN Persons as c ON c.persons_id = Projects.ClientManager_id " +
+                        "LEFT JOIN TipoContratto ON TipoContratto.TipoContratto_id = Projects.TipoContratto_id " +
+                        " " + sWhere;
 
+        // ✅ FIX: aggiorna il parametro @DL_flattivo
+        DSCanoni.SelectParameters.Clear();
+        DSCanoni.SelectParameters.Add("DL_flattivo", DL_flattivo.SelectedValue);
+
+        strMessage = DSCanoni.SelectCommand;
+
+        GridView1.DataBind();
     }
 
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -82,6 +130,11 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
             var drv = (System.Data.DataRowView)e.Row.DataItem;
+
+            if (drv["Revenue"] != DBNull.Value)
+                _totaleRevenue += Convert.ToDecimal(drv["Revenue"]);
+            if (drv["Cost"] != DBNull.Value)
+                _totaleCost += Convert.ToDecimal(drv["Cost"]);
 
             // Trova i bottoni
             LinkButton btnEdit = (LinkButton)e.Row.FindControl("SelectButton");
@@ -96,6 +149,19 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
 
             if (btnEdit != null) btnEdit.Visible = isForfait;
             if (btnDelete != null) btnDelete.Visible = isForfait;
+        }
+    }
+
+    protected void GridView1_DataBound(object sender, EventArgs e)
+    {
+        GridViewRow footerRow = GridView1.FooterRow;
+        if (footerRow != null)
+        {
+            Label lblRev = (Label)footerRow.FindControl("lblTotaleRevenue");
+            Label lblCst = (Label)footerRow.FindControl("lblTotaleCost");
+
+            if (lblRev != null) lblRev.Text = _totaleRevenue.ToString("C");
+            if (lblCst != null) lblCst.Text = _totaleCost.ToString("C");
         }
     }
 
@@ -133,11 +199,6 @@ public partial class m_gestione_Canoni_montly_fee_lookup_list : System.Web.UI.Pa
     protected void DL_flattivo_SelectedIndexChanged(Object sender, System.EventArgs e)
     {
         Session["DL_flattivo_val_att"] = DL_flattivo.SelectedValue;
-    }
-
-    protected void TB_Codice_TextChanged(Object sender, System.EventArgs e)
-    {
-        Session["TB_CanoneCode"] = TB_Codice.Text;
     }
 
     protected void DL_progetto_DataBound(Object sender, System.EventArgs e)

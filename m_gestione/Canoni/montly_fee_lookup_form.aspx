@@ -276,8 +276,27 @@
                    INNER JOIN Projects ON Monthly_Fee.Projects_id = Projects.Projects_Id 
                    INNER JOIN Persons ON Persons.persons_id = Projects.ClientManager_id
                    WHERE Monthly_Fee.Monthly_Fee_id = @Monthly_Fee_id"
-        InsertCommand="INSERT INTO Monthly_Fee (Projects_id, ProjectCode, Monthly_Fee_Code, Year, Month, Revenue, Cost, Active, CreatedBy, CreationDate, Note) 
-                   VALUES (@Projects_id, @ProjectCode, @Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Active, @CreatedBy, GETDATE(), @Note)"
+        InsertCommand="INSERT INTO Monthly_Fee (
+                        Projects_id, ProjectCode, Monthly_Fee_Code, 
+                        Year, Month, Revenue, Cost, 
+                        Active, CreatedBy, CreationDate, Note
+                    ) 
+                    SELECT 
+                        @Projects_id, 
+                        @ProjectCode, 
+                        -- Calcolo del codice: CodiceBase + _ + Anno + _ + Mese + _ + (Conteggio+1)
+                        @ProjectCode + '_' + CAST(@Year AS VARCHAR) + '_' + CAST(@Month AS VARCHAR) + '_' + 
+                        CAST((SELECT ISNULL(COUNT(*), 0) + 1 
+                              FROM Monthly_Fee 
+                              WHERE ProjectCode = @ProjectCode AND Year = @Year AND Month = @Month) AS VARCHAR),
+                        @Year, 
+                        @Month, 
+                        @Revenue, 
+                        @Cost, 
+                        @Active, 
+                        @CreatedBy, 
+                        GETDATE(), 
+                        @Note"
         UpdateCommand="UPDATE Monthly_Fee SET Projects_id=@Projects_id, Year=@Year, Revenue=@Revenue, Cost=@Cost, Active=@Active, 
                    LastModifiedBy=@CreatedBy, LastModificationDate=GETDATE(), Note=@Note
                    WHERE Monthly_Fee_id=@Monthly_Fee_id">
