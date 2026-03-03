@@ -923,11 +923,28 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
             string insertQuery = string.Format(
                 @"INSERT INTO {0} 
-               (Projects_id,[ProjectCode],[Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
-                CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
-             VALUES 
-               (@ProjectsId,@ProjectCode,@Monthly_Fee_Code, @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost, 
-                @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)", tableName);
+                (Projects_id, [ProjectCode], [Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
+                SELECT 
+                 @ProjectsId, 
+                 @ProjectCode, 
+                 -- Generazione dinamica del codice con suffisso progressivo
+                 @ProjectCode + '_' + CAST(@Year AS VARCHAR) + '_' + CAST(@Month AS VARCHAR) + '_' + 
+                 CAST((SELECT ISNULL(COUNT(*), 0) + 1 
+                       FROM {0} 
+                       WHERE ProjectCode = @ProjectCode AND [Year] = @Year AND [Month] = @Month) AS VARCHAR),
+                 @Year, 
+                 @Month, 
+                 @Revenue, 
+                 @Cost, 
+                 @Days, 
+                 @Day_Revenue, 
+                 @Day_Cost, 
+                 @CreatedBy, 
+                 GETDATE(), 
+                 @LastModifiedBy, 
+                 GETDATE(), 
+                 1", tableName);
 
             foreach (var accrual in accrualList)
             {
