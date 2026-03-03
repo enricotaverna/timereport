@@ -334,6 +334,16 @@
                                             Text="Rigenera"
                                             OnClick="btnRigenera_Click"
                                             OnClientClick="return confirm('Sei sicuro di voler rigenerare i dati? Questa operazione potrebbe sovrascrivere i ratei esistenti.');" />
+
+                                        <asp:Button
+                                            ID="btnRinnova"
+                                            runat="server"
+                                            CausesValidation="False"
+                                            CssClass="orangebutton"
+                                            Text="Rinnova"
+                                            Visible="false"
+                                            OnClick="btnRinnova_Click"
+                                            OnClientClick="return confirm('Questa operazione aggiungerà i monthly fee per il periodo di proroga. Continuare?');" />
                                     </div>
                                     <div id="DivScrollableGrid" style="height: 90%; overflow: auto;">
                                         <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" 

@@ -170,7 +170,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             if (FVProgetto.CurrentMode == FormViewMode.Edit && FVProgetto.DataItem != null)
             {
                 // 1. Trova il bottone "Rigenera"
-                Button btnRigenera = (Button)FVProgetto.FindControl("btnRigenera");                
+                Button btnRigenera = (Button)FVProgetto.FindControl("btnRigenera");
 
                 if (btnRigenera != null)
                 {
@@ -206,6 +206,52 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                         // Qui potresti anche loggare l'errore: LogError(ex);
                     }
                 }
+
+                // =========================================================
+                // LOGICA VISIBILITÀ BOTTONE "RINNOVA"
+                // Visibile solo su progetti Resale+Forfait che hanno già dei monthly fee
+                // =========================================================
+                Button btnRinnova = (Button)FVProgetto.FindControl("btnRinnova");
+
+                if (btnRinnova != null)
+                {
+                    try
+                    {
+                        DropDownList ddlTipo = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
+                        DropDownList ddlContratto = (DropDownList)FVProgetto.FindControl("DDLTipoContratto");
+
+                        bool isResaleForfait = ddlTipo != null && ddlContratto != null
+                            && ddlTipo.SelectedItem != null && ddlContratto.SelectedItem != null
+                            && ddlTipo.SelectedItem.Text == "Resale"
+                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
+
+                        if (isResaleForfait)
+                        {
+                            // Verifica che esistano già dei monthly fee nel DB per questo progetto
+                            string projectCode = ((System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto")).Text;
+                            int countFee = 0;
+                            DataTable dtFee = Database.GetData(
+                                "SELECT COUNT(*) AS cnt FROM Monthly_Fee mf " +
+                                "INNER JOIN Projects p ON p.Projects_id = mf.Projects_id " +
+                                "WHERE p.ProjectCode = '" + projectCode + "'");
+                            if (dtFee.Rows.Count > 0)
+                                int.TryParse(dtFee.Rows[0]["cnt"].ToString(), out countFee);
+
+                            btnRinnova.Visible = (countFee > 0);
+                        }
+                        else
+                        {
+                            btnRinnova.Visible = false;
+                        }
+                    }
+                    catch
+                    {
+                        btnRinnova.Visible = false;
+                    }
+                }
+                // =========================================================
+                // FINE LOGICA VISIBILITÀ BOTTONE "RINNOVA"
+                // =========================================================
             }
 
         }
@@ -552,6 +598,182 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                     "ErrorScript",
                     "alert('" + errorMessage + "');",
                     true);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Gestisce il click sul pulsante "Rinnova".
+    /// Calcola e inserisce SOLO i monthly fee del periodo di proroga (delta),
+    /// senza toccare i record esistenti.
+    /// </summary>
+    protected void btnRinnova_Click(object sender, EventArgs e)
+    {
+        System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
+        System.Web.UI.WebControls.TextBox txtDataFineForm = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoA");
+
+        if (txtProjectCode == null || txtDataFineForm == null)
+            return;
+
+        string projectCode = txtProjectCode.Text;
+
+        if (string.IsNullOrEmpty(projectCode))
+            return;
+
+        try
+        {
+            CultureInfo italianCulture = new CultureInfo("it-IT");
+
+            // 1. Legge la nuova DataFine dal form
+            DateTime nuovaDataFine;
+            if (!DateTime.TryParse(txtDataFineForm.Text, italianCulture, DateTimeStyles.None, out nuovaDataFine))
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                    "alert(\'Data fine non valida nel form.\');", true);
+                return;
+            }
+
+            // 2. Recupera l'ultimo mese già coperto dai monthly fee nel DB
+            DateTime vecchiaDataFine = DateTime.MinValue;
+            DataTable dtMaxDate = Database.GetData(
+                "SELECT MAX(mf.Year) AS MaxYear, MAX(mf.Month) AS MaxMonth " +
+                "FROM Monthly_Fee mf " +
+                "INNER JOIN Projects p ON p.Projects_id = mf.Projects_id " +
+                "WHERE p.ProjectCode = '" + projectCode + "'");
+
+            if (dtMaxDate.Rows.Count > 0 && dtMaxDate.Rows[0]["MaxYear"] != DBNull.Value)
+            {
+                int maxYear = Convert.ToInt32(dtMaxDate.Rows[0]["MaxYear"]);
+                int maxMonth = Convert.ToInt32(dtMaxDate.Rows[0]["MaxMonth"]);
+                // Vecchia fine = ultimo giorno del mese più recente già presente
+                vecchiaDataFine = new DateTime(maxYear, maxMonth, 1).AddMonths(1).AddDays(-1);
+            }
+            else
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                    "alert(\'Nessun monthly fee esistente trovato. Usa il bottone Rigenera.\');", true);
+                return;
+            }
+
+            // 3. Verifica che la nuova data fine sia successiva all'ultimo mese coperto
+            if (nuovaDataFine <= vecchiaDataFine)
+            {
+                string msg = string.Format(
+                    "La nuova data fine ({0}) deve essere successiva all'ultimo mese già coperto ({1}).",
+                    nuovaDataFine.ToString("dd/MM/yyyy"),
+                    vecchiaDataFine.ToString("dd/MM/yyyy")).Replace("'", "\'");
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                    "alert('" + msg + "');", true);
+                return;
+            }
+
+            // 4. Il delta parte dal primo giorno successivo alla vecchia data fine
+            DateTime deltaStart = vecchiaDataFine.AddDays(1);
+
+            // 5. Legge il budget dal form (valore INCREMENTALE per il periodo di proroga)
+            System.Web.UI.WebControls.TextBox txtRevenue = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBRevenueBudget");
+            System.Web.UI.WebControls.TextBox txtCost = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("SpeseBudgetTextBox");
+
+            decimal importoTotale = 0M;
+            decimal costoTotale = 0M;
+
+            if (txtRevenue != null)
+                decimal.TryParse(txtRevenue.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out importoTotale);
+            if (txtCost != null)
+                decimal.TryParse(txtCost.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out costoTotale);
+
+            // 6. Calcola i ratei per il solo periodo delta
+            List<AccrualResult> deltaList = CalculateMonthlyAccrual(deltaStart, nuovaDataFine, importoTotale, costoTotale);
+
+            if (deltaList.Count == 0)
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaInfo",
+                    "alert(\'Nessun rateo da aggiungere per il periodo indicato.\');", true);
+                return;
+            }
+
+            // 7. INSERT ONLY - non elimina i record esistenti
+            AppendAccrualNelDB(projectCode, deltaList);
+
+            // 8. Aggiorna la GridView
+            DSCanoni.DataBind();
+            System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)FVProgetto.FindControl("GridView1");
+            if (gridCanoni != null)
+                gridCanoni.DataBind();
+        }
+        catch (Exception ex)
+        {
+            string errorMessage = "Errore durante il rinnovo: " + ex.Message.Replace("'", "`");
+            ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                "alert('" + errorMessage + "');", true);
+        }
+    }
+
+    /// <summary>
+    /// Inserisce nel DB i ratei del periodo di proroga (INSERT ONLY, senza DELETE).
+    /// </summary>
+    private void AppendAccrualNelDB(string projectCode, List<AccrualResult> accrualList)
+    {
+        string connectionStringName = "MSSql12155ConnectionString";
+        string tableName = "Monthly_Fee";
+        string createdBy = CurrentSession.UserId.ToString();
+
+        System.Configuration.ConnectionStringSettings connectionSection =
+            ConfigurationManager.ConnectionStrings[connectionStringName];
+
+        string connectionString = (connectionSection != null) ? connectionSection.ConnectionString : null;
+
+        if (string.IsNullOrEmpty(connectionString))
+            throw new ConfigurationErrorsException("La stringa di connessione '" + connectionStringName + "' non e' stata trovata.");
+
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        {
+            conn.Open();
+
+            // Recupera Projects_id dal ProjectCode
+            int projectsId = 0;
+            using (SqlCommand cmdSelect = new SqlCommand("SELECT Projects_id FROM Projects WHERE ProjectCode = @ProjectCode", conn))
+            {
+                cmdSelect.Parameters.AddWithValue("@ProjectCode", projectCode);
+                object result = cmdSelect.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                    projectsId = Convert.ToInt32(result);
+            }
+
+            if (projectsId <= 0)
+                return;
+
+            // INSERT ONLY - nessuna DELETE
+            string insertQuery = string.Format(
+                @"INSERT INTO {0} 
+                (Projects_id, [ProjectCode], [Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
+                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
+                SELECT 
+                 @ProjectsId, @ProjectCode,
+                 @ProjectCode + '_' + CAST(@Year AS VARCHAR) + '_' + CAST(@Month AS VARCHAR) + '_' + 
+                 CAST((SELECT ISNULL(COUNT(*), 0) + 1 FROM {0} 
+                       WHERE ProjectCode = @ProjectCode AND [Year] = @Year AND [Month] = @Month) AS VARCHAR),
+                 @Year, @Month, @Revenue, @Cost, @Days, @Day_Revenue, @Day_Cost,
+                 @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1", tableName);
+
+            foreach (var accrual in accrualList)
+            {
+                using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProjectsId", projectsId);
+                    cmd.Parameters.AddWithValue("@ProjectCode", projectCode);
+                    cmd.Parameters.AddWithValue("@Year", accrual.Year);
+                    cmd.Parameters.AddWithValue("@Month", accrual.Month);
+                    cmd.Parameters.AddWithValue("@Revenue", accrual.Revenue);
+                    cmd.Parameters.AddWithValue("@Cost", accrual.Cost);
+                    cmd.Parameters.AddWithValue("@Days", accrual.AccrualDays);
+                    cmd.Parameters.AddWithValue("@Day_Revenue", accrual.DailyRevenueRate);
+                    cmd.Parameters.AddWithValue("@Day_Cost", accrual.DailyCostRate);
+                    cmd.Parameters.AddWithValue("@CreatedBy", createdBy);
+                    cmd.Parameters.AddWithValue("@LastModifiedBy", createdBy);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
     }
@@ -922,7 +1144,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
             // *** C. INSERIMENTO DEI NUOVI RATEI (Usando projectsId) ***
             string insertQuery = string.Format(
-               @"INSERT INTO {0} 
+                @"INSERT INTO {0} 
                 (Projects_id, [ProjectCode], [Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
                  CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
                 SELECT 
