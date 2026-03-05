@@ -66,19 +66,25 @@
                                 <div id="tabs-1" style="height: 380px; width: 100%">
 
                                     <!-- *** NOME  ***  -->
-                                    <div class="input nobottomborder ">
+                                    <div class="input nobottomborder" style="display:flex; align-items:center">
                                         <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Nome:"></asp:Label>
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBNome" Enabled="false" runat="server" Text='<%# Bind("Name") %>' MaxLength="50" Width="270px" />
                                     </div>
 
                                      <!-- *** Employee Number ***  -->
-                                    <div class="input nobottomborder">
+                                    <div class="input nobottomborder" style="display:flex; align-items:center">
                                             <asp:Label CssClass="inputtext" runat="server" Text="Employee Number:"></asp:Label>
                                             <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL" Enabled="false"  
                                                 AppendDataBoundItems="True" data-parsley-errors-container="#valMsg"  data-parsley-employee-number="employeeNumber.ToString()">
                                                 <asp:ListItem Value="" Text="Non rilevante" />
                                             </asp:DropDownList>
-                                    </div
+                                    </div>
+
+                                    <!-- *** Practice ***  -->
+                                    <div class="input nobottomborder" style="display:flex; align-items:center">
+                                        <asp:Label CssClass="inputtext" runat="server" Text="Practice:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBPractice" Enabled="false" runat="server" Text='<%# Bind("Practice") %>' MaxLength="50" Width="270px" />
+                                    </div>
 
                                     <!-- *** ATTIVO DA A  ***  -->
                                     <div class="input nobottomborder">
@@ -306,19 +312,26 @@
                                 <div id="tabs-1" style="height: 380px; width: 100%">
 
                                     <!-- *** NOME  ***  -->
-                                    <div class="input nobottomborder ">
+                                    <div class="input nobottomborder " style="display: flex; align-items: center">
                                         <asp:Label CssClass="inputtext" ID="Label4" runat="server" Text="Nome:"></asp:Label>
                                         <asp:TextBox CssClass="ASPInputcontent" ID="TBNome" runat="server" Text='<%# Bind("Name") %>'
                                             data-parsley-errors-container="#valMsg" MaxLength="50" Width="270px" required="" />
                                     </div>
 
                                     <!-- *** Employee Number ***  -->
-                                    <div class="input nobottomborder">
+                                    <div class="input nobottomborder" style="display: flex; align-items: center">
                                             <asp:Label CssClass="inputtext" runat="server" Text="Employee Number:"></asp:Label>
                                             <asp:DropDownList ID="DDLEmployeeNumber" runat="server" CssClass="sumoDLL"  data-parsley-validate-if-empty ="true"
                                                 AppendDataBoundItems="True" data-parsley-errors-container="#valMsg" data-parsley-employee-number="true">
                                                 <asp:ListItem Value="" Text="Non rilevante" />
                                             </asp:DropDownList>
+                                    </div>
+
+                                    <!-- *** Practice ***  -->
+                                    <div class="input nobottomborder" style="display: flex; align-items: center">
+                                        <asp:Label CssClass="inputtext" runat="server" Text="Practice:"></asp:Label>
+                                        <asp:TextBox CssClass="ASPInputcontent" ID="TBPractice" runat="server" Text='<%# Bind("Practice") %>'
+                                            data-parsley-errors-container="#valMsg" MaxLength="50" Width="270px" />
                                     </div>
 
                                     <!-- *** ATTIVO DA A  ***  -->
@@ -552,8 +565,8 @@
     <asp:SqlDataSource ID="DSPersone" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT * FROM [Persons] WHERE ([Persons_id] = @Persons_id)"
-        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a], [CreationDate], [CreatedBy], [SaleforceEmail], [EmployeeNumber] ) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a, @CreationDate, @CreatedBy, @SaleforceEmail, @EmployeeNumber)"
-        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, SaleforceEmail = @SaleforceEmail, EmployeeNumber = @EmployeeNumber WHERE [Persons_id] = @Persons_id"
+        InsertCommand="INSERT INTO [Persons] ([Name], [Roles_Id], [Company_id], [NickName], [Mail], [Attivo_da], [Attivo_fino], [Active],  [ForcedAccount], [Lingua], [EscludiControlloEconomics], [userId], [password], [userLevel_ID], [ColorScheme], [PwdVPN], [ExpensesProfile_id], [ContractHours], [Note], [BetaTester], [Calendar_id], [Manager_id], [AnniNonAeonvis], [ConsultantType_id], [Contratto_da], [Contratto_a], [CreationDate], [CreatedBy], [SaleforceEmail], [EmployeeNumber], [Practice] ) VALUES (@Name, @Roles_Id, @Company_id, @NickName, @Mail, @Attivo_da, @Attivo_fino, @Active,  @ForcedAccount, @Lingua, @EscludiControlloEconomics, @userId, @password, @userLevel_ID, 1, @PwdVPN, @ExpensesProfile_id, @ContractHours, @Note, @BetaTester, @Calendar_id, @Manager_id, @AnniNonAeonvis, @ConsultantType_id, @Contratto_da, @Contratto_a, @CreationDate, @CreatedBy, @SaleforceEmail, @EmployeeNumber, @Practice)"
+        UpdateCommand="UPDATE [Persons] SET [Name] = @Name, [Roles_Id] = @Roles_Id, [Company_id] = @Company_id, [NickName] = @NickName, [Mail] = @Mail, [Attivo_da] = @Attivo_da, [Attivo_fino] = @Attivo_fino, [Active] = @Active, [ForcedAccount] = @ForcedAccount, [Lingua] = @Lingua, [EscludiControlloEconomics] = @EscludiControlloEconomics,  [password] = @password, [userLevel_ID] = @userLevel_ID, [ExpensesProfile_id] = @ExpensesProfile_id, [ContractHours] = @ContractHours, [Note] = @Note, [BetaTester]=@BetaTester, [Calendar_id]=@Calendar_id, [Manager_id]=@Manager_id, [AnniNonAeonvis]=@AnniNonAeonvis, [ConsultantType_id] = @ConsultantType_id, [Contratto_da] = @Contratto_da, [Contratto_a] = @Contratto_a, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, SaleforceEmail = @SaleforceEmail, EmployeeNumber = @EmployeeNumber, Practice = @Practice WHERE [Persons_id] = @Persons_id"
         OnInserting="DSpersons_Insert" OnUpdating="DSpersons_Update">
         <InsertParameters>
             <asp:Parameter Name="Name" Type="String" />
@@ -586,6 +599,7 @@
             <asp:Parameter Name="CreationDate" Type="DateTime" />
             <asp:Parameter Name="SaleforceEmail" Type="String" />
             <asp:Parameter Name="EmployeeNumber" Type="String" />
+            <asp:Parameter Name="Practice" Type="String" />
         </InsertParameters>
         <SelectParameters>
             <asp:QueryStringParameter Name="Persons_id" QueryStringField="persons_id"
@@ -623,6 +637,7 @@
             <asp:Parameter Name="LastModificationDate" Type="DateTime" />
             <asp:Parameter Name="SaleforceEmail" Type="String" />
             <asp:Parameter Name="EmployeeNumber" Type="String" />
+            <asp:Parameter Name="Practice" Type="String" />
         </UpdateParameters>
     </asp:SqlDataSource>
 
@@ -796,6 +811,7 @@
 
                         $('#DDLSocieta').val(1); // Aeonvis
                         $('#DDLSocieta')[0].sumo.reload();
+                        $('#TBPractice').val(data.d.Practice);
 
                         // Extract the first letter and the last word of data.d.Consulente
                         var consulente = data.d.Consulente;

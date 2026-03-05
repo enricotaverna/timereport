@@ -37,6 +37,7 @@ public class WS_Persons : System.Web.Services.WebService
         public string Ruolo { get; set; }
         public string DataAssunzione { get; set; }
         public string DataCessazione { get; set; }
+        public string Practice { get; set; }
     }
 
     //  **** COPIA PROGETTO ***** 
@@ -64,6 +65,7 @@ public class WS_Persons : System.Web.Services.WebService
                 data.OreGiornaliere = row["OreGiornaliere"].ToString();
                 data.MailAziendale = row["MailAziendale"].ToString();
                 data.OreGiornaliere = row["OreGiornaliere"].ToString();
+                data.Practice = row["UnitaOrg"].ToString();
 
                 // valorizza chiave sede   
                 string sede = row["Sede"].ToString().ToUpper();

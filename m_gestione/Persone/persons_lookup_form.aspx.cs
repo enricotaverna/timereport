@@ -77,10 +77,12 @@ public partial class persons_lookup_form : System.Web.UI.Page
     {
         DropDownList ddlManager = (DropDownList)FVPersone.FindControl("DDLManager");
         DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
+        TextBox TBPractice = (TextBox)FVPersone.FindControl("TBPractice");
 
         e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
         e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
+        e.Command.Parameters["@Practice"].Value = TBPractice.Text;
 
         // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
         if (ddlManager != null)
@@ -93,10 +95,12 @@ public partial class persons_lookup_form : System.Web.UI.Page
     {
         DropDownList ddlManager = (DropDownList)FVPersone.FindControl("DDLManager");
         DropDownList DDLEmployeeNumber = (DropDownList)FVPersone.FindControl("DDLEmployeeNumber");
+        TextBox TBPractice = (TextBox)FVPersone.FindControl("TBPractice");
 
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
         e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
+        e.Command.Parameters["@Practice"].Value = TBPractice.Text;
 
         // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
         if (ddlManager != null)
