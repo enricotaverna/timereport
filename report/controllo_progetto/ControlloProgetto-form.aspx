@@ -310,19 +310,22 @@
                                         </div>
                                         <br />
                                         <br />
-
-                                        <!-- *** MESI COPERTURA ***  -->
-                                        <div style="width: 95%; margin: 0 auto 10px auto; display: flex; align-items: center;">
-                                            <span style="margin-right: 10px;">Copertura:</span>
-                                            <asp:TextBox ID="TBMesiCopertura" runat="server" Enabled="False" Style="width: 80px; margin-right: 5px;" />
-                                            <span>mesi</span>
+                                        
+                                        <!-- *** MESI COPERTURA + NOTE ECONOMICS ***  -->
+                                        <div style="width: 95%; margin: 0 auto 10px auto; display: flex; align-items: flex-start; gap: 30px;">
+                                            <div style="display: flex; align-items: center;">
+                                                <span style="margin-right: 10px;">Copertura:</span>
+                                                <asp:TextBox ID="TBMesiCopertura" runat="server" Enabled="False" Style="width: 80px; margin-right: 5px;" />
+                                                <span>mesi</span>
+                                            </div>
+                                            <div style="display: flex; align-items: flex-start;">
+                                                <span style="margin-right: 10px; white-space: nowrap;">Nota:</span>
+                                                <asp:TextBox ID="TBNotaEconomics" runat="server" TextMode="MultiLine" Rows="2"
+                                                    Text='<%# Bind("NotaEconomics") %>' class="ASPInputcontent" Style="width: 460px; height: auto;" />
+                                            </div>
                                         </div>
 
-
                                     </div>
-
-                                    <!-- *** TAB 2 ***  -->
-
 
                                     <!-- *** TAB 3 ***  -->
 
@@ -547,6 +550,7 @@
             }
             $('#FVProgetto_btn_calc').click(function () { MaskScreen(true); });
             $('#FVProgetto_btnAnnulla').click(function () { MaskScreen(true); });
+            $('#FVProgetto_TBNotaEconomics').on('input', function () { mustSaveEconomics = true; });
 
             var activeTab = sessionStorage.getItem('activeTab');
             if (activeTab) {
@@ -703,8 +707,14 @@
                 margineRow[item.AnnoMese] = item.Margine;
             });
 
+            // Costruisci array di righe in base ai permessi
+            var tableData = [costETCRow];
+            if (canEditMargine) {
+                tableData.push(margineRow);
+            }
+
             economicsTable = new Tabulator("#EconomicsTable", {
-                data: [costETCRow, margineRow],  // Era: [etcRow, margineRow]
+                data: tableData,
                 layout: "fitDataTable",
                 columns: columns,
                 responsiveLayout: false,
@@ -762,13 +772,15 @@
 
             console.log("Dati da salvare:", dataToPost); // DEBUG
 
+            var notaEconomics = $("#FVProgetto_TBNotaEconomics").val();
+
             // ✅ Mostra loading PRIMA della chiamata AJAX
             MaskScreen(true);
 
             $.ajax({
                 type: "POST",
                 url: "/timereport/webservices/WS_ControlloProgetto.asmx/SaveEconomicsData",
-                data: JSON.stringify({ economicsTable: dataToPost }),
+                data: JSON.stringify({ economicsTable: dataToPost, notaEconomics: notaEconomics }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {

@@ -303,7 +303,7 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public SaveResult SaveEconomicsData(string[] economicsTable)
+    public SaveResult SaveEconomicsData(string[] economicsTable, string notaEconomics)
     {
         try
         {
@@ -351,9 +351,18 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                     }
                 }
                 
-                // ✅ Aggiorna Economics dopo il salvataggio
+                // Salva notaEconomics su Projects
                 if (projectId > 0)
                 {
+                    string updateNote = "UPDATE Projects SET notaEconomics = @notaEconomics WHERE Projects_id = @Projects_id";
+                    using (SqlCommand cmdNote = new SqlCommand(updateNote, conn))
+                    {
+                        cmdNote.Parameters.AddWithValue("@Projects_id", projectId);
+                        cmdNote.Parameters.AddWithValue("@notaEconomics", string.IsNullOrEmpty(notaEconomics) ? (object)DBNull.Value : notaEconomics);
+                        cmdNote.ExecuteNonQuery();
+                    }
+
+                    // ✅ Aggiorna Economics dopo il salvataggio
                     AggiornaEconomicsProgetto(conn, projectId);
                 }
             }
