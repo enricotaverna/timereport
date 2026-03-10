@@ -22,7 +22,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         // se non è amministratore nasconde i controlli LOB e contrattoSF
         if (!Auth.ReturnPermission("REPORT", "PROJECT_ALL")) {
             LBLOB.Visible = false;
-            LBSFContractType.Visible = false;
+            //LBSFContractType.Visible = false;
         }
 
         // Popola Drop Down con lista progetti
