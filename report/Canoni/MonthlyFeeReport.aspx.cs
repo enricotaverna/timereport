@@ -87,6 +87,8 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         WhereClause wc = new WhereClause();
         wc.WhereClauseDays = "";
 
+        wc.WhereClauseDays = Addclause(wc.WhereClauseDays, " ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_RESALE"]+"");
+
         string sListaProgettiSel = Utilities.ListSelections(CBLProgetti);
         string sListaProgettiAll = Utilities.ListSelections(CBLProgetti, true);
 
@@ -128,7 +130,7 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
                     "   AND Projects_id IN ( " + sListaProgettiAll + " )  ) ";
 
                 if ((bool)Session["bChargeableAndOthers"])
-                    wc.WhereClauseDays += " OR  ( ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_RESALE"] +
+                    wc.WhereClauseDays += " OR  ( ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_RESALE"] +
                     " AND ( Persons_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
                     " OR Manager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + ")" +
                     " ) ) ";
@@ -147,7 +149,7 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         if (DDLManager.SelectedValue != "")
             wc.WhereClauseDays = Addclause(wc.WhereClauseDays, "( Manager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
                                                    " OR AccountManager_id = " + ASPcompatility.FormatStringDb(DDLManager.SelectedValue) +
-                                                   " OR [Projects].ProjectType_id <> " + ConfigurationManager.AppSettings["PROGETTO_RESALE"] + " )");
+                                                   " OR [Projects].ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_RESALE"] + " )");
 
         if (!string.IsNullOrEmpty(wc.WhereClauseDays))
             wc.WhereClauseDays = wc.WhereClauseDays + " AND ";
@@ -163,6 +165,15 @@ public partial class MonthlyFeeReport : System.Web.UI.Page
         //wc.WhereClauseYear = wc.WhereClauseYear + " Year >= " + annoDa + " AND Year  <= " + annoA + "";
         wc.WhereClauseMonths = wc.WhereClauseDays + " (Year * 100 + Month) >= "+ annoDa + meseDa + " AND (Year * 100 + Month) <= " + annoA + meseA + "";
         //wc.WhereClauseDays = wc.WhereClauseDays + " AND Month >= " + meseDa + " AND Month <= " + meseA;
+
+        //if (!string.IsNullOrEmpty(wc.WhereClauseDays))
+        //    wc.WhereClauseDays = wc.WhereClauseDays + " AND " ;
+
+
+        //wc.WhereClauseMonths = wc.WhereClauseDays + " AnnoMese >= '" + annoDa + "-" + meseDa + "' AND AnnoMese  <= '" + annoA + "-" + meseA + "'";
+        //wc.WhereClauseDays = wc.WhereClauseDays + " date >= " + fd + " AND date <= " + ld;
+
+
         return wc;
 
     }
