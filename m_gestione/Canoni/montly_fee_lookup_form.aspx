@@ -257,7 +257,7 @@
         </form>
         <!-- Form  -->
     </div>
-    <!-- container --
+    <!-- container -->
 
     <!-- *** FOOTER *** -->
     <div class="container bg-light">
