@@ -223,16 +223,23 @@ public class ControlloProgetto
         DateTime dataCutoff = CurrentSession.dCutoffDate;
         string annoMeseCutoff = dataCutoff.ToString("yyyy-MM");
 
-        // ✅ Query semplice sulla vista unica con filtri applicati via WHERE
-        string query = "SELECT * FROM [MSSql12155].[v_ProjectEconomicsReport] " +
-                      "WHERE AnnoMese = " + ASPcompatility.FormatStringDb(annoMeseCutoff) +
-                      " AND Active = 1 " +
-                      " AND TipoContratto_id IN (1, 2)"; // Solo T&M e FIXED
+        // ✅ Aggiunge il campo CostETCNextMonth che contiene ETC per il mese successivo al cutoff
+        string query = @"
+            SELECT vr.*, pe_next.CostETC AS CostETCNextMonth
+            FROM [MSSql12155].[v_ProjectEconomicsReport] vr
+            LEFT JOIN [MSSql12155].[ProjectEconomics] pe_next
+                ON  pe_next.Projects_id = vr.Projects_id
+                AND pe_next.AnnoMese    = FORMAT(DATEADD(MONTH, 1, 
+                                             CAST(vr.AnnoMese + '-01' AS DATE)
+                                         ), 'yyyy-MM')
+            WHERE vr.AnnoMese = " + ASPcompatility.FormatStringDb(annoMeseCutoff) + @"
+              AND vr.Active = 1 
+              AND vr.TipoContratto_id IN (1, 2)";
 
         // Applica filtri opzionali
         query = filtri.Progetto != "0" ? query += " AND Projects_id = " + ASPcompatility.FormatStringDb(filtri.Progetto) : query;
         query = filtri.Manager != "0" ? query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) +
-                                                 " OR AccountManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) + ")" 
+                                                 " OR AccountManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) + ")"
                                                  : query;
         query = filtri.LOB != "0" ? query += " AND LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
         query = filtri.ContractType != "0" ? query += " AND SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
@@ -359,7 +366,8 @@ public class ControlloProgetto
         DataSet result = Database.ExecuteStoredProcedure("REV3_HoursCostAndRevenueUpdate", parameters);
 
         // se richiamato con progetto ricalcola gli economics (valorizza ProjectEconomics) 
-        if (project_id != 0) {
+        if (project_id != 0)
+        {
             parametersList.Clear();
             parametersList.Add(new SqlParameter("@Project_id", project_id));
             parameters = parametersList.ToArray();

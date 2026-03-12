@@ -65,10 +65,10 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
         // se costo o bill rate sono a zero
         if (e.Row.RowType == DataControlRowType.DataRow)
 
-            if (decimal.TryParse(e.Row.Cells[10].Text, out value)) {
+            if (decimal.TryParse(e.Row.Cells[9].Text, out value)) {
                 
                 if(value < 0)
-                    e.Row.Cells[10].ForeColor = System.Drawing.Color.Red; // Cambia il colore della cella in rosso 
+                    e.Row.Cells[9].ForeColor = System.Drawing.Color.Red; // Cambia il colore di sfondo della cella in rosso
             }
 
     }

@@ -119,7 +119,7 @@
                                 <asp:BoundField DataField="PName" HeaderText="Progetto" SortExpression="PName" />
                                 <asp:BoundField DataField="Director" HeaderText="Manager" SortExpression="Director" />
                                 <asp:BoundField DataField="TipoContratto" HeaderText="Contratto" SortExpression="TipoContratto" />
-                                <asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" DataFormatString="{0:dd/MM/yyyy}" />
+                                <%--<asp:BoundField DataField="DataFine" HeaderText="Data Fine" SortExpression="DataFine" DataFormatString="{0:dd/MM/yyyy}" />--%>
 
                                 <asp:BoundField DataField="RevenueBDG" HeaderText="Budget" SortExpression="RevenueBDG" DataFormatString="{0:###,###;-; }" />
                                 <asp:BoundField DataField="RevenueACT" HeaderText="Revenue ACT" SortExpression="RevenueACT" DataFormatString="{0:###,###;-; }" />
@@ -128,7 +128,7 @@
                                 <asp:BoundField DataField="MargineEAC" HeaderText="Margine EAC" SortExpression="MargineEAC" DataFormatString="{0:#.##%;-#.##%;}" />
 
                                 <asp:BoundField DataField="WriteUpEAC" HeaderText="Write Up/Off" SortExpression="WriteUpEAC" DataFormatString="{0:###,###;-###,###; }" />
-                                <asp:BoundField DataField="MesiCopertura" HeaderText="Mesi C." SortExpression="MesiCopertura" DataFormatString="{0:###,###.0;-###,###.0; }" />
+                                <asp:BoundField DataField="CostETCNextMonth" HeaderText="Costo ETC" SortExpression="CostETC" DataFormatString="{0:###,###;-###,###; }" />
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
