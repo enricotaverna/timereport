@@ -82,12 +82,16 @@ public partial class persons_lookup_form : System.Web.UI.Page
         e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
         e.Command.Parameters["@EmployeeNumber"].Value = DDLEmployeeNumber.SelectedValue;
-        e.Command.Parameters["@Practice"].Value = TBPractice.Text;
+        e.Command.Parameters["@Practice"].Value = string.IsNullOrWhiteSpace(TBPractice.Text) ? (object)DBNull.Value : TBPractice.Text;
 
         // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
-        if (ddlManager != null)
+        if (ddlManager != null && !string.IsNullOrEmpty(ddlManager.SelectedValue))
         {
-            e.Command.Parameters["@Manager_id"].Value = ddlManager.SelectedValue;
+            e.Command.Parameters["@Manager_id"].Value = int.Parse(ddlManager.SelectedValue);
+        }
+        else
+        {
+            e.Command.Parameters["@Manager_id"].Value = DBNull.Value;
         }
     }
 
@@ -103,9 +107,13 @@ public partial class persons_lookup_form : System.Web.UI.Page
         e.Command.Parameters["@Practice"].Value = TBPractice.Text;
 
         // AGGIUNTA MANUALE DEL MANAGER (Sostituisce il Bind)
-        if (ddlManager != null)
+        if (ddlManager != null && !string.IsNullOrEmpty(ddlManager.SelectedValue))
         {
-            e.Command.Parameters["@Manager_id"].Value = ddlManager.SelectedValue;
+            e.Command.Parameters["@Manager_id"].Value = int.Parse(ddlManager.SelectedValue);
+        }
+        else
+        {
+            e.Command.Parameters["@Manager_id"].Value = DBNull.Value;
         }
     }
 
