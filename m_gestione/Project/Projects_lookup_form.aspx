@@ -290,6 +290,11 @@
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
+                                        <br />
+                                        <div class="inputtext">&nbsp;</div>
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+
                                     </div>
 
                                     <!-- *** Tipo Workflow ***  -->
@@ -620,6 +625,11 @@
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
+                                        <br />
+                                        <div class="inputtext">&nbsp;</div>
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+
                                     </div>
 
                                     <!-- *** Tipo Workflow ***  -->
@@ -867,6 +877,11 @@
                                         <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="DisBloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
+                                        <br />
+                                        <div class="inputtext">&nbsp;</div>
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+
                                     </div>
 
                                     <!-- *** Tipo Workflow ***  -->
@@ -927,9 +942,9 @@
     <asp:SqlDataSource ID="projects" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         DeleteCommand="DELETE FROM [Projects] WHERE [Projects_Id] = @Projects_Id"
-        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, SFContractType_Id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy, LOB_Id, ProjectVisibility_id ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @SFContractType_Id, @Active, 0, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy, @LOB_Id, @ProjectVisibility_id )"
+        InsertCommand="INSERT INTO Projects(ProjectCode, Name, ProjectType_Id, Channels_Id, Company_id, SFContractType_Id, Active, Always_available, BloccoCaricoSpese,ClientManager_id, AccountManager_id,TipoContratto_id, RevenueBudget, SpeseBudget, SpeseForfait, MargineProposta, DataInizio, DataFine, RevenueFatturate, SpeseFatturate, Incassato, PianoFatturazione, MetodoPagamento, TerminiPagamento, CodiceCliente, Note, ActivityOn, TestoObbligatorio, MessaggioDiErrore, NoOvertime, WorkflowType, CreationDate, CreatedBy, LOB_Id, ProjectVisibility_id, RecurringProject ) VALUES (@ProjectCode, @Name, @ProjectType_Id, @Channels_Id, @Company_id, @SFContractType_Id, @Active, 0, @BloccoCaricoSpese, @ClientManager_id, @AccountManager_id, @TipoContratto_id, @RevenueBudget, @SpeseBudget, @SpeseForfait, @MargineProposta/100, @DataInizio, @DataFine, @RevenueFatturate, @SpeseFatturate, @Incassato, @PianoFatturazione, @MetodoPagamento, @TerminiPagamento, @CodiceCliente, @Note, @ActivityOn, @TestoObbligatorio, @MessaggioDiErrore, @NoOvertime, @WorkflowType, @CreationDate, @CreatedBy, @LOB_Id, @ProjectVisibility_id,@RecurringProject )"
         SelectCommand="SELECT * FROM [Projects] WHERE ([ProjectCode] = @ProjectCode)"
-        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, SFContractType_Id = @SFContractType_Id, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = 0, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, LOB_Id = @LOB_Id, ProjectVisibility_id = @ProjectVisibility_id  WHERE (Projects_Id = @Projects_Id)"
+        UpdateCommand="UPDATE Projects SET ProjectCode = @ProjectCode, Name = @Name, SFContractType_Id = @SFContractType_Id, ProjectType_Id = @ProjectType_Id, Channels_Id = @Channels_Id, Company_id = @Company_id, Active = @Active, Always_available = 0, BloccoCaricoSpese = @BloccoCaricoSpese, ClientManager_id = @ClientManager_id, AccountManager_id = @AccountManager_id, TipoContratto_id = @TipoContratto_id, RevenueBudget = @RevenueBudget ,SpeseBudget = @SpeseBudget, SpeseForfait = @SpeseForfait, MargineProposta=@MargineProposta/100, DataFine=@DataFine, DataInizio=@DataInizio, RevenueFatturate = @RevenueFatturate, SpeseFatturate = @SpeseFatturate, Incassato = @Incassato, PianoFatturazione = @PianoFatturazione, MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, LOB_Id = @LOB_Id, ProjectVisibility_id = @ProjectVisibility_id, RecurringProject = @RecurringProject WHERE (Projects_Id = @Projects_Id)"
         OnInserting="DSprojects_Insert" OnUpdating="DSprojects_Update">
         <SelectParameters>
             <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
@@ -975,6 +990,7 @@
             <asp:Parameter Name="LastModificationDate" />
             <asp:Parameter Name="LOB_Id" />
             <asp:Parameter Name="ProjectVisibility_id" />
+            <asp:Parameter Name="RecurringProject" />
         </UpdateParameters>
         <InsertParameters>
             <asp:Parameter Name="ProjectCode" Type="String" />
@@ -1012,6 +1028,7 @@
             <asp:Parameter Name="CreationDate" />
             <asp:Parameter Name="LOB_Id" />
             <asp:Parameter Name="ProjectVisibility_id" />
+            <asp:Parameter Name="RecurringProject" />
         </InsertParameters>
     </asp:SqlDataSource>
     <asp:SqlDataSource ID="DSVisibility" runat="server"
