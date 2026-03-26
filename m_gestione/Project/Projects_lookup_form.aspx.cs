@@ -660,7 +660,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             if (nuovaDataFine <= vecchiaDataFine)
             {
                 string msg = string.Format(
-                    "La nuova data fine ({0}) deve essere successiva all'ultimo mese già coperto ({1}).",
+                    "La nuova data fine ({0}) deve essere successiva all ultimo mese già coperto ({1}).",
                     nuovaDataFine.ToString("dd/MM/yyyy"),
                     vecchiaDataFine.ToString("dd/MM/yyyy")).Replace("'", "\'");
                 ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",

@@ -270,6 +270,38 @@ public class Utilities
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sQuery"></param>
+    /// <returns></returns>
+    public static byte[] ExportXlsToBytes(string sQuery)
+    {
+        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString);
+        SqlDataAdapter adapter = new SqlDataAdapter(sQuery, conn);
+        DataSet ds = new DataSet();
+        adapter.Fill(ds, "export");
+
+        DataGrid grid = new DataGrid();
+        grid.DataSource = ds.Tables["export"].DefaultView;
+        grid.DataBind();
+
+        // scrive in memoria invece che sulla Response
+        StringWriter sw = new StringWriter();
+        HtmlTextWriter hw = new HtmlTextWriter(sw);
+        grid.RenderControl(hw);
+
+        // Unicode come ExportXls originale
+        byte[] preamble = Encoding.Unicode.GetPreamble();
+        byte[] content = Encoding.Unicode.GetBytes(sw.ToString());
+
+        byte[] result = new byte[preamble.Length + content.Length];
+        Buffer.BlockCopy(preamble, 0, result, 0, preamble.Length);
+        Buffer.BlockCopy(content, 0, result, preamble.Length, content.Length);
+
+        return result;
+    }
+
     // Esporta Xls usando il framework Synfusion, torna false in caso di errore
     // riceve in input un workbook
     public static bool ExporXlsxWorkbook(IWorkbook workbook, string filename)

@@ -229,6 +229,7 @@
                     <asp:RadioButtonList ID="RBTipoExport" runat="server" meta:resourcekey="RBTipoReportResource1" RepeatColumns="1" Width="220px">
                         <asp:ListItem Value="1" Text="<%$ Resources:exportore%>"></asp:ListItem>
                         <asp:ListItem Value="2" Text="<%$ Resources:exportspese%>"></asp:ListItem>
+                        <asp:ListItem Value="7" Text="Spese + Giustificativi"></asp:ListItem>
                     </asp:RadioButtonList>
                 </span>
                 <span class="Inputcontent"
@@ -334,17 +335,18 @@
 
             $("#RBTipoReport").on('change', function () {
                 $("input[name=RBTipoExport]").prop('checked', false);
-            })
+            })            
 
             $("#BTexec").click(function () {
+                var selectedVal = $("input[name='RBTipoExport']:checked").val();
 
-                if ($("input[name='RBTipoExport']:checked").val() == 1 || $("input[name='RBTipoExport']:checked").val() == 2)
-                    return;
+                if (selectedVal == 1 || selectedVal == 2) return;
+
+                // per Spese + Giustificativi (7) NON mettere la maschera
+                if (selectedVal == 7) return;
 
                 MaskScreen(true);
-
             });
-
 
         });
 

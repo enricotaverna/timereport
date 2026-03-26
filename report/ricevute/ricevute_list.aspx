@@ -7,11 +7,44 @@
 <link href="/timereport/include/BTmenu/menukit.css" rel="stylesheet" />
 <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
 <link href="/timereport/include/newstyle.css?v=<%=MyConstants.CSS_VERSION %>" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <style type="text/css">
     :target {
         background: yellow;
     }
+
+    /* ogni cella con immagine va su pagina separata in stampa */
+    @media print {
+    .buttons, #TitoloTabellaRicevute { 
+        display: none; 
+    }
+
+    #TabellaRicevute td {
+        display: block;
+        page-break-after: always;
+        width: 100% !important;
+        text-align: center;
+        border: none;
+    }
+
+    #TabellaRicevute td img,
+    #TabellaRicevute td canvas {
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+    #TabellaRicevute td:last-child {
+        page-break-after: avoid;
+    }
+}
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -37,7 +70,9 @@
                     <%--Messaggio se nessun dato selezionato --%>
                     <asp:Button ID="BtnSave" runat="server" CausesValidation="False" CssClass="orangebutton" Style="float:left;margin-right: 10px" OnClientClick="JavaScript:window.print();return false;" CommandName="Print" Text="<%$ appSettings: PRINT_TXT %>" />
                     <asp:Button ID="CancelButton" runat="server" CausesValidation="False" CssClass="greybutton" Style="float:left;margin-right: 10px" CommandName="Cancel" Text="<%$ appSettings: BACK_TXT %>" OnClick="CancelButton_Click" />
-
+                    <button type="button" id="BtnZip" class="orangebutton" style="float:left;margin-right:10px">
+                        Download
+                    </button>
                 </div>
                 <!--End buttons-->
 
@@ -96,5 +131,112 @@
     </asp:SqlDataSource>
 
 </body>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var pdfContainers = document.querySelectorAll('.pdf-container');
+
+            pdfContainers.forEach(function (container) {
+                var pdfUrl = container.getAttribute('data-pdf');
+
+                pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
+                    container.innerHTML = ''; // rimuove "Caricamento..."
+
+                    // loop su tutte le pagine del PDF
+                    var renderPage = function (pageNum) {
+                        pdf.getPage(pageNum).then(function (page) {
+
+                            // scala per riempire la larghezza disponibile
+                            var containerWidth = container.offsetWidth || 800;
+                            var viewport = page.getViewport({ scale: 1 });
+                            var scale = containerWidth / viewport.width * 0.7;
+                            var scaledViewport = page.getViewport({ scale: scale });
+
+                            var canvas = document.createElement('canvas');
+                            canvas.width = scaledViewport.width;
+                            canvas.height = scaledViewport.height;
+                            canvas.style.width = 'auto';
+                            canvas.style.height = 'auto';
+                            canvas.style.maxWidth = '600px';   // larghezza massima
+                            canvas.style.maxHeight = '700px';  // altezza massima
+                            canvas.style.display = 'block';
+                            canvas.style.margin = '0 auto 10px auto'; // centrato
+
+                            // se il PDF ha più pagine, ogni canvas va su pagina separata in stampa
+                            if (pdf.numPages > 1)
+                                canvas.style.pageBreakAfter = 'always';
+
+                            container.appendChild(canvas);
+
+                            var renderContext = {
+                                canvasContext: canvas.getContext('2d'),
+                                viewport: scaledViewport
+                            };
+
+                            page.render(renderContext).promise.then(function () {
+                                // renderizza la pagina successiva
+                                if (pageNum < pdf.numPages)
+                                    renderPage(pageNum + 1);
+                            });
+                        });
+                    };
+
+                    renderPage(1); // parte dalla prima pagina
+
+                }).catch(function (err) {
+                    container.innerHTML = '<p style="color:red">Errore caricamento PDF: ' + err.message + '</p>';
+                });
+            });
+        });
+
+        document.getElementById('BtnZip').addEventListener('click', function () {
+
+            var zip = new JSZip();
+            var promises = [];
+
+            // raccoglie tutti i link download presenti nella tabella
+            var links = document.querySelectorAll('#TabellaRicevute a[download]');
+
+            if (links.length === 0) {
+                alert('Nessun file da scaricare.');
+                return;
+            }
+
+            var btn = document.getElementById('BtnZip');
+            btn.disabled = true;
+            btn.innerText = 'Preparazione ZIP...';
+
+            links.forEach(function (link) {
+                var url = link.href;
+                var filename = link.getAttribute('download');
+
+                // evita duplicati (ogni file ha due link: view e download)
+                if (zip.file(filename)) return;
+
+                var promise = fetch(url)
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('Errore scaricamento: ' + url);
+                        return response.blob();
+                    })
+                    .then(function (blob) {
+                        zip.file(filename, blob);
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                    });
+
+                promises.push(promise);
+            });
+
+            Promise.all(promises).then(function () {
+                zip.generateAsync({ type: 'blob' }).then(function (content) {
+                    saveAs(content, 'ricevute.zip');
+                    btn.disabled = false;
+                    btn.innerText = 'Download ZIP';
+                });
+            });
+        });
+    </script>
 
 </html>

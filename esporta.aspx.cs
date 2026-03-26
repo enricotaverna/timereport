@@ -294,9 +294,12 @@ public partial class Esporta : System.Web.UI.Page
                 Utilities.ExportXls("Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, Invoiceflag,KM, Importo, Comment, AccountingDateAnnoMese, '', AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, LOBCode, SFContractType from v_spese where " + wc.WhereClauseDays);
                 //Response.Redirect("/timereport/esporta.aspx");
                 break;
-                //case "3":
-                //    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
-                //    break;
+            //case "3":
+            //    Utilities.ExportXls("Select Hours_Id, NomePersona, NomeSocieta, CodiceCliente, NomeCliente, ProjectCode, NomeProgetto, ActivityCode, ActivityName, DescTipoProgetto, " + "NomeManager, fDate, AnnoMese, flagstorno, Hours, Giorni, Comment, AccountingDateAnnoMese from v_ore where " + sWhereClause);
+            //    break;
+            case "7":
+                EsportaSpeseConGiustificativi(wc.WhereClauseDays);
+                break;
         }
 
         switch (RBTipoReport.SelectedValue)
@@ -322,6 +325,155 @@ public partial class Esporta : System.Web.UI.Page
                 Response.Redirect("report/rdlc/ReportExecute.aspx");
                 break;
 
+        }
+    }
+
+    /// <summary>
+    /// Punto di ingresso per l'export spese + giustificativi.
+    /// Coordina la generazione dell'Excel, la ricerca dei file allegati
+    /// e l'invio dello ZIP al client.
+    /// </summary>
+    /// <param name="whereClause">Clausola WHERE già costruita dai filtri della pagina</param>
+    protected void EsportaSpeseConGiustificativi(string whereClause)
+    {
+        byte[] excelBytes = GeneraExcelSpese(whereClause);
+        string[] giustificativi = TrovaGiustificativi(whereClause);
+        InviaZip(excelBytes, giustificativi);
+    }
+
+    /// <summary>
+    /// Genera il file Excel delle spese in memoria e lo restituisce come array di byte.
+    /// Usa lo stesso formato e la stessa query dell'export standard (case "2").
+    /// </summary>
+    /// <param name="whereClause">Clausola WHERE già costruita dai filtri della pagina</param>
+    /// <returns>Array di byte contenente il file XLS</returns>
+    protected byte[] GeneraExcelSpese(string whereClause)
+    {
+        return Utilities.ExportXlsToBytes(
+            "Select Expenses_Id, Persona, NomeSocieta, CodiceCliente, NomeCliente, " +
+            "ProjectCode, NomeProgetto, TipoProgetto, Manager, fDate, AnnoMese, " +
+            "ExpenseCode, DescSpesa, CreditCardPayed, CompanyPayed, flagstorno, " +
+            "Invoiceflag, KM, Importo, Comment, AccountingDateAnnoMese, '', " +
+            "AdditionalCharges, PreinvoiceNum, CTMPreinvoiceNum, OpportunityId, " +
+            "LOBCode, SFContractType from v_spese where " + whereClause);
+    }
+
+    /// <summary>
+    /// Scansiona il filesystem sotto PATH_RICEVUTE e restituisce tutti i file
+    /// (immagini e PDF) che corrispondono alle spese nel filtro corrente.
+    /// La ricerca avviene per nome file nel formato fid-{expenses_id}-{timestamp}.ext,
+    /// come salvato da carica_file.ashx al momento del caricamento.
+    /// </summary>
+    /// <param name="whereClause">Clausola WHERE già costruita dai filtri della pagina</param>
+    /// <returns>Array di path fisici dei file trovati</returns>
+    protected string[] TrovaGiustificativi(string whereClause)
+    {
+        // recupera tutti gli expenses_id corrispondenti ai filtri
+        DataTable dtSpese = Database.GetData(
+            "Select Expenses_Id from v_spese where " + whereClause);
+
+        // costruisce un set per la ricerca veloce per id
+        var expenseIds = new System.Collections.Generic.HashSet<string>();
+        foreach (DataRow row in dtSpese.Rows)
+            expenseIds.Add(row["Expenses_Id"].ToString());
+
+        string pathRicevute = Server.MapPath(
+            ConfigurationManager.AppSettings["PATH_RICEVUTE"]);
+
+        // se la directory non esiste restituisce array vuoto
+        if (!System.IO.Directory.Exists(pathRicevute))
+            return new string[0];
+
+        // scansiona ricorsivamente tutto PATH_RICEVUTE (struttura anno/mese/persona)
+        // e filtra i file che:
+        // 1. hanno estensione immagine o PDF
+        // 2. hanno nome nel formato fid-{expenses_id}-{timestamp}.ext
+        // 3. il loro expenses_id è presente nel set costruito sopra
+        return System.IO.Directory
+            .GetFiles(pathRicevute, "*.*", System.IO.SearchOption.AllDirectories)
+            .Where(f => {
+                string fname = System.IO.Path.GetFileName(f).ToLower();
+
+                // filtra per estensione
+                if (!fname.EndsWith("jpg") && !fname.EndsWith("jpeg") &&
+                    !fname.EndsWith("png") && !fname.EndsWith("gif") &&
+                    !fname.EndsWith("pdf") && !fname.EndsWith("bmp") &&
+                    !fname.EndsWith("tiff"))
+                    return false;
+
+                // estrae expenses_id dal nome file (fid-{id}-{timestamp}.ext)
+                var start = fname.IndexOf("fid-") + 4;
+                if (start < 4) return false;
+                var end = fname.LastIndexOf("-");
+                if (end <= start) return false;
+                var id = fname.Substring(start, end - start);
+
+                return expenseIds.Contains(id);
+            })
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Crea uno ZIP in memoria contenente il file Excel delle spese e tutti
+    /// i giustificativi allegati, e lo invia al client come download.
+    /// La struttura dello ZIP è:
+    ///   spese.xls
+    ///   giustificativi/
+    ///     {anno}/
+    ///       {mese}/
+    ///         {persona}/
+    ///           fid-{id}-{timestamp}.ext
+    /// </summary>
+    /// <param name="excelBytes">Array di byte del file Excel generato da GeneraExcelSpese</param>
+    /// <param name="giustificativi">Array di path fisici dei file trovati da TrovaGiustificativi</param>
+    protected void InviaZip(byte[] excelBytes, string[] giustificativi)
+    {
+        string pathRicevute = Server.MapPath(
+            ConfigurationManager.AppSettings["PATH_RICEVUTE"]);
+
+        // tiene traccia dei path già aggiunti per evitare duplicati nello ZIP
+        // (GetEntry non è disponibile in modalità Create)
+        var pathAggiunti = new System.Collections.Generic.HashSet<string>();
+
+        using (var memStream = new System.IO.MemoryStream())
+        {
+            using (var archive = new System.IO.Compression.ZipArchive(
+                memStream, System.IO.Compression.ZipArchiveMode.Create, true))
+            {
+                // aggiunge il file Excel nella root dello ZIP
+                var excelEntry = archive.CreateEntry("spese.xls",
+                    System.IO.Compression.CompressionLevel.Fastest);
+                using (var es = excelEntry.Open())
+                    es.Write(excelBytes, 0, excelBytes.Length);
+
+                // aggiunge i giustificativi mantenendo la struttura
+                // anno/mese/persona del filesystem originale
+                foreach (var file in giustificativi)
+                {
+                    // costruisce il path relativo dentro lo ZIP
+                    string relativePath = file.Replace(pathRicevute, "").TrimStart('\\', '/');
+                    string zipPath = "giustificativi/" + relativePath.Replace("\\", "/");
+
+                    // HashSet.Add restituisce false se il path esiste già -> salta
+                    if (!pathAggiunti.Add(zipPath)) continue;
+
+                    var entry = archive.CreateEntry(zipPath,
+                        System.IO.Compression.CompressionLevel.Fastest);
+                    using (var es = entry.Open())
+                    using (var fs = System.IO.File.OpenRead(file))
+                        fs.CopyTo(es);
+                }
+            }
+
+            // invia lo ZIP al client come attachment
+            Response.Clear();
+            Response.ContentType = "application/zip";
+            Response.AddHeader("Content-Disposition",
+                "attachment; filename=spese_giustificativi.zip");
+            memStream.Seek(0, System.IO.SeekOrigin.Begin);
+            memStream.CopyTo(Response.OutputStream);
+            Response.Flush();
+            Response.End();
         }
     }
 

@@ -87,39 +87,41 @@ public partial class report_ricevute_ricevute_list : System.Web.UI.Page
     // Stampa la tabella con le immagini
     protected void Stampa_Ricevute()
     {
-
-        // loop per stampare immagini
-        string stFile = "";
-        HtmlTableRow row = new HtmlTableRow(); // aggiunge riga  
-
-        // ciclo su tutte le immagini corrispondenti a quella spesa, lista oggetti è costruita in modo da essere
-        // sempre multipla di 3
         foreach (IndexFileObj ogg in IndexFile)
         {
+            if (ogg.filename == "") continue;
 
-            stFile = ogg.filename;
-            
-            // crea la cella
-            HtmlTableCell cell1 = new HtmlTableCell();
+            HtmlTableRow row = new HtmlTableRow();
+            HtmlTableCell cell = new HtmlTableCell();
 
-            // alla prima cella crea la riga
-            if (Convert.ToInt16(ogg.index) % 3 == 1)
-                row = new HtmlTableRow(); // aggiunge riga   
+            string isPdf = ogg.filename.ToLower().EndsWith("pdf") ? "true" : "false";
+            string contenuto;
 
-            // invece di ogg.index
-            cell1.InnerHtml = ogg.filename != "" ? " <A name=" + ogg.shortFileName  + ">" + ogg.shortFileName + "<A><br/><a href='" + ogg.filename + "' download='" + Path.GetFileName(ogg.filename) + "' ><img height=300 src='" + ogg.preview + "' />" : "";
-            cell1.Width = "300px";
-            cell1.Align = "center";
+            if (ogg.filename.ToLower().EndsWith("pdf"))
+            {
+                contenuto = "<A name='" + ogg.shortFileName + "'>" + ogg.shortFileName + "</A><br/>" +
+                            "<div class='pdf-container' data-pdf='" + ogg.filename + "' " +
+                            "style='width:100%; min-height:90vh;'>" +
+                            "<p style='color:#999'>Caricamento PDF...</p>" +
+                            "</div>" +
+                            "<br/><a href='" + ogg.filename + "' download='" + Path.GetFileName(ogg.filename) + "'>Download PDF</a>";
+            }
+            else
+            {
+                // Immagine normale
+                contenuto = "<A name='" + ogg.shortFileName + "'>" + ogg.shortFileName + "</A><br/>" +
+                            "<a href='" + ogg.filename + "' download='" + Path.GetFileName(ogg.filename) + "'>" +
+                            "<img src='" + ogg.filename + "' style='max-width:100%; max-height:90vh; object-fit:contain;' />" +
+                            "</a>";
+            }
 
-            row.Cells.Add(cell1);
- 
-            // ogni tre celle aggiunge una riga
-            if ( Convert.ToInt16(ogg.index) % 3 == 0 ) {
-                TitoloTabellaRicevute.Attributes.Add("style", "display:visible");
-                TabellaRicevute.Rows.Add(row);    }
-       
-        } //  next 
+            cell.InnerHtml = contenuto;
+            cell.Align = "center";
+            cell.Style["width"] = "100%";
 
+            row.Cells.Add(cell);
+            TabellaRicevute.Rows.Add(row);
+        }
     }
 
     // popola la lista che contiene nomi file e expensed_id associati ai file delle ricevute
