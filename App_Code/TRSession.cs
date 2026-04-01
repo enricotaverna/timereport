@@ -43,6 +43,15 @@ public class Opportunity
     public string OpenDate { get; set; }
     [JsonProperty("StageName")]
     public string StageName { get; set; }
+
+    [JsonProperty("RecordType")]
+    public RecordType RecordType { get; set; }
+}
+
+public class RecordType
+{
+    [JsonProperty("DeveloperName")]
+    public string DeveloperName { get; set; }
 }
 
 public class TRSession
@@ -316,7 +325,7 @@ public class TRSession
 
             string SFtoken = clsUtility.GetTokenSF();
 
-            serviceURL += string.Format("SELECT Code__c, Name, Account.Name, Open_date__c, StageName FROM Opportunity ORDER BY Account.Name, Name", SalesforceAccount);
+            serviceURL += string.Format("SELECT Code__c, Name, Account.Name, Open_date__c, StageName, RecordType.DeveloperName FROM Opportunity ORDER BY Account.Name, Name", SalesforceAccount);
 
             string JSON_TOT = "";
             clsStandard.GetAllRecord AllRecord = new clsStandard.GetAllRecord();

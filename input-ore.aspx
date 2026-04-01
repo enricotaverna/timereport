@@ -74,9 +74,8 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLprogettoResource1"
-                                    data-parsley-errors-container="#valMsg" data-parsley-required="true">
+                                <asp:DropDownList ID="DDLProgetto" runat="server" AppendDataBoundItems="True"
+                                    meta:resourcekey="DDLProgettoResource1">
                                 </asp:DropDownList>
                             </div>
 
@@ -183,9 +182,9 @@
 
                                 <!-- per stile CSS -->
                                 <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLprogettoResource2" data-parsley-required="true" data-parsley-errors-container="#valMsg">
+                                    meta:resourcekey="DDLprogettoResource2" data-parsley-required="true"
+                                    data-parsley-errors-container="#valMsg">
                                 </asp:DropDownList>
-
                             </div>
 
                             <!-- *** DDL Attività ***  -->
@@ -516,13 +515,46 @@
         }
 
         function BindOpportunity() {
-            // gestione Opportunity Id
-            var OpportunityIsRequired = $("#FVore_DDLprogetto").find("option:selected").attr("data-OpportunityIsRequired");
+            var selectedText = $("#FVore_DDLprogetto option:selected").text();
+            var OpportunityIsRequired = $("#FVore_DDLprogetto option:selected").attr("data-OpportunityIsRequired");
 
-            if (OpportunityIsRequired == "True")
-                $('#lbOpportunityId').show(); // visualizza DropDown
-            else
-                $('#lbOpportunityId').hide(); // visualizza DropDown
+            if (OpportunityIsRequired == "True") {
+                $('#lbOpportunityId').show();
+
+                var ddl = $("#FVore_DDLOpportunity");
+
+                // Distruggi SumoSelect se esiste
+                if (ddl[0].sumo) {
+                    ddl[0].sumo.unload();
+                }
+
+                // Determina quali RecordType mostrare in base al progetto selezionato
+                var allowedTypes = [];
+                if (selectedText.indexOf("BD_NO_CLIE") !== -1) {
+                    allowedTypes = ["Iniziative_BD_No_Client"];
+                } else if (selectedText.indexOf("BD_CLIENT") !== -1) {
+                    allowedTypes = ["Relazione", "Trattativa"];
+                }
+
+                // Filtra le opzioni
+                ddl.find('option').each(function () {
+                    var recordType = $(this).attr('data-record-type');
+                    if (!recordType || allowedTypes.length === 0 || allowedTypes.indexOf(recordType) !== -1) {
+                        $(this).show().prop('disabled', false);
+                    } else {
+                        $(this).hide().prop('disabled', true);
+                    }
+                });
+
+                // Reset selezione
+                ddl.val('');
+
+                // Reinizializza SumoSelect
+                ddl.SumoSelect({ search: true, searchText: '' });
+                $('.SumoSelect > .optWrapper').css('width', '550px');
+            } else {
+                $('#lbOpportunityId').hide();
+            }
         }
 
         // *** popola controllo delle Location *** 

@@ -236,38 +236,85 @@ public partial class input_ore : System.Web.UI.Page
 
     }
 
-    protected void Bind_DDLOpportunita()
+    // al cambio del progetto richiama il bind delle opportunità per filtrare le opportunità in base al progetto selezionato
+    // la logica di filtraggio è gestita in javascript lato client per evitare ulteriori postback alla pagina
+    // vengono filtrate tutte le opportunità legate al progetto selezionato:
+    // - tipo BD_NO_CLIENT verranno filtrate tutte le opportunità con recordtype Trattativa,Relazione
+    // - tipo BD_CLIENT verranno filtrate tutte le opportunità  Iniziative_BD_No_Client
+    // - altrimenti non viene applicato nessun filtro e vengono mostrate tutte le opportunità legate a tutti i progetti
+    protected void DDLProgetto_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        DropDownList DDLProgetto = (DropDownList)FVore.FindControl("DDLProgetto");
+        // Recupero il valore del progetto selezionato
+        string selectedProject = DDLProgetto.SelectedItem.Text;
+
+        // Richiamo il metodo di bind passando il filtro
+        Bind_DDLOpportunita(selectedProject);
+    }
+
+    /// <summary>
+    /// Populates the DDLOpportunity DropDownList with available opportunities, filtered by the specified project code
+    /// and the current FormView mode.
+    /// </summary>
+    /// <remarks>If projectCode is "CODICE_BD_NO_CLIENT", only internal opportunities are included. If
+    /// projectCode is "CODICE_BD_CLIENT", only client opportunities are included. Otherwise, all relevant opportunities
+    /// are shown based on the FormView mode.</remarks>
+    /// <param name="projectCode">The project code used to filter the list of opportunities.</param>
+    protected void Bind_DDLOpportunita(string projectCode)
     {
         DropDownList DDLOpportunity;
+        DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
         List<Opportunity> ListaOpportunita = new List<Opportunity>();
 
-        //valorizzazione con valore default
-        DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
         DDLOpportunity.Items.Clear();
-        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+        DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave;", ""));
 
-        if (FVore.CurrentMode == FormViewMode.Insert | FVore.CurrentMode == FormViewMode.Edit)
-            ListaOpportunita = CurrentSession.ListaOpenOpportunity;
-        else
-            ListaOpportunita = CurrentSession.ListaAllOpportunity;
+        ListaOpportunita = CurrentSession.ListaOpenOpportunity;
 
-        // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
-        // di progetti chiusi
         foreach (Opportunity opp in ListaOpportunita)
         {
             ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+            liItem.Attributes.Add("data-record-type", opp.RecordType.DeveloperName);
             DDLOpportunity.Items.Add(liItem);
         }
 
         DDLOpportunity.DataTextField = "OpportunityName";
         DDLOpportunity.DataValueField = "OpportunityId";
         DDLOpportunity.DataBind();
-
-        if (FVore.CurrentMode == FormViewMode.Insert)
-            DDLOpportunity.SelectedValue = (string)Session["OpportunityDefault"];
-        else
-            DDLOpportunity.SelectedValue = OpportunityId;
     }
+
+    //protected void Bind_DDLOpportunita(string projectCode)
+    //{
+    //    DropDownList DDLOpportunity;
+    //    List<Opportunity> ListaOpportunita = new List<Opportunity>();
+
+    //    //valorizzazione con valore default
+    //    DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
+    //    DDLOpportunity.Items.Clear();
+    //    DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave", ""));
+
+    //    if (FVore.CurrentMode == FormViewMode.Insert | FVore.CurrentMode == FormViewMode.Edit)
+    //        ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+    //    else
+    //        ListaOpportunita = CurrentSession.ListaAllOpportunity;
+
+    //    // carica progetti forzati in insert e change, tutti i progetti in display per evitare problemi in caso
+    //    // di progetti chiusi
+    //    foreach (Opportunity opp in ListaOpportunita)
+    //    {
+    //        ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
+    //        DDLOpportunity.Items.Add(liItem);
+    //    }
+
+    //    DDLOpportunity.DataTextField = "OpportunityName";
+    //    DDLOpportunity.DataValueField = "OpportunityId";
+    //    DDLOpportunity.DataBind();
+
+    //    if (FVore.CurrentMode == FormViewMode.Insert)
+    //        DDLOpportunity.SelectedValue = (string)Session["OpportunityDefault"];
+    //    else
+    //        DDLOpportunity.SelectedValue = OpportunityId;
+    //}
 
     public void Bind_DDLAttivita()
     {
@@ -366,14 +413,14 @@ public partial class input_ore : System.Web.UI.Page
             Bind_DDLprogetto();
             Bind_DDLAttivita();
             Bind_DDLTaskSF();
-            Bind_DDLOpportunita();
+            Bind_DDLOpportunita("");
         }
         else // insert
         {
             Bind_DDLprogetto();
             Bind_DDLAttivita();
             Bind_DDLTaskSF();
-            Bind_DDLOpportunita();
+            Bind_DDLOpportunita("");
         }
 
         //      se livello autorizzativo è inferiore a 4 spegne il campo competenza
