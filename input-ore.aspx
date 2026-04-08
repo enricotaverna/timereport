@@ -74,8 +74,8 @@
                             <div class="input nobottomborder">
                                 <asp:Label CssClass="inputtext" ID="Label7" runat="server" Text="Progetto" meta:resourcekey="Label7Resource1"></asp:Label>
                                 <!-- per stile CSS -->
-                                <asp:DropDownList ID="DDLProgetto" runat="server" AppendDataBoundItems="True"
-                                    meta:resourcekey="DDLProgettoResource1">
+                                <asp:DropDownList ID="DDLprogetto" runat="server" AppendDataBoundItems="True"
+                                    meta:resourcekey="DDLprogettoResource1">
                                 </asp:DropDownList>
                             </div>
 
@@ -696,7 +696,7 @@
                 LocationKey: LocationKey,
                 LocationDescription: LocationDescription,
                 OpportunityId: ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : ''),
-                AccountingDate: AccountingDate !== '' ? AccountingDate : null,
+                AccountingDate: AccountingDate,
                 SalesforceTaskID: TaskName
             };
 

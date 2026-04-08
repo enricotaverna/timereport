@@ -260,27 +260,38 @@ public partial class input_ore : System.Web.UI.Page
     /// projectCode is "CODICE_BD_CLIENT", only client opportunities are included. Otherwise, all relevant opportunities
     /// are shown based on the FormView mode.</remarks>
     /// <param name="projectCode">The project code used to filter the list of opportunities.</param>
-    protected void Bind_DDLOpportunita(string projectCode)
+    protected void Bind_DDLOpportunita(string projectCode = "")
     {
         DropDownList DDLOpportunity;
-        DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
         List<Opportunity> ListaOpportunita = new List<Opportunity>();
 
+        DDLOpportunity = (DropDownList)FVore.FindControl("DDLOpportunity");
         DDLOpportunity.Items.Clear();
         DDLOpportunity.Items.Add(new ListItem("seleziona una opportunit&agrave;", ""));
 
-        ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+        // ← RIPRISTINATO dalla vecchia: ReadOnly carica TUTTE le opportunità
+        // (evita problemi se l'opportunità è già chiusa)
+        if (FVore.CurrentMode == FormViewMode.Insert || FVore.CurrentMode == FormViewMode.Edit)
+            ListaOpportunita = CurrentSession.ListaOpenOpportunity;
+        else
+            ListaOpportunita = CurrentSession.ListaAllOpportunity;
 
         foreach (Opportunity opp in ListaOpportunita)
         {
             ListItem liItem = new ListItem(opp.OpportunityAccount.AccountName + " - " + opp.OpportunityName, opp.OpportunityCode);
-            liItem.Attributes.Add("data-record-type", opp.RecordType.DeveloperName);
+            liItem.Attributes.Add("data-record-type", opp.RecordType.DeveloperName); // ← MANTENUTO dalla nuova
             DDLOpportunity.Items.Add(liItem);
         }
 
         DDLOpportunity.DataTextField = "OpportunityName";
         DDLOpportunity.DataValueField = "OpportunityId";
         DDLOpportunity.DataBind();
+
+        // ← RIPRISTINATO dalla vecchia: senza questo in edit non selezionava il valore salvato
+        if (FVore.CurrentMode == FormViewMode.Insert)
+            DDLOpportunity.SelectedValue = (string)(Session["OpportunityDefault"] ?? "");
+        else if (!string.IsNullOrEmpty(OpportunityId))
+            DDLOpportunity.SelectedValue = OpportunityId;
     }
 
     //protected void Bind_DDLOpportunita(string projectCode)
