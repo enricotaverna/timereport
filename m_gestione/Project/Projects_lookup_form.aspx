@@ -292,7 +292,7 @@
 
                                         <br />
                                         <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
                                         <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
@@ -627,7 +627,7 @@
 
                                         <br />
                                         <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
                                         <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
@@ -879,7 +879,7 @@
 
                                         <br />
                                         <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
                                         <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
