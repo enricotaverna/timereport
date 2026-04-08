@@ -445,10 +445,10 @@
             /*    $('#FVore_DDLLocation').SumoSelect({ search: true, searchText: '' });*/
             /* $('#FVore_DDLAttivita').SumoSelect({ search: true, searchText: '' });  tolto temporaneamente */
             $('#FVore_DDLOpportunity').SumoSelect({ search: true, searchText: '' });
-            if ($('#FVore_DDLprogetto')[0].sumo)
-                $('#FVore_DDLprogetto')[0].sumo.optDiv.css('width', '350px'); // fa in modo che la tendina per le opportunità sia larga 550px
-            if ($('#FVore_DDLOpportunity')[0].sumo)
-                $('#FVore_DDLOpportunity')[0].sumo.optDiv.css('width', '550px'); // fa in modo che la tendina per le opportunità sia larga 550px
+            if ($('#FVore_DDLprogetto')[0] && $('#FVore_DDLprogetto')[0].sumo)
+                $('#FVore_DDLprogetto')[0].sumo.optDiv.css('width', '350px');
+            if ($('#FVore_DDLOpportunity')[0] && $('#FVore_DDLOpportunity')[0].sumo)
+                $('#FVore_DDLOpportunity')[0].sumo.optDiv.css('width', '550px');
 
         });
 
@@ -696,7 +696,7 @@
                 LocationKey: LocationKey,
                 LocationDescription: LocationDescription,
                 OpportunityId: ($('#FVore_DDLOpportunity').is(':visible') ? $('#FVore_DDLOpportunity').val() : ''),
-                AccountingDate: AccountingDate,
+                AccountingDate: AccountingDate !== '' ? AccountingDate : null,
                 SalesforceTaskID: TaskName
             };
 
