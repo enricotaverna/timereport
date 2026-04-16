@@ -408,7 +408,8 @@
         // evita il postback con INVIO (che non faceva funzionare bene il bind delle attivita)
         stopPostbackWithEnter();
 
-        // *** Page Load ***  
+        // *** Page Load *** 
+        var savedOpportunityId = '<%= OpportunityId %>';
         $(function () {
             $("#FVore_TBAccountingDate").datepicker($.datepicker.regional['it']);
             $("#FVore_disCancelFlagCheckBox").attr("disabled", true);
@@ -439,6 +440,12 @@
             BindActivity();
             BindLocation();
             BindOpportunity();
+
+            if (savedOpportunityId) {
+                var ddl = $("#FVore_DDLOpportunity");
+                ddl.val(savedOpportunityId);
+                if (ddl[0].sumo) ddl[0].sumo.reload();
+            }
 
             // Sumo Select
             $('#FVore_DDLprogetto').SumoSelect({ search: true, searchText: '' });
