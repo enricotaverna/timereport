@@ -176,7 +176,7 @@ public class Utilities
         {
             ws.UsedRange.AutofitColumns();
             ws.UsedRange.AutofitRows();
-            ws.Rows[0].CellStyle = headerStyle;
+            ws.Rows[1].CellStyle = headerStyle;
         }
     }
 
