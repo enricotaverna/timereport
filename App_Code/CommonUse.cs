@@ -174,9 +174,22 @@ public class Utilities
         // applica formattazione alla prima riga di intestazione
         foreach (var ws in wb.Worksheets)
         {
-            ws.UsedRange.AutofitColumns();
-            ws.UsedRange.AutofitRows();
-            ws.Rows[1].CellStyle = headerStyle;
+            try
+            {
+                if (ws.UsedRange != null && ws.UsedRange.LastRow > 0 && ws.UsedRange.LastColumn > 0)
+                {
+                    ws.UsedRange.AutofitColumns();
+                    ws.UsedRange.AutofitRows();
+
+                    // Applica lo stile all'header (prima riga)
+                    ws.Range[1, 1, 1, ws.UsedRange.LastColumn].CellStyle = headerStyle;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log o gestisci l'errore per questo specifico foglio
+                //System.Diagnostics.Debug.WriteLine($"Errore nel foglio {ws.Name}: {ex.Message}");
+            }
         }
     }
 
