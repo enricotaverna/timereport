@@ -120,7 +120,7 @@
                     </div>
 
                     <div class="input nobottomborder" id="DivManager" runat="server">
-                        <div class="inputtext">Mngr o Delivery Owner</div>
+                        <div class="inputtext">Mngr o Del.Owner</div>
 
                         <!-- per stile CSS -->
                         <asp:DropDownList ID="DDLManager" runat="server" DataSourceID="Manager"
