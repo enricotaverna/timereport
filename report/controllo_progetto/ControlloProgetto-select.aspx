@@ -59,7 +59,7 @@
                         <div class="inputtext">Responsabile</div>
                             <asp:DropDownList ID="DDLManager" runat="server" DataTextField="Name" DataValueField="Persons_id" data-parsley-errors-container="#valMsg" data-parsley-required="true" CssClass="SumoDLL" 
                                 AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_Persone" data-parsley-required-message="Specificare un valore per Responsabile" >
-                                <asp:ListItem Value="0">-- Manager o Account --</asp:ListItem>
+                                <asp:ListItem Value="0">-- Manager o Delivery Owner --</asp:ListItem>
                             </asp:DropDownList>
                         </div>
 

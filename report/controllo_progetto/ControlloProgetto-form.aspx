@@ -171,7 +171,7 @@
 
                                         <!-- *** CODICE ACCOUNT ***  -->
                                         <div class="input nobottomborder">
-                                            <div class="inputtext">Account:</div>
+                                            <div class="inputtext">Delivery Owner:</div>
                                             <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
                                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
                                                 SelectedValue='<%# Bind("AccountManager_id") %>'
