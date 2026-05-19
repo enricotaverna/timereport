@@ -16,6 +16,7 @@ public partial class input_ore : System.Web.UI.Page
     private List<TaskRay> ListaTaskTotale = new List<TaskRay>();
     //private DropDownList ddlActivity;
 
+
     public string lProject_id, lActivity_id, lLocationKey, SalesforceTaskID, OpportunityId;
 
     // recupera oggetto sessione
