@@ -237,7 +237,11 @@ public partial class m_utilita_upload_expenses_xls1 : System.Web.UI.Page
             if (!simulazione.Checked)
             {
                 //string url = "http://localhost/timereport/webservices/WS_DBUpdates.asmx/SaveExpenses";
-                string url = ResolveUrl("~/webservices/WS_DBUpdates.asmx/SaveExpenses");
+                //string url = ResolveUrl("~/webservices/WS_DBUpdates.asmx/SaveExpenses");
+
+                string url = Request.Url.GetLeftPart(UriPartial.Authority)
+                            + ResolveUrl("~/webservices/WS_DBUpdates.asmx/SaveExpenses");
+
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.Method = "POST";
                 request.ContentType = "application/json; charset=utf-8";
