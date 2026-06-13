@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Script.Serialization;
 
 // definisce la struttura  da ritornare con GetApprovalRecord
@@ -200,29 +201,85 @@ public class Card
 
                 break;
 
-            case "CVdaConfermare":
+            // Legacy dismesso: KPI CV da confermare
+            //case "CVdaConfermare":
+            //
+            //    CurriculumList list = new CurriculumList();
+            //    list.BuildListFromRagicAPI();
+            //
+            //    int count = 0; // numero CV da rivedere a cura del manager
+            //    foreach (Dictionary<string, string> row in list.Data)
+            //    {
+            //        string CVStatus = "";
+            //        string manager_id = "";
+            //
+            //        if (row.TryGetValue("CVStatus", out CVStatus) && row.TryGetValue("Manager_Id", out manager_id))
+            //        {
+            //            if (CVStatus.Substring(0, 2) == "03" && manager_id == persons_id.ToString()) // manager review
+            //                count++;
+            //        }
+            //    }
+            //
+            //    kpi = new KPISet();
+            //    kpi.KPIDescription = "";
+            //    kpi.KPIValue = count.ToString();
+            //    kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning";
+            //    KPIList.Add(kpi);
+            //    break;
 
-                CurriculumList list = new CurriculumList();
-                list.BuildListFromRagicAPI();
+            case "ETCdaAggiornare":
 
-                int count = 0; // numero CV da rivedere a cura del manager
-                foreach (Dictionary<string, string> row in list.Data)
-                {
-                    string CVStatus = "";
-                    string manager_id = "";
+                TRSession CurrentSession = (TRSession)HttpContext.Current.Session["CurrentSession"];
+                string annoMeseCutoff = CurrentSession.dCutoffDate.ToString("yyyy-MM");
 
-                    if (row.TryGetValue("CVStatus", out CVStatus) && row.TryGetValue("Manager_Id", out manager_id))
-                    {
-                        if (CVStatus.Substring(0, 2) == "03" && manager_id == persons_id.ToString()) // manager review
-                            count++;
-                    }
-                }
+                string filtroEtc = @"
+                    FROM [MSSql12155].[v_ProjectEconomicsReport] vr
+                    LEFT JOIN [MSSql12155].[ProjectEconomics] pe_next
+                        ON pe_next.Projects_id = vr.Projects_id
+                        AND pe_next.AnnoMese = FORMAT(
+                            DATEADD(
+                                MONTH,
+                                1,
+                                CAST(vr.AnnoMese + '-01' AS DATE)
+                            ),
+                            'yyyy-MM'
+                        )
+                    WHERE vr.AnnoMese = " + ASPcompatility.FormatStringDb(annoMeseCutoff) + @"
+                      AND vr.Active = 1
+                      AND vr.TipoContratto_id = " + ConfigurationManager.AppSettings["CONTRATTO_FIXED"] + @"
+                      AND vr.SFContractType_id = " + ConfigurationManager.AppSettings["SYSTEM_INTEGRATION"] + @"
+                      AND (
+                            vr.ClientManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + @"
+                            OR vr.AccountManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + @"
+                          )";
+
+                object ETCset = Database.ExecuteScalar("SELECT COUNT(*)" + filtroEtc + " AND pe_next.CostETC is NOT NULL", null);
+                object ETCtotal = Database.ExecuteScalar("SELECT COUNT(*)" + filtroEtc, null);
+
+                int ETCmissing = Convert.ToInt32(ETCtotal) - Convert.ToInt32(ETCset);
 
                 kpi = new KPISet();
                 kpi.KPIDescription = "";
-                kpi.KPIValue = count.ToString(); ;
-                kpi.CSSClass = kpi.KPIValue == "0" ? "text-success" : "text-warning";
+                kpi.KPIValue = ETCmissing.ToString();
+
+                float percentage=0;
+                if (Convert.ToInt32(ETCtotal) != 0 )
+                    percentage = (float)ETCmissing / Convert.ToInt32(ETCtotal);
+
+                if (percentage == 0)
+                    kpi.CSSClass = "text-success";
+                else if (percentage > 0.5)
+                    kpi.CSSClass = "text-danger";
+                else
+                    kpi.CSSClass = "text-warning";
+
                 KPIList.Add(kpi);
+
+                kpi = new KPISet();
+                kpi.KPIDescription = "";
+                kpi.KPIValue = (ETCtotal == DBNull.Value || ETCtotal == null) ? "0" : ETCtotal.ToString();
+                KPIList.Add(kpi);
+
                 break;
 
             case "ListaLocation":
@@ -349,7 +406,7 @@ public class Card
 
                     if (rowsSpeseMese[i]["Descrizione"].ToString() =="")
                     {
-                            DescRimborso = "Rimborso: ";
+                        DescRimborso = "Rimborso: ";
                     }
 
                     kpi = new KPISet();
@@ -380,7 +437,8 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
     Card TrainingDaValutare;
     Card OreNelMese;
     Card SpeseNelMese;
-    Card CVdaConfermare;
+    // Card CVdaConfermare; // legacy dismessa
+    Card ETCdaAggiornare;
     Card ListaLocation;
     Card ContrattiSubco;
 
@@ -400,6 +458,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         SpeseNelMese = Session["SpeseNelMese"] == null ? new Card("SpeseNelMese", 10) : (Card)Session["SpeseNelMese"];
         //  27/12/23 commentato perchè non usato e aumento performance
         //CVdaConfermare = Session["CVdaConfermare"] == null ? new Card("CVdaConfermare", 60) : (Card)Session["CVdaConfermare"]; // aggiornamento 1 minuti
+        ETCdaAggiornare = Session["ETCdaAggiornare"] == null ? new Card("ETCdaAggiornare", 60) : (Card)Session["ETCdaAggiornare"]; // aggiornamento 1 minuti
         ListaLocation = Session["ListaLocation"] == null ? new Card("ListaLocation", 10) : (Card)Session["ListaLocation"];
         //  27/12/23 commentato perchè non usato 
         // ContrattiSubco = Session["ContrattiSubco"] == null ? new Card("ContrattiSubco", 10) : (Card)Session["ContrattiSubco"];
@@ -412,6 +471,7 @@ public class WSWF_ApprovalWorkflow : System.Web.Services.WebService
         listaCard.Add(GiorniAssenza);
         listaCard.Add(SpeseNelMese);
         //listaCard.Add(CVdaConfermare);
+        listaCard.Add(ETCdaAggiornare);
         listaCard.Add(ListaLocation);
         //listaCard.Add(ContrattiSubco);
     }

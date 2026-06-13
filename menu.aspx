@@ -87,9 +87,28 @@
                     </div>
                 </div>--%>
 
+                <!--  *** Box ETC DA AGGIORNARE ***    -->
+                <div class="col-md-4" id="ETCdaAggiornare" runat="server">
+                    <div class="card  my-2 widget-content hoverOn">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">ETC progetto da aggiornare</div>
+                                
+                                <div class="widget-subheading">Totale progetti di tipo FIXED: <span id="ETCdaAggiornare-KPIValue1">-</span></div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers"><span id="ETCdaAggiornare-KPIValue0">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--  *** visibile solo se ETC DA AGGIORNARE è spento ***    -->
+                <div class="col-md-4" id="DivPlaceholder" runat="server">
+                </div>
+
                 <!--  *** Box ASSENZE ***    -->
                 <div class="col-md-4" id="GiorniAssenza" runat="server">
-
                     <div class="card  my-2 widget-content hoverOn">
                         <div class="widget-content-wrapper">
                             <div class="widget-content-left">
@@ -102,22 +121,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!--  *** Box CV ***    -->
-                <div class="col-md-4" id="CVdaConfermare" runat="server">
-                    <div class="card  my-2 widget-content hoverOn">
-                        <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                                <div class="widget-heading">Curriculum da confermare</div>
-                                <div class="widget-subheading">da parte manager</div>
-                            </div>
-                            <div class="widget-content-right">
-                                <div class="widget-numbers"><span id="CVdaConfermare-KPIValue0">-</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
 
                 <!--  *** Box TRAINING DA VALUTARE ***    -->
 <%--                <div class="col-md-4" id="TrainingDaValutare" runat="server">
@@ -320,8 +323,8 @@
                 location.href = "/timereport/m_gestione/Approval/HoursList.aspx?tipoOre=<%=ConfigurationManager.AppSettings["CODICI_ASSENZE"]%>";
             });
 
-            $("#CVdaConfermare").click(function () {
-                location.href = "/timereport/m_gestione/curricula/CV_list.aspx";
+            $("#ETCdaAggiornare").click(function () {
+                location.href = "/timereport/menu.aspx?goto=ControlloProgettoList";
             });
 
             //$("#ContrattiSubco").click(function () {

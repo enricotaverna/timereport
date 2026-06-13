@@ -13,6 +13,7 @@ public class ControlloProgettoFiltri
     public string Manager { get; set; }
     public string LOB { get; set; }
     public string ContractType { get; set; }
+    public string TipoContratto { get; set; }
 
     public static ControlloProgettoFiltri FromSession(HttpSessionState session)
     {
@@ -21,7 +22,8 @@ public class ControlloProgettoFiltri
             Progetto = session["DDLCpProgetto"] != null ? session["DDLCpProgetto"].ToString() : null,
             Manager = session["DDLCpManager"] != null ? session["DDLCpManager"].ToString() : null,
             LOB = session["DDLCpLOB"] != null ? session["DDLCpLOB"].ToString() : null,
-            ContractType = session["DDLCpSFContractType"] != null ? session["DDLCpSFContractType"].ToString() : null
+            ContractType = session["DDLCpSFContractType"] != null ? session["DDLCpSFContractType"].ToString() : null,
+            TipoContratto = session["DDLCpTipoContratto"] != null ? session["DDLCpTipoContratto"].ToString() : null
         };
     }
 
@@ -30,7 +32,8 @@ public class ControlloProgettoFiltri
         return !string.IsNullOrEmpty(Progetto) &&
                !string.IsNullOrEmpty(Manager) &&
                !string.IsNullOrEmpty(LOB) &&
-               !string.IsNullOrEmpty(ContractType);
+               !string.IsNullOrEmpty(ContractType) &&
+               !string.IsNullOrEmpty(TipoContratto);
     }
 }
 
@@ -237,12 +240,13 @@ public class ControlloProgetto
               AND vr.TipoContratto_id IN (1, 2)";
 
         // Applica filtri opzionali
-        query = filtri.Progetto != "0" ? query += " AND Projects_id = " + ASPcompatility.FormatStringDb(filtri.Progetto) : query;
-        query = filtri.Manager != "0" ? query += " AND (ClientManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) +
-                                                 " OR AccountManager_id = " + ASPcompatility.FormatStringDb(filtri.Manager) + ")"
+        query = filtri.Progetto != "0" ? query += " AND vr.Projects_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt32(filtri.Progetto)) : query;
+        query = filtri.Manager != "0" ? query += " AND (vr.ClientManager_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt32(filtri.Manager)) +
+                                                 " OR vr.AccountManager_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt32(filtri.Manager)) + ")"
                                                  : query;
-        query = filtri.LOB != "0" ? query += " AND LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
-        query = filtri.ContractType != "0" ? query += " AND SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
+        query = filtri.LOB != "0" ? query += " AND vr.LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
+        query = filtri.ContractType != "0" ? query += " AND vr.SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
+        query = filtri.TipoContratto != "0" ? query += " AND vr.TipoContratto_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.TipoContratto)) : query;
 
         query += " ORDER BY ProjectCode";
 
@@ -432,6 +436,7 @@ public class ControlloProgetto
                                                  : query;
         query = filtri.LOB != "0" ? query += " AND LOB_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.LOB)) : query;
         query = filtri.ContractType != "0" ? query += " AND SFContractType_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.ContractType)) : query;
+        query = filtri.TipoContratto != "0" ? query += " AND TipoContratto_id = " + ASPcompatility.FormatNumberDB(Convert.ToInt16(filtri.TipoContratto)) : query;
 
         query += " ORDER BY Consulente, Data";
 

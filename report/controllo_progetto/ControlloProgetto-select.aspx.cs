@@ -43,6 +43,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         Session["DDLCpManager"] = DDLManager.SelectedValue;
         Session["DDLCpLOB"] = DDLLOB.SelectedValue;
         Session["DDLCpSFContractType"] = DDLSFContractType.SelectedValue;
+        Session["DDLCpTipoContratto"] = DDLTipoContratto.SelectedValue;
 
         Response.Redirect("ControlloProgetto-list.aspx");
 
@@ -64,7 +65,7 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         if (Auth.ReturnPermission("REPORT","PROJECT_FORCED") && !Auth.ReturnPermission("REPORT", "PROJECT_ALL")) { 
             cmd = new SqlCommand("SELECT a.Projects_Id, a.ProjectCode + ' ' + left(a.Name,20) AS Descrizione FROM Projects as a" +               
                                  " WHERE a.active = 'true' " +
-                                 " AND a.ClientManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR a.AccountManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) +
+                                 " AND ( a.ClientManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " OR a.AccountManager_id = " + ASPcompatility.FormatNumberDB(CurrentSession.Persons_id) + " ) " +
                                  " AND a.ProjectType_id = " + ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"]  +
                                  " ORDER BY a.ProjectCode", conn);
 
@@ -112,9 +113,15 @@ public partial class report_ControlloProgettoSelect : System.Web.UI.Page
         }
 
         // Ripristina il valore tipo contratto dalla sessione
-        if (Session["DDLCpSFContractType"] != null && DDLLOB.Items.FindByValue(Session["DDLCpSFContractType"].ToString()) != null)
+        if (Session["DDLCpSFContractType"] != null && DDLSFContractType.Items.FindByValue(Session["DDLCpSFContractType"].ToString()) != null)
         {
             DDLSFContractType.SelectedValue = Session["DDLCpSFContractType"].ToString();
+        }
+
+        // Ripristina il valore tipo contratto dalla sessione
+        if (Session["DDLCpTipoContratto"] != null && DDLTipoContratto.Items.FindByValue(Session["DDLCpTipoContratto"].ToString()) != null)
+        {
+            DDLTipoContratto.SelectedValue = Session["DDLCpTipoContratto"].ToString();
         }
     }
 
