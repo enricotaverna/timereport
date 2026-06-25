@@ -579,7 +579,7 @@ public partial class report_PresenzeSpese : System.Web.UI.Page
                         rowsTot[0]["Spese Tras ITALIA"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
                     }
 
-                    if (Spesa["Descrizione"].ToNullToString() == "indennità USA")
+                    if (Spesa["Descrizione"].ToNullToString() == "indennità USA" || Spesa["Descrizione"].ToNullToString() == "Forfait USA")
                     {
                         rows[0]["Inden. USA"] = (Spesa["Quantita"].ToNullToString() != "") ? Spesa["Quantita"].ToNullToString() : null;
                         rows[0]["Inden. € USA"] = (Spesa["Totale"].ToNullToString() != "") ? Spesa["Totale"].ToNullToString() : null;
