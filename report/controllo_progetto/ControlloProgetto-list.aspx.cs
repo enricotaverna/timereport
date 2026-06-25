@@ -41,6 +41,15 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
             Session["dsGVAttivita"] = ds;
             GVAttivita.DataBind();
 
+            // Ripristina eventuale ordinamento salvato in sessione
+            if (Session["GVAttivita_SortExpression"] != null && Session["GVAttivita_SortDirection"] != null)
+            {
+                DataView dv = ds.Tables[0].DefaultView;
+                dv.Sort = Session["GVAttivita_SortExpression"] + " " + Session["GVAttivita_SortDirection"];
+                GVAttivita.DataSource = dv;
+                GVAttivita.DataBind();
+            }
+
             // Valorizza indirizzo pagina chiamante
             btn_back.OnClientClick = "window.location='/timereport/report/controllo_progetto/ControlloProgetto-select.aspx'; return(false);";
         }
@@ -153,19 +162,21 @@ public partial class report_ControlloProgettoList : System.Web.UI.Page
     protected void GVAttivita_Sorting(object sender, GridViewSortEventArgs e)
     {
         DataSet ds = (DataSet)Session["dataset"];
-        DataTable dt = ds.Tables[0];
-        DataView dv = new DataView(dt);
+        DataView dv = ds.Tables[0].DefaultView;
 
         // Gestisce l'alternanza ASC/DESC
-        string sortDirection = "ASC";
-        if (ViewState["SortExpression"] != null && ViewState["SortExpression"].ToString() == e.SortExpression)
-        {
-            sortDirection = ViewState["SortDirection"] != null && ViewState["SortDirection"].ToString() == "ASC" ? "DESC" : "ASC";
-        }
+        string currentExpression = ViewState["SortExpression"] as string;
+        string currentDirection = ViewState["SortDirection"] as string ?? "ASC";
+
+        string sortDirection = (currentExpression == e.SortExpression && currentDirection == "ASC") ? "DESC" : "ASC";
 
         dv.Sort = e.SortExpression + " " + sortDirection;
         ViewState["SortExpression"] = e.SortExpression;
         ViewState["SortDirection"] = sortDirection;
+
+        // Persistenza ordinamento tra navigazioni
+        Session["GVAttivita_SortExpression"] = e.SortExpression;
+        Session["GVAttivita_SortDirection"] = sortDirection;
 
         GVAttivita.DataSource = dv;
         GVAttivita.DataBind();

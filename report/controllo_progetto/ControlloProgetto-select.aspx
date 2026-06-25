@@ -89,6 +89,15 @@
                             </asp:DropDownList>
                     </div>
 
+                    <!--  *** TIPO CONTRATTO *** -->
+                    <div ID="LBTipoContratto" class="input nobottomborder" runat="server">
+                        <div class="inputtext">Tipo Contratto</div>
+                            <asp:DropDownList ID="DDLTipoContratto" runat="server" DataTextField="Descrizione" DataValueField="TipoContratto_id" CssClass="SumoDLL"
+                                AppendDataBoundItems="True" AutoPostBack="True" OnDataBound="DDLManager_DataBound" DataSourceID="DS_TipoContratto">
+                                <asp:ListItem Value="0">-- Tipo Contratto --</asp:ListItem>
+                            </asp:DropDownList>
+                    </div>
+
                     <br />
 
                     <!--  **** INFORMAZIONE DATA CUTOFF ** -->
@@ -144,6 +153,10 @@
     <asp:SqlDataSource ID="DS_SFContractType" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT DISTINCT SFContractType_id, Descrizione FROM SFContractType ORDER BY Descrizione">
     </asp:SqlDataSource> 
+
+    <asp:SqlDataSource ID="DS_TipoContratto" runat="server" ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT TipoContratto_id, Descrizione FROM TipoContratto ORDER BY Descrizione">
+    </asp:SqlDataSource>
     
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">

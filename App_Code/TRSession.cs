@@ -76,6 +76,7 @@ public class TRSession
     public string UserMail;
     public string Language; // it or en
     public int UserLevel;
+    public string Practice;
     public string sCutoffDate;
     public DateTime dCutoffDate;
     public Boolean ForcedAccount;
@@ -220,6 +221,7 @@ public class TRSession
         Language = rdr["Lingua"].ToString();
         Calendar_id = Convert.ToInt16(rdr["calendar_id"].ToString());
         SalesforceAccount = rdr["SaleforceEmail"].ToString();
+        Practice = rdr["Practice"].ToString().TrimEnd();
     }
 
     public void LoadOptions()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amazon.Util.Internal.PlatformServices;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -16,7 +17,20 @@ public partial class menu : System.Web.UI.Page
 
         Auth.CheckPermission("BASE", "MENU");
         CurrentSession = (TRSession)Session["CurrentSession"]; // recupera oggetto con variabili di sessione
-        
+
+        if (Request.QueryString["goto"] == "ControlloProgettoList")
+        {
+            // se clicca la card di completa ETC va al report con i valori impostati
+            Session["DDLCpProgetto"] = "0";
+            Session["DDLCpManager"] = CurrentSession.Persons_id.ToString();
+            Session["DDLCpLOB"] = "0";
+            Session["DDLCpSFContractType"] = ConfigurationManager.AppSettings["SYSTEM_INTEGRATION"];
+            Session["DDLCpTipoContratto"] = ConfigurationManager.AppSettings["CONTRATTO_FIXED"]; // FIXED
+
+            Response.Redirect("/timereport/report/controllo_progetto/ControlloProgetto-list.aspx");
+            return;
+        }
+
         // disattiva box Richiesta Assenza
         if (ConfigurationManager.AppSettings["LEAVE_ON"] == "false")
             RichiesteAperte.Visible = false;
@@ -24,7 +38,7 @@ public partial class menu : System.Web.UI.Page
         //if (Session["TrainingCheckSecondCall"] == null)
         //    Session["TrainingCheckSecondCall"] = "false";
         //else
-        //    Session["TrainingCheckSecondCall"] = "true";
+        //    Session["TrainingCheckSecondCall"] = "true";     
 
         // spegne box GiorniTraining e GiorniAssenza in assenza di autorizzazioni
         if (!Auth.ReturnPermission("REPORT", "PEOPLE_ALL")) { 
@@ -32,9 +46,17 @@ public partial class menu : System.Web.UI.Page
             GiorniAssenza.Visible = false;
         }
 
-        // spegne box controllo CV in assenza di autorizzazioni
-        if (!Auth.ReturnPermission("REPORT", "CURRICULA"))
-            CVdaConfermare.Visible = false;
+        // spegne box ETC da aggiornare in assenza di autorizzazioni
+        if (!Auth.ReturnPermission("REPORT", "ECONOMICS") || CurrentSession.Practice != ConfigurationManager.AppSettings["PR. ERP"])
+        {
+            ETCdaAggiornare.Visible = false;
+            DivPlaceholder.Visible = true;
+        }
+        else {
+            ETCdaAggiornare.Visible = true;
+            DivPlaceholder.Visible = false;
+        }
+
 
         // spegne box Feedback training in assenza di autorizzazioni
         //if (!Auth.ReturnPermission("TRAINING", "RATE"))
