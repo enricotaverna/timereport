@@ -435,31 +435,20 @@
         // validazione campo revenue in caso il progetto sia FORFAIT
         window.Parsley.addValidator("requiredIfFixed", {
             validateString: function (value, requirement) {
+                // Normalizza il valore: rimuove i punti (separatori migliaia) e sostituisce virgola con punto
+                var normalizedValue = value.replace(/\./g, '').replace(',', '.');
 
-                value = value.toString().replace(',', '.');
-
-                // se inserito deve essere un numero
-                if (isNaN(value) && !!value) {
+                // Verifica che sia un numero valido se il campo è compilato
+                if (normalizedValue && isNaN(normalizedValue)) {
                     window.Parsley.addMessage('it', 'requiredIfFixed', "Inserire un numero");
                     return false;
                 }
 
-                if (jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>") {
-
-                    // se FIXED verifica obbligatorietà
-                    if (!value && requirement != "percent") {
-                        window.Parsley.addMessage('it', 'requiredIfFixed', "Verificare i campi obbligatori");
-                        return false;
-                    }
-
-                    // se number verifica tipo
-                    if (requirement == "number")
-                        if (!isNaN(value)) //  compilato e numerico
-                            return true;
-                        else {
-                            window.Parsley.addMessage('it', 'requiredIfFixed', "Inserire un numero");
-                            return false;
-                        }
+                // Verifica obbligatorietà solo se il contratto è FORFAIT
+                var isForfait = jQuery("#FVProgetto_DDLTipoContratto option:selected").val() == "<%= ConfigurationManager.AppSettings["CONTRATTO_FORFAIT"] %>";
+                if (isForfait && !normalizedValue && requirement != "percent") {
+                    window.Parsley.addMessage('it', 'requiredIfFixed', "Verificare i campi obbligatori");
+                    return false;
                 }
 
                 return true;
