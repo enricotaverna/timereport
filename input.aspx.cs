@@ -68,9 +68,16 @@ public partial class input : System.Web.UI.Page
         DDLProgetto.DataValueField = "Projects_Id";
         DDLProgetto.DataBind();
 
-        // se in creazione imposta il default di progetto 
+        // se in creazione imposta il default di progetto
         if (Session["ProjectCodeDefault"] != null)
-            DDLProgetto.SelectedValue = Session["ProjectCodeDefault"].ToString();
+        {
+            string sDefault = Session["ProjectCodeDefault"].ToString();
+            ListItem li = DDLProgetto.Items.FindByValue(sDefault);
+            if (li != null)
+                DDLProgetto.SelectedValue = sDefault;
+            else
+                Session["ProjectCodeDefault"] = null; // scarta il default non più valido
+        }
     }
 
     //   ****************************************
