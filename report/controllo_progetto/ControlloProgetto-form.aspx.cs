@@ -43,6 +43,25 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         }
     }
 
+    protected void FVProgetto_DataBound(object sender, EventArgs e)
+    {
+        DataRowView dataRow = (DataRowView)FVProgetto.DataItem;
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLPLATFORM"),
+                                  CurrentSession.ListaSFPlatform,
+                                  dataRow != null ? dataRow["Platform"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLTL"),
+                                  CurrentSession.ListaSFTL,
+                                  dataRow != null ? dataRow["T_L"].ToString() : "");
+
+        // Calcolo_ricavi: NULL sui progetti pregressi => default true (evita InvalidCastException del Bind su DBNull)
+        CheckBox cbCalcoloRicavi = (CheckBox)(FVProgetto.FindControl("CBCalcoloRicavi") ?? FVProgetto.FindControl("DisCalcoloRicaviCheckBox"));
+        if (cbCalcoloRicavi != null)
+            cbCalcoloRicavi.Checked = dataRow == null || dataRow["Calcolo_ricavi"] == DBNull.Value || Convert.ToBoolean(dataRow["Calcolo_ricavi"]);
+
+        // Visibilità campi Risconto in base al livello utente
+        Utilities.ApplyRiscontoVisibility(FVProgetto, CurrentSession);
+    }
+
     protected void LoadFormData()
     {
         HiddenField TProjects_Id = (HiddenField)FVProgetto.FindControl("TBProjects_id");
@@ -273,4 +292,5 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         Response.Redirect("/timereport/report/controllo_progetto/ControlloProgetto-form.aspx?ProjectCode=" + ProgettoCorrente.ProjectCode);
     }
+
 }

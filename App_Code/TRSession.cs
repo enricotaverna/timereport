@@ -58,6 +58,8 @@ public class TRSession
 {
     // bufferizza la lista delle location selezionabili in input_spese.aspx
     public List<LocationRecord> LocationList = new List<LocationRecord>();
+    public List<SFPicklistValue> ListaSFPlatform = new List<SFPicklistValue>();
+    public List<SFPicklistValue> ListaSFTL = new List<SFPicklistValue>();
     // Progetti disponibili per la persona
     public DataTable dtProgettiForzati;
     public DataTable dtSpeseForzate;
@@ -86,6 +88,14 @@ public class TRSession
     public string SalesforceAccount;
     public CultureInfo defaultCulture;
 
+    // ------ Regole campi Risconto (AuthUserLevel: 4 = Director -> AUTH_MANAGER, 5 = Amministratore) ------
+    // Risconto: visibile e modificabile da Director e livelli superiori
+    public bool CanEditRisconto { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    // Calcolo ricavi: stessa regola di Risconto (da confermare)
+    public bool CanEditCalcoloRicavi { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    // RevenueBudgetConRisconto (calcolato): visibile (sola lettura) da Director e livelli superiori
+    public bool CanViewRevenueConRisconto { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+
     public TRSession(int inputPersons_id)
     {
         Persons_id = inputPersons_id;
@@ -106,6 +116,8 @@ public class TRSession
         }
 
         LoadSFOpportunity();
+
+        LoadSFPicklists(); // valorizzo le combo DDLPLATFORM / DDLTL leggendo le picklist Opportunity.Platform / Opportunity.T_L
 
         if (UserLevel == MyConstants.AUTH_ADMIN)
         {
@@ -367,6 +379,76 @@ public class TRSession
         {
             //* gestione errore **//
         }
-
     }
+
+    /// <summary>
+    /// Caricamento dei dati della picklist SF Platform per valorizzare la combo DDLPLATFORM
+    /// </summary>
+    // Carica le picklist SF usate nelle maschere progetto (una sola autenticazione)
+    public void LoadSFPicklists()
+    {
+        try
+        {
+            string SFconnect = WebConfigurationManager.AppSettings["TRSALESFORCE"];
+            string[] Splitted = SFconnect.ToString().Split(';');
+
+            clsParametri.Parametri.clientID = Splitted[0].ToString().Split('=')[1];
+            clsParametri.Parametri.ClientSecret = Splitted[1].ToString().Split('=')[1];
+            clsParametri.Parametri.refresh_token = Splitted[2].ToString().Replace("refresh_token=", "");
+            clsParametri.Parametri.EndpointSF = Splitted[3].ToString().Split('=')[1];
+            clsParametri.Parametri.SFVersione = Splitted[4].ToString().Split('=')[1];
+
+            string SFtoken = clsUtility.GetTokenSF();
+        }
+        catch (Exception ex)
+        {
+            LogSFError(ex);
+            return;
+        }
+
+        ListaSFPlatform = LoadSFPicklist("Opportunity", "Platform");
+        ListaSFTL = LoadSFPicklist("Opportunity", "T_L");   // DeveloperName = API name senza __c
+    }
+
+    // Restituisce i valori attivi della picklist objectApiName.fieldDeveloperName (lista vuota in caso di errore)
+    private List<SFPicklistValue> LoadSFPicklist(string objectApiName, string fieldDeveloperName)
+    {
+        List<SFPicklistValue> lista = new List<SFPicklistValue>();
+        try
+        {
+            string serviceURL = "SELECT+Label,Value+" +
+                                "FROM+PicklistValueInfo+WHERE+EntityParticle.EntityDefinition.QualifiedApiName='" + objectApiName + "'" +
+                                "+AND+EntityParticle.DeveloperName='" + fieldDeveloperName + "'" +
+                                "+AND+IsActive=true" +
+                                "+order+by+Label";
+
+            string JSON_TOT = "";
+            clsStandard.GetAllRecord AllRecord = new clsStandard.GetAllRecord();
+            clsUtility.GetPagedData(serviceURL, ref JSON_TOT, ref AllRecord);
+
+            if (AllRecord.records != null)
+                for (int i = 0; i <= AllRecord.records.Count - 1; i++)
+                    lista.Add(JsonConvert.DeserializeObject<SFPicklistValue>(AllRecord.records[i].ToString()));
+        }
+        catch (Exception ex)
+        {
+            LogSFError(ex);
+        }
+        return lista;
+    }
+
+    private void LogSFError(Exception ex)
+    {
+        var st = new StackTrace(ex, true);
+        var sf = st.GetFrame(st.FrameCount - 1);
+        string ErrorLine = clsUtility.NullToString(sf.GetFileLineNumber()).ToString();
+        string MethodName = clsUtility.NullToString(sf.GetMethod().Name).ToString();
+        string FileSource = clsUtility.NullToString(sf.GetFileName()).ToString();
+        string Description = String.Format("Method Name: {0} - Error Line: {1} - FileSource: {2}", MethodName, ErrorLine, FileSource);
+        clsLog.WriteErrLog("0", ex.Message, Description.ToString());
+    }
+
+
+
+
 }
