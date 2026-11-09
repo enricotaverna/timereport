@@ -81,7 +81,7 @@
                         <!-- margine per separare le righe -->
 
                         <div class="col-1">
-                            <label class="inputtext">Mngr/Acnt</label>
+                            <label class="inputtext">Mngr/Del.Own</label>
                         </div>
                         <div class="col-4">
                             <asp:DropDownList ID="DDLManager" runat="server" class="ASPInputcontent" AutoPostBack="True" OnSelectedIndexChanged="DDLManager_SelectedIndexChanged" AppendDataBoundItems="True"
@@ -120,7 +120,7 @@
                             <asp:BoundField DataField="ProjectCode" HeaderText="Codice" SortExpression="ProjectCode" />
                             <asp:BoundField DataField="ProjectName" HeaderText="Nome" SortExpression="ProjectName" />
                             <asp:BoundField DataField="ManagerName" HeaderText="Manager" SortExpression="ManagerName" />
-                            <asp:BoundField DataField="AccountName" HeaderText="Account" SortExpression="AccountName" />
+                            <asp:BoundField DataField="AccountName" HeaderText="Delivery Owner" SortExpression="AccountName" />
                             <asp:BoundField DataField="ProjectType" HeaderText="Tipo" SortExpression="ProjectType" />
                             <asp:BoundField DataField="TipoContrattoDesc" HeaderText="Contratto" SortExpression="TipoContrattoDesc" />
                             <asp:BoundField DataField="RevenueBudget" HeaderText="Revenue Bdg" SortExpression="RevenueBudget" DataFormatString="{0:###,###}" />

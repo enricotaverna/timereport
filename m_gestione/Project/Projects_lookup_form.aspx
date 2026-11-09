@@ -65,6 +65,7 @@
                                     <li><a href="#tabs-2">Budget</a></li>
                                     <li><a href="#tabs-4">Altri dati</a></li>
                                     <li style="display:none"><a href="#tabs-5">Monthly fee</a></li>
+                                    <li id="tabStoricoLink"><a href="#tabs-6">Storico</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 460px; width: 100%">
@@ -122,7 +123,7 @@
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Account:</div>
+                                        <div class="inputtext">Delivery Owner:</div>
                                         <asp:DropDownList ID="DDLAccountManager" runat="server"
                                             AppendDataBoundItems="True"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
@@ -347,8 +348,16 @@
                                             CssClass="orangebutton"
                                             Text="Rinnova"
                                             Visible="false"
+                                            OnClientClick="return false;" />
+                                        
+                                        <!-- Bottone hidden che fa il vero postback dopo conferma modal -->
+                                        <asp:Button
+                                            ID="btnRinnovaSubmit"
+                                            runat="server"
+                                            CausesValidation="False"
+                                            Text=""
                                             OnClick="btnRinnova_Click"
-                                            OnClientClick="return confirm('Questa operazione aggiungerà i monthly fee per il periodo di proroga. Continuare?');" />
+                                            style="display:none;" />
                                     </div>
                                     <div id="DivScrollableGrid" style="height: 90%; overflow: auto;">
                                         <asp:GridView Style=" width: 100%; height:100% " ID="GridView1" runat="server" AllowSorting="True" 
@@ -395,6 +404,28 @@
                                    
                                 </div>
                                 <!-- *** TAB 5 ***  -->
+
+                                <!-- *** TAB 6 - STORICO ***  -->
+                                <div id="tabs-6" style="height: 460px; width: 100%;">
+                                    <h4 style="margin-bottom: 15px;">Storico Periodi Precedenti</h4>
+                                    <asp:GridView ID="GridViewStorico" runat="server" 
+                                        CssClass="GridView" 
+                                        AutoGenerateColumns="False"
+                                        GridLines="None"
+                                        Width="100%"
+                                        ShowHeader="true">
+                                        <HeaderStyle CssClass="GV_header" />
+                                        <RowStyle CssClass="GV_row" />
+                                        <AlternatingRowStyle CssClass="GV_row_alt" />
+                                        <Columns>
+                                            <asp:BoundField DataField="Periodo" HeaderText="Periodo" />
+                                            <asp:BoundField DataField="Revenue" HeaderText="Revenue (€)" DataFormatString="{0:N2}" ItemStyle-HorizontalAlign="Right" />
+                                            <asp:BoundField DataField="Cost" HeaderText="Cost (€)" DataFormatString="{0:N2}" ItemStyle-HorizontalAlign="Right" />
+                                            <asp:BoundField DataField="Margine" HeaderText="Margine (%)" ItemStyle-HorizontalAlign="Right" />
+                                        </Columns>
+                                    </asp:GridView>
+                                </div>
+                                <!-- *** TAB 6 ***  -->
 
                             </div>
                             <!-- *** TABS ***  -->
@@ -470,7 +501,7 @@
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Account:</div>
+                                        <div class="inputtext">Delivery Owner:</div>
                                         <asp:DropDownList ID="DDLAccountManager" runat="server"
                                             AppendDataBoundItems="True"
                                             data-parsley-errors-container="#valMsg" data-parsley-required="true">
@@ -716,7 +747,7 @@
 
                                     <!-- *** CODICE ACCOUNT ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Account:</div>
+                                        <div class="inputtext">Delivery Owner:</div>
 
                                         <asp:DropDownList ID="DDLAccountManager" runat="server"
                                             AppendDataBoundItems="True"
@@ -917,10 +948,57 @@
                        
                     </asp:FormView>
 
+                    <!-- Hidden Fields per passare i dati del Rinnova al server -->
+                    <asp:HiddenField ID="hdnNuovaDataInizio" runat="server" />
+                    <asp:HiddenField ID="hdnNuovaDataFine" runat="server" />
+                    <asp:HiddenField ID="hdnNuovoRevenue" runat="server" />
+                    <asp:HiddenField ID="hdnNuovoCost" runat="server" />
+
                 </div>
                 <!-- FormWrap -->
             </div>
             <!-- LastRow -->
+            
+            <!-- Modal Rinnova Progetto RESALE -->
+            <div class="modal fade" id="modalRinnova" tabindex="-1" role="dialog" aria-labelledby="modalRinnovaTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalRinnovaTitle">Rinnova Progetto RESALE</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="txtModalDataInizio">Data Inizio:</label>
+                                <input type="text" class="form-control" id="txtModalDataInizio" placeholder="gg/mm/aaaa" />
+                            </div>
+                            <div class="form-group">
+                                <label for="txtModalDataFine">Data Fine:</label>
+                                <input type="text" class="form-control" id="txtModalDataFine" placeholder="gg/mm/aaaa" />
+                            </div>
+                            <div class="form-group">
+                                <label for="txtModalRevenue">Revenue (€):</label>
+                                <input type="text" class="form-control" id="txtModalRevenue" placeholder="0,00" />
+                            </div>
+                            <div class="form-group">
+                                <label for="txtModalCost">Cost (€):</label>
+                                <input type="text" class="form-control" id="txtModalCost" placeholder="0,00" />
+                            </div>
+                            <div class="form-group">
+                                <label>Margine:</label>
+                                <input type="text" class="form-control" id="txtModalMargine" readonly style="background-color: #e9ecef;" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                            <button type="button" class="btn btn-primary" id="btnConfermaRinnova">Conferma Rinnova</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </form>
         <!-- Form  -->
     </div>
@@ -1067,8 +1145,7 @@
         SelectCommand="SELECT * FROM [Monthly_Fee] WHERE ProjectCode = @ProjectCode"
         DeleteCommand="UPDATE Monthly_Fee SET Active = 0, InactiveBy = @persons_Name, LastModificationDate = GETDATE() WHERE (Monthly_Fee_id = @Monthly_Fee_id)">
         <SelectParameters>
-            <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode"
-                Type="String" />
+            <asp:QueryStringParameter Name="ProjectCode" QueryStringField="ProjectCode" Type="String" />
         </SelectParameters>
     </asp:SqlDataSource>
 
@@ -1242,6 +1319,10 @@
         // datepicker
         $("#FVProgetto_TBAttivoDa").datepicker($.datepicker.regional['it']);
         $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
+        
+        // datepicker per il modal Rinnova
+        $("#txtModalDataInizio").datepicker($.datepicker.regional['it']);
+        $("#txtModalDataFine").datepicker($.datepicker.regional['it']);
 
         // formatta il campo percentuale
         var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
@@ -1322,7 +1403,7 @@
     });
 
     // Funzione globale che accetta un parametro opzionale per il testo iniziale
-    function checkFieldsVisibility(initialSelectedText) {
+    function checkFieldsVisibility(initialSelectedText, isEditMode) {
 
         // Recupera la DropDownList
         var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
@@ -1331,10 +1412,16 @@
         var divFatturati = $('#<%= FVProgetto.FindControl("LBSpeseForfait").ClientID %>');
         var divOvertime = $('#<%= FVProgetto.FindControl("lblCBNoOvertime").ClientID %>');
         const btnCopiaId = '<%= (FVProgetto.FindControl("CloneButton") != null) ? FVProgetto.FindControl("CloneButton").ClientID : "ID_NON_PRESENTE_CLONE_BUTTON" %>';
+        const btnRinnovaId = '<%= (FVProgetto.FindControl("btnRinnova") != null) ? FVProgetto.FindControl("btnRinnova").ClientID : "ID_NON_PRESENTE_RINNOVA_BUTTON" %>';
 
         // 2. Usiamo jQuery per selezionare l'elemento SOLO SE l'ID non è quello fittizio.
         // Se l'ID è fittizio (controllo non renderizzato), btnCopia sarà una collezione jQuery vuota.
         var btnCopia = $('#' + btnCopiaId);
+        var btnRinnova = $('#' + btnRinnovaId);
+
+        // Campi Revenue e Costi nel tab Budget
+        var tbRevenueBudget = $('#<%= FVProgetto.FindControl("TBRevenueBudget").ClientID %>');
+        var tbSpeseBudget = $('#<%= FVProgetto.FindControl("SpeseBudgetTextBox").ClientID %>');
 
         let selectedText;
         if (initialSelectedText) {
@@ -1355,10 +1442,33 @@
             divOvertime.find('input, select').val('');
             divFatturati.find('input, select').val('');
             btnCopia.hide();
+            
+            // LOGICA RESALE: Applica SOLO in Edit mode (quando isEditMode è true)
+            if (isEditMode === true) {
+                // Blocca DDLTipoProgetto dopo selezione (solo in modifica)
+                ddlTipoProgetto.prop('disabled', true);
+                
+                // Rendi readonly Revenue e Costi nel tab Budget (solo in modifica)
+                tbRevenueBudget.prop('readonly', true);
+                tbSpeseBudget.prop('readonly', true);
+            }
+            
+            // NOTA: La visibilità del pulsante Rinnova è gestita lato server
+            // Non nascondiamo più il pulsante qui, perché deve essere visibile per RESALE scaduti
         } else {
             divOvertime.show();
             divFatturati.show();
             btnCopia.show();
+            
+            // Abilita DDLTipoProgetto se non è RESALE
+            ddlTipoProgetto.prop('disabled', false);
+            
+            // Abilita Revenue e Costi se non è RESALE
+            tbRevenueBudget.prop('readonly', false);
+            tbSpeseBudget.prop('readonly', false);
+            
+            // Il pulsante Rinnova può essere mostrato per altri tipi (se gestito dal server)
+            // btnRinnova.show(); // Commentato perché la visibilità è gestita dal server
         }
     }
 
@@ -1432,37 +1542,131 @@
     // ***************************************************************
     
     // Recupera la DropDownList (assumendo sia disponibile dallo scope precedente o globale)
-    var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>'); 
-    
-    // Collega l'evento 'keyup' e 'change' per calcolare il margine in tempo reale
-    const $revenueField = $('#' + TBRevenueBudgetId);
-    const $costField = $('#' + SpeseBudgetTextBoxId);
+    var ddlTipoProgetto = $('#<%= FVProgetto.FindControl("DDLTipoProgetto").ClientID %>');
 
-    // Funzione handler unica per Revenue e Costi
-    const marginCalculatorHandler = function() {
-        // Esegui il calcolo solo se il progetto è di tipo 'Resale'
-        if (ddlTipoProgetto.find('option:selected').text() === RESALE_TEXT) {        
-            console.log('marginCalculatorHandler');
-            calculateMargin();
-        }
-    };
+        // Collega l'evento 'keyup' e 'change' per calcolare il margine in tempo reale
+        const $revenueField = $('#' + TBRevenueBudgetId);
+        const $costField = $('#' + SpeseBudgetTextBoxId);
 
-    // Controlla se i campi esistono prima di legare l'evento
-    if ($revenueField.length > 0 && $costField.length > 0) {
-        
-        $revenueField.on('keyup change', marginCalculatorHandler);
-        $costField.on('keyup change', marginCalculatorHandler);
-    }
-    
-    // Aggiorna anche l'handler principale per il cambio DDL, nel caso
-    // si passi da un altro tipo a 'Resale'
-    ddlTipoProgetto.on('change', function () {
-        
-        // Se si passa a 'Resale', esegui subito un primo calcolo
-        if ($(this).find('option:selected').text() === RESALE_TEXT) {
-            calculateMargin();
-        }
-    });
+        // Funzione handler unica per Revenue e Costi
+        const marginCalculatorHandler = function () {
+            // Esegui il calcolo solo se il progetto è di tipo 'Resale'
+            if (ddlTipoProgetto.find('option:selected').text() === RESALE_TEXT) {
+                console.log('marginCalculatorHandler');
+                calculateMargin();
+            }
+        };
+
+        // Controlla se i campi esistono prima di legare l'evento
+        if ($revenueField.length > 0 && $costField.length > 0) {
+
+            $revenueField.on('keyup change', marginCalculatorHandler);
+            $costField.on('keyup change', marginCalculatorHandler);
+        }
+
+        // Aggiorna anche l'handler principale per il cambio DDL, nel caso
+        // si passi da un altro tipo a 'Resale'
+        ddlTipoProgetto.on('change', function () {
+
+            // Se si passa a 'Resale', esegui subito un primo calcolo
+            if ($(this).find('option:selected').text() === RESALE_TEXT) {
+                calculateMargin();
+            }
+        });
+
+        // ***************************************************************
+        // LOGICA MODAL RINNOVA PROGETTO RESALE
+        // ***************************************************************
+
+        // Intercetta il click sul pulsante Rinnova
+        $('[id$="btnRinnova"]').on('click', function (e) {
+            e.preventDefault(); // Previeni il postback immediato
+
+            // Recupera la vecchia DataFine dal form
+            var oldDataFine = $('[id$="TBAttivoA"]').val(); // Es: "31/12/2024"
+
+            // Calcola la nuova DataInizio suggerita (vecchia DataFine + 1 giorno)
+            var suggestedDataInizio = '';
+            if (oldDataFine) {
+                try {
+                    var parts = oldDataFine.split('/');
+                    var oldDate = new Date(parts[2], parts[1] - 1, parts[0]); // anno, mese-1, giorno
+                    oldDate.setDate(oldDate.getDate() + 1); // +1 giorno
+
+                    var day = ('0' + oldDate.getDate()).slice(-2);
+                    var month = ('0' + (oldDate.getMonth() + 1)).slice(-2);
+                    var year = oldDate.getFullYear();
+                    suggestedDataInizio = day + '/' + month + '/' + year;
+                } catch (ex) {
+                    console.error('Errore calcolo data suggerita:', ex);
+                }
+            }
+
+            // Popola i campi del modal con valori suggeriti
+            $('#txtModalDataInizio').val(suggestedDataInizio);
+            $('#txtModalDataFine').val(''); // L'utente inserirà manualmente
+            $('#txtModalRevenue').val('');
+            $('#txtModalCost').val('');
+            $('#txtModalMargine').val('');
+
+            // Mostra il modal
+            $('#modalRinnova').modal('show');
+
+            return false; // Previeni il postback
+        });
+
+        // Calcola il margine in tempo reale nel modal
+        function calculateModalMargin() {
+            var revenueStr = $('#txtModalRevenue').val().replace(/\./g, '').replace(',', '.');
+            var costStr = $('#txtModalCost').val().replace(/\./g, '').replace(',', '.');
+
+            var revenue = parseFloat(revenueStr) || 0;
+            var cost = parseFloat(costStr) || 0;
+
+            if (revenue === 0) {
+                $('#txtModalMargine').val('0,00%');
+                return;
+            }
+
+            var marginRatio = (revenue - cost) / revenue;
+            var marginPercent = (marginRatio * 100).toFixed(2).replace('.', ',');
+            $('#txtModalMargine').val(marginPercent + '%');
+        }
+
+        // Calcola margine quando cambiano Revenue o Cost
+        $('#txtModalRevenue, #txtModalCost').on('keyup change', calculateModalMargin);
+
+        // FORZA chiusura modal con bottone Annulla e X
+        $('#modalRinnova button[data-dismiss="modal"]').on('click', function () {
+            $('#modalRinnova').modal('hide');
+        });
+
+        // Conferma Rinnova: popola hidden fields e fai postback
+        $('#btnConfermaRinnova').on('click', function () {
+            // Valida che tutti i campi siano compilati
+            var dataInizio = $('#txtModalDataInizio').val();
+            var dataFine = $('#txtModalDataFine').val();
+            var revenue = $('#txtModalRevenue').val();
+            var cost = $('#txtModalCost').val();
+
+            if (!dataInizio || !dataFine || !revenue || !cost) {
+                alert('Compila tutti i campi obbligatori');
+                return;
+            }
+
+            // Popola gli hidden fields
+            $('[id$="hdnNuovaDataInizio"]').val(dataInizio);
+            $('[id$="hdnNuovaDataFine"]').val(dataFine);
+            $('[id$="hdnNuovoRevenue"]').val(revenue);
+            $('[id$="hdnNuovoCost"]').val(cost);
+
+            // Chiudi il modal
+            $('#modalRinnova').modal('hide');
+
+            // Click sul bottone hidden che fa il vero postback al server
+            // (più affidabile di __doPostBack che potrebbe non essere definito)
+            $('[id$="btnRinnovaSubmit"]')[0].click();
+        });
 
     </script>
 

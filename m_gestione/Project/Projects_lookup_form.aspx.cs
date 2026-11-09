@@ -18,6 +18,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
     // Variabili per i totali del Footer
     private decimal TotalRevenue = 0.00M;
+
+    // Date correnti del progetto - usate per filtrare GridView1 (Tab Monthly Fee)
+    private DateTime? _currentProjectDataInizio = null;
+    private DateTime? _currentProjectDataFine = null;
     private decimal TotalCost = 0.00M;
 
     protected void Page_Load(object sender, EventArgs e)
@@ -30,8 +34,51 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // recupera oggetto con variabili di sessione
         CurrentSession = (TRSession)Session["CurrentSession"];
 
+        // =========================================================
+        // CARICA SUBITO LE DATE CORRENTI DEL PROGETTO DAL DB
+        // (necessarie per filtrare GridView1 in RowDataBound)
+        // =========================================================
+        string projectCodeForDates = Request.QueryString["ProjectCode"] ?? Request.QueryString["Projectcode"];
+        if (!string.IsNullOrEmpty(projectCodeForDates))
+        {
+            try
+            {
+                using (SqlConnection connDates = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+                {
+                    connDates.Open();
+                    using (SqlCommand cmdDates = new SqlCommand("SELECT DataInizio, DataFine FROM Projects WHERE ProjectCode = @pc", connDates))
+                    {
+                        cmdDates.Parameters.AddWithValue("@pc", projectCodeForDates);
+                        using (SqlDataReader rdr = cmdDates.ExecuteReader())
+                        {
+                            if (rdr.Read())
+                            {
+                                if (rdr["DataInizio"] != DBNull.Value)
+                                    _currentProjectDataInizio = Convert.ToDateTime(rdr["DataInizio"]);
+                                if (rdr["DataFine"] != DBNull.Value)
+                                    _currentProjectDataFine = Convert.ToDateTime(rdr["DataFine"]);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // In caso di errore, le date restano null e il filtro non viene applicato
+            }
+        }
+        // =========================================================
+
         if (!IsPostBack)
         {
+            // Mostra messaggio di successo se arriva da un rinnovo
+            if (Request.QueryString["success"] == "1")
+            {
+                string count = Request.QueryString["count"] ?? "0";
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaSuccessMsg",
+                    "alert('Progetto rinnovato con successo! Generati " + count + " nuovi Monthly Fee.');", true);
+            }
+
             if (Request.QueryString["Projectcode"] != null)
             {
                 FVProgetto.ChangeMode(FormViewMode.Edit);
@@ -143,6 +190,16 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 DDLCliente.SelectedValue = cliente;
 
             // =========================================================
+            // SALVA LE DATE CORRENTI DEL PROGETTO PER FILTRARE GridView1
+            // (usate in GridView1_RowDataBound per nascondere i Monthly Fee storici)
+            // =========================================================
+            if (dataRow.Row.Table.Columns.Contains("DataInizio") && dataRow["DataInizio"] != DBNull.Value)
+                _currentProjectDataInizio = Convert.ToDateTime(dataRow["DataInizio"]);
+            if (dataRow.Row.Table.Columns.Contains("DataFine") && dataRow["DataFine"] != DBNull.Value)
+                _currentProjectDataFine = Convert.ToDateTime(dataRow["DataFine"]);
+            // =========================================================
+
+            // =========================================================
             // NUOVA LOGICA: INIEZIONE SCRIPT VISIBILITÀ CAMPI
             // =========================================================
             DropDownList ddlTipoProgetto = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
@@ -154,13 +211,44 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 // Legge il testo attualmente selezionato (es. "Resale")
                 string selectedText = ddlTipoProgetto.SelectedItem.Text;
 
-                // Script per chiamare la funzione JS checkFieldsVisibility() con il valore iniziale.
+                // Determina se siamo in Edit mode
+                bool isEditMode = (FVProgetto.CurrentMode == FormViewMode.Edit);
+
+                // Script per chiamare la funzione JS checkFieldsVisibility() con il valore iniziale e la modalità.
                 // Si usa un piccolo ritardo (100ms) per garantire che il DOM e jQuery siano pronti.
                 // Il valore viene passato come stringa per essere usato dal JS.
-                string script = String.Format("$(function() {{ setTimeout(function() {{ checkFieldsVisibility('{0}'); }}, 100); }});", selectedText.Replace("'", "\\'"));
+                string script = String.Format("$(function() {{ setTimeout(function() {{ checkFieldsVisibility('{0}', {1}); }}, 100); }});",
+                    selectedText.Replace("'", "\\'"),
+                    isEditMode.ToString().ToLower());
 
                 // Inietta lo script. Usiamo una chiave univoca.
                 Page.ClientScript.RegisterStartupScript(this.GetType(), "InitialFieldsVisibility", script, true);
+
+                // =========================================================
+                // NUOVA LOGICA RESALE: Gestione lato server SOLO IN EDIT MODE
+                // =========================================================
+                // IMPORTANTE: Applica la logica SOLO se siamo in modalità Edit
+                if (FVProgetto.CurrentMode == FormViewMode.Edit &&
+                    selectedText.Equals("Resale", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 1. Blocca il campo Tipo Progetto (solo in modifica)
+                    ddlTipoProgetto.Enabled = false;
+
+                    // 2. Rendi readonly i campi Revenue e Costi nel tab Budget (solo in modifica)
+                    System.Web.UI.WebControls.TextBox tbRevenueBudget = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBRevenueBudget");
+                    System.Web.UI.WebControls.TextBox tbSpeseBudget = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("SpeseBudgetTextBox");
+
+                    if (tbRevenueBudget != null)
+                        tbRevenueBudget.ReadOnly = true;
+
+                    if (tbSpeseBudget != null)
+                        tbSpeseBudget.ReadOnly = true;
+
+                    // 3. Nascondi definitivamente il pulsante Rinnova per progetti RESALE
+                    Button btnRinnova = (Button)FVProgetto.FindControl("btnRinnova");
+                    if (btnRinnova != null)
+                        btnRinnova.Visible = false;
+                }
             }
             // =========================================================
             // FINE NUOVA LOGICA
@@ -209,7 +297,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
                 // =========================================================
                 // LOGICA VISIBILITÀ BOTTONE "RINNOVA"
-                // Visibile solo su progetti Resale+Forfait che hanno già dei monthly fee
+                // Visibile SOLO per progetti RESALE scaduti (DataFine < oggi)
                 // =========================================================
                 Button btnRinnova = (Button)FVProgetto.FindControl("btnRinnova");
 
@@ -218,29 +306,28 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                     try
                     {
                         DropDownList ddlTipo = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
-                        DropDownList ddlContratto = (DropDownList)FVProgetto.FindControl("DDLTipoContratto");
+                        System.Web.UI.WebControls.TextBox txtDataFine = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoA");
 
-                        bool isResaleForfait = ddlTipo != null && ddlContratto != null
-                            && ddlTipo.SelectedItem != null && ddlContratto.SelectedItem != null
-                            && ddlTipo.SelectedItem.Text == "Resale"
-                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
+                        bool isResale = ddlTipo != null && ddlTipo.SelectedItem != null
+                            && ddlTipo.SelectedItem.Text.Equals("Resale", StringComparison.OrdinalIgnoreCase);
 
-                        if (isResaleForfait)
+                        if (isResale && txtDataFine != null && !string.IsNullOrEmpty(txtDataFine.Text))
                         {
-                            // Verifica che esistano già dei monthly fee nel DB per questo progetto
-                            string projectCode = ((System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto")).Text;
-                            int countFee = 0;
-                            DataTable dtFee = Database.GetData(
-                                "SELECT COUNT(*) AS cnt FROM Monthly_Fee mf " +
-                                "INNER JOIN Projects p ON p.Projects_id = mf.Projects_id " +
-                                "WHERE p.ProjectCode = '" + projectCode + "'");
-                            if (dtFee.Rows.Count > 0)
-                                int.TryParse(dtFee.Rows[0]["cnt"].ToString(), out countFee);
-
-                            btnRinnova.Visible = (countFee > 0);
+                            // Verifica se il progetto è scaduto
+                            DateTime dataFine;
+                            if (DateTime.TryParse(txtDataFine.Text, out dataFine))
+                            {
+                                // Mostra il pulsante SOLO se DataFine < oggi (progetto scaduto)
+                                btnRinnova.Visible = (dataFine < DateTime.Now.Date);
+                            }
+                            else
+                            {
+                                btnRinnova.Visible = false;
+                            }
                         }
                         else
                         {
+                            // Non è RESALE o mancano dati → nascondi
                             btnRinnova.Visible = false;
                         }
                     }
@@ -251,6 +338,130 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 }
                 // =========================================================
                 // FINE LOGICA VISIBILITÀ BOTTONE "RINNOVA"
+                // =========================================================
+
+                // =========================================================
+                // LOGICA TAB STORICO - Solo per progetti RESALE con storico
+                // =========================================================
+                DropDownList ddlTipoPerStorico = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
+                bool isResalePerStorico = ddlTipoPerStorico != null && ddlTipoPerStorico.SelectedItem != null
+                    && ddlTipoPerStorico.SelectedItem.Text.Equals("Resale", StringComparison.OrdinalIgnoreCase);
+
+                if (isResalePerStorico && FVProgetto.CurrentMode == FormViewMode.Edit)
+                {
+                    try
+                    {
+                        // Recupera Projects_id - prova diverse varianti del nome
+                        int projectId = 0;
+                        if (dataRow.Row.Table.Columns.Contains("Projects_id"))
+                            projectId = Convert.ToInt32(dataRow["Projects_id"]);
+                        else if (dataRow.Row.Table.Columns.Contains("Projects_Id"))
+                            projectId = Convert.ToInt32(dataRow["Projects_Id"]);
+
+                        if (projectId == 0)
+                        {
+                            // Tenta di recuperare dal DataKey
+                            if (FVProgetto.DataKey != null && FVProgetto.DataKey.Value != null)
+                                projectId = Convert.ToInt32(FVProgetto.DataKey.Value);
+                        }
+
+                        // Recupera le date correnti del progetto
+                        DateTime? dataInizioCorrente = null;
+                        DateTime? dataFineCorrente = null;
+
+                        if (dataRow.Row.Table.Columns.Contains("DataInizio") && dataRow["DataInizio"] != DBNull.Value)
+                            dataInizioCorrente = Convert.ToDateTime(dataRow["DataInizio"]);
+                        if (dataRow.Row.Table.Columns.Contains("DataFine") && dataRow["DataFine"] != DBNull.Value)
+                            dataFineCorrente = Convert.ToDateTime(dataRow["DataFine"]);
+
+                        // Query per recuperare i periodi storici (escluso il periodo corrente)
+                        string queryStorico = @"
+                            SELECT 
+                                DataInizio,
+                                DataFine,
+                                SUM(Revenue) as TotRevenue,
+                                SUM(Cost) as TotCost
+                            FROM Monthly_Fee
+                            WHERE Projects_id = " + projectId + @"
+                                AND Active = 1
+                                AND NOT (
+                                    (DataInizio = @DataInizioCorrente OR (DataInizio IS NULL AND @DataInizioCorrente IS NULL))
+                                    AND 
+                                    (DataFine = @DataFineCorrente OR (DataFine IS NULL AND @DataFineCorrente IS NULL))
+                                )
+                            GROUP BY DataInizio, DataFine
+                            ORDER BY DataInizio DESC";
+
+                        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString))
+                        {
+                            conn.Open();
+                            using (SqlCommand cmd = new SqlCommand(queryStorico, conn))
+                            {
+                                // Gestione parametri NULL
+                                cmd.Parameters.AddWithValue("@DataInizioCorrente",
+                                    dataInizioCorrente.HasValue ? (object)dataInizioCorrente.Value : DBNull.Value);
+                                cmd.Parameters.AddWithValue("@DataFineCorrente",
+                                    dataFineCorrente.HasValue ? (object)dataFineCorrente.Value : DBNull.Value);
+
+                                DataTable dtStorico = new DataTable();
+                                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                                {
+                                    adapter.Fill(dtStorico);
+                                }
+
+                                // Prepara i dati per la visualizzazione
+                                DataTable dtDisplay = new DataTable();
+                                dtDisplay.Columns.Add("Periodo", typeof(string));
+                                dtDisplay.Columns.Add("Revenue", typeof(decimal));
+                                dtDisplay.Columns.Add("Cost", typeof(decimal));
+                                dtDisplay.Columns.Add("Margine", typeof(string));
+
+                                foreach (DataRow row in dtStorico.Rows)
+                                {
+                                    string periodo;
+                                    if (row["DataInizio"] != DBNull.Value && row["DataFine"] != DBNull.Value)
+                                    {
+                                        DateTime dtInizio = Convert.ToDateTime(row["DataInizio"]);
+                                        DateTime dtFine = Convert.ToDateTime(row["DataFine"]);
+                                        periodo = dtInizio.ToString("dd/MM/yyyy") + " - " + dtFine.ToString("dd/MM/yyyy");
+                                    }
+                                    else
+                                    {
+                                        periodo = "Periodo non definito";
+                                    }
+
+                                    decimal revenue = row["TotRevenue"] != DBNull.Value ? Convert.ToDecimal(row["TotRevenue"]) : 0;
+                                    decimal cost = row["TotCost"] != DBNull.Value ? Convert.ToDecimal(row["TotCost"]) : 0;
+
+                                    string margine = "0,00";
+                                    if (revenue > 0)
+                                    {
+                                        decimal marginRatio = (revenue - cost) / revenue * 100;
+                                        margine = marginRatio.ToString("0.00", new CultureInfo("it-IT"));
+                                    }
+
+                                    dtDisplay.Rows.Add(periodo, revenue, cost, margine);
+                                }
+
+                                // Popola SEMPRE la GridView (anche se vuota)
+                                System.Web.UI.WebControls.GridView gvStorico = (System.Web.UI.WebControls.GridView)FVProgetto.FindControl("GridViewStorico");
+                                if (gvStorico != null)
+                                {
+                                    gvStorico.DataSource = dtDisplay;
+                                    gvStorico.DataBind();
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Mostra l'errore reale all'utente per debug
+                        ClientScript.RegisterStartupScript(this.GetType(), "StoricoError",
+                            "alert('Errore caricamento storico: " + ex.Message.Replace("'", "`").Replace("\r", " ").Replace("\n", " ") + "');", true);
+                    }
+                }
+                // =========================================================
+                // FINE LOGICA TAB STORICO
                 // =========================================================
             }
 
@@ -399,6 +610,33 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     // Gestisce il calcolo e la visualizzazione dei totali nella GridView dei canoni mensili    
     protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
     {
+        // =========================================================
+        // FILTRO: Nascondi le righe Monthly Fee con periodo diverso da quello corrente
+        // (mostra solo i Monthly Fee del periodo attuale del progetto RESALE)
+        // =========================================================
+        if (e.Row.RowType == DataControlRowType.DataRow && _currentProjectDataInizio.HasValue && _currentProjectDataFine.HasValue)
+        {
+            DataRowView drvFilter = (DataRowView)e.Row.DataItem;
+
+            DateTime? rowDataInizio = drvFilter["DataInizio"] != DBNull.Value ?
+                (DateTime?)Convert.ToDateTime(drvFilter["DataInizio"]) : null;
+            DateTime? rowDataFine = drvFilter["DataFine"] != DBNull.Value ?
+                (DateTime?)Convert.ToDateTime(drvFilter["DataFine"]) : null;
+
+            // Se la riga ha date diverse dal periodo corrente, nascondila
+            bool sameInizio = rowDataInizio.HasValue && rowDataInizio.Value == _currentProjectDataInizio.Value;
+            bool sameFine = rowDataFine.HasValue && rowDataFine.Value == _currentProjectDataFine.Value;
+
+            if (!sameInizio || !sameFine)
+            {
+                e.Row.Visible = false;
+                return; // Esci subito, non accumulare i totali per questa riga nascosta
+            }
+        }
+        // =========================================================
+        // FINE FILTRO
+        // =========================================================
+
         // Variabili per il parsing dei valori di riga
         decimal monthlyRevenue = 0.00M;
         decimal monthlyCost = 0.00M;
@@ -608,99 +846,190 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     /// Calcola e inserisce SOLO i monthly fee del periodo di proroga (delta),
     /// senza toccare i record esistenti.
     /// </summary>
+    /// <summary>
+    /// Rinnova un progetto RESALE scaduto con nuove date e budget.
+    /// Aggiorna il progetto E genera automaticamente i nuovi Monthly Fee per il nuovo periodo.
+    /// I Monthly Fee vecchi rimangono come storico.
+    /// </summary>
     protected void btnRinnova_Click(object sender, EventArgs e)
     {
-        System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
-        System.Web.UI.WebControls.TextBox txtDataFineForm = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBAttivoA");
-
-        if (txtProjectCode == null || txtDataFineForm == null)
-            return;
-
-        string projectCode = txtProjectCode.Text;
-
-        if (string.IsNullOrEmpty(projectCode))
-            return;
+        // Dichiarazione variabile fuori dal blocco using per poterla usare nell'alert finale
+        List<AccrualResult> nuoviRatei = new List<AccrualResult>();
 
         try
         {
+            // 1. Recupera i valori dagli hidden fields popolati dal modal
+            // IMPORTANTE: Gli hidden fields sono FUORI dal FormView, quindi usare this (la pagina)
+            HiddenField hdnDataInizio = (HiddenField)this.FindControl("hdnNuovaDataInizio");
+            HiddenField hdnDataFine = (HiddenField)this.FindControl("hdnNuovaDataFine");
+            HiddenField hdnRevenue = (HiddenField)this.FindControl("hdnNuovoRevenue");
+            HiddenField hdnCost = (HiddenField)this.FindControl("hdnNuovoCost");
+
+            if (hdnDataInizio == null || hdnDataFine == null || hdnRevenue == null || hdnCost == null)
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                    "alert('Errore: campi hidden non trovati');", true);
+                return;
+            }
+
+            string nuovaDataInizioStr = hdnDataInizio.Value;
+            string nuovaDataFineStr = hdnDataFine.Value;
+            string nuovoRevenueStr = hdnRevenue.Value;
+            string nuovoCostStr = hdnCost.Value;
+
+            if (string.IsNullOrEmpty(nuovaDataInizioStr) || string.IsNullOrEmpty(nuovaDataFineStr) ||
+                string.IsNullOrEmpty(nuovoRevenueStr) || string.IsNullOrEmpty(nuovoCostStr))
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                    "alert('Errore: dati mancanti dal modal');", true);
+                return;
+            }
+
+            // 2. Parse dei valori
             CultureInfo italianCulture = new CultureInfo("it-IT");
 
-            // 1. Legge la nuova DataFine dal form
+            DateTime nuovaDataInizio;
             DateTime nuovaDataFine;
-            if (!DateTime.TryParse(txtDataFineForm.Text, italianCulture, DateTimeStyles.None, out nuovaDataFine))
+            decimal nuovoRevenue;
+            decimal nuovoCost;
+
+            if (!DateTime.TryParse(nuovaDataInizioStr, italianCulture, DateTimeStyles.None, out nuovaDataInizio) ||
+                !DateTime.TryParse(nuovaDataFineStr, italianCulture, DateTimeStyles.None, out nuovaDataFine))
             {
                 ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
-                    "alert(\'Data fine non valida nel form.\');", true);
+                    "alert('Date non valide');", true);
                 return;
             }
 
-            // 2. Recupera l'ultimo mese già coperto dai monthly fee nel DB
-            DateTime vecchiaDataFine = DateTime.MinValue;
-            DataTable dtMaxDate = Database.GetData(
-                "SELECT MAX(mf.Year) AS MaxYear, MAX(mf.Month) AS MaxMonth " +
-                "FROM Monthly_Fee mf " +
-                "INNER JOIN Projects p ON p.Projects_id = mf.Projects_id " +
-                "WHERE p.ProjectCode = '" + projectCode + "'");
+            // Parse dei decimali (formato italiano: 1.000,00)
+            nuovoRevenueStr = nuovoRevenueStr.Replace(".", "").Replace(",", ".");
+            nuovoCostStr = nuovoCostStr.Replace(".", "").Replace(",", ".");
 
-            if (dtMaxDate.Rows.Count > 0 && dtMaxDate.Rows[0]["MaxYear"] != DBNull.Value)
-            {
-                int maxYear = Convert.ToInt32(dtMaxDate.Rows[0]["MaxYear"]);
-                int maxMonth = Convert.ToInt32(dtMaxDate.Rows[0]["MaxMonth"]);
-                // Vecchia fine = ultimo giorno del mese più recente già presente
-                vecchiaDataFine = new DateTime(maxYear, maxMonth, 1).AddMonths(1).AddDays(-1);
-            }
-            else
+            if (!decimal.TryParse(nuovoRevenueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out nuovoRevenue) ||
+                !decimal.TryParse(nuovoCostStr, NumberStyles.Any, CultureInfo.InvariantCulture, out nuovoCost))
             {
                 ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
-                    "alert(\'Nessun monthly fee esistente trovato. Usa il bottone Rigenera.\');", true);
+                    "alert('Importi non validi');", true);
                 return;
             }
 
-            // 3. Verifica che la nuova data fine sia successiva all'ultimo mese coperto
-            if (nuovaDataFine <= vecchiaDataFine)
+            // 3. Recupera il ProjectCode dal QueryString (più affidabile del FormView)
+            string projectCode = Request.QueryString["ProjectCode"];
+
+            if (string.IsNullOrEmpty(projectCode))
             {
-                string msg = string.Format(
-                    "La nuova data fine ({0}) deve essere successiva all ultimo mese già coperto ({1}).",
-                    nuovaDataFine.ToString("dd/MM/yyyy"),
-                    vecchiaDataFine.ToString("dd/MM/yyyy")).Replace("'", "\'");
+                // Fallback: prova dal FormView
+                System.Web.UI.WebControls.TextBox txtProjectCode = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBProgetto");
+                if (txtProjectCode != null)
+                    projectCode = txtProjectCode.Text;
+            }
+
+            if (string.IsNullOrEmpty(projectCode))
+            {
                 ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
-                    "alert('" + msg + "');", true);
+                    "alert('Codice progetto non trovato');", true);
                 return;
             }
 
-            // 4. Il delta parte dal primo giorno successivo alla vecchia data fine
-            DateTime deltaStart = vecchiaDataFine.AddDays(1);
+            string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
+            int projectId = 0;
 
-            // 5. Legge il budget dal form (valore INCREMENTALE per il periodo di proroga)
-            System.Web.UI.WebControls.TextBox txtRevenue = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("TBRevenueBudget");
-            System.Web.UI.WebControls.TextBox txtCost = (System.Web.UI.WebControls.TextBox)FVProgetto.FindControl("SpeseBudgetTextBox");
-
-            decimal importoTotale = 0M;
-            decimal costoTotale = 0M;
-
-            if (txtRevenue != null)
-                decimal.TryParse(txtRevenue.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out importoTotale);
-            if (txtCost != null)
-                decimal.TryParse(txtCost.Text.Replace(".", ""), NumberStyles.Currency, italianCulture, out costoTotale);
-
-            // 6. Calcola i ratei per il solo periodo delta
-            List<AccrualResult> deltaList = CalculateMonthlyAccrual(deltaStart, nuovaDataFine, importoTotale, costoTotale);
-
-            if (deltaList.Count == 0)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                ClientScript.RegisterStartupScript(this.GetType(), "RinnovaInfo",
-                    "alert(\'Nessun rateo da aggiungere per il periodo indicato.\');", true);
-                return;
+                conn.Open();
+
+                // Recupera Projects_id
+                string selectIdQuery = "SELECT Projects_id FROM Projects WHERE ProjectCode = @ProjectCode";
+                using (SqlCommand cmdId = new SqlCommand(selectIdQuery, conn))
+                {
+                    cmdId.Parameters.AddWithValue("@ProjectCode", projectCode);
+                    object result = cmdId.ExecuteScalar();
+                    if (result != null)
+                        projectId = Convert.ToInt32(result);
+                }
+
+                if (projectId == 0)
+                {
+                    ClientScript.RegisterStartupScript(this.GetType(), "RinnovaError",
+                        "alert('Progetto non trovato');", true);
+                    return;
+                }
+
+                // 4. Aggiorna il progetto nel database
+                string updateQuery = @"
+                    UPDATE Projects 
+                    SET DataInizio = @DataInizio,
+                        DataFine = @DataFine,
+                        RevenueBudget = @Revenue,
+                        SpeseBudget = @Cost,
+                        LastModifiedBy = @ModifiedBy,
+                        LastModificationDate = GETDATE()
+                    WHERE Projects_id = @ProjectId";
+
+                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@DataInizio", nuovaDataInizio);
+                    cmd.Parameters.AddWithValue("@DataFine", nuovaDataFine);
+                    cmd.Parameters.AddWithValue("@Revenue", nuovoRevenue);
+                    cmd.Parameters.AddWithValue("@Cost", nuovoCost);
+                    cmd.Parameters.AddWithValue("@ModifiedBy", CurrentSession.UserName);
+                    cmd.Parameters.AddWithValue("@ProjectId", projectId);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                // 5. Calcola i ratei per il nuovo periodo
+                nuoviRatei = CalculateMonthlyAccrual(nuovaDataInizio, nuovaDataFine, nuovoRevenue, nuovoCost);
+
+                if (nuoviRatei.Count == 0)
+                {
+                    ClientScript.RegisterStartupScript(this.GetType(), "RinnovaWarning",
+                        "alert('Progetto rinnovato ma nessun rateo generato per il periodo indicato');", true);
+                    return;
+                }
+
+                // 6. Inserisci i nuovi Monthly Fee (senza eliminare i vecchi)
+                string insertQuery = @"
+                    INSERT INTO Monthly_Fee 
+                    (Projects_id, ProjectCode, Monthly_Fee_Code, Year, Month, Revenue, Cost, Days, 
+                     Day_Revenue, Day_Cost, DataInizio, DataFine, 
+                     CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
+                    VALUES 
+                    (@ProjectId, @ProjectCode, @MonthlyFeeCode, @Year, @Month, @Revenue, @Cost, @Days,
+                     @DayRevenue, @DayCost, @DataInizio, @DataFine,
+                     @CreatedBy, GETDATE(), @LastModifiedBy, GETDATE(), 1)";
+
+                foreach (var rateo in nuoviRatei)
+                {
+                    using (SqlCommand cmdInsert = new SqlCommand(insertQuery, conn))
+                    {
+                        cmdInsert.Parameters.AddWithValue("@ProjectId", projectId);
+                        cmdInsert.Parameters.AddWithValue("@ProjectCode", projectCode);
+                        cmdInsert.Parameters.AddWithValue("@MonthlyFeeCode",
+                            projectCode + "_" + rateo.Year + "_" + rateo.Month);
+                        cmdInsert.Parameters.AddWithValue("@Year", rateo.Year);
+                        cmdInsert.Parameters.AddWithValue("@Month", rateo.Month);
+                        cmdInsert.Parameters.AddWithValue("@Revenue", rateo.Revenue);
+                        cmdInsert.Parameters.AddWithValue("@Cost", rateo.Cost);
+                        cmdInsert.Parameters.AddWithValue("@Days", rateo.AccrualDays);
+                        cmdInsert.Parameters.AddWithValue("@DayRevenue", rateo.DailyRevenueRate);
+                        cmdInsert.Parameters.AddWithValue("@DayCost", rateo.DailyCostRate);
+
+                        // IMPORTANTE: Popola DataInizio e DataFine del NUOVO periodo
+                        cmdInsert.Parameters.AddWithValue("@DataInizio", nuovaDataInizio);
+                        cmdInsert.Parameters.AddWithValue("@DataFine", nuovaDataFine);
+
+                        cmdInsert.Parameters.AddWithValue("@CreatedBy", CurrentSession.UserName);
+                        cmdInsert.Parameters.AddWithValue("@LastModifiedBy", CurrentSession.UserName);
+
+                        cmdInsert.ExecuteNonQuery();
+                    }
+                }
             }
 
-            // 7. INSERT ONLY - non elimina i record esistenti
-            AppendAccrualNelDB(projectCode, deltaList);
-
-            // 8. Aggiorna la GridView
-            DSCanoni.DataBind();
-            System.Web.UI.WebControls.GridView gridCanoni = (System.Web.UI.WebControls.GridView)FVProgetto.FindControl("GridView1");
-            if (gridCanoni != null)
-                gridCanoni.DataBind();
+            // Successo! Redirect alla stessa pagina per mostrare i dati aggiornati
+            // Usa Response.Redirect per evitare loop infiniti
+            Response.Redirect("Projects_lookup_form.aspx?ProjectCode=" + projectCode + "&success=1&count=" + nuoviRatei.Count, false);
         }
         catch (Exception ex)
         {
@@ -1111,18 +1440,30 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         {
             conn.Open();
 
-            // *** A. RETRIEVE Projects_id DAL DB USANDO ProjectCode ***
-            string selectQuery = "SELECT Projects_id FROM Projects WHERE ProjectCode = @ProjectCode";
+            // *** A. RETRIEVE Projects_id, DataInizio, DataFine DAL DB USANDO ProjectCode ***
+            string selectQuery = "SELECT Projects_id, DataInizio, DataFine FROM Projects WHERE ProjectCode = @ProjectCode";
             int projectsId = 0;
+            // Uso nullable DateTime per gestire correttamente i NULL
+            DateTime? dataInizio = null;
+            DateTime? dataFine = null;
 
             using (SqlCommand cmdSelect = new SqlCommand(selectQuery, conn))
             {
                 cmdSelect.Parameters.AddWithValue("@ProjectCode", projectCode);
-                object result = cmdSelect.ExecuteScalar();
 
-                if (result != null && result != DBNull.Value)
+                using (SqlDataReader reader = cmdSelect.ExecuteReader())
                 {
-                    projectsId = Convert.ToInt32(result);
+                    if (reader.Read())
+                    {
+                        projectsId = Convert.ToInt32(reader["Projects_id"]);
+
+                        // Recupera le date del progetto (potrebbero essere NULL)
+                        if (reader["DataInizio"] != DBNull.Value)
+                            dataInizio = Convert.ToDateTime(reader["DataInizio"]);
+
+                        if (reader["DataFine"] != DBNull.Value)
+                            dataFine = Convert.ToDateTime(reader["DataFine"]);
+                    }
                 }
             }
 
@@ -1146,7 +1487,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             string insertQuery = string.Format(
                 @"INSERT INTO {0} 
                 (Projects_id, [ProjectCode], [Monthly_Fee_Code], [Year], [Month], Revenue, Cost, [Days], Day_Revenue, Day_Cost, 
-                 CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
+                 DataInizio, DataFine, CreatedBy, CreationDate, LastModifiedBy, LastModificationDate, Active) 
                 SELECT 
                  @ProjectsId, 
                  @ProjectCode, 
@@ -1162,6 +1503,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                  @Days, 
                  @Day_Revenue, 
                  @Day_Cost, 
+                 @DataInizio,
+                 @DataFine,
                  @CreatedBy, 
                  GETDATE(), 
                  @LastModifiedBy, 
@@ -1183,6 +1526,13 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                     cmd.Parameters.AddWithValue("@Days", accrual.AccrualDays);
                     cmd.Parameters.AddWithValue("@Day_Revenue", accrual.DailyRevenueRate);
                     cmd.Parameters.AddWithValue("@Day_Cost", accrual.DailyCostRate);
+
+                    // NUOVA LOGICA: Popola DataInizio e DataFine dal progetto
+                    // Gestione corretta dei NULL per evitare errori SQL Server (DateTime min = 1753)
+                    cmd.Parameters.AddWithValue("@DataInizio",
+                        dataInizio.HasValue ? (object)dataInizio.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DataFine",
+                        dataFine.HasValue ? (object)dataFine.Value : DBNull.Value);
 
                     cmd.Parameters.AddWithValue("@CreatedBy", createdBy);
                     cmd.Parameters.AddWithValue("@LastModifiedBy", createdBy);
@@ -1245,7 +1595,9 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             }
         }
 
-        // ... (Eventuale altra logica per TextBox, ecc.)
+        // NOTA: La logica di blocco campo Tipo Progetto e readonly Revenue/Costi
+        // viene gestita solo in Edit mode tramite il metodo Bind_DDL.
+        // Durante Insert mode, l'utente deve poter cambiare liberamente il tipo progetto.        
     }
     #endregion
 }
