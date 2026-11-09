@@ -34,3 +34,10 @@ public class Contratto
     public string Commessa_Aeonvis__c { get; set; }
     public string Projects_Id { get; set; }
 }
+
+// Classe per la mappatura di valori presi dalle picklist di SF (PicklistValueInfo)
+public class SFPicklistValue
+{
+    public string Label { get; set; }
+    public string Value { get; set; }
+}

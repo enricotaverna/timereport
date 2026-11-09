@@ -156,6 +156,44 @@ public class Auth
 
 public class Utilities
 {
+    // Applica le regole di visibilità dei campi Risconto al template corrente del FormView
+    public static void ApplyRiscontoVisibility(Control container, TRSession s)
+    {
+        if (container == null || s == null) return;
+        SetVisible(container, "PHRisconto", s.CanEditRisconto);
+        SetVisible(container, "PHCalcoloRicavi", s.CanEditCalcoloRicavi);
+        SetVisible(container, "PHRevConRisconto", s.CanViewRevenueConRisconto);
+        SetVisible(container, "PNRigaRisconto2", s.CanEditCalcoloRicavi || s.CanViewRevenueConRisconto);
+    }
+
+    private static void SetVisible(Control container, string id, bool visible)
+    {
+        Control c = container.FindControl(id);
+        if (c != null) c.Visible = visible;
+    }
+
+    // Popola una DDL (DDLPLATFORM, DDLTL, ...) con una picklist SF precaricata in sessione.
+    // Se il valore salvato non è più presente (picklist disattivata / SF non raggiungibile al login)
+    // viene aggiunto come item per non perderlo e non far fallire il binding.
+    public static void BindPicklistDDL(DropDownList ddl, List<SFPicklistValue> lista, string selectedValue)
+    {
+        if (ddl == null) return;
+
+        ddl.Items.Clear();
+        ddl.Items.Add(new ListItem("Selezionare un valore", ""));
+
+        if (lista != null)
+            foreach (SFPicklistValue p in lista)
+                ddl.Items.Add(new ListItem(p.Label, p.Value));
+
+        if (string.IsNullOrEmpty(selectedValue)) return;
+
+        if (ddl.Items.FindByValue(selectedValue) == null)
+            ddl.Items.Add(new ListItem(selectedValue + " (non attivo)", selectedValue));
+
+        ddl.SelectedValue = selectedValue;
+    }
+
 
     // Applica alcune formattazioni standard a tutti i worksheet 
     public static void FormatWorkbook(ref IWorkbook wb)

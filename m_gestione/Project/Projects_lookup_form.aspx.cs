@@ -69,6 +69,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
                 DropDownList ddlVisibility = (DropDownList)FVProgetto.FindControl("DDLVisibility");
                 ddlVisibility.SelectedValue = ConfigurationManager.AppSettings["SOLO_AUTORIZZATI"];
                 ((CheckBox)FVProgetto.FindControl("ActiveCheckBox")).Checked = true;
+                ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked = true;   // default DB = 1
             }
         }
     }
@@ -127,6 +128,22 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
         // Imposta il valore predefinito
         DataRowView dataRow = (DataRowView)FVProgetto.DataItem;
+
+        // *** Popola DDLPLATFORM e DDLTL (picklist SF precaricate al login) ***
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLPLATFORM"),
+                                  CurrentSession.ListaSFPlatform,
+                                  dataRow != null ? dataRow["Platform"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLTL"),
+                                  CurrentSession.ListaSFTL,
+                                  dataRow != null ? dataRow["T_L"].ToString() : "");
+
+        // Calcolo_ricavi: NULL sui progetti pregressi => default true (evita InvalidCastException del Bind su DBNull)
+        CheckBox cbCalcoloRicavi = (CheckBox)(FVProgetto.FindControl("CBCalcoloRicavi") ?? FVProgetto.FindControl("DisCalcoloRicaviCheckBox"));
+        if (cbCalcoloRicavi != null)
+            cbCalcoloRicavi.Checked = dataRow == null || dataRow["Calcolo_ricavi"] == DBNull.Value || Convert.ToBoolean(dataRow["Calcolo_ricavi"]);
+
+        // Visibilità campi Risconto in base al livello utente
+        Utilities.ApplyRiscontoVisibility(FVProgetto, CurrentSession);
 
         if (dataRow != null)
         {
@@ -266,12 +283,16 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     {
         e.Command.Parameters["@CreatedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@CreationDate"].Value = DateTime.Now;
+        e.Command.Parameters["@CanEditRisconto"].Value = CurrentSession.CanEditRisconto;
+        e.Command.Parameters["@CanEditCalcoloRicavi"].Value = CurrentSession.CanEditCalcoloRicavi;
     }
 
     protected void DSprojects_Update(object sender, SqlDataSourceCommandEventArgs e)
     {
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+        e.Command.Parameters["@CanEditRisconto"].Value = CurrentSession.CanEditRisconto;
+        e.Command.Parameters["@CanEditCalcoloRicavi"].Value = CurrentSession.CanEditCalcoloRicavi;
     }
 
     protected void BackToList(Object sender, EventArgs e)
@@ -339,6 +360,9 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.NewValues["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.NewValues["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.NewValues["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
+        e.NewValues["Platform"] = ((DropDownList)FVProgetto.FindControl("DDLPLATFORM")).SelectedValue;
+        e.NewValues["T_L"] = ((DropDownList)FVProgetto.FindControl("DDLTL")).SelectedValue;
+        e.NewValues["Calcolo_ricavi"] = ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked;
     }
 
     protected void FVProgetto_ItemInserting(object sender, FormViewInsertEventArgs e)
@@ -347,6 +371,9 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Values["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.Values["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.Values["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
+        e.Values["Platform"] = ((DropDownList)FVProgetto.FindControl("DDLPLATFORM")).SelectedValue;
+        e.Values["T_L"] = ((DropDownList)FVProgetto.FindControl("DDLTL")).SelectedValue;
+        e.Values["Calcolo_ricavi"] = ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked;
     }
 
     protected void CloneButton_Click(object sender, EventArgs e)

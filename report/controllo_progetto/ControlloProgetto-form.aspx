@@ -110,7 +110,7 @@
                 <div id="FormWrap" runat="server" class="StandardForm col-7" style="max-width: 58.333333%; overflow: hidden;">
 
                     <asp:FormView ID="FVProgetto" runat="server" DataKeyNames="Projects_Id"
-                        DataSourceID="projects" DefaultMode="Edit" Width="100%">
+                        DataSourceID="projects" DefaultMode="Edit" Width="100%" OnDataBound="FVProgetto_DataBound">
 
                         <EditItemTemplate>
 
@@ -197,15 +197,36 @@
 
                                         <br />
 
-                                        <!-- *** IMPORTO REVENUE ***  -->
+                                        <!-- *** REVENUE + RISCONTO (stessa riga) ***  -->
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Revenue: </div>
-                                            <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Text='<%#  Bind("RevenueBudget", "{0:#,####}") %>'
+                                            <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Width="100px" Text='<%#  Bind("RevenueBudget", "{0:#,####}") %>'
                                                 data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
                                             <label>€</label>
+                                            <asp:PlaceHolder ID="PHRisconto" runat="server">
+                                            <span style="display: inline-block; margin-left: 15px; width: 75px; color: #777;">Risconto: </span>
+                                            <asp:TextBox ID="TBRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("Risconto", "{0:0.00}") %>'
+                                                data-parsley-errors-container="#valMsg" />
+                                            <label>€</label>
+                                            </asp:PlaceHolder>
                                         </div>
 
-                                        <!-- *** IMPORTO SPESE ***  -->
+                                        <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) + CALCOLO RICAVI ***  -->
+                                        <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input nobottomborder">
+                                            <asp:PlaceHolder ID="PHRevConRisconto" runat="server">
+                                            <div class="inputtext">Rev. + Risconto: </div>
+                                            <asp:TextBox ID="TBRevenueBudgetConRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Eval("RevenueBudgetConRisconto", "{0:0.00}") %>' Enabled="False" />
+                                            <label>€</label>
+                                            </asp:PlaceHolder>
+                                            <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
+                                            <span style="display: inline-block; margin-left: 15px;">
+                                                <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
+                                                <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
+                                            </span>
+                                            </asp:PlaceHolder>
+                                        </asp:Panel>
+
+                                        <!-- *** IMPORTO SPESE ***  
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Spese: </div>
                                             <asp:TextBox ID="SpeseBudgetTextBox" class="ASPInputcontent" runat="server" Text='<%#  Bind("SpeseBudget", "{0:#,####}") %>'
@@ -213,13 +234,42 @@
                                             <label>€</label>
                                             <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                             <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="incluse"></asp:Label>
+                                        </div> -->
+                                                        
+                                        <!-- *** PLATFORM ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Platform:</div>
+                                            <asp:DropDownList ID="DDLPLATFORM" runat="server"
+                                                DataTextField="Platform" DataValueField="Platform" AppendDataBoundItems="True"
+                                                data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
                                         </div>
 
-                                        <!-- *** MARGINE TARGET ***  -->
-                                        <div class="input nobottomborder">
+                                        <!-- *** T&L ***  -->
+                                        <div class="input">
+                                            <div class="inputtext">T&L:</div>
+                                            <asp:DropDownList ID="DDLTL" runat="server"
+                                                DataTextField="T_L" DataValueField="T_L" AppendDataBoundItems="True"
+                                                data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+
+                                        <!-- *** MARGINE TARGET *** (nascosto temporaneamente)  -->
+                                        <div class="input nobottomborder" style="display: none;">
                                             <div class="inputtext">Margine: </div>
-                                            <asp:TextBox ID="TBMargine" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
+                                            <asp:TextBox ID="TBMargine" data-parsley-excluded="true" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
                                                 data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
+                                            <label>%</label>
+                                        </div>
+
+                                        <!-- *** MARGINE ETC ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Margine ETC: </div>
+                                            <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>'
+                                                data-parsley-errors-container="#valMsg" />
                                             <label>%</label>
                                         </div>
 
@@ -414,6 +464,9 @@
     <asp:SqlDataSource ID="TipoContratto" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT [Descrizione], [TipoContratto_id] FROM [TipoContratto]"></asp:SqlDataSource>
+    
+
+
 
     <!-- *** JAVASCRIPT *** -->
     <script type="text/javascript">
@@ -537,6 +590,29 @@
                 percentCent = percentCent.toString().replace('.', ',');
                 $('#FVProgetto_TBMargine').val(percentCent);
             }
+
+            // formatta il campo percentuale Margine ETC (DB: decimal(5,4) -> video: %)
+            var percentEtc = $("#FVProgetto_TBMargineEtc").val();
+            if (percentEtc != null && percentEtc.toString() != "") {
+                var percentEtcCent = Math.round(parseFloat(percentEtc.toString().replace(",", ".")) * 10000) / 100;
+                $("#FVProgetto_TBMargineEtc").val(percentEtcCent.toString().replace(".", ","));
+            }
+
+            // Rev. + Risconto: anteprima lato client mentre si digita (valore definitivo = colonna calcolata DB)
+            function aggiornaRevConRisconto() {
+                var $tot = $("#FVProgetto_TBRevenueBudgetConRisconto");
+                if ($tot.length === 0) return;   // inserimento: campo non presente
+                var toNum = function (v) {
+                    v = (v || "").toString().replace(/\./g, "").replace(",", ".");
+                    return (v === "" || isNaN(v)) ? 0 : parseFloat(v);
+                };
+                var rev = $("#FVProgetto_TBRevenueBudget").val(), ris = $("#FVProgetto_TBRisconto").val();
+                if (!rev && !ris) { $tot.val(""); return; }
+                $tot.val((toNum(rev) + toNum(ris)).toFixed(2).replace(".", ","));
+            }
+            $("#FVProgetto_TBRevenueBudget, #FVProgetto_TBRisconto").on("input change", aggiornaRevConRisconto);
+            aggiornaRevConRisconto();
+
             $('#FVProgetto_btn_calc').click(function () { MaskScreen(true); });
             $('#FVProgetto_btnAnnulla').click(function () { MaskScreen(true); });
             $('#FVProgetto_TBNotaEconomics').on('input', function () { mustSaveEconomics = true; });
@@ -802,7 +878,14 @@
             var revenueBudget = $("#FVProgetto_TBRevenueBudget").val().replace(/\./g, '').replace(',', '.');
             var speseBudget = $("#FVProgetto_SpeseBudgetTextBox").val().replace(/\./g, '').replace(',', '.');
             var speseForfait = $("#FVProgetto_SpeseForfaitCheckBox").is(':checked');
+
+            var Platform = $("#FVProgetto_DDLPLATFORM option:selected").val();
+            var t_l = $("#FVProgetto_DDLTL option:selected").val();
+
             var margineProposta = $("#FVProgetto_TBMargine").val().replace(',', '.');
+            var margineEtc = $("#FVProgetto_TBMargineEtc").val().replace(',', '.');
+            var risconto = ($("#FVProgetto_TBRisconto").val() || "").replace(/\./g, '').replace(',', '.');   // campo assente se utente non abilitato
+            var calcoloRicavi = $("#FVProgetto_CBCalcoloRicavi").is(':checked');
             var dataFine = $("#FVProgetto_TBAttivoA").val();
             var dataInizio = $("#FVProgetto_TBAttivoDa").val();
             var noOvertime = $("#FVProgetto_CBNoOvertime").is(':checked');
@@ -822,7 +905,12 @@
                 MargineProposta: parseFloat(margineProposta) || 0,
                 DataFine: dataFine,
                 DataInizio: dataInizio,
-                NoOvertime: noOvertime
+                NoOvertime: noOvertime,
+                Platform: Platform,
+                TL: t_l,
+                MargineEtc: margineEtc === "" ? null : parseFloat(margineEtc),   // null = NULL su DB
+                Risconto: risconto === "" ? null : parseFloat(risconto),         // null = 0 su DB
+                CalcoloRicavi: calcoloRicavi
             };
 
             console.log("Dati progetto da salvare:", projectData); // DEBUG

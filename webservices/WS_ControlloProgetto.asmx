@@ -21,6 +21,11 @@ public class ProjectData
     public string DataFine { get; set; }
     public string DataInizio { get; set; }
     public bool NoOvertime { get; set; }
+    public string Platform { get; set; }
+    public string TL { get; set; }
+    public decimal? MargineEtc { get; set; }   // in percentuale (es. 35), salvato come frazione
+    public bool CalcoloRicavi { get; set; }
+    public decimal? Risconto { get; set; }
 }
 
 // Struttura dati per singolo mese Economics
@@ -111,6 +116,11 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                         DataFine = @DataFine, 
                         DataInizio = @DataInizio, 
                         NoOvertime = @NoOvertime, 
+                        Platform = @Platform, 
+                        T_L = @T_L, 
+                        Margine_etc = @Margine_etc, 
+                        Calcolo_ricavi = CASE WHEN @CanEditCalcoloRicavi = 1 THEN @Calcolo_ricavi ELSE Calcolo_ricavi END, 
+                        Risconto = CASE WHEN @CanEditRisconto = 1 THEN ISNULL(@Risconto, 0) ELSE Risconto END, 
                         LastModificationDate = @LastModificationDate, 
                         LastModifiedBy = @LastModifiedBy  
                     WHERE Projects_Id = @Projects_Id";
@@ -123,6 +133,15 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                     cmd.Parameters.AddWithValue("@SpeseForfait", projectData.SpeseForfait);
                     cmd.Parameters.AddWithValue("@MargineProposta", margineDecimale);
                     cmd.Parameters.AddWithValue("@NoOvertime", projectData.NoOvertime);
+                    cmd.Parameters.AddWithValue("@Platform", string.IsNullOrEmpty(projectData.Platform) ? (object)DBNull.Value : projectData.Platform);
+                    cmd.Parameters.AddWithValue("@T_L", string.IsNullOrEmpty(projectData.TL) ? (object)DBNull.Value : projectData.TL);
+                    cmd.Parameters.AddWithValue("@Calcolo_ricavi", projectData.CalcoloRicavi);
+                    cmd.Parameters.AddWithValue("@CanEditCalcoloRicavi", CurrentSession.CanEditCalcoloRicavi);   // regola applicata lato server
+                    cmd.Parameters.AddWithValue("@CanEditRisconto", CurrentSession.CanEditRisconto);
+                    SqlParameter pRisconto = cmd.Parameters.Add("@Risconto", SqlDbType.Decimal);
+                    pRisconto.Precision = 10; pRisconto.Scale = 2;   // decimal(10,2)
+                    pRisconto.Value = projectData.Risconto.HasValue ? (object)projectData.Risconto.Value : DBNull.Value;
+                    cmd.Parameters.AddWithValue("@Margine_etc", projectData.MargineEtc.HasValue ? (object)(projectData.MargineEtc.Value / 100) : DBNull.Value);
                     cmd.Parameters.AddWithValue("@LastModifiedBy", CurrentSession.UserName);
                     cmd.Parameters.AddWithValue("@LastModificationDate", DateTime.Now);
 
