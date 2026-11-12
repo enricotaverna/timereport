@@ -26,6 +26,9 @@ public class ProjectData
     public decimal? MargineEtc { get; set; }   // in percentuale (es. 35), salvato come frazione
     public bool CalcoloRicavi { get; set; }
     public decimal? Risconto { get; set; }
+    public string SubLob { get; set; }
+    public string Offering { get; set; }
+    public string NoteBudget { get; set; }
 }
 
 // Struttura dati per singolo mese Economics
@@ -98,29 +101,16 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                 return new SaveResult { Success = false, Message = "ID progetto non valido" };
             }
 
-            // Converte MargineProposta da percentuale (es. 35) a decimale (0.35)
-            decimal margineDecimale = projectData.MargineProposta / 100;
-
             string connectionString = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
             
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
+                // Tab Progetto di ControlloProgetto in sola lettura: si aggiorna solo la data fine
                 string updateQuery = @"
                     UPDATE Projects 
-                    SET RevenueBudget = @RevenueBudget, 
-                        SpeseBudget = @SpeseBudget, 
-                        SpeseForfait = @SpeseForfait, 
-                        MargineProposta = @MargineProposta, 
-                        DataFine = @DataFine, 
-                        DataInizio = @DataInizio, 
-                        NoOvertime = @NoOvertime, 
-                        Platform = @Platform, 
-                        T_L = @T_L, 
-                        Margine_etc = @Margine_etc, 
-                        Calcolo_ricavi = CASE WHEN @CanEditCalcoloRicavi = 1 THEN @Calcolo_ricavi ELSE Calcolo_ricavi END, 
-                        Risconto = CASE WHEN @CanEditRisconto = 1 THEN ISNULL(@Risconto, 0) ELSE Risconto END, 
+                    SET DataFine = @DataFine, 
                         LastModificationDate = @LastModificationDate, 
                         LastModifiedBy = @LastModifiedBy  
                     WHERE Projects_Id = @Projects_Id";
@@ -128,37 +118,10 @@ public class WS_ControlloProgetto : System.Web.Services.WebService
                 using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@Projects_Id", projectData.Projects_Id);
-                    cmd.Parameters.AddWithValue("@RevenueBudget", projectData.RevenueBudget);
-                    cmd.Parameters.AddWithValue("@SpeseBudget", projectData.SpeseBudget);
-                    cmd.Parameters.AddWithValue("@SpeseForfait", projectData.SpeseForfait);
-                    cmd.Parameters.AddWithValue("@MargineProposta", margineDecimale);
-                    cmd.Parameters.AddWithValue("@NoOvertime", projectData.NoOvertime);
-                    cmd.Parameters.AddWithValue("@Platform", string.IsNullOrEmpty(projectData.Platform) ? (object)DBNull.Value : projectData.Platform);
-                    cmd.Parameters.AddWithValue("@T_L", string.IsNullOrEmpty(projectData.TL) ? (object)DBNull.Value : projectData.TL);
-                    cmd.Parameters.AddWithValue("@Calcolo_ricavi", projectData.CalcoloRicavi);
-                    cmd.Parameters.AddWithValue("@CanEditCalcoloRicavi", CurrentSession.CanEditCalcoloRicavi);   // regola applicata lato server
-                    cmd.Parameters.AddWithValue("@CanEditRisconto", CurrentSession.CanEditRisconto);
-                    SqlParameter pRisconto = cmd.Parameters.Add("@Risconto", SqlDbType.Decimal);
-                    pRisconto.Precision = 10; pRisconto.Scale = 2;   // decimal(10,2)
-                    pRisconto.Value = projectData.Risconto.HasValue ? (object)projectData.Risconto.Value : DBNull.Value;
-                    cmd.Parameters.AddWithValue("@Margine_etc", projectData.MargineEtc.HasValue ? (object)(projectData.MargineEtc.Value / 100) : DBNull.Value);
                     cmd.Parameters.AddWithValue("@LastModifiedBy", CurrentSession.UserName);
                     cmd.Parameters.AddWithValue("@LastModificationDate", DateTime.Now);
 
-                    // Gestione date (possono essere vuote)
-                    if (!string.IsNullOrEmpty(projectData.DataInizio))
-                    {
-                        DateTime dataInizio;
-                        if (DateTime.TryParse(projectData.DataInizio, out dataInizio))
-                            cmd.Parameters.AddWithValue("@DataInizio", dataInizio);
-                        else
-                            cmd.Parameters.AddWithValue("@DataInizio", DBNull.Value);
-                    }
-                    else
-                    {
-                        cmd.Parameters.AddWithValue("@DataInizio", DBNull.Value);
-                    }
-
+                    // Gestione data fine (può essere vuota)
                     if (!string.IsNullOrEmpty(projectData.DataFine))
                     {
                         DateTime dataFine;

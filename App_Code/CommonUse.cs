@@ -163,7 +163,22 @@ public class Utilities
         SetVisible(container, "PHRisconto", s.CanEditRisconto);
         SetVisible(container, "PHCalcoloRicavi", s.CanEditCalcoloRicavi);
         SetVisible(container, "PHRevConRisconto", s.CanViewRevenueConRisconto);
-        SetVisible(container, "PNRigaRisconto2", s.CanEditCalcoloRicavi || s.CanViewRevenueConRisconto);
+        SetVisible(container, "PHMargineEtc", s.CanEditMargineEtc);
+        SetVisible(container, "PHNoteBudget", s.CanEditNoteBudget);
+        // le righe contenitore spariscono se nessuno dei loro campi è visibile
+        SetPanelVisibleIfAnyChild(container, "PNRigaRisconto2");
+        SetPanelVisibleIfAnyChild(container, "PNRigaNote");
+    }
+
+    private static void SetPanelVisibleIfAnyChild(Control container, string panelId)
+    {
+        Control panel = container.FindControl(panelId);
+        if (panel == null) return;
+        panel.Visible = true;   // Visible dei figli dipende dal contenitore: va riattivato prima del controllo
+        bool any = false;
+        foreach (Control child in panel.Controls)
+            if (child is PlaceHolder && child.Visible) { any = true; break; }
+        panel.Visible = any;
     }
 
     private static void SetVisible(Control container, string id, bool visible)
