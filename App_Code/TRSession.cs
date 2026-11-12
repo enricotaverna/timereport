@@ -60,6 +60,8 @@ public class TRSession
     public List<LocationRecord> LocationList = new List<LocationRecord>();
     public List<SFPicklistValue> ListaSFPlatform = new List<SFPicklistValue>();
     public List<SFPicklistValue> ListaSFTL = new List<SFPicklistValue>();
+    public List<SFPicklistValue> ListaSFSubLob = new List<SFPicklistValue>();
+    public List<SFPicklistValue> ListaSFOffering = new List<SFPicklistValue>();
     // Progetti disponibili per la persona
     public DataTable dtProgettiForzati;
     public DataTable dtSpeseForzate;
@@ -95,6 +97,10 @@ public class TRSession
     public bool CanEditCalcoloRicavi { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
     // RevenueBudgetConRisconto (calcolato): visibile (sola lettura) da Director e livelli superiori
     public bool CanViewRevenueConRisconto { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    // Margine ETC: visibile e modificabile solo da Director e livelli superiori
+    public bool CanEditMargineEtc { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    // Note budget: visibile e modificabile solo da Director e livelli superiori
+    public bool CanEditNoteBudget { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
 
     public TRSession(int inputPersons_id)
     {
@@ -408,6 +414,8 @@ public class TRSession
 
         ListaSFPlatform = LoadSFPicklist("Opportunity", "Platform");
         ListaSFTL = LoadSFPicklist("Opportunity", "T_L");   // DeveloperName = API name senza __c
+        ListaSFSubLob = LoadSFPicklist("Opportunity", "SUB_LOB");      // Opportunity.SUB_LOB__c (da verificare)
+        ListaSFOffering = LoadSFPicklist("Opportunity", "Offering");   // Opportunity.Offering__c (da verificare)
     }
 
     // Restituisce i valori attivi della picklist objectApiName.fieldDeveloperName (lista vuota in caso di errore)

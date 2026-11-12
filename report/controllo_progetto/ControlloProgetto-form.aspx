@@ -170,7 +170,7 @@
                                         </div>
 
                                         <!-- *** CODICE ACCOUNT ***  -->
-                                        <div class="input nobottomborder">
+                                        <div class="input">
                                             <div class="inputtext">Delivery Owner:</div>
                                             <asp:DropDownList ID="DropDownList1" runat="server" DataSourceID="account"
                                                 DataTextField="Name" DataValueField="Persons_id" AppendDataBoundItems="True"
@@ -180,51 +180,134 @@
                                             </asp:DropDownList>
                                         </div>
 
-                                        <!-- *** TIPO CONTRATTO ***  -->
-                                        <div class="input ">
-                                            <div class="inputtext">Contratto: </div>
-                                            <asp:DropDownList ID="DDLTipoContratto" runat="server" AppendDataBoundItems="True"
-                                                DataSourceID="TipoContratto" DataTextField="Descrizione"
-                                                DataValueField="TipoContratto_id"
-                                                SelectedValue='<%# Bind("TipoContratto_id") %>'
-                                                Enabled="False">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-
-                                            <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' Enabled="False" />
-                                            <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="Label3" runat="server" Text="No Overtime"></asp:Label>
-                                        </div>
-
-                                        <br />
 
                                         <!-- *** REVENUE + RISCONTO (stessa riga) ***  -->
                                         <div class="input nobottomborder">
                                             <div class="inputtext">Revenue: </div>
-                                            <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Width="100px" Text='<%#  Bind("RevenueBudget", "{0:#,####}") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
+                                            <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("RevenueBudget", "{0:0.00}") %>' Enabled="False" />
                                             <label>€</label>
                                             <asp:PlaceHolder ID="PHRisconto" runat="server">
-                                            <span style="display: inline-block; margin-left: 15px; width: 75px; color: #777;">Risconto: </span>
-                                            <asp:TextBox ID="TBRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("Risconto", "{0:0.00}") %>'
-                                                data-parsley-errors-container="#valMsg" />
+                                            <span style="display: inline-block; margin-left: 15px; width: 100px; color: #777;">Risconto: </span>
+                                            <asp:TextBox ID="TBRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("Risconto", "{0:0.00}") %>' Enabled="False" />
                                             <label>€</label>
                                             </asp:PlaceHolder>
                                         </div>
 
-                                        <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) + CALCOLO RICAVI ***  -->
-                                        <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input nobottomborder">
+                                        <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) ***  -->
+                                        <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input">
                                             <asp:PlaceHolder ID="PHRevConRisconto" runat="server">
                                             <div class="inputtext">Rev. + Risconto: </div>
                                             <asp:TextBox ID="TBRevenueBudgetConRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Eval("RevenueBudgetConRisconto", "{0:0.00}") %>' Enabled="False" />
                                             <label>€</label>
                                             </asp:PlaceHolder>
+                                        </asp:Panel>
+
+                                        <!-- *** MARGINE TARGET + MARGINE ETC (stessa riga) ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Margine: </div>
+                                            <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' Enabled="False" />
+                                            <label>%</label>
+                                            <asp:PlaceHolder ID="PHMargineEtc" runat="server">
+                                            <span style="display: inline-block; margin-left: 15px; width: 95px; color: #777;">Margine ETC: </span>
+                                            <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>' Enabled="False" />
+                                            <label>%</label>
+                                            </asp:PlaceHolder>
+                                        </div>
+
+                                        <!-- *** NOTE BUDGET + CALCOLO RICAVI (stessa riga) ***  -->
+                                        <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
+                                            <asp:PlaceHolder ID="PHNoteBudget" runat="server">
+                                            <div class="inputtext">Note: </div>
+                                            <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Width="220px" Text='<%# Bind("Note_Budget") %>' Enabled="False" />
+                                            </asp:PlaceHolder>
                                             <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                             <span style="display: inline-block; margin-left: 15px;">
-                                                <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
+                                                <asp:CheckBox ID="CBCalcoloRicavi" runat="server" Enabled="False" />
                                                 <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
                                             </span>
                                             </asp:PlaceHolder>
                                         </asp:Panel>
+
+                                        <!-- *** T&L ***  -->
+                                        <div class="input">
+                                            <div class="inputtext">T&L:</div>
+                                            <asp:DropDownList ID="DDLTL" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataTextField="T_L" DataValueField="T_L">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** LOB ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">LOB:</div>                                        
+                                            <asp:DropDownList ID="DDLLOB" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataSourceID="lob" DataTextField="Description" DataValueField="LOB_Id"
+                                                SelectedValue='<%# Bind("LOB_Id") %>'>
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** SUB LOB ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Sub LOB:</div>                                        
+                                            <asp:DropDownList ID="DDLSUBLOB" runat="server" Enabled="False" AppendDataBoundItems="True">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** OFFERING ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Offering:</div>
+                                            <asp:DropDownList ID="DDLOFFERING" runat="server" Enabled="False" AppendDataBoundItems="True">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** PLATFORM ***  -->
+                                        <div class="input">
+                                            <div class="inputtext">Platform:</div>
+                                            <asp:DropDownList ID="DDLPLATFORM" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataTextField="Platform" DataValueField="Platform">
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** TIPO CONTRATTO ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Contratto: </div>
+                                            <asp:DropDownList ID="DDLTipoContratto" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataSourceID="TipoContratto" DataTextField="Descrizione" DataValueField="TipoContratto_id"
+                                                SelectedValue='<%# Bind("TipoContratto_id") %>'>
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** TIPO CONTRATTO SF ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Contratto SF: </div>
+                                            <asp:DropDownList ID="DDLTipoContrattoSF" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataSourceID="SFContractType" DataTextField="Descrizione" DataValueField="SFContractType_Id"
+                                                SelectedValue='<%# Bind("SFContractType_id") %>'>
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <!-- *** TIPO PROGETTO ***  -->
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext">Tipo progetto:</div>
+                                            <asp:DropDownList ID="DDLTipoProgetto" runat="server" Enabled="False" AppendDataBoundItems="True"
+                                                DataSourceID="tipoprogetto" DataTextField="Name" DataValueField="ProjectType_Id"
+                                                SelectedValue='<%# Bind("ProjectType_Id") %>'>
+                                                <asp:ListItem Value="" Text="Selezionare un valore" />
+                                            </asp:DropDownList>
+                                        </div>
+
+                                        <div class="input nobottomborder">
+                                            <div class="inputtext"></div>
+                                            <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' Enabled="False" />
+                                            <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
+
+                                        </div>
 
                                         <!-- *** IMPORTO SPESE ***  
                                         <div class="input nobottomborder">
@@ -235,43 +318,6 @@
                                             <asp:CheckBox ID="SpeseForfaitCheckBox" runat="server" Checked='<%# Bind("SpeseForfait") %>' />
                                             <asp:Label AssociatedControlID="SpeseForfaitCheckBox" class="css-label" ID="LBSpeseForfait" runat="server" Text="incluse"></asp:Label>
                                         </div> -->
-                                                        
-                                        <!-- *** PLATFORM ***  -->
-                                        <div class="input nobottomborder">
-                                            <div class="inputtext">Platform:</div>
-                                            <asp:DropDownList ID="DDLPLATFORM" runat="server"
-                                                DataTextField="Platform" DataValueField="Platform" AppendDataBoundItems="True"
-                                                data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        </div>
-
-                                        <!-- *** T&L ***  -->
-                                        <div class="input">
-                                            <div class="inputtext">T&L:</div>
-                                            <asp:DropDownList ID="DDLTL" runat="server"
-                                                DataTextField="T_L" DataValueField="T_L" AppendDataBoundItems="True"
-                                                data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true">
-                                                <asp:ListItem Value="" Text="Selezionare un valore" />
-                                            </asp:DropDownList>
-                                        </div>
-
-
-                                        <!-- *** MARGINE TARGET *** (nascosto temporaneamente)  -->
-                                        <div class="input nobottomborder" style="display: none;">
-                                            <div class="inputtext">Margine: </div>
-                                            <asp:TextBox ID="TBMargine" data-parsley-excluded="true" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
-                                                data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if-Fixed="number" />
-                                            <label>%</label>
-                                        </div>
-
-                                        <!-- *** MARGINE ETC ***  -->
-                                        <div class="input nobottomborder">
-                                            <div class="inputtext">Margine ETC: </div>
-                                            <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Columns="5" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>'
-                                                data-parsley-errors-container="#valMsg" />
-                                            <label>%</label>
-                                        </div>
 
                                         <!-- *** DATA INIZIO  ***  -->
                                         <div class="input nobottomborder">
@@ -461,6 +507,15 @@
     <asp:SqlDataSource ID="account" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT Persons_id, Name FROM Persons WHERE (Active = 1) ORDER BY Name"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="tipoprogetto" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [ProjectType]"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="lob" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT * FROM [LOB]"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="SFContractType" runat="server"
+        ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
+        SelectCommand="SELECT [Descrizione], [SFContractType_id] FROM [SFContractType]"></asp:SqlDataSource>
     <asp:SqlDataSource ID="TipoContratto" runat="server"
         ConnectionString="<%$ ConnectionStrings:MSSql12155ConnectionString %>"
         SelectCommand="SELECT [Descrizione], [TipoContratto_id] FROM [TipoContratto]"></asp:SqlDataSource>
@@ -873,22 +928,9 @@
                 return false;
             }
 
-            // Recupera i valori dal FormView
+            // Tab Progetto in sola lettura: l'unico campo modificabile è la data fine
             var projectsId = parseInt($("#FVProgetto_TBProjects_id").val());
-            var revenueBudget = $("#FVProgetto_TBRevenueBudget").val().replace(/\./g, '').replace(',', '.');
-            var speseBudget = $("#FVProgetto_SpeseBudgetTextBox").val().replace(/\./g, '').replace(',', '.');
-            var speseForfait = $("#FVProgetto_SpeseForfaitCheckBox").is(':checked');
-
-            var Platform = $("#FVProgetto_DDLPLATFORM option:selected").val();
-            var t_l = $("#FVProgetto_DDLTL option:selected").val();
-
-            var margineProposta = $("#FVProgetto_TBMargine").val().replace(',', '.');
-            var margineEtc = $("#FVProgetto_TBMargineEtc").val().replace(',', '.');
-            var risconto = ($("#FVProgetto_TBRisconto").val() || "").replace(/\./g, '').replace(',', '.');   // campo assente se utente non abilitato
-            var calcoloRicavi = $("#FVProgetto_CBCalcoloRicavi").is(':checked');
             var dataFine = $("#FVProgetto_TBAttivoA").val();
-            var dataInizio = $("#FVProgetto_TBAttivoDa").val();
-            var noOvertime = $("#FVProgetto_CBNoOvertime").is(':checked');
 
             // Validazioni
             if (isNaN(projectsId) || projectsId === 0) {
@@ -899,18 +941,7 @@
             // Prepara i dati da inviare
             var projectData = {
                 Projects_Id: projectsId,
-                RevenueBudget: parseFloat(revenueBudget) || 0,
-                SpeseBudget: parseFloat(speseBudget) || 0,
-                SpeseForfait: speseForfait,
-                MargineProposta: parseFloat(margineProposta) || 0,
-                DataFine: dataFine,
-                DataInizio: dataInizio,
-                NoOvertime: noOvertime,
-                Platform: Platform,
-                TL: t_l,
-                MargineEtc: margineEtc === "" ? null : parseFloat(margineEtc),   // null = NULL su DB
-                Risconto: risconto === "" ? null : parseFloat(risconto),         // null = 0 su DB
-                CalcoloRicavi: calcoloRicavi
+                DataFine: dataFine
             };
 
             console.log("Dati progetto da salvare:", projectData); // DEBUG
