@@ -84,6 +84,10 @@
         height: 460px;
         overflow-y: auto;
     }
+
+    /* etichetta Margine: affiancata alla Rev. + Risconto; da sola (utente non director) si allinea come le altre etichette */
+    .lblMargineBudget { display: inline-block; margin-left: 15px; width: 100px; color: #777; }
+    .lblMargineBudget:first-child { float: left; display: block; margin-left: 0; width: 130px; line-height: 30px; }
 </style>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -193,38 +197,38 @@
                                             </asp:PlaceHolder>
                                         </div>
 
-                                        <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) ***  -->
-                                        <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input">
+                                        <!-- *** REV. + RISCONTO (colonna calcolata DB, sola lettura) + MARGINE (stessa riga) ***  -->
+                                        <div class="input nobottomborder">
                                             <asp:PlaceHolder ID="PHRevConRisconto" runat="server">
                                             <div class="inputtext">Rev. + Risconto: </div>
                                             <asp:TextBox ID="TBRevenueBudgetConRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Eval("RevenueBudgetConRisconto", "{0:0.00}") %>' Enabled="False" />
                                             <label>€</label>
                                             </asp:PlaceHolder>
-                                        </asp:Panel>
-
-                                        <!-- *** MARGINE TARGET + MARGINE ETC (stessa riga) ***  -->
-                                        <div class="input nobottomborder">
-                                            <div class="inputtext">Margine: </div>
+                                            <span class="lblMargineBudget">Margine: </span>
                                             <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' Enabled="False" />
                                             <label>%</label>
-                                            <asp:PlaceHolder ID="PHMargineEtc" runat="server">
-                                            <span style="display: inline-block; margin-left: 15px; width: 95px; color: #777;">Margine ETC: </span>
-                                            <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>' Enabled="False" />
-                                            <label>%</label>
-                                            </asp:PlaceHolder>
                                         </div>
 
-                                        <!-- *** NOTE BUDGET + CALCOLO RICAVI (stessa riga) ***  -->
-                                        <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
-                                            <asp:PlaceHolder ID="PHNoteBudget" runat="server">
-                                            <div class="inputtext">Note: </div>
-                                            <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Width="220px" Text='<%# Bind("Note_Budget") %>' Enabled="False" />
+                                        <!-- *** MARGINE ETC + CALCOLO RICAVI (stessa riga) ***  -->
+                                        <div class="input nobottomborder">
+                                            <asp:PlaceHolder ID="PHMargineEtc" runat="server">
+                                            <div class="inputtext">Margine ETC: </div>
+                                            <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>' Enabled="False" />
+                                            <label>%</label>
                                             </asp:PlaceHolder>
                                             <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                             <span style="display: inline-block; margin-left: 15px;">
                                                 <asp:CheckBox ID="CBCalcoloRicavi" runat="server" Enabled="False" />
                                                 <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
                                             </span>
+                                            </asp:PlaceHolder>
+                                        </div>
+
+                                        <!-- *** NOTE BUDGET (riga propria) ***  -->
+                                        <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
+                                            <asp:PlaceHolder ID="PHNoteBudget" runat="server">
+                                            <div class="inputtext">Note: </div>
+                                            <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Style="width: calc(100% - 140px);" Text='<%# Bind("Note_Budget") %>' Enabled="False" />
                                             </asp:PlaceHolder>
                                         </asp:Panel>
 

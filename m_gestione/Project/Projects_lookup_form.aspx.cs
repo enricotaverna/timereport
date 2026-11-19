@@ -198,6 +198,31 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // Visibilità campi Risconto in base al livello utente
         Utilities.ApplyRiscontoVisibility(FVProgetto, CurrentSession);
 
+        // la riga Margine ETC + Calcolo ricavi sparisce se nessuno dei due campi è visibile
+        Panel pnRigaEtc = FVProgetto.FindControl("PNRigaEtc") as Panel;
+        if (pnRigaEtc != null)
+            pnRigaEtc.Visible = CurrentSession.CanEditMargineEtc || CurrentSession.CanEditCalcoloRicavi;
+
+        // Modifica: Revenue e Margine budget abilitati solo per director e progetto chargeable;
+        // la nota è obbligatoria alla variazione del budget (valori originali per il controllo lato client)
+        if (FVProgetto.CurrentMode == FormViewMode.Edit && dataRow != null)
+        {
+            bool chargeable = IsChargeable(dataRow["ProjectType_Id"]);
+            EnableBudgetFields(chargeable);
+
+            TextBox tbNota = FVProgetto.FindControl("TBNoteBudget") as TextBox;
+            if (chargeable && tbNota != null)
+            {
+                CultureInfo inv = CultureInfo.InvariantCulture;
+                Func<object, string> fmt = delegate(object o) { return (o == null || o == DBNull.Value) ? "" : Convert.ToDecimal(o).ToString("0.####", inv); };
+                tbNota.Attributes["data-orig-revenue"] = (dataRow["RevenueBudget"] == DBNull.Value) ? "" : Convert.ToDecimal(dataRow["RevenueBudget"]).ToString("0.00", inv);
+                tbNota.Attributes["data-orig-margine"] = fmt(dataRow["MargineProposta"]);
+                tbNota.Attributes["data-orig-etc"] = fmt(dataRow["Margine_etc"]);
+                tbNota.Attributes["data-orig-calcolo"] = (dataRow["Calcolo_ricavi"] == DBNull.Value || Convert.ToBoolean(dataRow["Calcolo_ricavi"])) ? "1" : "0";
+                tbNota.Attributes["data-orig-nota"] = dataRow["Note_Budget"] == DBNull.Value ? "" : dataRow["Note_Budget"].ToString();
+            }
+        }
+
         if (dataRow != null)
         {
             string managerId = dataRow["ClientManager_id"].ToString();
@@ -516,6 +541,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Command.Parameters["@CanEditNoteBudget"].Value = CurrentSession.CanEditNoteBudget;
         e.Command.Parameters["@CanEditRisconto"].Value = CurrentSession.CanEditRisconto;
         e.Command.Parameters["@CanEditCalcoloRicavi"].Value = CurrentSession.CanEditCalcoloRicavi;
+        // Revenue e Margine budget: permesso E progetto chargeable (stato letto dal DB in ItemUpdating)
+        bool chargeable = m_budgetSnapshot != null && m_budgetSnapshot.Chargeable;
+        e.Command.Parameters["@CanEditRevenueBudget"].Value = chargeable && CurrentSession.CanEditRevenueBudget;
+        e.Command.Parameters["@CanEditMargineBudget"].Value = chargeable && CurrentSession.CanEditMargineBudget;
     }
 
     // Testo selezionato: dalla DDL se presente (inserimento), altrimenti dalla descrizione letta dal DB (modifica)
@@ -595,6 +624,134 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.NewValues["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.NewValues["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
         e.NewValues["Calcolo_ricavi"] = ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked;
+        e.NewValues["SUB_LOB"] = ((DropDownList)FVProgetto.FindControl("DDLSUBLOB")).SelectedValue;
+        e.NewValues["Offering"] = ((DropDownList)FVProgetto.FindControl("DDLOFFERING")).SelectedValue;
+
+        // Stato attuale del budget letto dal DB (mai dal client): serve per i permessi effettivi e per la regola della nota
+        m_budgetSnapshot = LoadBudgetSnapshot(Convert.ToInt32(FVProgetto.DataKey["Projects_Id"]));
+        if (m_budgetSnapshot == null)
+        {
+            e.Cancel = true;
+            return;
+        }
+
+        if (m_budgetSnapshot.Chargeable && !NotaBudgetValida(m_budgetSnapshot))
+        {
+            e.Cancel = true;
+            // le caselle mantengono i valori digitati (già in %): niente riconversione lato JS
+            string script = "window.salvataggioAnnullato = true; $(function () { ShowPopup('" + MSG_NOTA_BUDGET + "'); });";
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "NotaBudgetObbligatoria", script, true);
+            EnableBudgetFields(true);
+        }
+    }
+
+    // ---- Budget chargeable: permessi effettivi e regola della nota ----
+    private const string MSG_NOTA_BUDGET = "Inserire una nota che giustifichi la modifica del budget";
+
+    private BudgetSnapshot m_budgetSnapshot;
+
+    private class BudgetSnapshot
+    {
+        public bool Chargeable;
+        public decimal? Revenue;
+        public decimal? Margine;
+        public decimal? MargineEtc;
+        public bool CalcoloRicavi;
+        public string Nota;
+    }
+
+    private static bool IsChargeable(object projectTypeId)
+    {
+        string chargeable = ConfigurationManager.AppSettings["PROGETTO_CHARGEABLE"];
+        return projectTypeId != null && projectTypeId != DBNull.Value && !string.IsNullOrEmpty(chargeable)
+            && projectTypeId.ToString() == chargeable;
+    }
+
+    private static decimal? ToNullableDecimal(object o)
+    {
+        if (o == null || o == DBNull.Value) return null;
+        return Convert.ToDecimal(o);
+    }
+
+    private BudgetSnapshot LoadBudgetSnapshot(int projectsId)
+    {
+        string cs = ConfigurationManager.ConnectionStrings["MSSql12155ConnectionString"].ConnectionString;
+        using (SqlConnection conn = new SqlConnection(cs))
+        using (SqlCommand cmd = new SqlCommand(
+            "SELECT ProjectType_Id, RevenueBudget, MargineProposta, Margine_etc, Calcolo_ricavi, Note_Budget FROM Projects WHERE Projects_Id = @Projects_Id", conn))
+        {
+            cmd.Parameters.Add("@Projects_Id", SqlDbType.Int).Value = projectsId;
+            conn.Open();
+            using (SqlDataReader r = cmd.ExecuteReader())
+            {
+                if (!r.Read()) return null;
+                BudgetSnapshot s = new BudgetSnapshot();
+                s.Chargeable = IsChargeable(r["ProjectType_Id"]);
+                s.Revenue = ToNullableDecimal(r["RevenueBudget"]);
+                s.Margine = ToNullableDecimal(r["MargineProposta"]);
+                s.MargineEtc = ToNullableDecimal(r["Margine_etc"]);
+                s.CalcoloRicavi = r["Calcolo_ricavi"] == DBNull.Value || Convert.ToBoolean(r["Calcolo_ricavi"]);   // NULL = true
+                s.Nota = r["Note_Budget"] == DBNull.Value ? "" : r["Note_Budget"].ToString();
+                return s;
+            }
+        }
+    }
+
+    // Valore digitato -> decimal normalizzato; vuoto = null; non numerico = false (trattato come "modificato")
+    private static bool TryParseTyped(string text, int decimals, decimal divisor, out decimal? value)
+    {
+        value = null;
+        if (string.IsNullOrWhiteSpace(text)) return true;
+        decimal d;
+        if (!decimal.TryParse(text.Trim(), NumberStyles.Number, CultureInfo.CurrentCulture, out d)) return false;
+        value = Math.Round(d / divisor, decimals);
+        return true;
+    }
+
+    // true se il valore digitato coincide con quello salvato (stessa scala e precisione del DB)
+    private static bool SameValue(string typed, decimal? stored, int decimals, decimal divisor)
+    {
+        decimal? t;
+        if (!TryParseTyped(typed, decimals, divisor, out t)) return false;
+        decimal? s = stored.HasValue ? (decimal?)Math.Round(stored.Value, decimals) : null;
+        return t == s;
+    }
+
+    private static string TextOf(Control c)
+    {
+        TextBox tb = c as TextBox;
+        return tb != null ? tb.Text : "";
+    }
+
+    // Chargeable: se cambia Revenue, Margine, Margine ETC o Calcolo ricavi (fra i campi che l'utente può modificare)
+    // la nota deve essere non vuota e diversa (Trim) da quella salvata
+    private bool NotaBudgetValida(BudgetSnapshot s)
+    {
+        bool changed = false;
+
+        if (CurrentSession.CanEditRevenueBudget && !SameValue(TextOf(FVProgetto.FindControl("TBRevenueBudget")), s.Revenue, 2, 1M)) changed = true;
+        if (CurrentSession.CanEditMargineBudget && !SameValue(TextOf(FVProgetto.FindControl("TBMargine")), s.Margine, 4, 100M)) changed = true;
+        if (CurrentSession.CanEditMargineEtc && !SameValue(TextOf(FVProgetto.FindControl("TBMargineEtc")), s.MargineEtc, 4, 100M)) changed = true;
+
+        CheckBox cbCalcolo = FVProgetto.FindControl("CBCalcoloRicavi") as CheckBox;
+        if (CurrentSession.CanEditCalcoloRicavi && cbCalcolo != null && cbCalcolo.Checked != s.CalcoloRicavi) changed = true;
+
+        if (!changed) return true;
+
+        // senza permesso sulla nota non si può giustificare la modifica
+        if (!CurrentSession.CanEditNoteBudget) return false;
+
+        string nuova = TextOf(FVProgetto.FindControl("TBNoteBudget")).Trim();
+        return nuova.Length > 0 && !string.Equals(nuova, (s.Nota ?? "").Trim(), StringComparison.Ordinal);
+    }
+
+    // Revenue e Margine budget: modificabili solo da chi ha il permesso e solo se il progetto è chargeable (letto dal DB)
+    private void EnableBudgetFields(bool chargeable)
+    {
+        TextBox tbRev = FVProgetto.FindControl("TBRevenueBudget") as TextBox;
+        TextBox tbMar = FVProgetto.FindControl("TBMargine") as TextBox;
+        if (tbRev != null) tbRev.Enabled = chargeable && CurrentSession.CanEditRevenueBudget;
+        if (tbMar != null) tbMar.Enabled = chargeable && CurrentSession.CanEditMargineBudget;
     }
 
     protected void FVProgetto_ItemInserting(object sender, FormViewInsertEventArgs e)
