@@ -31,6 +31,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" type="image/x-icon" href="/timereport/apple-touch-icon.png" />
+    <style>
+        /* etichetta Margine: affiancata alla Rev. + Risconto; da sola (utente non director) si allinea come le altre etichette */
+        .lblMargineBudget { display: inline-block; margin-left: 15px; width: 100px; color: #777; }
+        .lblMargineBudget:first-child { float: left; display: block; margin-left: 0; width: 130px; line-height: 30px; }
+    </style>
     <title>
         <asp:Literal runat="server" Text="Anagrafica progetto" /></title>
 </head>
@@ -169,10 +174,11 @@
 
                                 <div id="tabs-2" style="height: 460px; width: 100%; overflow-y: auto;">
 
-                                    <!-- *** REVENUE + RISCONTO (stessa riga, sola lettura) ***  -->
+                                    <!-- *** REVENUE + RISCONTO (stessa riga) ***  -->
                                     <div class="input nobottomborder">
                                         <div id="lbRevenueBudget" class="inputtext">Revenue: </div>
-                                        <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("RevenueBudget", "{0:0.00}") %>' Enabled="False" />
+                                        <asp:TextBox ID="TBRevenueBudget" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Bind("RevenueBudget", "{0:0.00}") %>' Enabled="False"
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="decimal" />
                                         <label>€</label>
                                         <asp:PlaceHolder ID="PHRisconto" runat="server">
                                         <span style="display: inline-block; margin-left: 15px; width: 100px; color: #777;">Risconto: </span>
@@ -181,39 +187,41 @@
                                         </asp:PlaceHolder>
                                     </div>
 
-                                    <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) ***  -->
-                                    <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input">
+                                    <!-- *** REV. + RISCONTO (colonna calcolata DB, sola lettura) + MARGINE (stessa riga) ***  -->
+                                    <div class="input nobottomborder">
                                         <asp:PlaceHolder ID="PHRevConRisconto" runat="server">
                                         <div class="inputtext">Rev. + Risconto: </div>
                                         <asp:TextBox ID="TBRevenueBudgetConRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Eval("RevenueBudgetConRisconto", "{0:0.00}") %>' Enabled="False" />
                                         <label>€</label>
                                         </asp:PlaceHolder>
-                                    </asp:Panel>
-
-                                    <!-- *** MARGINE TARGET + MARGINE ETC (stessa riga) ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">Margine: </div>
-                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' Enabled="False" />
+                                        <span class="lblMargineBudget">Margine: </span>
+                                        <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' Enabled="False"
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>%</label>
+                                    </div>
+
+                                    <!-- *** MARGINE ETC + CALCOLO RICAVI (stessa riga) ***  -->
+                                    <asp:Panel ID="PNRigaEtc" runat="server" CssClass="input nobottomborder">
                                         <asp:PlaceHolder ID="PHMargineEtc" runat="server">
-                                        <span style="display: inline-block; margin-left: 15px; width: 95px; color: #777;">Margine ETC: </span>
+                                        <div class="inputtext">Margine ETC: </div>
                                         <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>'
                                             data-parsley-errors-container="#valMsg" />
                                         <label>%</label>
-                                        </asp:PlaceHolder>
-                                    </div>
-
-                                    <!-- *** NOTE BUDGET + CALCOLO RICAVI (stessa riga) ***  -->
-                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
-                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
-                                        <div class="inputtext">Note: </div>
-                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Width="220px" Text='<%# Bind("Note_Budget") %>' />
                                         </asp:PlaceHolder>
                                         <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
                                             <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
                                         </span>
+                                        </asp:PlaceHolder>
+                                    </asp:Panel>
+
+                                    <!-- *** NOTE BUDGET (riga propria) ***  -->
+                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
+                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
+                                        <div class="inputtext">Note: </div>
+                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Style="width: calc(100% - 140px);" Text='<%# Bind("Note_Budget") %>'
+                                            data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-nota-budget="true" />
                                         </asp:PlaceHolder>
                                     </asp:Panel>
 
@@ -228,7 +236,7 @@
 
                                     <!-- *** LOB ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">LOB:</div>                                        
+                                        <div class="inputtext">LOB:</div>
                                         <asp:DropDownList ID="DDLLOB" runat="server" Enabled="False" Style="width: calc(100% - 140px);" AppendDataBoundItems="True"
                                             DataSourceID="lob" DataTextField="Description" DataValueField="LOB_Id"
                                             SelectedValue='<%# Bind("LOB_Id") %>'>
@@ -238,8 +246,8 @@
 
                                     <!-- *** SUB LOB ***  -->
                                     <div class="input nobottomborder">
-                                        <div class="inputtext">Sub LOB:</div>                                        
-                                        <asp:DropDownList ID="DDLSUBLOB" runat="server" Enabled="False" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
+                                        <div class="inputtext">Sub LOB:</div>
+                                        <asp:DropDownList ID="DDLSUBLOB" runat="server" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
                                     </div>
@@ -247,7 +255,7 @@
                                     <!-- *** OFFERING ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Offering:</div>
-                                        <asp:DropDownList ID="DDLOFFERING" runat="server" Enabled="False" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
+                                        <asp:DropDownList ID="DDLOFFERING" runat="server" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
                                     </div>
@@ -577,31 +585,35 @@
                                     </div>
 
 
-                                    <!-- *** MARGINE TARGET + MARGINE ETC (stessa riga) ***  -->
+                                    <!-- *** MARGINE (stessa riga della Rev. + Risconto, assente in inserimento) ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Margine: </div>
                                         <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>'
                                             data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" data-parsley-required-if="number" />
                                         <label>%</label>
+                                    </div>
+
+                                    <!-- *** MARGINE ETC + CALCOLO RICAVI (stessa riga) ***  -->
+                                    <asp:Panel ID="PNRigaEtc" runat="server" CssClass="input nobottomborder">
                                         <asp:PlaceHolder ID="PHMargineEtc" runat="server">
-                                        <span style="display: inline-block; margin-left: 15px; width: 95px; color: #777;">Margine ETC: </span>
+                                        <div class="inputtext">Margine ETC: </div>
                                         <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>'
                                             data-parsley-errors-container="#valMsg" />
                                         <label>%</label>
-                                        </asp:PlaceHolder>
-                                    </div>
-
-                                    <!-- *** NOTE BUDGET + CALCOLO RICAVI (stessa riga) ***  -->
-                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
-                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
-                                        <div class="inputtext">Note: </div>
-                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Width="220px" Text='<%# Bind("Note_Budget") %>' />
                                         </asp:PlaceHolder>
                                         <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
                                             <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
                                         </span>
+                                        </asp:PlaceHolder>
+                                    </asp:Panel>
+
+                                    <!-- *** NOTE BUDGET (riga propria) ***  -->
+                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
+                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
+                                        <div class="inputtext">Note: </div>
+                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Style="width: calc(100% - 140px);" Text='<%# Bind("Note_Budget") %>' />
                                         </asp:PlaceHolder>
                                     </asp:Panel>
 
@@ -890,38 +902,38 @@
                                         </asp:PlaceHolder>
                                     </div>
 
-                                    <!-- *** REVENUE CON RISCONTO (colonna calcolata DB, sola lettura) ***  -->
-                                    <asp:Panel ID="PNRigaRisconto2" runat="server" CssClass="input">
+                                    <!-- *** REV. + RISCONTO (colonna calcolata DB, sola lettura) + MARGINE (stessa riga) ***  -->
+                                    <div class="input nobottomborder">
                                         <asp:PlaceHolder ID="PHRevConRisconto" runat="server">
                                         <div class="inputtext">Rev. + Risconto: </div>
                                         <asp:TextBox ID="TBRevenueBudgetConRisconto" class="ASPInputcontent" runat="server" Width="100px" Text='<%# Eval("RevenueBudgetConRisconto", "{0:0.00}") %>' Enabled="False" />
                                         <label>€</label>
                                         </asp:PlaceHolder>
-                                    </asp:Panel>
-
-                                    <!-- *** MARGINE TARGET + MARGINE ETC (stessa riga) ***  -->
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext">Margine: </div>
+                                        <span class="lblMargineBudget">Margine: </span>
                                         <asp:TextBox ID="TBMargine" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("MargineProposta", "{0:0.####}") %>' Enabled="False" />
                                         <label>%</label>
-                                        <asp:PlaceHolder ID="PHMargineEtc" runat="server">
-                                        <span style="display: inline-block; margin-left: 15px; width: 95px; color: #777;">Margine ETC: </span>
-                                        <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>' Enabled="False" />
-                                        <label>%</label>
-                                        </asp:PlaceHolder>
                                     </div>
 
-                                    <!-- *** NOTE BUDGET + CALCOLO RICAVI (stessa riga) ***  -->
-                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
-                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
-                                        <div class="inputtext">Note: </div>
-                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Width="220px" Text='<%# Bind("Note_Budget") %>' Enabled="False" />
+                                    <!-- *** MARGINE ETC + CALCOLO RICAVI (stessa riga) ***  -->
+                                    <asp:Panel ID="PNRigaEtc" runat="server" CssClass="input nobottomborder">
+                                        <asp:PlaceHolder ID="PHMargineEtc" runat="server">
+                                        <div class="inputtext">Margine ETC: </div>
+                                        <asp:TextBox ID="TBMargineEtc" class="ASPInputcontent" Width="100px" runat="server" Text='<%# Bind("Margine_etc", "{0:0.####}") %>' Enabled="False" />
+                                        <label>%</label>
                                         </asp:PlaceHolder>
                                         <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="DisCalcoloRicaviCheckBox" runat="server" />
                                             <asp:Label AssociatedControlID="DisCalcoloRicaviCheckBox" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
                                         </span>
+                                        </asp:PlaceHolder>
+                                    </asp:Panel>
+
+                                    <!-- *** NOTE BUDGET (riga propria) ***  -->
+                                    <asp:Panel ID="PNRigaNote" runat="server" CssClass="input nobottomborder">
+                                        <asp:PlaceHolder ID="PHNoteBudget" runat="server">
+                                        <div class="inputtext">Note: </div>
+                                        <asp:TextBox ID="TBNoteBudget" class="ASPInputcontent" runat="server" Style="width: calc(100% - 140px);" Text='<%# Bind("Note_Budget") %>' Enabled="False" />
                                         </asp:PlaceHolder>
                                     </asp:Panel>
 
@@ -1156,7 +1168,10 @@
             MetodoPagamento = @MetodoPagamento, TerminiPagamento = @TerminiPagamento, CodiceCliente = @CodiceCliente, Note = @Note, ActivityOn = @ActivityOn, 
             TestoObbligatorio = @TestoObbligatorio, MessaggioDiErrore  = @MessaggioDiErrore, NoOvertime = @NoOvertime, WorkflowType = @WorkflowType, 
             LastModificationDate = @LastModificationDate, LastModifiedBy = @LastModifiedBy, ProjectVisibility_id = @ProjectVisibility_id, 
-            RecurringProject = @RecurringProject, Margine_etc = CASE WHEN @CanEditMargineEtc = 1 THEN @Margine_etc/100 ELSE Margine_etc END, 
+            RecurringProject = @RecurringProject, Margine_etc = CASE WHEN @CanEditMargineEtc = 1 THEN @Margine_etc/100 ELSE Margine_etc END,
+            RevenueBudget = CASE WHEN @CanEditRevenueBudget = 1 THEN @RevenueBudget ELSE RevenueBudget END,
+            MargineProposta = CASE WHEN @CanEditMargineBudget = 1 THEN @MargineProposta/100 ELSE MargineProposta END,
+            SUB_LOB = @SUB_LOB, Offering = @Offering,
             Calcolo_ricavi = CASE WHEN @CanEditCalcoloRicavi = 1 THEN ISNULL(@Calcolo_ricavi, 1) ELSE Calcolo_ricavi END, Note_Budget = CASE WHEN @CanEditNoteBudget = 1 THEN @Note_Budget ELSE Note_Budget END WHERE (Projects_Id = @Projects_Id)"
         OnInserting="DSprojects_Insert" OnUpdating="DSprojects_Update">
         <SelectParameters>
@@ -1216,6 +1231,8 @@
             <asp:Parameter Name="Note_Budget" Type="String" />
             <asp:Parameter Name="CanEditMargineEtc" Type="Boolean" />
             <asp:Parameter Name="CanEditNoteBudget" Type="Boolean" />
+            <asp:Parameter Name="CanEditRevenueBudget" Type="Boolean" />
+            <asp:Parameter Name="CanEditMargineBudget" Type="Boolean" />
         </UpdateParameters>
         <InsertParameters>
             <asp:Parameter Name="ProjectCode" Type="String" />
@@ -1394,6 +1411,41 @@
         .addMessage('it', 'checkChargeable', 'Codice cliente e lob obbligatori');
 
 
+    // *** progetti chargeable in modifica: se cambia il budget la nota deve essere compilata e diversa da quella salvata
+    // (valori originali negli attributi data-orig-* resi dal server; il server rifà il controllo ed è l'autorità)
+    window.Parsley.addValidator("notaBudget", {
+        validateString: function (value) {
+            var $nota = $("#FVProgetto_TBNoteBudget");
+            var orig = $nota.attr("data-orig-nota");
+            if (orig === undefined) return true;   // regola non applicabile (inserimento, non chargeable, utente non autorizzato)
+
+            var num = function (v) {
+                v = (v === undefined || v === null) ? "" : v.toString().replace(",", ".");
+                return (v === "" || isNaN(v)) ? null : parseFloat(v);
+            };
+            var sameNum = function (typed, origVal, decimals, divisor) {
+                var a = num(typed), b = num(origVal);
+                if (a === null || b === null) return a === b;
+                var f = Math.pow(10, decimals);
+                return Math.round((a / divisor) * f) === Math.round(b * f);
+            };
+
+            var changed = false;
+            var $rev = $("#FVProgetto_TBRevenueBudget"), $mar = $("#FVProgetto_TBMargine"), $etc = $("#FVProgetto_TBMargineEtc"), $calc = $("#FVProgetto_CBCalcoloRicavi");
+            if ($rev.length && !$rev.prop("disabled") && !sameNum($rev.val(), $nota.attr("data-orig-revenue"), 2, 1)) changed = true;
+            if ($mar.length && !$mar.prop("disabled") && !sameNum($mar.val(), $nota.attr("data-orig-margine"), 4, 100)) changed = true;
+            if ($etc.length && !$etc.prop("disabled") && !sameNum($etc.val(), $nota.attr("data-orig-etc"), 4, 100)) changed = true;
+            if ($calc.length && $calc.is(":checked") !== ($nota.attr("data-orig-calcolo") === "1")) changed = true;
+
+            if (!changed) return true;
+            var nuova = $.trim(value || "");
+            return nuova !== "" && nuova !== $.trim(orig);
+        },
+        messages: {
+            it: 'Inserire una nota che giustifichi la modifica del budget'
+        }
+    });
+
     // *** controllo che non esista lo stesso codice utente *** //
     window.Parsley.addValidator('codiceunico', {
         validateString: function (value, requirement) {
@@ -1498,9 +1550,10 @@
         $("#FVProgetto_TBAttivoA").datepicker($.datepicker.regional['it']);
 
         // formatta il campo percentuale
+        // (salvataggio annullato dal server: i campi contengono già i valori digitati in %, non vanno riconvertiti)
         var percentDecimal = $("#FVProgetto_TBMargine").val().toString().replace(",", ".");
 
-        if (percentDecimal != "") {
+        if (percentDecimal != "" && !window.salvataggioAnnullato) {
             var percentCent = Math.round(parseFloat(percentDecimal) * 10000) / 100;
             percentCent = percentCent.toString().replace(".", ",");
             $("#FVProgetto_TBMargine").val(percentCent);
@@ -1508,7 +1561,7 @@
 
         // formatta il campo percentuale Margine ETC (DB: decimal(5,4) -> video: %)
         var percentEtc = $("#FVProgetto_TBMargineEtc").val();
-        if (percentEtc != null && percentEtc.toString() != "") {
+        if (percentEtc != null && percentEtc.toString() != "" && !window.salvataggioAnnullato) {
             var percentEtcCent = Math.round(parseFloat(percentEtc.toString().replace(",", ".")) * 10000) / 100;
             $("#FVProgetto_TBMargineEtc").val(percentEtcCent.toString().replace(".", ","));
         }

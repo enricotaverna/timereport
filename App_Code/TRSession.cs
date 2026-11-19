@@ -101,6 +101,9 @@ public class TRSession
     public bool CanEditMargineEtc { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
     // Note budget: visibile e modificabile solo da Director e livelli superiori
     public bool CanEditNoteBudget { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    // Revenue e Margine budget: modificabili da Director e livelli superiori (solo su progetti chargeable, vedi maschera progetti)
+    public bool CanEditRevenueBudget { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
+    public bool CanEditMargineBudget { get { return UserLevel >= MyConstants.AUTH_MANAGER; } }
 
     public TRSession(int inputPersons_id)
     {
