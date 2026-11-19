@@ -183,6 +183,12 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLTL"),
                                   CurrentSession.ListaSFTL,
                                   dataRow != null ? dataRow["T_L"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLSUBLOB"),
+                                  CurrentSession.ListaSFSubLob,
+                                  dataRow != null ? dataRow["SUB_LOB"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLOFFERING"),
+                                  CurrentSession.ListaSFOffering,
+                                  dataRow != null ? dataRow["Offering"].ToString() : "");
 
         // Calcolo_ricavi: NULL sui progetti pregressi => default true (evita InvalidCastException del Bind su DBNull)
         CheckBox cbCalcoloRicavi = (CheckBox)(FVProgetto.FindControl("CBCalcoloRicavi") ?? FVProgetto.FindControl("DisCalcoloRicaviCheckBox"));
@@ -219,14 +225,10 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             // =========================================================
             // NUOVA LOGICA: INIEZIONE SCRIPT VISIBILITÀ CAMPI
             // =========================================================
-            DropDownList ddlTipoProgetto = (DropDownList)FVProgetto.FindControl("DDLTipoProgetto");
+            // Tipo progetto: dalla DDL (inserimento) o dalla descrizione letta dal DB (modifica)
+            string selectedText = GetSelectedOrDbText("DDLTipoProgetto", dataRow, "ProjectType_Desc");
 
-            // Assumiamo che il valore di DDLTipoProgetto sia stato caricato
-            // tramite <%# Bind("TipoProgetto") %> nel FormView.
-            if (ddlTipoProgetto != null)
             {
-                // Legge il testo attualmente selezionato (es. "Resale")
-                string selectedText = ddlTipoProgetto.SelectedItem.Text;
 
                 // Determina se siamo in Edit mode
                 bool isEditMode = (FVProgetto.CurrentMode == FormViewMode.Edit);
@@ -327,6 +329,14 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
 
                         bool isResale = ddlTipo != null && ddlTipo.SelectedItem != null
                             && ddlTipo.SelectedItem.Text.Equals("Resale", StringComparison.OrdinalIgnoreCase);
+                            && ddlTipo.SelectedItem.Text == "Resale"
+                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
+                            && ddlTipo.SelectedItem.Text == "Resale"
+                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
+                            && ddlTipo.SelectedItem.Text == "Resale"
+                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
+                            && ddlTipo.SelectedItem.Text == "Resale"
+                            && ddlContratto.SelectedItem.Text.ToLower() == "forfait";
 
                         if (isResale && txtDataFine != null && !string.IsNullOrEmpty(txtDataFine.Text))
                         {
@@ -502,8 +512,21 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     {
         e.Command.Parameters["@LastModifiedBy"].Value = CurrentSession.UserId;
         e.Command.Parameters["@LastModificationDate"].Value = DateTime.Now;
+        e.Command.Parameters["@CanEditMargineEtc"].Value = CurrentSession.CanEditMargineEtc;
+        e.Command.Parameters["@CanEditNoteBudget"].Value = CurrentSession.CanEditNoteBudget;
         e.Command.Parameters["@CanEditRisconto"].Value = CurrentSession.CanEditRisconto;
         e.Command.Parameters["@CanEditCalcoloRicavi"].Value = CurrentSession.CanEditCalcoloRicavi;
+    }
+
+    // Testo selezionato: dalla DDL se presente (inserimento), altrimenti dalla descrizione letta dal DB (modifica)
+    private string GetSelectedOrDbText(string ddlId, DataRowView row, string descColumn)
+    {
+        DropDownList ddl = FVProgetto.FindControl(ddlId) as DropDownList;
+        if (ddl != null)
+            return ddl.SelectedItem != null ? ddl.SelectedItem.Text : "";
+        if (row != null && row.DataView.Table.Columns.Contains(descColumn))
+            return row[descColumn].ToString();
+        return "";
     }
 
     protected void BackToList(Object sender, EventArgs e)
@@ -571,8 +594,6 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.NewValues["CodiceCliente"] = ((DropDownList)FVProgetto.FindControl("DDLCliente")).SelectedValue;
         e.NewValues["ClientManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLManager")).SelectedValue;
         e.NewValues["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
-        e.NewValues["Platform"] = ((DropDownList)FVProgetto.FindControl("DDLPLATFORM")).SelectedValue;
-        e.NewValues["T_L"] = ((DropDownList)FVProgetto.FindControl("DDLTL")).SelectedValue;
         e.NewValues["Calcolo_ricavi"] = ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked;
     }
 
@@ -584,6 +605,8 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         e.Values["AccountManager_id"] = ((DropDownList)FVProgetto.FindControl("DDLAccountManager")).SelectedValue;
         e.Values["Platform"] = ((DropDownList)FVProgetto.FindControl("DDLPLATFORM")).SelectedValue;
         e.Values["T_L"] = ((DropDownList)FVProgetto.FindControl("DDLTL")).SelectedValue;
+        e.Values["SUB_LOB"] = ((DropDownList)FVProgetto.FindControl("DDLSUBLOB")).SelectedValue;
+        e.Values["Offering"] = ((DropDownList)FVProgetto.FindControl("DDLOFFERING")).SelectedValue;
         e.Values["Calcolo_ricavi"] = ((CheckBox)FVProgetto.FindControl("CBCalcoloRicavi")).Checked;
     }
 

@@ -46,12 +46,20 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
     protected void FVProgetto_DataBound(object sender, EventArgs e)
     {
         DataRowView dataRow = (DataRowView)FVProgetto.DataItem;
+
+        // Picklist SF precaricate al login (DDL in sola lettura)
         Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLPLATFORM"),
                                   CurrentSession.ListaSFPlatform,
                                   dataRow != null ? dataRow["Platform"].ToString() : "");
         Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLTL"),
                                   CurrentSession.ListaSFTL,
                                   dataRow != null ? dataRow["T_L"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLSUBLOB"),
+                                  CurrentSession.ListaSFSubLob,
+                                  dataRow != null ? dataRow["SUB_LOB"].ToString() : "");
+        Utilities.BindPicklistDDL((DropDownList)FVProgetto.FindControl("DDLOFFERING"),
+                                  CurrentSession.ListaSFOffering,
+                                  dataRow != null ? dataRow["Offering"].ToString() : "");
 
         // Calcolo_ricavi: NULL sui progetti pregressi => default true (evita InvalidCastException del Bind su DBNull)
         CheckBox cbCalcoloRicavi = (CheckBox)(FVProgetto.FindControl("CBCalcoloRicavi") ?? FVProgetto.FindControl("DisCalcoloRicaviCheckBox"));
