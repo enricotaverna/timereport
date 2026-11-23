@@ -30,6 +30,29 @@ public class CustomerBillRateRecord
     public string LastModifiedBy { get; set; }
 }
 
+public class ProjectBillRateRecord
+{
+    public int ProjectBillRate_id { get; set; }
+    public int Projects_id { get; set; }
+    public decimal? BillRate { get; set; }
+    public decimal? CostRate { get; set; }
+    public string DataDa { get; set; }
+    public string DataA { get; set; }
+    public string Comment { get; set; }
+    public string CreationDate { get; set; }
+    public string CreatedBy { get; set; }
+    public string LastModificationDate { get; set; }
+    public string LastModifiedBy { get; set; }
+}
+
+// Date di inizio e fine del progetto (dd/MM/yyyy, vuote se non valorizzate)
+public class ProjectDatesInfo
+{
+    public bool Success { get; set; }
+    public string DataInizio { get; set; }
+    public string DataFine { get; set; }
+}
+
 public class BillRateSaveResult
 {
     public bool Success { get; set; }
@@ -67,6 +90,12 @@ public class WS_BillRate : System.Web.Services.WebService
     {
         Table = "CustomerBillRate", IdCol = "CustomerBillRate_id", KeyCol = "CodiceCliente",
         KeyType = SqlDbType.NVarChar, KeySize = CODICECLIENTE_LEN, KeyInvalidMsg = "Cliente non valido"
+    };
+
+    private static readonly RateTable Project = new RateTable
+    {
+        Table = "ProjectBillRate", IdCol = "ProjectBillRate_id", KeyCol = "Projects_id",
+        KeyType = SqlDbType.Int, KeySize = 0, KeyInvalidMsg = "Progetto non valido"
     };
 
     // ---------------------------------------------------------------------------------------------
@@ -428,5 +457,247 @@ public class WS_BillRate : System.Web.Services.WebService
     public BillRateSaveResult DeleteCustomerBillRate(int id)
     {
         return DeleteCore(Customer, id);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // ProjectBillRate
+    // ---------------------------------------------------------------------------------------------
+
+    [WebMethod(EnableSession = true)]
+    public string GetProjectBillRateTable(bool active)
+    {
+        if (Session["CurrentSession"] as TRSession == null || !HasPermission(AUTH_DISPLAY))
+            return "[]";
+
+        string query =
+            "SELECT A.ProjectBillRate_id, A.Projects_id, D.ProjectCode, D.Name AS ProjectName, C.Nome1 AS NomeCliente, " +
+            "       A.BillRate, A.Comment, " +
+            "       CONVERT(VARCHAR(10), A.DataDa, 103) AS DataDa, CONVERT(VARCHAR(8), A.DataDa, 112) AS DataDaSort, " +
+            "       CONVERT(VARCHAR(10), A.DataA, 103) AS DataA, CONVERT(VARCHAR(8), A.DataA, 112) AS DataASort, " +
+            "       CASE WHEN NOT EXISTS (SELECT 1 FROM ProjectBillRate AS B WHERE B.Projects_id = A.Projects_id AND B.DataA > A.DataA) THEN 1 ELSE 0 END AS IsLast " +
+            "FROM ProjectBillRate AS A " +
+            "JOIN Projects AS D ON D.Projects_id = A.Projects_id " +
+            "LEFT JOIN Customers AS C ON C.CodiceCliente = D.CodiceCliente " +
+            "WHERE D.Active = @Active " +
+            "ORDER BY A.DataDa DESC, C.Nome1, D.ProjectCode";
+
+        SqlParameter pActive = new SqlParameter("@Active", SqlDbType.Bit) { Value = active };
+        return QueryToJson(query, pActive);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public ProjectBillRateRecord GetProjectBillRate(int id)
+    {
+        ProjectBillRateRecord rec = new ProjectBillRateRecord();
+
+        if (Session["CurrentSession"] as TRSession == null || !HasPermission(AUTH_DISPLAY))
+            return rec;
+
+        using (SqlConnection con = new SqlConnection(ConnString))
+        using (SqlCommand cmd = new SqlCommand("SELECT * FROM ProjectBillRate WHERE ProjectBillRate_id = @Id", con))
+        {
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+            con.Open();
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                if (rdr.Read())
+                {
+                    rec.ProjectBillRate_id = (int)rdr["ProjectBillRate_id"];
+                    rec.Projects_id = (int)rdr["Projects_id"];
+                    rec.BillRate = rdr["BillRate"] == DBNull.Value ? (decimal?)null : (decimal)rdr["BillRate"];
+                    rec.CostRate = rdr["CostRate"] == DBNull.Value ? (decimal?)null : (decimal)rdr["CostRate"];
+                    rec.DataDa = FormatDate(rdr["DataDa"], DATE_FMT);
+                    rec.DataA = FormatDate(rdr["DataA"], DATE_FMT);
+                    rec.Comment = rdr["Comment"] == DBNull.Value ? "" : rdr["Comment"].ToString();
+                    rec.CreationDate = FormatDate(rdr["CreationDate"], DATETIME_FMT);
+                    rec.CreatedBy = rdr["CreatedBy"] == DBNull.Value ? "" : rdr["CreatedBy"].ToString();
+                    rec.LastModificationDate = FormatDate(rdr["LastModificationDate"], DATETIME_FMT);
+                    rec.LastModifiedBy = rdr["LastModifiedBy"] == DBNull.Value ? "" : rdr["LastModifiedBy"].ToString();
+                }
+            }
+        }
+        return rec;
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string CheckDateProject(int Projects_id, int ProjectBillRate_id, string DataDa, string DataA)
+    {
+        if (Session["CurrentSession"] as TRSession == null) return "Sessione scaduta";
+        if (!HasPermission(AUTH_DISPLAY)) return "Operazione non autorizzata";
+
+        DateTime dDa, dA;
+        // formato/obbligatorietà sono segnalati dagli altri validatori e dal Save: qui nulla da controllare
+        if (Projects_id <= 0 || !TryParseDate(DataDa, out dDa) || !TryParseDate(DataA, out dA))
+            return "true";
+
+        using (SqlConnection con = new SqlConnection(ConnString))
+        {
+            con.Open();
+            string overlap = CheckOverlapProject(con, null, Projects_id, ProjectBillRate_id, dDa, dA);
+            if (overlap != null) return overlap;
+            return CheckDateCore(Project, con, null, Projects_id, ProjectBillRate_id, dDa, dA);
+        }
+    }
+
+    // Periodo sovrapposto a un altro periodo dello stesso progetto (escluso il record in modifica).
+    // Ritorna null se non ci sono sovrapposizioni, altrimenti un messaggio breve che indica quale data cambiare.
+    private static string CheckOverlapProject(SqlConnection con, SqlTransaction tx, int projectsId, int id, DateTime dDa, DateTime dA)
+    {
+        string sql =
+            "SELECT TOP 1 DataDa, DataA FROM ProjectBillRate " +
+            "WHERE Projects_id = @Key AND ProjectBillRate_id <> @Id AND DataDa <= @DataA AND DataA >= @DataDa " +
+            "ORDER BY DataDa";
+
+        DateTime eDa, eA;
+        using (SqlCommand cmd = new SqlCommand(sql, con, tx))
+        {
+            cmd.Parameters.Add("@Key", SqlDbType.Int).Value = projectsId;
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+            cmd.Parameters.Add(DateParam("@DataDa", dDa));
+            cmd.Parameters.Add(DateParam("@DataA", dA));
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                if (!rdr.Read()) return null;
+                eDa = (DateTime)rdr["DataDa"];
+                eA = (DateTime)rdr["DataA"];
+            }
+        }
+
+        bool startIn = dDa >= eDa && dDa <= eA;
+        bool endIn = dA >= eDa && dA <= eA;
+
+        // messaggio breve: indica solo quale data cambiare
+        if (startIn && !endIn)
+            return "Periodo sovrapposto, cambiare la data inizio";
+        if (endIn && !startIn)
+            return "Periodo sovrapposto, cambiare la data fine";
+        return "Periodo sovrapposto, cambiare le date";
+    }
+
+    // Periodo proposto in inserimento: inizio = ultima DataA del progetto + 1 giorno (se ci sono periodi) o inizio progetto; fine = fine progetto
+    [WebMethod(EnableSession = true)]
+    public ProjectDatesInfo GetProjectDates(int Projects_id)
+    {
+        ProjectDatesInfo info = new ProjectDatesInfo { Success = false, DataInizio = "", DataFine = "" };
+
+        if (Session["CurrentSession"] as TRSession == null || !HasPermission(AUTH_DISPLAY) || Projects_id <= 0)
+            return info;
+
+        // DataInizio proposta: se il progetto ha già periodi, ultima DataA + 1 giorno; altrimenti inizio del progetto
+        using (SqlConnection con = new SqlConnection(ConnString))
+        using (SqlCommand cmd = new SqlCommand(
+            "SELECT P.DataInizio, P.DataFine, (SELECT MAX(B.DataA) FROM ProjectBillRate AS B WHERE B.Projects_id = P.Projects_id) AS UltimaDataA " +
+            "FROM Projects AS P WHERE P.Projects_id = @Prj", con))
+        {
+            cmd.Parameters.Add("@Prj", SqlDbType.Int).Value = Projects_id;
+            con.Open();
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                if (rdr.Read())
+                {
+                    info.Success = true;
+                    info.DataFine = FormatDate(rdr["DataFine"], DATE_FMT);
+                    info.DataInizio = rdr["UltimaDataA"] == DBNull.Value
+                        ? FormatDate(rdr["DataInizio"], DATE_FMT)
+                        : ((DateTime)rdr["UltimaDataA"]).AddDays(1).ToString(DATE_FMT, CultureInfo.InvariantCulture);
+                }
+            }
+        }
+        return info;
+    }
+
+    [WebMethod(EnableSession = true)]
+    public BillRateSaveResult SaveProjectBillRate(ProjectBillRateRecord rec)
+    {
+        try
+        {
+            TRSession session = Session["CurrentSession"] as TRSession;
+            if (session == null) return Fail("Sessione scaduta");
+            if (!HasPermission(AUTH_UPDATE)) return Fail("Operazione non autorizzata");
+            if (rec == null) return Fail("Dati mancanti");
+
+            if (rec.Projects_id <= 0) return Fail("Progetto obbligatorio");
+
+            // Cost Rate non è gestito da questa maschera: si ignora il valore ricevuto e il dato esistente non viene toccato.
+            // Il Bill Rate è quindi l'unica tariffa e diventa obbligatorio (0 è valido, vuoto no)
+            if (!rec.BillRate.HasValue) return Fail("Bill Rate obbligatorio");
+
+            DateTime dDa, dA;
+            string err = ValidateCommon(rec.DataDa, rec.DataA, rec.BillRate, null, rec.Comment, out dDa, out dA);
+            if (err != null) return Fail(err);
+
+            using (SqlConnection con = new SqlConnection(ConnString))
+            {
+                con.Open();
+                using (SqlTransaction tx = con.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    using (SqlCommand cmd = new SqlCommand("SELECT COUNT(1) FROM Projects WHERE Projects_id = @Prj", con, tx))
+                    {
+                        cmd.Parameters.Add("@Prj", SqlDbType.Int).Value = rec.Projects_id;
+                        if ((int)cmd.ExecuteScalar() == 0) return Fail("Progetto non valido");
+                    }
+
+                    string overlap = CheckOverlapProject(con, tx, rec.Projects_id, rec.ProjectBillRate_id, dDa, dA);
+                    if (overlap != null) return Fail(overlap);
+
+                    string expected = CheckDateCore(Project, con, tx, rec.Projects_id, rec.ProjectBillRate_id, dDa, dA);
+                    if (expected != "true") return Fail("Data inizio dovrebbe essere: " + expected);
+
+                    int id = rec.ProjectBillRate_id;
+
+                    if (id > 0)
+                    {
+                        string sql =
+                            "UPDATE ProjectBillRate SET Projects_id = @Prj, BillRate = @BillRate, " +
+                            "DataDa = @DataDa, DataA = @DataA, Comment = @Comment, " +
+                            "LastModificationDate = @Now, LastModifiedBy = @User " +
+                            "WHERE ProjectBillRate_id = @Id";
+                        using (SqlCommand cmd = new SqlCommand(sql, con, tx))
+                        {
+                            cmd.Parameters.Add("@Prj", SqlDbType.Int).Value = rec.Projects_id;
+                            cmd.Parameters.Add(AmountParam("@BillRate", rec.BillRate));
+                            cmd.Parameters.Add(DateParam("@DataDa", dDa));
+                            cmd.Parameters.Add(DateParam("@DataA", dA));
+                            cmd.Parameters.Add(StringParam("@Comment", rec.Comment, COMMENT_MAX));
+                            cmd.Parameters.Add(DateParam("@Now", DateTime.Now));
+                            cmd.Parameters.Add(StringParam("@User", session.UserId, 50));
+                            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+                            if (cmd.ExecuteNonQuery() == 0) return Fail("Record non trovato");
+                        }
+                    }
+                    else
+                    {
+                        string sql =
+                            "INSERT INTO ProjectBillRate (Projects_id, BillRate, DataDa, DataA, Comment, CreationDate, CreatedBy) " +
+                            "OUTPUT INSERTED.ProjectBillRate_id " +
+                            "VALUES (@Prj, @BillRate, @DataDa, @DataA, @Comment, @Now, @User)";
+                        using (SqlCommand cmd = new SqlCommand(sql, con, tx))
+                        {
+                            cmd.Parameters.Add("@Prj", SqlDbType.Int).Value = rec.Projects_id;
+                            cmd.Parameters.Add(AmountParam("@BillRate", rec.BillRate));
+                            cmd.Parameters.Add(DateParam("@DataDa", dDa));
+                            cmd.Parameters.Add(DateParam("@DataA", dA));
+                            cmd.Parameters.Add(StringParam("@Comment", rec.Comment, COMMENT_MAX));
+                            cmd.Parameters.Add(DateParam("@Now", DateTime.Now));
+                            cmd.Parameters.Add(StringParam("@User", session.UserId, 50));
+                            id = (int)cmd.ExecuteScalar();
+                        }
+                    }
+
+                    tx.Commit();
+                    return new BillRateSaveResult { Success = true, Message = "", Id = id };
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return Fail("Errore durante il salvataggio");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public BillRateSaveResult DeleteProjectBillRate(int id)
+    {
+        return DeleteCore(Project, id);
     }
 }

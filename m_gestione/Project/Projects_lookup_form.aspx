@@ -111,6 +111,7 @@
                                             data-parsley-check-chargeable="true"
                                             data-parsley-errors-container="#valMsg"
                                             data-parsley-required="true"
+                                            Enabled="False"
                                             AppendDataBoundItems="True">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
@@ -248,7 +249,7 @@
                                     <!-- *** SUB LOB ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Sub LOB:</div>
-                                        <asp:DropDownList ID="DDLSUBLOB" runat="server" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
+                                        <asp:DropDownList ID="DDLSUBLOB" runat="server" Enabled="False" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
                                     </div>
@@ -256,7 +257,7 @@
                                     <!-- *** OFFERING ***  -->
                                     <div class="input nobottomborder">
                                         <div class="inputtext">Offering:</div>
-                                        <asp:DropDownList ID="DDLOFFERING" runat="server" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
+                                        <asp:DropDownList ID="DDLOFFERING" runat="server" Enabled="False" data-parsley-check-chargeable="true" data-parsley-errors-container="#valMsg" data-parsley-validate-if-empty="true" Style="width: calc(100% - 140px);" AppendDataBoundItems="True">
                                             <asp:ListItem Value="" Text="Selezionare un valore" />
                                         </asp:DropDownList>
                                     </div>
@@ -1777,10 +1778,6 @@
             if (isEditMode === true) {
                 // Blocca DDLTipoProgetto dopo selezione (solo in modifica)
                 ddlTipoProgetto.prop('disabled', true);
-                
-                // Rendi readonly Revenue e Costi nel tab Budget (solo in modifica)
-                tbRevenueBudget.prop('readonly', true);
-                tbSpeseBudget.prop('readonly', true);
             }
             
             // NOTA: La visibilità del pulsante Rinnova è gestita lato server
