@@ -70,7 +70,6 @@
                                     <li><a href="#tabs-2">Budget</a></li>
                                     <li><a href="#tabs-4">Altri dati</a></li>
                                     <li style="display:none"><a href="#tabs-5">Monthly fee</a></li>
-                                    <li id="tabStoricoLink"><a href="#tabs-6">Storico</a></li>
                                 </ul>
 
                                 <div id="tabs-1" style="height: 460px; width: 100%">
@@ -470,28 +469,6 @@
                                    
                                 </div>
                                 <!-- *** TAB 5 ***  -->
-
-                                <!-- *** TAB 6 - STORICO ***  -->
-                                <div id="tabs-6" style="height: 460px; width: 100%;">
-                                    <h4 style="margin-bottom: 15px;">Storico Periodi Precedenti</h4>
-                                    <asp:GridView ID="GridViewStorico" runat="server" 
-                                        CssClass="GridView" 
-                                        AutoGenerateColumns="False"
-                                        GridLines="None"
-                                        Width="100%"
-                                        ShowHeader="true">
-                                        <HeaderStyle CssClass="GV_header" />
-                                        <RowStyle CssClass="GV_row" />
-                                        <AlternatingRowStyle CssClass="GV_row_alt" />
-                                        <Columns>
-                                            <asp:BoundField DataField="Periodo" HeaderText="Periodo" />
-                                            <asp:BoundField DataField="Revenue" HeaderText="Revenue (€)" DataFormatString="{0:N2}" ItemStyle-HorizontalAlign="Right" />
-                                            <asp:BoundField DataField="Cost" HeaderText="Cost (€)" DataFormatString="{0:N2}" ItemStyle-HorizontalAlign="Right" />
-                                            <asp:BoundField DataField="Margine" HeaderText="Margine (%)" ItemStyle-HorizontalAlign="Right" />
-                                        </Columns>
-                                    </asp:GridView>
-                                </div>
-                                <!-- *** TAB 6 ***  -->
 
                             </div>
                             <!-- *** TABS ***  -->
