@@ -160,7 +160,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
         // la nota è obbligatoria alla variazione del budget (valori originali per il controllo lato client)
         if (FVProgetto.CurrentMode == FormViewMode.Edit && dataRow != null)
         {
-            bool chargeable = IsChargeable(dataRow["ProjectType_Id"]);
+            bool chargeable = IsBudgetRuleType(dataRow["ProjectType_Id"]);
             EnableBudgetFields(chargeable);
 
             TextBox tbNota = FVProgetto.FindControl("TBNoteBudget") as TextBox;
@@ -443,6 +443,15 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             && projectTypeId.ToString() == chargeable;
     }
 
+    // Regola budget (Revenue, Margine, nota): vale per i progetti Chargeable e Resale
+    private static bool IsBudgetRuleType(object projectTypeId)
+    {
+        if (IsChargeable(projectTypeId)) return true;
+        string resale = ConfigurationManager.AppSettings["PROGETTO_RESALE"];
+        return projectTypeId != null && projectTypeId != DBNull.Value && !string.IsNullOrEmpty(resale)
+            && projectTypeId.ToString() == resale;
+    }
+
     private static decimal? ToNullableDecimal(object o)
     {
         if (o == null || o == DBNull.Value) return null;
@@ -462,7 +471,7 @@ public partial class m_gestione_Project_Projects_lookup_form : System.Web.UI.Pag
             {
                 if (!r.Read()) return null;
                 BudgetSnapshot s = new BudgetSnapshot();
-                s.Chargeable = IsChargeable(r["ProjectType_Id"]);
+                s.Chargeable = IsBudgetRuleType(r["ProjectType_Id"]);
                 s.Revenue = ToNullableDecimal(r["RevenueBudget"]);
                 s.Margine = ToNullableDecimal(r["MargineProposta"]);
                 s.MargineEtc = ToNullableDecimal(r["Margine_etc"]);
