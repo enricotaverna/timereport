@@ -187,10 +187,10 @@
     <value>Competenza</value>
   </data>
   <data name="LBCBCreditCardResource1.Text" xml:space="preserve">
-    <value>C.Cred. Azienda</value>
+    <value>Carta Credito Nexi</value>
   </data>
   <data name="LBCBCreditCardResource2.Text" xml:space="preserve">
-    <value>C.Cred. Azienda</value>
+    <value>Carta Credito Nexi</value>
   </data>
   <data name="LbCommentResource1.Text" xml:space="preserve">
     <value>Nota</value>
