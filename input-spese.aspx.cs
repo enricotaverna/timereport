@@ -57,8 +57,10 @@ public partial class input_spese : System.Web.UI.Page
             // verifica se TR della persona è chiuso
             var trChiuso = Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND stato=1 AND mese=" + dateRecord.Month.ToString() + " AND anno=" + dateRecord.Year.ToString());
 
+            bool readOnly = false;
+
             if (dateRecord < CurrentSession.dCutoffDate || trChiuso || lTipoBonus_id > 0)
-                FVSpese.ChangeMode(FormViewMode.ReadOnly);
+                FVSpese.ChangeMode(FormViewMode.ReadOnly); 
             else
                 FVSpese.ChangeMode(FormViewMode.Edit);
 
@@ -99,10 +101,12 @@ public partial class input_spese : System.Web.UI.Page
 
         // rende visibile il box
         BoxRicevute.Visible = true;
+        bool readOnly = false;
 
         // se display rende non visibile il bottone
         if (FVSpese.CurrentMode == FormViewMode.ReadOnly)
             divBottoni.Visible = false;
+            readOnly = true;
 
         // restituisce array con nome dei file o null se non si sono ricevute
         string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), CurrentSession.UserName, lDataSpesa);
@@ -144,9 +148,14 @@ public partial class input_spese : System.Web.UI.Page
             cell2.Width = "40px";
             row.Cells.Add(cell2);
 
-            cell3.InnerHtml = "<a href='#' onclick='cancella_ricevuta(\"" + stFile + "\");'><img height=20 src='/timereport/images/icons/other/empty_trash-50.png' /></a>";
-            cell3.Width = "40px";
-            row.Cells.Add(cell3);
+            /* Richiesta del 26-11-2026 da parte dell'amministrazione specifica ID 18 */
+            // se non è in display aggiunge il tasto cancella            
+            if (readOnly == false)
+            {
+                cell3.InnerHtml = "<a href='#' onclick='cancella_ricevuta(\"" + stFile + "\");'><img height=20 src='/timereport/images/icons/other/empty_trash-50.png' /></a>";
+                cell3.Width = "40px";
+                row.Cells.Add(cell3);
+            }
 
             TabellaRicevute.Rows.Add(row);
 
