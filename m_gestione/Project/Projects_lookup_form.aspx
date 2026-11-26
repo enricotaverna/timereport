@@ -212,8 +212,12 @@
                                         <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
-                                            <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
+                                            <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calc. ricavi"></asp:Label>
+                                            <!-- *** CHECKBOX NO OVERTIME ***  -->
+                                            <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
+                                            <asp:Label style="margin: inherit;" AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
                                         </span>
+
                                         </asp:PlaceHolder>
                                     </asp:Panel>
 
@@ -300,13 +304,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext"></div>
-                                        <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
-
-                                    </div>
-
                                     <!-- *** IMPORTO SPESE ***  ----- VIENE SOSTITUITO DA Platform
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
@@ -356,11 +353,9 @@
                                         <div class="inputtext">&nbsp;</div>
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
-
-                                        <br />
-                                        <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
-                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+                                                                                
+                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label Visible="false" AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
 
@@ -613,7 +608,10 @@
                                         <asp:PlaceHolder ID="PHCalcoloRicavi" runat="server">
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="CBCalcoloRicavi" runat="server" />
-                                            <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
+                                            <asp:Label AssociatedControlID="CBCalcoloRicavi" class="css-label" runat="server" Text="Calc. ricavi"></asp:Label>
+                                            <!-- *** CHECKBOX NO OVERTIME ***  -->
+                                            <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
+                                            <asp:Label style="margin: inherit;" AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>                                        
                                         </span>
                                         </asp:PlaceHolder>
                                     </asp:Panel>
@@ -700,13 +698,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext"></div>
-                                        <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
-
-                                    </div>
-
                                     <!-- *** IMPORTO SPESE ***  ----- VIENE SOSTITUITO DA Platform
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
@@ -756,10 +747,8 @@
                                         <asp:CheckBox ID="BloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="BloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
-                                        <br />
-                                        <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
-                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label Visible="false" AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
 
@@ -934,6 +923,9 @@
                                         <span style="display: inline-block; margin-left: 15px;">
                                             <asp:CheckBox ID="DisCalcoloRicaviCheckBox" runat="server" />
                                             <asp:Label AssociatedControlID="DisCalcoloRicaviCheckBox" class="css-label" runat="server" Text="Calcolo ricavi"></asp:Label>
+                                            <!-- *** CHECKBOX NO OVERTIME ***  -->
+                                            <asp:CheckBox ID="CheckBox1" runat="server" Checked='<%#Bind("NoOvertime") %>' />
+                                            <asp:Label style="margin: inherit;" AssociatedControlID="CBNoOvertime" class="css-label" ID="Label10" runat="server" Text="No Overtime"></asp:Label>                                        
                                         </span>
                                         </asp:PlaceHolder>
                                     </asp:Panel>
@@ -1020,13 +1012,6 @@
                                         </asp:DropDownList>
                                     </div>
 
-                                    <div class="input nobottomborder">
-                                        <div class="inputtext"></div>
-                                        <asp:CheckBox ID="CBNoOvertime" runat="server" Checked='<%#Bind("NoOvertime") %>' Enabled="False" />
-                                        <asp:Label AssociatedControlID="CBNoOvertime" class="css-label" ID="lblCBNoOvertime" runat="server" Text="No Overtime"></asp:Label>
-
-                                    </div>
-
                                     <!-- *** IMPORTO SPESE ***  ----- VIENE SOSTITUITO DA Platform
                                     <div class="input nobottomborder">
                                         <div id="lbSpeseBudgetTextBox" class="inputtext">Spese: </div>
@@ -1093,10 +1078,8 @@
                                         <asp:CheckBox ID="DisBloccoCaricoSpeseCheckBox" runat="server" Checked='<%#Bind("BloccoCaricoSpese") %>' />
                                         <asp:Label AssociatedControlID="DisBloccoCaricoSpeseCheckBox" class="css-label" ID="Label6" runat="server" Text="Blocco carico spese"></asp:Label>
 
-                                        <br />
-                                        <div class="inputtext">&nbsp;</div>
-                                        <asp:CheckBox ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
-                                        <asp:Label AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
+                                        <asp:CheckBox Visible="false" ID="RecurringPrj" runat="server" Checked='<%#Bind("RecurringProject") %>' />
+                                        <asp:Label Visible="false" AssociatedControlID="RecurringPrj" class="css-label" ID="Label9" runat="server" Text="Recurring Project" Style="padding-right: 40px"></asp:Label>
 
                                     </div>
 
