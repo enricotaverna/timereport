@@ -57,8 +57,6 @@ public partial class input_spese : System.Web.UI.Page
             // verifica se TR della persona è chiuso
             var trChiuso = Database.RecordEsiste("SELECT * FROM logtr WHERE persons_id=" + CurrentSession.Persons_id + " AND stato=1 AND mese=" + dateRecord.Month.ToString() + " AND anno=" + dateRecord.Year.ToString());
 
-            bool readOnly = false;
-
             if (dateRecord < CurrentSession.dCutoffDate || trChiuso || lTipoBonus_id > 0)
                 FVSpese.ChangeMode(FormViewMode.ReadOnly); 
             else
@@ -104,9 +102,10 @@ public partial class input_spese : System.Web.UI.Page
         bool readOnly = false;
 
         // se display rende non visibile il bottone
-        if (FVSpese.CurrentMode == FormViewMode.ReadOnly)
+        if (FVSpese.CurrentMode == FormViewMode.ReadOnly) { 
             divBottoni.Visible = false;
             readOnly = true;
+        }
 
         // restituisce array con nome dei file o null se non si sono ricevute
         string[] filePaths = TrovaRicevuteLocale(Convert.ToInt32(strExpenses_Id), CurrentSession.UserName, lDataSpesa);
